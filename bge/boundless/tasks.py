@@ -13,7 +13,7 @@ logger = get_task_logger(__name__)
 
 @app.task
 def update_prices():
-    items = Item.objects.all()
+    items = Item.objects.filter(active=True)
     client = BoundlessClient()
 
     logger.info("Updating the prices for %s", len(items))

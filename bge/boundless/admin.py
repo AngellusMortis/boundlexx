@@ -9,7 +9,7 @@ from bge.boundless.models import (
 
 @admin.register(Item)
 class ItemAdmin(admin.ModelAdmin):
-    list_display = ("gui_name", "id", "name")
+    list_display = ("gui_name", "id", "name", "active")
     search_fields = ("id", "name", "gui_name")
 
 
