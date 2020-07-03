@@ -1,5 +1,7 @@
-import djclick as click
 import json
+
+import djclick as click
+
 from bge.boundless.models import Item
 
 

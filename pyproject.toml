@@ -14,7 +14,7 @@ exclude = '''
     | buck-out
     | build
     | dist
-    | microsoft_auth/_version.py
+    | .*migrations.*
     | versioneer.py
   )
 )
