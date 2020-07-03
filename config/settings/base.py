@@ -97,6 +97,7 @@ THIRD_PARTY_APPS = [
 LOCAL_APPS = [
     "bge.users.apps.UsersConfig",
     "bge.celery",
+    "bge.boundless",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -249,7 +250,7 @@ EMAIL_TIMEOUT = 5
 # ADMIN
 # ------------------------------------------------------------------------------
 # Django Admin URL.
-ADMIN_URL = ""
+ADMIN_URL = "admin/"
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
 ADMINS = [("admin", "test@example.com")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers

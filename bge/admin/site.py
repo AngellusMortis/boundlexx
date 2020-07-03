@@ -2,7 +2,6 @@ from copy import deepcopy
 
 from django.contrib.admin.sites import AdminSite
 from django.db.models.base import ModelBase
-from django.urls import path
 
 
 class BGEAdminSite(AdminSite):
@@ -20,10 +19,3 @@ class BGEAdminSite(AdminSite):
                 to_register.append(model)
 
         return super().register(to_register, admin_class, **options)
-
-    def get_urls(self):
-        urls = super().get_urls()
-
-        bge_urls = []
-
-        return bge_urls + urls

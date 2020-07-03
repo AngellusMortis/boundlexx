@@ -23,7 +23,7 @@ class BGEMenu(Menu):
             items.Bookmarks(),
             items.AppList(
                 _("Data"),
-                exclude=("django.contrib.*", "bge.users.*", "allauth.*",),
+                exclude=("django.contrib.*", "bge.users.*", "allauth.*"),
             ),
             items.AppList(
                 _("Administration"),
