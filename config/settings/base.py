@@ -309,11 +309,6 @@ ACCOUNT_EMAIL_REQUIRED = False
 # https://django-allauth.readthedocs.io/en/latest/configuration.html
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
-SOCIALACCOUNT_PROVIDERS = {
-    "openid": {"SERVERS": []},
-    "steam": {"APP": {"secret": env("STEAM_API_KEY")}},
-}
-
 SOCIALACCOUNT_STORE_TOKENS = False
 
 # django-compressor
@@ -387,3 +382,8 @@ CODEMIRROR_BUNDLE_JS_OPTIONS = {
     "filters": "yui_js",
     "output": "js/dcm-{settings_name}.min.js",
 }
+
+
+BOUNDLESS_API_URL_BASE = env(
+    "BOUNDLESS_API_URL_BASE", default="http://127.0.0.1:8950"
+)
