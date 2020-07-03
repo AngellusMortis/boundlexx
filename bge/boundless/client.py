@@ -16,7 +16,7 @@ class Location:
     z: int
 
     def __str__(self):
-        return f"({self.x}, {self.z}) Alt: {self.z}"
+        return f"({self.x}, {self.z}) Alt: {self.y}"
 
 
 @dataclass
