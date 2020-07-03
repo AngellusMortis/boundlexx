@@ -8,6 +8,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("admin_tools/", include("admin_tools.urls")),
     path("accounts/", include("allauth.urls")),
+    path("users/", include("bge.users.urls", namespace="users")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
@@ -31,7 +32,6 @@ if settings.DEBUG:
             kwargs={"exception": Exception("Page not Found")},
         ),
         path("500/", default_views.server_error),
-        path("users/", include("bge.users.urls", namespace="users")),
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
