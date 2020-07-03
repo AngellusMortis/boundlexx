@@ -88,8 +88,6 @@ THIRD_PARTY_APPS = [
     "allauth",
     "allauth.account",
     "allauth.socialaccount",
-    "allauth.socialaccount.providers.discord",
-    "allauth.socialaccount.providers.github",
     "django_celery_beat",
     "django_celery_results",
     "djangocodemirror",
@@ -253,7 +251,7 @@ EMAIL_TIMEOUT = 5
 # Django Admin URL.
 ADMIN_URL = ""
 # https://docs.djangoproject.com/en/dev/ref/settings/#admins
-ADMINS = [("""arkutils""", "arkutils@example.com")]
+ADMINS = [("admin", "test@example.com")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
 
@@ -311,18 +309,8 @@ ACCOUNT_EMAIL_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
 
 SOCIALACCOUNT_PROVIDERS = {
-    "discord": {
-        "APP": {
-            "client_id": env("DISCORD_CLIENT_ID"),
-            "secret": env("DISCORD_CLIENT_SECRET"),
-        }
-    },
-    "github": {
-        "APP": {
-            "client_id": env("GITHUB_CLIENT_ID"),
-            "secret": env("GITHUB_CLIENT_SECRET"),
-        }
-    },
+    "openid": {"SERVERS": []},
+    "steam": {"APP": {"secret": env("STEAM_API_KEY")}},
 }
 
 SOCIALACCOUNT_STORE_TOKENS = False

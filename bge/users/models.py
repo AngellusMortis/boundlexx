@@ -13,4 +13,4 @@ class User(AbstractUser):
         return reverse("users:detail", kwargs={"username": self.username})
 
 
-User.admin_app_label = "auth"  # type: ignore
+# User.admin_app_label = "auth"  # type: ignore

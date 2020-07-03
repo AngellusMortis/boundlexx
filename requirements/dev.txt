@@ -84,7 +84,7 @@ pillow==7.1.2             # via -r requirements/in/base.in
 pip-tools==5.1.2          # via -r requirements/in/dev.in
 pluggy==0.13.1            # via pytest
 prompt-toolkit==3.0.5     # via ipython
-# psycopg2==2.8.5           # via -r requirements/in/base.in
+psycopg2==2.8.5           # via -r requirements/in/base.in
 ptvsd==4.3.2              # via -r requirements/in/dev.in
 ptyprocess==0.6.0         # via pexpect
 py==1.8.1                 # via pytest

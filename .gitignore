@@ -1,5 +1,6 @@
 .vscode/setting.json
 docker-compose.override.yml
+.env.local
 
 ### Python template
 # Byte-compiled / optimized / DLL files

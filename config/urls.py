@@ -33,6 +33,7 @@ if settings.DEBUG:
             kwargs={"exception": Exception("Page not Found")},
         ),
         path("500/", default_views.server_error),
+        path("users/", include("bge.users.urls", namespace="users")),
     ]
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
@@ -40,9 +41,3 @@ if settings.DEBUG:
         urlpatterns = [
             path("__debug__/", include(debug_toolbar.urls))
         ] + urlpatterns
-
-# only add /users for tests as the main site is not using it yet
-if os.environ.get("DJANGO_SETTINGS_MODULE") == "config.settings.test":
-    urlpatterns += [
-        path("users/", include("bge.users.urls", namespace="users"))
-    ]

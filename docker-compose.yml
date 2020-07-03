@@ -13,6 +13,7 @@ services:
     image: bge_dev_django
     depends_on:
       - postgres
+      - redis
     volumes:
       - .:/app
     env_file:

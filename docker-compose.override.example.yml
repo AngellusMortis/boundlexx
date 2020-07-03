@@ -1,1 +1,30 @@
 version: '3.4'
+
+services:
+    django: &django
+      # enable .env.local file
+      env_file:
+        - ./.env
+        - ./.env.local
+
+    manage:
+      <<: *django
+
+    test:
+      <<: *django
+
+    lint:
+      <<: *django
+
+    format:
+      <<: *django
+
+    celery:
+      <<: *django
+
+    celerybeat:
+      <<: *django
+
+
+    flower:
+      <<: *django
