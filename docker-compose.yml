@@ -1,0 +1,92 @@
+version: '3.4'
+
+volumes:
+  local_postgres_data: {}
+  local_postgres_data_backups: {}
+
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: ./docker/django/Dockerfile
+      target: dev
+    image: bge_dev_django
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    env_file:
+      - ./.env
+    ports:
+      - "8000:8000"
+    command: /start
+
+  manage:
+    <<: *django
+    environment:
+      - DJANGO_MANAGE=1
+    command: ""
+    ports: []
+
+  test:
+    <<: *django
+    environment:
+      - PYTEST=1
+    command: ""
+    ports: []
+
+  lint:
+    <<: *django
+    depends_on: []
+    entrypoint: /bin/bash
+    command: -c "cd /app && black . --check && flake8 . && isort && mypy . && bandit ."
+    ports: []
+
+  format:
+    <<: *django
+    depends_on: []
+    entrypoint: /bin/bash
+    command: -c "/usr/local/bin/black --config /app/pyproject.toml /app/"
+    ports: []
+
+  postgres:
+    build:
+      context: .
+      dockerfile: ./docker/postgres/Dockerfile
+    image: bge_postgres
+    volumes:
+      - local_postgres_data:/var/lib/postgresql/data
+      - local_postgres_data_backups:/backups
+    env_file:
+      - ./.env
+
+  redis:
+    image: redis:5.0
+    command: redis-server --appendonly yes
+
+  celery:
+    <<: *django
+    image: bge_dev_celeryworker
+    depends_on:
+      - redis
+      - postgres
+
+    ports: []
+    command: /start-celeryworker
+
+  celerybeat:
+    <<: *django
+    image: bge_dev_celerybeat
+    depends_on:
+      - redis
+      - postgres
+
+    ports: []
+    command: /start-celerybeat
+
+  flower:
+    <<: *django
+    image: bge_dev_flower
+    ports:
+      - "5555:5555"
+    command: /start-flower

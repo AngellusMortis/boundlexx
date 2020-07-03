@@ -1,0 +1,32 @@
+# linters/formaters
+bandit
+black
+django-stubs
+flake8
+flake8-bugbear
+flake8-builtins
+flake8-commas
+flake8-comprehensions
+flake8-isort
+mypy
+pylint-celery
+pylint-django
+
+# debugging
+django-debug-toolbar
+ipdb
+ptvsd
+werkzeug
+
+# testing
+django-coverage-plugin
+django-extensions
+factory-boy
+pytest-django
+pytest<6,!=5.4.0,!=5.4.1
+pytest-sugar
+pytest-cov
+pytest-dotenv
+
+sphinx
+pip-tools

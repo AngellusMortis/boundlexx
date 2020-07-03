@@ -1,0 +1,37 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "BGE: Update Requirements",
+            "type": "shell",
+            "command": "pip-compile requirements/in/base.in requirements/in/dev.in -o requirements/dev.txt --upgrade && pip-compile requirements/in/base.in requirements/in/production.in -o requirements/production.txt --upgrade",
+            "problemMatcher": []
+        },
+        {
+            "label": "BGE: Migrate Database",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env && python manage.py migrate",
+            "problemMatcher": []
+        },
+        {
+            "label": "BGE: Make Migrations",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env && python manage.py makemigrations",
+            "problemMatcher": []
+        },
+        {
+            "label": "BGE: Django Shell",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env && python manage.py shell_plus",
+            "problemMatcher": []
+        },
+        {
+            "label": "BGE: Make Superuser",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env && python manage.py makesuperuser",
+            "problemMatcher": []
+        },
+    ]
+}

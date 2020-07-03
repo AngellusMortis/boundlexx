@@ -1,0 +1,27 @@
+# Django
+argon2-cffi
+click<7.1
+django-admin-tools
+django-allauth
+django-celery-results
+django-click
+django-compressor
+django-crispy-forms
+django-environ
+django-model-utils
+django-redis
+django-redis
+django-reversion
+django<3.1
+djangocodemirror
+python-redis-lock[django]
+whitenoise
+
+# Celery
+celery<5
+django-celery-beat
+flower
+
+pillow
+psycopg2 --no-binary psycopg2
+python-slugify

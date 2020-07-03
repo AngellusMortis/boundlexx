@@ -1,0 +1,14 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+
+python manage.py migrate
+
+# handle Python syntax errors during development
+while true; do
+    python manage.py runserver_plus 0.0.0.0:8000
+    sleep 5
+done

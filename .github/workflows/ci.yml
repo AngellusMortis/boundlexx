@@ -1,0 +1,115 @@
+name: BGE Build
+
+on:
+  push:
+    # Publish `master` as Docker `latest` image.
+    branches:
+      - master
+
+    # Publish `v1.2.3` tags as releases.
+    tags:
+      - v*
+
+  # Run tests for any PRs.
+  pull_request:
+
+jobs:
+  # Run tests.
+  # See also https://docs.docker.com/docker-hub/builds/automated-testing/
+  test:
+    name: Test and Lint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Log into Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Pull Cached Postgres Images
+        run: docker pull docker.pkg.github.com/AngellusMortis/bge/build-cache-postgres || true
+
+      - name: Pull Cached Django Images
+        run: docker pull docker.pkg.github.com/AngellusMortis/bge/build-cache-django || true
+
+      - name: Build CI Images
+        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --build-arg DJANGO_UID=$(id -u) postgres test lint
+
+      - name: Push Postgres Image Cache
+        run: docker tag bge_postgres docker.pkg.github.com/AngellusMortis/bge/build-cache-postgres && docker push docker.pkg.github.com/arkutils/bge/build-cache-postgres || true
+
+      - name: Push Django Image Cache
+        run: docker tag bge_dev_django docker.pkg.github.com/AngellusMortis/bge/build-cache-django && docker push docker.pkg.github.com/arkutils/bge/build-cache-django || true
+
+      - name: Run Linters
+        run: docker-compose run --rm lint
+
+      - name: Run Tests
+        run: docker-compose run --rm test
+
+  # Push image to GitHub Packages.
+  # See also https://docs.docker.com/docker-hub/builds/
+  push:
+    name: Build Production and Push
+    needs: test
+
+    runs-on: ubuntu-latest
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Build Postgres Image
+        run: docker build -t bge_postgres -f docker/postgres/Dockerfile .
+
+      - name: Build Django Image
+        run: docker build -t bge_django --target production -f docker/django/Dockerfile .
+
+      - name: Log into Registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+
+      - name: Push Postgres Image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/bge_postgres
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag bge_postgres $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
+
+      - name: Push Django Image
+        run: |
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/bge_django
+
+          # Change all uppercase to lowercase
+          IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
+
+          # Strip git ref prefix from version
+          VERSION=$(echo "${{ github.ref }}" | sed -e 's,.*/\(.*\),\1,')
+
+          # Strip "v" prefix from tag name
+          [[ "${{ github.ref }}" == "refs/tags/"* ]] && VERSION=$(echo $VERSION | sed -e 's/^v//')
+
+          # Use Docker `latest` tag convention
+          [ "$VERSION" == "master" ] && VERSION=latest
+
+          echo IMAGE_ID=$IMAGE_ID
+          echo VERSION=$VERSION
+
+          docker tag bge_django $IMAGE_ID:$VERSION
+          docker push $IMAGE_ID:$VERSION
