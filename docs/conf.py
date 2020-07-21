@@ -23,7 +23,7 @@ from typing import List
 # -- Project information -----------------------------------------------------
 
 project = "BGE"
-copyright = """2020, arkutils"""
+copyright = """2020, bge"""
 author = "AngellusMorits"
 
 

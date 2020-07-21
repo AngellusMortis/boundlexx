@@ -19,11 +19,12 @@ ptvsd
 werkzeug
 
 # testing
+coverage[toml]
 django-coverage-plugin
 django-extensions
 factory-boy
 pytest-django
-pytest<6,!=5.4.0,!=5.4.1
+pytest==6.0.0rc1
 pytest-sugar
 pytest-cov
 pytest-dotenv

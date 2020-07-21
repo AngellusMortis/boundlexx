@@ -14,8 +14,8 @@ class TestUserCreationForm:
         form = UserCreationForm(
             {
                 "username": proto_user.username,
-                "password1": proto_user._password,
-                "password2": proto_user._password,
+                "password1": proto_user._password,  # pylint: disable=protected-access # noqa E501
+                "password2": proto_user._password,  # pylint: disable=protected-access # noqa E501
             }
         )
 
@@ -30,8 +30,8 @@ class TestUserCreationForm:
         form = UserCreationForm(
             {
                 "username": proto_user.username,
-                "password1": proto_user._password,
-                "password2": proto_user._password,
+                "password1": proto_user._password,  # pylint: disable=protected-access # noqa E501
+                "password2": proto_user._password,  # pylint: disable=protected-access # noqa E501
             }
         )
 

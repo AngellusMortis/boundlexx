@@ -1,5 +1,7 @@
+from typing import Sequence, Type
+
 from django.contrib import admin
-from typing import List
+from django.contrib.admin.options import InlineModelAdmin
 
 from bge.boundless.models import (
     Color,
@@ -57,7 +59,7 @@ class GameObjAdmin(admin.ModelAdmin):
     search_fields = ["game_id", "localizedname"]
     readonly_fields = ["game_id"]
 
-    inlines = [LocalizationInline]
+    inlines: Sequence[Type[InlineModelAdmin]] = [LocalizationInline]
 
     def has_delete_permission(self, request, obj=None):
         return False
@@ -81,7 +83,7 @@ class MetalAdmin(GameObjAdmin):
 @admin.register(Item)
 class ItemAdmin(GameObjAdmin):
     raw_id_fields = ["item_subtitle"]
-    inlines: List[admin.ModelAdmin] = [
+    inlines = [
         ItemRequestBasketPriceInline,
         ItemShopStandPriceInline,
     ]

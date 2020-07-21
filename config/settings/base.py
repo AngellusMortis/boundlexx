@@ -359,7 +359,7 @@ CODEMIRROR_MODES = {
 
 # HTML element to load a Javascript asset
 CODEMIRROR_JS_ASSET_TAG = (
-    u'<script type="text/javascript" ' 'src="{url}"></script>'
+    u'<script type="text/javascript" src="{url}"></script>'
 )
 
 # HTML element to load a CSS asset

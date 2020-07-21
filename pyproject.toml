@@ -19,3 +19,75 @@ exclude = '''
   )
 )
 '''
+
+[tool.coverage.run]
+include = [
+  'bge/*',
+]
+omit = [
+  '*migrations*',
+  '*tests*',
+]
+plugins = [
+  'django_coverage_plugin',
+]
+
+
+[tool.isort]
+line_length = 79
+multi_line_output = 3
+include_trailing_comma = true
+sections = [
+  "FUTURE",
+  "STDLIB",
+  "THIRDPARTY",
+  "FIRSTPARTY",
+  "LOCALFOLDER",
+]
+skip = [
+  ".tox",
+  ".git",
+  "*/migrations/*",
+  "*/static/CACHE/*",
+  "docs",
+  "node_modules",
+]
+
+[tool.pylint.master]
+load-plugins = [
+  'pylint_django',
+  'pylint_celery'
+]
+
+[tool.pylint.format]
+max-line = 80
+
+[tool.pylint.messages_control]
+disable = [
+  'too-few-public-methods',
+  'no-self-use',
+  'missing-docstring',
+  'invalid-name',
+  'bad-continuation',
+  'line-too-long',
+  'unused-argument',
+]
+
+[tool.pylint.design]
+max-parents = 13
+
+[tool.pylint.typecheck]
+generated-members = [
+  'REQUEST',
+  'acl_users',
+  'aq_parent',
+  '[a-zA-Z]+_set{1,2}',
+  'save',
+  'delete',
+]
+
+[tool.pytest.ini_options]
+addopts = "--ds=config.settings.test --reuse-db --cov-report xml --cov-report term:skip-covered --cov=bge"
+python_files = "tests.py test_*.py"
+env_override_existing_values = 1
+env_files= '.test.env'

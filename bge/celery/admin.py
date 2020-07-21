@@ -84,8 +84,6 @@ class TaskResultAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if ALLOW_EDITS:
             return self.readonly_fields
-        else:
-            local_fields = list(
-                {field.name for field in self.opts.local_fields}
-            )
-            return local_fields + ["task_output"]
+
+        local_fields = list({field.name for field in self.opts.local_fields})
+        return local_fields + ["task_output"]

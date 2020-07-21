@@ -4,7 +4,11 @@ from typing import Dict, List
 
 import djclick as click
 
-from bge.boundless.models import Color, Item, Metal, Subtitle, LocalizedName
+from bge.boundless.models import Color, Item, LocalizedName, Metal, Subtitle
+
+# Adapted from
+# https://gist.github.com/mayumi7/ca9e58a21459ccc76ee09873cff5000f
+# https://forum.playboundless.com/t/documentation-of-itemcolorstrings-dat-structure/45708
 
 LanguagePointer = namedtuple(
     "LanguagePointer", ("name", "start_index", "end_index")
