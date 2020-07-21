@@ -27,17 +27,16 @@ class LocalizationInline(admin.TabularInline):
 class ItemPriceInline(admin.TabularInline):
     fk_name = "item"
     readonly_fields = [
-        "beacon_name",
-        "guild_tag",
+        "time",
         "world",
-        "shop_activity",
         "location_x",
         "location_y",
         "location_z",
-        "last_updated",
-        "item_count",
         "price",
-        "world",
+        "item_count",
+        "beacon_name",
+        "guild_tag",
+        "shop_activity",
     ]
     can_delete = False
     max_num = 0
@@ -84,6 +83,7 @@ class MetalAdmin(GameObjAdmin):
 class ItemAdmin(GameObjAdmin):
     raw_id_fields = ["item_subtitle"]
     inlines = [
+        LocalizationInline,
         ItemRequestBasketPriceInline,
         ItemShopStandPriceInline,
     ]
@@ -94,24 +94,23 @@ class ItemPriceAdmin(admin.ModelAdmin):
     list_display = [
         "item",
         "item_count",
-        "price",
         "world",
-        "beacon_name",
         "location",
+        "price",
+        "beacon_name",
         "active",
     ]
     readonly_fields = [
-        "beacon_name",
-        "guild_tag",
+        "time",
         "world",
-        "shop_activity",
         "location_x",
         "location_y",
         "location_z",
-        "last_updated",
-        "item_count",
         "price",
-        "world",
+        "item_count",
+        "beacon_name",
+        "guild_tag",
+        "shop_activity",
     ]
     search_fields = ["item__default_name", "world", "beacon_name"]
 

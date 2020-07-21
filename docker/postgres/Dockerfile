@@ -1,4 +1,4 @@
-FROM postgres:11.3
+FROM timescale/timescaledb:latest-pg12
 
 COPY ./docker/postgres/maintenance /usr/local/bin/maintenance
 RUN chmod +x /usr/local/bin/maintenance/*

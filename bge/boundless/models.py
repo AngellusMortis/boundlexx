@@ -86,25 +86,61 @@ class Item(GameObj):
         return self.itemrequestbasketprice_set.filter(active=True)
 
 
+class World(models.Model):
+    REGION_USE = "use"
+    REGION_USW = "usw"
+    REGION_EUC = "ecu"
+    REGION_AUS = "aus"
+    REGION_CREATIVE = "creative"
+
+    REGION_CHOICES = [
+        (REGION_USE, "US East"),
+        (REGION_USE, "US West"),
+        (REGION_EUC, "EU Central"),
+        (REGION_AUS, "Australia"),
+        (REGION_CREATIVE, "Creative"),
+    ]
+
+    name = models.CharField(max_length=64)
+    display_name = models.CharField(max_length=64)
+    region = models.CharField(max_length=16, choices=REGION_CHOICES)
+    tier = models.IntegerField()
+    description = models.CharField(max_length=16)
+    size = models.IntegerField()
+    world_type = models.CharField(max_length=16)
+
+    def __str__(self):
+        return self.display_name
+
+
 class ItemShopPrice(models.Model):
-    item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    beacon_name = models.CharField(max_length=64, db_index=True)
-    guild_tag = models.CharField(max_length=8)
-    world = models.CharField(max_length=64, db_index=True)
-    item_count = models.IntegerField()
-    shop_activity = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
+    time = models.DateTimeField(auto_now=True, primary_key=True)
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
     location_x = models.IntegerField()
     location_y = models.IntegerField()
     location_z = models.IntegerField()
-    last_updated = models.DateTimeField(auto_now=True)
+    price = models.DecimalField(max_digits=10, decimal_places=2)
+    item = models.ForeignKey("Item", on_delete=models.CASCADE)
+    item_count = models.IntegerField()
 
+    beacon_name = models.CharField(max_length=64, db_index=True)
+    guild_tag = models.CharField(max_length=8)
+    shop_activity = models.IntegerField()
     active = models.BooleanField(db_index=True, default=True)
 
     _location = None
 
     class Meta:
         abstract = True
+        unique_together = (
+            "time",
+            "world",
+            "location_x",
+            "location_y",
+            "item",
+            "price",
+            "item_count",
+        )
 
     def __str__(self):
         return f"{self.item.default_name}: {self.item_count} @ {self.price}c"
@@ -125,7 +161,7 @@ class ItemShopPrice(models.Model):
     def from_shop_item(
         manager, world: str, item: Item, shop_item: ShopItem
     ) -> ItemShopPrice:
-        obj, created = manager.get_or_create(
+        return manager.create(
             item_id=item.id,
             beacon_name=shop_item.beacon_name,
             guild_tag=shop_item.guild_tag,
@@ -135,15 +171,8 @@ class ItemShopPrice(models.Model):
             location_x=shop_item.location.x,
             location_y=shop_item.location.y,
             location_z=shop_item.location.z,
-            world=world,
+            world=World.objects.get(name=world),
         )
-
-        if not created:
-            obj.active = True
-            obj.last_updated = timezone.now()
-            obj.save()
-
-        return obj
 
 
 class ItemShopStandPrice(ItemShopPrice):
