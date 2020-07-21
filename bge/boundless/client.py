@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass
 from struct import unpack_from
 from typing import Dict, List, Optional, Union
@@ -91,7 +92,10 @@ class BoundlessClient:
         servers = cache.get(cache_key)
 
         if servers is None:
-            response = requests.get(self.api_url("/list-gameservers"))
+            response = requests.get(
+                self.api_url("/list-gameservers"),
+                timeout=settings.BOUNDLESS_API_TIMEOUT,
+            )
 
             response.raise_for_status()
             servers = {}
@@ -101,6 +105,24 @@ class BoundlessClient:
             cache.set(cache_key, servers, 300)
 
         return servers
+
+    def _get_world(self, world, path):
+        with cache.lock("boundless_client:lock", expire=10):
+            cache_key = f"boundless_client:{world}"
+            last_call = cache.get(cache_key) or 0
+            now = time.monotonic()
+
+            time_since = now - last_call
+            if time_since < settings.BOUNDLESS_API_WORLD_DELAY:
+                time.sleep(settings.BOUNDLESS_API_WORLD_DELAY - time_since)
+
+            response = requests.get(
+                self.world_url(world, path),
+                timeout=settings.BOUNDLESS_API_TIMEOUT,
+            )
+            cache.set(cache_key, time.monotonic())
+
+        return response
 
     def call_world_api(
         self, path: str, worlds: Optional[List[str]] = None
@@ -114,7 +136,7 @@ class BoundlessClient:
             if world not in all_worlds:
                 raise ValueError("invalid world")
 
-            response = requests.get(self.world_url(world, path))
+            response = self._get_world(world, path)
 
             response.raise_for_status()
 

@@ -75,6 +75,7 @@ ADMIN_APPS = [
 ]
 DJANGO_APPS = [
     "django.contrib.auth",
+    "polymorphic",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.sites",
@@ -91,7 +92,6 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
     "django_celery_results",
     "djangocodemirror",
-    "reversion",
 ]
 
 LOCAL_APPS = [
@@ -384,6 +384,18 @@ CODEMIRROR_BUNDLE_JS_OPTIONS = {
 }
 
 
+# base URL for discovery server
 BOUNDLESS_API_URL_BASE = env(
     "BOUNDLESS_API_URL_BASE", default="http://127.0.0.1:8950"
 )
+
+# number of seconds between calls to each world
+BOUNDLESS_API_WORLD_DELAY = 0.3
+
+# path to Boundless itemcolorstrings.dat
+BOUNDLESS_ITEMS_FILE = (
+    "/boundless/server/assets/archetypes/itemcolorstrings.dat"
+)
+
+# timeout for making an API request
+BOUNDLESS_API_TIMEOUT = 5

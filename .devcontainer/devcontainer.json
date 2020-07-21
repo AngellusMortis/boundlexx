@@ -46,7 +46,6 @@
     "extensions": [
         "ms-python.python",
         "eamodio.gitlens",
-        "github.vscode-pull-request-github",
         "brainfit.vscode-coverage-highlighter",
         "bungcip.better-toml",
     ],
@@ -67,6 +66,6 @@
     "remoteUser": "root",
     "forwardPorts": [
         5555,
-        8000
+        9000
     ],
 }

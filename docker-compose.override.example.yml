@@ -2,10 +2,14 @@ version: '3.4'
 
 services:
     django: &django
-      # enable .env.local file
-      env_file:
-        - ./.env
-        - ./.env.local
+  ## enable .env.local file
+    env_file:
+      - ./.env
+      - ./.env.local
+    volumes:
+      - .:/app
+      ## Replace with path your Boundless install
+      - C:\Program Files\Steam\steamapps\common\Boundless:/boundless
 
     manage:
       <<: *django

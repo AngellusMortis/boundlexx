@@ -16,19 +16,25 @@ def update_prices():
     items = Item.objects.filter(active=True)
     client = BoundlessClient()
 
-    logger.info("Updating the prices for %s", len(items))
+    logger.info("Updating the prices for %s items", len(items))
 
     for item in items:
         total_baskets = 0
         total_stands = 0
 
-        request_baskets = client.shop_buy(item.id)
+        request_baskets = client.shop_buy(item.game_id)
+        ItemRequestBasketPrice.objects.filter(item=item, active=True).update(
+            active=False
+        )
         for world, baskets in request_baskets.items():
             for basket in baskets:
                 ItemRequestBasketPrice.from_shop_item(world, item, basket)
                 total_baskets += 1
 
-        shop_stands = client.shop_sell(item.id)
+        shop_stands = client.shop_sell(item.game_id)
+        ItemShopStandPrice.objects.filter(item=item, active=True).update(
+            active=False
+        )
         for world, stands in shop_stands.items():
             for stand in stands:
                 ItemShopStandPrice.from_shop_item(world, item, stand)
@@ -36,7 +42,7 @@ def update_prices():
 
         logger.info(
             "Updated %s (Baskets: %s, Stands: %s)",
-            item.gui_name,
+            item,
             total_baskets,
             total_stands,
         )

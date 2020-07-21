@@ -33,6 +33,16 @@
                 "-P",
                 "solo",
             ]
+        },
+        {
+            "name": "BGE: Debug Import Items",
+            "type": "python",
+            "request": "launch",
+            "module": "manage",
+            "args": [
+                "import_items",
+                "/boundless/server/assets/archetypes/itemcolorstrings.dat"
+            ]
         }
     ]
 }
