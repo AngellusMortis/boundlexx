@@ -10,6 +10,8 @@ from admin_tools.menu import Menu, items
 from django.urls import reverse
 from django.utils.translation import ugettext_lazy as _
 
+from bge.admin import ADMIN_APPS
+
 
 class BGEMenu(Menu):
     """
@@ -21,12 +23,6 @@ class BGEMenu(Menu):
         self.children += [
             items.MenuItem(_("BGE"), reverse("admin:index")),
             items.Bookmarks(),
-            items.AppList(
-                _("Data"),
-                exclude=("django.contrib.*", "bge.users.*", "allauth.*"),
-            ),
-            items.AppList(
-                _("Administration"),
-                models=("django.contrib.*", "bge.users.*", "allauth.*"),
-            ),
+            items.AppList(_("Data"), exclude=ADMIN_APPS),
+            items.AppList(_("Administration"), models=ADMIN_APPS),
         ]

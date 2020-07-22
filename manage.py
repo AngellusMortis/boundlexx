@@ -3,6 +3,15 @@ import os
 import sys
 from pathlib import Path
 
+
+def configure_logging():
+    import logging.config
+
+    from django.conf import settings
+
+    logging.config.dictConfig(settings.LOGGING)
+
+
 if __name__ == "__main__":
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
@@ -29,6 +38,8 @@ if __name__ == "__main__":
     current_path = Path(__file__).parent.resolve()
     sys.path.append(str(current_path / "bge"))
 
+    configure_logging()
+
     if settings.DEBUG:
         import environ
 
@@ -38,8 +49,11 @@ if __name__ == "__main__":
             os.environ.get("RUN_MAIN") or os.environ.get("WERKZEUG_RUN_MAIN")
         ):
             import ptvsd
+            import logging
+
+            logger = logging.getLogger("django")
 
             ptvsd.enable_attach(address=("127.0.0.1", 3000))
-            print("VS Code Remote debugger running on 127.0.0.1:3000")
+            logger.info("VS Code Remote debugger running on 127.0.0.1:3000")
 
     execute_from_command_line(sys.argv)

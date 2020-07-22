@@ -6,32 +6,60 @@
         {
             "label": "BGE: Update Requirements",
             "type": "shell",
-            "command": "pip-compile requirements/in/base.in requirements/in/dev.in -o requirements/dev.txt --upgrade && pip-compile requirements/in/base.in requirements/in/production.in -o requirements/production.txt --upgrade",
+            "command": "pip-compile ${workspaceFolder}/requirements/in/base.in ${workspaceFolder}/requirements/in/dev.in -o ${workspaceFolder}/requirements/dev.txt --upgrade && pip-compile ${workspaceFolder}/requirements/in/base.in ${workspaceFolder}/requirements/in/production.in -o ${workspaceFolder}/requirements/production.txt --upgrade",
+            "problemMatcher": []
+        },
+        {
+            "label": "BGE: Install Requirements",
+            "type": "shell",
+            "command": "pip install -r ${workspaceFolder}/requirements/dev.txt",
+            "problemMatcher": []
+        },
+        {
+            "label": "BGE: Manage",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env && python ${workspaceFolder}/manage.py ${input:commandName}",
             "problemMatcher": []
         },
         {
             "label": "BGE: Migrate Database",
             "type": "shell",
-            "command": "source ${workspaceFolder}/.env && python manage.py migrate",
+            "command": "source ${workspaceFolder}/.env && python ${workspaceFolder}/manage.py migrate ${input:appName}",
             "problemMatcher": []
         },
         {
             "label": "BGE: Make Migrations",
             "type": "shell",
-            "command": "source ${workspaceFolder}/.env && python manage.py makemigrations",
+            "command": "source ${workspaceFolder}/.env && python ${workspaceFolder}/manage.py makemigrations ${input:appName}",
             "problemMatcher": []
         },
         {
-            "label": "BGE: Django Shell",
+            "label": "BGE: Tail Output",
             "type": "shell",
-            "command": "source ${workspaceFolder}/.env && python manage.py shell_plus",
+            "command": "tail -f /tmp/django.log",
             "problemMatcher": []
         },
+    ],
+    "inputs": [
         {
-            "label": "BGE: Make Superuser",
-            "type": "shell",
-            "command": "source ${workspaceFolder}/.env && python manage.py makesuperuser",
-            "problemMatcher": []
+            "id": "appName",
+            "description": "BGE App (blank for all)",
+            "type": "promptString"
+        },
+        {
+            "id": "commandName",
+            "description": "Management Command",
+            "type": "pickString",
+            "options": [
+                "shell_plus",
+                "shell",
+                "makesuperuser",
+                "createsuperuser",
+                "migrate",
+                "makemigrations",
+                "creatersakey",
+            ],
+            "default": "shell_plus"
         },
     ]
 }

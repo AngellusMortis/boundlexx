@@ -71,6 +71,7 @@ disable = [
   'bad-continuation',
   'line-too-long',
   'unused-argument',
+  'useless-super-delegation',
 ]
 
 [tool.pylint.design]

@@ -13,6 +13,8 @@ And to activate the app index dashboard::
 from admin_tools.dashboard import AppIndexDashboard, Dashboard, modules
 from django.utils.translation import ugettext_lazy as _
 
+from bge.admin import ADMIN_APPS
+
 
 class BGEIndexDashboard(Dashboard):
     """
@@ -27,22 +29,8 @@ class BGEIndexDashboard(Dashboard):
                 _("Data"),
                 display="accordion",
                 children=[
-                    modules.AppList(
-                        _("Celery"),
-                        exclude=(
-                            "django.contrib.*",
-                            "bge.users.*",
-                            "allauth.*",
-                        ),
-                    ),
-                    modules.AppList(
-                        _("Administration"),
-                        models=(
-                            "django.contrib.*",
-                            "bge.users.*",
-                            "allauth.*",
-                        ),
-                    ),
+                    modules.AppList(_("Celery"), exclude=ADMIN_APPS),
+                    modules.AppList(_("Administration"), models=ADMIN_APPS),
                 ],
             )
         )

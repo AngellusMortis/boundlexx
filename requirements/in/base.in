@@ -8,11 +8,14 @@ django-click
 django-compressor
 django-crispy-forms
 django-environ
+django-filter
 django-model-utils
+django-oidc-provider
 django-polymorphic
 django-redis
 django<3.1
 djangocodemirror
+djangorestframework
 python-redis-lock[django]
 whitenoise
 
@@ -21,6 +24,10 @@ celery<5
 django-celery-beat
 flower
 
+colorama
+coloredlogs
 pillow
 psycopg2 --no-binary psycopg2
 python-slugify
+pyyaml
+uritemplate

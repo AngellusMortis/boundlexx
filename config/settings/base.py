@@ -92,12 +92,15 @@ THIRD_PARTY_APPS = [
     "django_celery_beat",
     "django_celery_results",
     "djangocodemirror",
+    "oidc_provider",
+    "rest_framework",
 ]
 
 LOCAL_APPS = [
     "bge.users.apps.UsersConfig",
     "bge.celery",
     "bge.boundless",
+    "bge.api",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -261,25 +264,51 @@ MANAGERS = ADMINS
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # See https://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
+LOGGING_CONFIG = None
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
+    "filters": {
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
+    },
     "formatters": {
-        "verbose": {
-            "format": (
-                "%(levelname)s %(asctime)s %(module)s "
-                "%(process)d %(thread)d %(message)s"
-            )
-        }
+        "default": {
+            "()": "logging.Formatter",
+            "format": "%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s",  # noqa E501
+        },
+        "colored": {
+            "()": "coloredlogs.ColoredFormatter",
+            "format": "%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s",  # noqa E501
+        },
     },
     "handlers": {
         "console": {
-            "level": "DEBUG",
+            "level": "INFO",
+            "filters": ["require_debug_true"],
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
-        }
+            "formatter": "colored",
+        },
+        "django.server": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "colored",
+        },
+        "file": {
+            "level": "DEBUG",
+            "class": "logging.FileHandler",
+            "filename": "/tmp/django.log",
+            "formatter": "colored",
+        },
     },
-    "root": {"level": "INFO", "handlers": ["console"]},
+    "loggers": {
+        "django": {"handlers": ["console", "file"], "level": "INFO"},
+        "django.server": {
+            "handlers": ["django.server", "file"],
+            "level": "INFO",
+            "propagate": False,
+        },
+    },
 }
 
 # Celery
@@ -381,6 +410,14 @@ CODEMIRROR_BUNDLE_CSS_OPTIONS = {
 CODEMIRROR_BUNDLE_JS_OPTIONS = {
     "filters": "yui_js",
     "output": "js/dcm-{settings_name}.min.js",
+}
+
+REST_FRAMEWORK = {
+    # Use Django's standard `django.contrib.auth` permissions,
+    # or allow read-only access for unauthenticated users.
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
+    ]
 }
 
 
