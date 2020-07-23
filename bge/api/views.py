@@ -48,7 +48,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             request, *args, **kwargs
         )
 
-    list.example = {"list_colors": {"value": [COLOR_EXAMPLE]}}
+    list.example = {"list_colors": {"value": [COLOR_EXAMPLE]}}  # type: ignore
 
     def retrieve(self, request, pk=None):  # pylint: disable=arguments-differ
         """
@@ -58,7 +58,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer_class()(color)
         return Response(serializer.data)
 
-    retrieve.example = {"retrieve_color": {"value": COLOR_EXAMPLE}}
+    retrieve.example = {"retrieve_color": {"value": COLOR_EXAMPLE}}  # type: ignore # noqa E501
 
 
 class ItemViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
@@ -74,7 +74,7 @@ class ItemViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             request, *args, **kwargs
         )
 
-    list.example = {"list_items": {"value": [ITEM_EXAMPLE]}}
+    list.example = {"list_items": {"value": [ITEM_EXAMPLE]}}  # type: ignore
 
     def retrieve(self, request, pk=None):  # pylint: disable=arguments-differ
         """
@@ -84,4 +84,4 @@ class ItemViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer_class()(item)
         return Response(serializer.data)
 
-    retrieve.example = {"retrieve_item": {"value": ITEM_EXAMPLE}}
+    retrieve.example = {"retrieve_item": {"value": ITEM_EXAMPLE}}  # type: ignore # noqa E501

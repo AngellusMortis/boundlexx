@@ -10,7 +10,7 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
 
 
 class ColorSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="game_id")
+    id = serializers.IntegerField(source="game_id")  # noqa A003
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True
     )
@@ -21,7 +21,7 @@ class ColorSerializer(serializers.ModelSerializer):
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="game_id")
+    id = serializers.IntegerField(source="game_id")  # noqa A003
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True
     )

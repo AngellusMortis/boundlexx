@@ -6,13 +6,13 @@ from django.contrib.admin.options import InlineModelAdmin
 from bge.boundless.models import (
     Color,
     Item,
+    ItemBuyRank,
     ItemRequestBasketPrice,
+    ItemSellRank,
     ItemShopStandPrice,
     LocalizedName,
     Metal,
     Subtitle,
-    ItemBuyRank,
-    ItemSellRank,
 )
 
 

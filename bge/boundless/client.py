@@ -142,7 +142,7 @@ class BoundlessClient:
 
                 try:
                     response.raise_for_status()
-                except Exception:
+                except requests.HTTPError:
                     tries -= 1
                     if tries == 0:
                         raise

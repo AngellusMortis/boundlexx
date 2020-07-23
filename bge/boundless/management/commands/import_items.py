@@ -2,8 +2,8 @@ from collections import namedtuple
 from struct import unpack_from
 from typing import Dict, List
 
-import msgpack
 import djclick as click
+import msgpack
 from django.conf import settings
 
 from bge.boundless.models import Color, Item, LocalizedName, Metal, Subtitle

@@ -82,7 +82,7 @@ class Item(GameObj):
     string_id = models.CharField(_("String ID"), max_length=64)
 
     @property
-    def default_name(self):
+    def default_name(self):  # pylint: disable=invalid-overridden-method
         return self.string_id
 
     @property
@@ -228,11 +228,15 @@ class ItemRank(models.Model):
         return f"Rank: {self.rank} for {self.item} @ {self.world}"
 
     def increase_rank(self):
-        if self.rank > 1:
+        if self.rank >= 20:
+            self.rank = 10
+        elif self.rank >= 10:
+            self.rank = 5
+        elif self.rank > 1:
             self.rank -= 1
 
     def decrease_rank(self):
-        if self.rank < 10:
+        if self.rank < 30:
             self.rank += 1
 
     @property
@@ -241,14 +245,27 @@ class ItemRank(models.Model):
 
         # decrease delay for more popular items
         # default: 30
-        # popular goes 25, 20, 15, 10
-        # inactive goes 120, 180, 240, 300, 360
-        if self.rank <= 5:
+        # popular (1-10) goes 10 * 6, 15, 20, 25, 30
+        offset = settings.BOUNDLESS_INACTIVE_ITEM_DELAY_OFFSET
+        if self.rank <= 10:
             offset = settings.BOUNDLESS_POPULAR_ITEM_DELAY_OFFSET
-            return delay - offset * (5 - self.rank)
+            delay = max(
+                delay - offset * (10 - self.rank),
+                settings.BOUNDLESS_MIN_ITEM_DELAY,
+            )
+        # inactive (11-19) goes 30, 40, 50, 60, 70, 80, 90, 100, 110, 120
+        elif self.rank <= 20:
+            delay = delay + offset * (self.rank - 11)
+        # dead (20-30) goes 150, 180, 210, 240, 270, 300, 330, 360 * 3
         else:
-            offset = settings.BOUNDLESS_INACTIVE_ITEM_DELAY_OFFSET
-            return delay + offset * (self.rank - 3.5)
+            delay = min(
+                delay
+                + offset * (self.rank - 11)
+                + offset * (self.rank - 20) * 2,
+                settings.BOUNDLESS_MAX_ITEM_DELAY,
+            )
+
+        return delay
 
     @property
     def next_update(self):
