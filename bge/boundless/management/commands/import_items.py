@@ -2,7 +2,9 @@ from collections import namedtuple
 from struct import unpack_from
 from typing import Dict, List
 
+import msgpack
 import djclick as click
+from django.conf import settings
 
 from bge.boundless.models import Color, Item, LocalizedName, Metal, Subtitle
 
@@ -222,16 +224,37 @@ def decode_language(
     return color_strings, metal_strings, item_strings
 
 
-def print_result(name, created):
+def construct_item_list(compileditems_binary):
+    data = msgpack.unpackb(compileditems_binary, strict_map_key=False)
+
+    items = {}
+    for i in data[0].values():
+        items[i[2]] = {
+            data[1][2]: i[2],  # id
+            data[1][10]: i[10],  # canDrop
+            data[1][99]: i[99],  # stringID
+        }
+
+    return items
+
+
+def print_result(name, created, action="imported"):
     if created > 0:
-        click.echo(f"Imported {created} new {name}(s)")
+        click.echo(f"{action.title()} {created} new {name}(s)")
     else:
-        click.echo(f"No new {name}s to import")
+        click.echo(f"No new {name}s {action}")
 
 
 @click.command()
-@click.argument("itemcolorstrings_file", type=click.File("rb"))
-def command(itemcolorstrings_file):
+@click.argument("itemcolorstrings_file", type=click.File("rb"), required=False)
+@click.argument("compileditems_file", type=click.File("rb"), required=False)
+def command(itemcolorstrings_file=None, compileditems_file=None):
+    if itemcolorstrings_file is None:
+        itemcolorstrings_file = open(settings.BOUNDLESS_ITEMS_FILE, "rb")
+    if compileditems_file is None:
+        compileditems_file = open(settings.BOUNDLESS_COMPILED_ITEMS_FILE, "rb")
+
+    compiled_items = construct_item_list(compileditems_file.read())
     binary_data = itemcolorstrings_file.read()
 
     (
@@ -276,17 +299,29 @@ def command(itemcolorstrings_file):
 
     click.echo("Creating Items...")
     items_created = 0
+    items_disabled = 0
     items = {}
     for item in item_types:
+        # do not add items that cannot be normally dropped
+        if not compiled_items[item.item_id]["canDrop"]:
+            items_disabled += Item.objects.filter(game_id=item.item_id).update(
+                active=False
+            )
+            continue
+
         item, was_created = Item.objects.get_or_create(
-            game_id=item.item_id, item_subtitle=subtitles[item.subtitle_id]
+            game_id=item.item_id,
+            string_id=compiled_items[item.item_id]["stringID"],
+            item_subtitle=subtitles[item.subtitle_id],
         )
 
         items[item.game_id] = item
 
         if was_created:
             items_created += 1
+
     print_result("item", items_created)
+    print_result("item", items_disabled, "disabled")
 
     click.echo("Creating Colors...")
     colors_created = 0
@@ -332,7 +367,11 @@ def command(itemcolorstrings_file):
                 localizations_created += 1
 
         for index, game_item in item_strings.items():
-            item = items[index]
+            item = items.get(index)
+
+            if item is None:
+                continue
+
             _, was_created = LocalizedName.objects.get_or_create(
                 game_obj=item, lang=language.name, name=game_item.name
             )

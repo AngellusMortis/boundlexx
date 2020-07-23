@@ -26,6 +26,7 @@ flower
 
 colorama
 coloredlogs
+msgpack
 pillow
 psycopg2 --no-binary psycopg2
 python-slugify

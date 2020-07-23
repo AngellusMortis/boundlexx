@@ -11,6 +11,8 @@ from bge.boundless.models import (
     LocalizedName,
     Metal,
     Subtitle,
+    ItemBuyRank,
+    ItemSellRank,
 )
 
 
@@ -43,6 +45,26 @@ class ItemPriceInline(admin.TabularInline):
 
     def get_queryset(self, request):
         return super().get_queryset(request).filter(active=True)
+
+
+class ItemRankInline(admin.TabularInline):
+    readonly_fields = [
+        "world",
+        "rank",
+        "last_update",
+        "state_hash",
+        "next_update",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+class ItemBuyRankInline(ItemRankInline):
+    model = ItemBuyRank
+
+
+class ItemSellRankInline(ItemRankInline):
+    model = ItemSellRank
 
 
 class ItemRequestBasketPriceInline(ItemPriceInline):
@@ -81,10 +103,13 @@ class MetalAdmin(GameObjAdmin):
 
 @admin.register(Item)
 class ItemAdmin(GameObjAdmin):
+    readonly_fields = ["game_id", "string_id"]
     raw_id_fields = ["item_subtitle"]
     inlines = [
         LocalizationInline,
+        ItemBuyRankInline,
         ItemRequestBasketPriceInline,
+        ItemSellRankInline,
         ItemShopStandPriceInline,
     ]
 

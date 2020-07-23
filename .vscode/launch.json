@@ -40,8 +40,16 @@
             "request": "launch",
             "module": "manage",
             "args": [
-                "import_items",
-                "/boundless/server/assets/archetypes/itemcolorstrings.dat"
+                "import_items"
+            ]
+        },
+        {
+            "name": "BGE: Shell",
+            "type": "python",
+            "request": "launch",
+            "module": "manage",
+            "args": [
+                "shell"
             ]
         }
     ]

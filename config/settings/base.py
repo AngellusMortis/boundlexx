@@ -91,7 +91,6 @@ THIRD_PARTY_APPS = [
     "allauth.socialaccount",
     "django_celery_beat",
     "django_celery_results",
-    "djangocodemirror",
     "oidc_provider",
     "rest_framework",
 ]
@@ -340,77 +339,12 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 
 SOCIALACCOUNT_STORE_TOKENS = False
 
-# django-compressor
-# ------------------------------------------------------------------------------
-# https://django-compressor.readthedocs.io/en/latest/quickstart/#installation
-INSTALLED_APPS += ["compressor"]
-STATICFILES_FINDERS += ["compressor.finders.CompressorFinder"]
-
 # Your stuff...
 # ------------------------------------------------------------------------------
 ADMIN_TOOLS_MENU = "bge.admin.menu.BGEMenu"
 ADMIN_TOOLS_INDEX_DASHBOARD = "bge.admin.dashboard.BGEIndexDashboard"
 ADMIN_TOOLS_APP_INDEX_DASHBOARD = "bge.admin.dashboard.BGEAppIndexDashboard"
 FLOWER_BASE_URL = env("FLOWER_BASE_URL")
-
-# codemirror
-# ------------------------------------------------------------------------------
-
-# Template string for HTML Code to instanciate CodeMirror for a field.
-CODEMIRROR_FIELD_INIT_JS = (
-    u"""<script>var {varname} = """
-    """CodeMirror.fromTextArea("""
-    """document.getElementById("{inputid}"),"""
-    """{settings});</script>"""
-)
-
-# Available CodeMirror configurations.
-CODEMIRROR_SETTINGS = {
-    "properties": {"mode": "properties", "modes": ["properties"]},
-}
-
-# List of CodeMirror Javascript base files that will be loaded before every
-# other CodeMirror Javascript components.
-CODEMIRROR_BASE_JS = ["CodeMirror/lib/codemirror.js"]
-
-# List of CodeMirror CSS base files that will be loaded before themes.
-CODEMIRROR_BASE_CSS = ["CodeMirror/lib/codemirror.css"]
-
-# Available CodeMirror CSS Theme files.
-CODEMIRROR_THEMES = {
-    "monokai": "CodeMirror/theme/monokai.css",
-}
-
-# Available CodeMirror Javascript mode files.
-CODEMIRROR_MODES = {
-    "properties": "CodeMirror/mode/properties/properties.js",
-}
-
-# HTML element to load a Javascript asset
-CODEMIRROR_JS_ASSET_TAG = (
-    u'<script type="text/javascript" src="{url}"></script>'
-)
-
-# HTML element to load a CSS asset
-CODEMIRROR_CSS_ASSET_TAG = u'<link rel="stylesheet" href="{url}">'
-
-# Template string for Javascript bundle names
-CODEMIRROR_BUNDLE_CSS_NAME = "dcm-{settings_name}_css"
-
-# Template string for CSS bundle names
-CODEMIRROR_BUNDLE_JS_NAME = "dcm-{settings_name}_js"
-
-# Option arguments used to build CSS bundles with ``django-assets``.
-CODEMIRROR_BUNDLE_CSS_OPTIONS = {
-    "filters": "yui_css",
-    "output": "css/dcm-{settings_name}.min.css",
-}
-
-# Option arguments used to build Javascript bundles with ``django-assets``.
-CODEMIRROR_BUNDLE_JS_OPTIONS = {
-    "filters": "yui_js",
-    "output": "js/dcm-{settings_name}.min.js",
-}
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,
@@ -427,12 +361,21 @@ BOUNDLESS_API_URL_BASE = env(
 )
 
 # number of seconds between calls to each world
-BOUNDLESS_API_WORLD_DELAY = 0.3
+BOUNDLESS_API_WORLD_DELAY = 1
 
 # path to Boundless itemcolorstrings.dat
-BOUNDLESS_ITEMS_FILE = (
-    "/boundless/server/assets/archetypes/itemcolorstrings.dat"
+BOUNDLESS_ITEMS_FILE = "/boundless/assets/archetypes/itemcolorstrings.dat"
+BOUNDLESS_COMPILED_ITEMS_FILE = (
+    "/boundless/assets/archetypes/compileditems.msgpack"
 )
 
 # timeout for making an API request
 BOUNDLESS_API_TIMEOUT = 5
+
+# minutes
+BOUNDLESS_BASE_ITEM_DELAY = 30
+BOUNDLESS_POPULAR_ITEM_DELAY_OFFSET = 5
+BOUNDLESS_INACTIVE_ITEM_DELAY_OFFSET = 60
+
+API_PROTOCOL = "http"
+API_BASE = "api/"

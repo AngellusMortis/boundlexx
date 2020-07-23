@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from bge.boundless.models import Color, LocalizedName
+from bge.boundless.models import Color, Item, LocalizedName
 
 
 class LocalizedNameSerializer(serializers.ModelSerializer):
@@ -10,10 +10,22 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
 
 
 class ColorSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="game_id")
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True
     )
 
     class Meta:
         model = Color
-        fields = ["game_id", "default_name", "localization"]
+        fields = ["id", "localization"]
+
+
+class ItemSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField(source="game_id")
+    localization = LocalizedNameSerializer(
+        source="localizedname_set", many=True
+    )
+
+    class Meta:
+        model = Item
+        fields = ["id", "string_id", "localization"]

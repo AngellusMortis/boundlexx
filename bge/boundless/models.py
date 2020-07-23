@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from datetime import timedelta
+
+from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
@@ -75,6 +79,11 @@ class Item(GameObj):
     item_subtitle = models.ForeignKey(
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )
+    string_id = models.CharField(_("String ID"), max_length=64)
+
+    @property
+    def default_name(self):
+        return self.string_id
 
     @property
     def buy_locations(self):
@@ -107,6 +116,9 @@ class World(models.Model):
     description = models.CharField(max_length=16)
     size = models.IntegerField()
     world_type = models.CharField(max_length=16)
+
+    active = models.BooleanField(default=True, db_index=True)
+    is_perm = models.BooleanField(default=True, db_index=True)
 
     def __str__(self):
         return self.display_name
@@ -173,6 +185,14 @@ class ItemShopPrice(models.Model):
             world=World.objects.get(name=world),
         )
 
+    @property
+    def state_hash(self):
+        return (
+            f"{self.item.id}:{self.world.id}:{self.location_x}:"
+            f"{self.location_y}:{self.location_z}:{self.price}:"
+            f"{self.item_count}"
+        ).encode("utf8")
+
 
 class ItemShopStandPrice(ItemShopPrice):
     @staticmethod
@@ -192,3 +212,54 @@ class ItemRequestBasketPrice(ItemShopPrice):
         return ItemShopPrice.from_shop_item(
             ItemRequestBasketPrice.objects, world, item, shop_item
         )
+
+
+class ItemRank(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    world = models.ForeignKey(World, on_delete=models.CASCADE)
+    rank = models.PositiveSmallIntegerField(default=5)
+    last_update = models.DateTimeField(blank=True, null=True)
+    state_hash = models.CharField(max_length=128, default="")
+
+    class Meta:
+        abstract = True
+
+    def __str__(self):
+        return f"Rank: {self.rank} for {self.item} @ {self.world}"
+
+    def increase_rank(self):
+        if self.rank > 1:
+            self.rank -= 1
+
+    def decrease_rank(self):
+        if self.rank < 10:
+            self.rank += 1
+
+    @property
+    def query_delay(self):
+        delay = settings.BOUNDLESS_BASE_ITEM_DELAY
+
+        # decrease delay for more popular items
+        # default: 30
+        # popular goes 25, 20, 15, 10
+        # inactive goes 120, 180, 240, 300, 360
+        if self.rank <= 5:
+            offset = settings.BOUNDLESS_POPULAR_ITEM_DELAY_OFFSET
+            return delay - offset * (5 - self.rank)
+        else:
+            offset = settings.BOUNDLESS_INACTIVE_ITEM_DELAY_OFFSET
+            return delay + offset * (self.rank - 3.5)
+
+    @property
+    def next_update(self):
+        if self.last_update is None:
+            return timezone.now() - timedelta(minutes=1)
+        return self.last_update + timedelta(minutes=self.query_delay)
+
+
+class ItemBuyRank(ItemRank):
+    pass
+
+
+class ItemSellRank(ItemRank):
+    pass

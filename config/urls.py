@@ -13,10 +13,13 @@ urlpatterns = [
     path("accounts/", include("allauth.urls")),
     path("users/", include("bge.users.urls", namespace="users")),
     path("openid/", include("oidc_provider.urls", namespace="oidc_provider")),
-    path("api/auth/", include("rest_framework.urls")),
-    path("api/schema/", schema_view, name="openapi_schema"),
-    path("api/docs/", TemplateView.as_view(template_name="bge/api/docs.html")),
-    path("api/", include("bge.api.urls")),
+    path(f"{settings.API_BASE}auth/", include("rest_framework.urls")),
+    path(f"{settings.API_BASE}schema/", schema_view, name="openapi_schema"),
+    path(
+        f"{settings.API_BASE}docs/",
+        TemplateView.as_view(template_name="bge/api/docs.html"),
+    ),
+    path(settings.API_BASE, include("bge.api.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -131,14 +131,23 @@ class BoundlessClient:
         if worlds is None:
             worlds = list(self.gameservers.keys())
 
-        responses = {}
+        responses: Dict[str, Union[str, dict, bytes]] = {}
         for world in worlds:
             if world not in all_worlds:
                 raise ValueError("invalid world")
 
-            response = self._get_world(world, path)
+            tries = 5
+            while True:
+                response = self._get_world(world, path)
 
-            response.raise_for_status()
+                try:
+                    response.raise_for_status()
+                except Exception:
+                    tries -= 1
+                    if tries == 0:
+                        raise
+                else:
+                    break
 
             response_text: Union[str, dict, bytes] = response.text
             if "Content-Type" in response.headers:
