@@ -73,7 +73,9 @@ def _update_item_prices(
     )
 
     # set all existing price records to inactive
-    price_klass.objects.filter(item=item, active=True).update(active=False)
+    price_klass.objects.filter(
+        item=item, active=True, world___name__in=list(ranks.keys())
+    ).update(active=False)
 
     for world_name, shops in shops.items():
         state_hash = hashlib.sha512()
