@@ -1,6 +1,5 @@
 name: Boundlexx Build
 
-
 on:
   push:
     # Publish `master` as Docker `latest` image.
