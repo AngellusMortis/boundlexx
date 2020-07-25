@@ -6,7 +6,13 @@ import djclick as click
 import msgpack
 from django.conf import settings
 
-from boundlexx.boundless.models import Color, Item, LocalizedName, Metal, Subtitle
+from boundlexx.boundless.models import (
+    Color,
+    Item,
+    LocalizedName,
+    Metal,
+    Subtitle,
+)
 
 # Adapted from
 # https://gist.github.com/mayumi7/ca9e58a21459ccc76ee09873cff5000f
@@ -276,49 +282,54 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
     click.echo("Creating Metals...")
     metals_created = 0
     metals = {}
-    for index in range(metals_max_index):
-        metal, was_created = Metal.objects.get_or_create(game_id=index)
+    with click.progressbar(range(metals_max_index)) as bar:
+        for index in bar:
+            metal, was_created = Metal.objects.get_or_create(game_id=index)
 
-        metals[metal.game_id] = metal
+            metals[metal.game_id] = metal
 
-        if was_created:
-            metals_created += 1
+            if was_created:
+                metals_created += 1
     print_result("metal", metals_created)
 
     click.echo("Creating Subtitles...")
     subtitles_created = 0
     subtitles = {}
-    for index in range(subtitles_max_index + 1):
-        subtitle, was_created = Subtitle.objects.get_or_create(game_id=index)
+    with click.progressbar(range(subtitles_max_index + 1)) as bar:
+        for index in bar:
+            subtitle, was_created = Subtitle.objects.get_or_create(
+                game_id=index
+            )
 
-        subtitles[subtitle.game_id] = subtitle
+            subtitles[subtitle.game_id] = subtitle
 
-        if was_created:
-            subtitles_created += 1
+            if was_created:
+                subtitles_created += 1
     print_result("subtitle", subtitles_created)
 
     click.echo("Creating Items...")
     items_created = 0
     items_disabled = 0
     items = {}
-    for item in item_types:
-        # do not add items that cannot be normally dropped
-        if not compiled_items[item.item_id]["canDrop"]:
-            items_disabled += Item.objects.filter(game_id=item.item_id).update(
-                active=False
+    with click.progressbar(item_types) as bar:
+        for item in bar:
+            # do not add items that cannot be normally dropped
+            if not compiled_items[item.item_id]["canDrop"]:
+                items_disabled += Item.objects.filter(
+                    game_id=item.item_id
+                ).update(active=False)
+                continue
+
+            item, was_created = Item.objects.get_or_create(
+                game_id=item.item_id,
+                string_id=compiled_items[item.item_id]["stringID"],
+                item_subtitle=subtitles[item.subtitle_id],
             )
-            continue
 
-        item, was_created = Item.objects.get_or_create(
-            game_id=item.item_id,
-            string_id=compiled_items[item.item_id]["stringID"],
-            item_subtitle=subtitles[item.subtitle_id],
-        )
+            items[item.game_id] = item
 
-        items[item.game_id] = item
-
-        if was_created:
-            items_created += 1
+            if was_created:
+                items_created += 1
 
     print_result("item", items_created)
     print_result("item", items_disabled, "disabled")
@@ -326,13 +337,14 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
     click.echo("Creating Colors...")
     colors_created = 0
     colors = {}
-    for index in range(255):
-        color, was_created = Color.objects.get_or_create(game_id=index + 1)
+    with click.progressbar(range(255)) as bar:
+        for index in bar:
+            color, was_created = Color.objects.get_or_create(game_id=index + 1)
 
-        colors[color.game_id] = color
+            colors[color.game_id] = color
 
-        if was_created:
-            colors_created += 1
+            if was_created:
+                colors_created += 1
     print_result("color", colors_created)
 
     click.echo("Processing localization data...")
@@ -349,43 +361,55 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
             language,
         )
 
-        localizations_created = 0
-        for index, name in color_strings.items():
-            _, was_created = LocalizedName.objects.get_or_create(
-                game_obj=colors[index], lang=language.name, name=name
-            )
+        total = len(color_strings) + len(metal_strings) + len(item_strings)
+        with click.progressbar(length=total) as bar:
 
-            if was_created:
-                localizations_created += 1
+            localizations_created = 0
+            for index, name in color_strings.items():
+                _, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=colors[index], lang=language.name, name=name
+                )
 
-        for index, name in metal_strings.items():
-            _, was_created = LocalizedName.objects.get_or_create(
-                game_obj=metals[index], lang=language.name, name=name
-            )
+                if was_created:
+                    localizations_created += 1
 
-            if was_created:
-                localizations_created += 1
+                bar.update(1)
+                bar.render_progress()
 
-        for index, game_item in item_strings.items():
-            item = items.get(index)
+            for index, name in metal_strings.items():
+                _, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=metals[index], lang=language.name, name=name
+                )
 
-            if item is None:
-                continue
+                if was_created:
+                    localizations_created += 1
 
-            _, was_created = LocalizedName.objects.get_or_create(
-                game_obj=item, lang=language.name, name=game_item.name
-            )
+                bar.update(1)
+                bar.render_progress()
 
-            if was_created:
-                localizations_created += 1
+            for index, game_item in item_strings.items():
+                bar.update(1)
+                bar.render_progress()
 
-            _, was_created = LocalizedName.objects.get_or_create(
-                game_obj=item.item_subtitle,
-                lang=language.name,
-                name=game_item.subtitle,
-            )
+                item = items.get(index)
 
-            if was_created:
-                localizations_created += 1
+                if item is None:
+                    continue
+
+                _, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=item, lang=language.name, name=game_item.name
+                )
+
+                if was_created:
+                    localizations_created += 1
+
+                _, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=item.item_subtitle,
+                    lang=language.name,
+                    name=game_item.subtitle,
+                )
+
+                if was_created:
+                    localizations_created += 1
 
         print_result("localization", localizations_created)
