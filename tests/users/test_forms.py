@@ -1,7 +1,7 @@
 import pytest
 from tests.users.factories import UserFactory
 
-from bge.users.forms import UserCreationForm
+from boundlexx.users.forms import UserCreationForm
 
 pytestmark = pytest.mark.django_db
 

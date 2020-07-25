@@ -7,8 +7,8 @@ from pathlib import Path
 import environ
 
 ROOT_DIR = Path(__file__).parents[2]
-# bge/)
-APPS_DIR = ROOT_DIR / "bge"
+# boundlexx/)
+APPS_DIR = ROOT_DIR / "boundlexx"
 env = environ.Env()
 
 READ_DOT_ENV_FILE = env.bool("DJANGO_READ_DOT_ENV_FILE", default=False)
@@ -65,12 +65,12 @@ WSGI_APPLICATION = "config.wsgi.application"
 # APPS
 # ------------------------------------------------------------------------------
 ADMIN_APPS = [
-    "bge.admin.theme",
+    "boundlexx.admin.theme",
     "admin_tools",
     "admin_tools.theming",
     "admin_tools.menu",
     "admin_tools.dashboard",
-    "bge.admin.apps.BGEAdminConfig",
+    "boundlexx.admin.apps.BoundlexxAdminConfig",
     # "django.contrib.admin",
 ]
 DJANGO_APPS = [
@@ -96,10 +96,10 @@ THIRD_PARTY_APPS = [
 ]
 
 LOCAL_APPS = [
-    "bge.users.apps.UsersConfig",
-    "bge.celery",
-    "bge.boundless",
-    "bge.api",
+    "boundlexx.users.apps.UsersConfig",
+    "boundlexx.celery",
+    "boundlexx.boundless",
+    "boundlexx.api",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -107,7 +107,7 @@ INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
 # MIGRATIONS
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#migration-modules
-MIGRATION_MODULES = {"sites": "bge.contrib.sites.migrations"}
+MIGRATION_MODULES = {"sites": "boundlexx.contrib.sites.migrations"}
 
 # AUTHENTICATION
 # ------------------------------------------------------------------------------
@@ -211,7 +211,7 @@ TEMPLATES = [
                 "django.template.context_processors.static",
                 "django.template.context_processors.tz",
                 "django.contrib.messages.context_processors.messages",
-                "bge.utils.context_processors.settings_context",
+                "boundlexx.utils.context_processors.settings_context",
             ],
         },
     }
@@ -341,9 +341,13 @@ SOCIALACCOUNT_STORE_TOKENS = False
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-ADMIN_TOOLS_MENU = "bge.admin.menu.BGEMenu"
-ADMIN_TOOLS_INDEX_DASHBOARD = "bge.admin.dashboard.BGEIndexDashboard"
-ADMIN_TOOLS_APP_INDEX_DASHBOARD = "bge.admin.dashboard.BGEAppIndexDashboard"
+ADMIN_TOOLS_MENU = "boundlexx.admin.menu.BoundlexxMenu"
+ADMIN_TOOLS_INDEX_DASHBOARD = (
+    "boundlexx.admin.dashboard.BoundlexxIndexDashboard"
+)
+ADMIN_TOOLS_APP_INDEX_DASHBOARD = (
+    "boundlexx.admin.dashboard.BoundlexxAppIndexDashboard"
+)
 FLOWER_BASE_URL = env("FLOWER_BASE_URL")
 
 REST_FRAMEWORK = {

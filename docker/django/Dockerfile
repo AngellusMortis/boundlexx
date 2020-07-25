@@ -79,7 +79,7 @@ RUN chmod +x /start-flower
 COPY --chown=django:django ./manage.py /app/
 COPY --chown=django:django ./locale /app/locale
 COPY --chown=django:django ./config /app/config
-COPY --chown=django:django ./bge /app/bge
+COPY --chown=django:django ./boundlexx /app/boundlexx
 
 USER django
 

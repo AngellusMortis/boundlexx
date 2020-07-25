@@ -4,37 +4,37 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "BGE: Update Requirements",
+            "label": "Boundlexx: Update Requirements",
             "type": "shell",
             "command": "pip-compile ${workspaceFolder}/requirements/in/base.in ${workspaceFolder}/requirements/in/dev.in -o ${workspaceFolder}/requirements/dev.txt --upgrade && pip-compile ${workspaceFolder}/requirements/in/base.in ${workspaceFolder}/requirements/in/production.in -o ${workspaceFolder}/requirements/production.txt --upgrade",
             "problemMatcher": []
         },
         {
-            "label": "BGE: Install Requirements",
+            "label": "Boundlexx: Install Requirements",
             "type": "shell",
             "command": "pip install -r ${workspaceFolder}/requirements/dev.txt",
             "problemMatcher": []
         },
         {
-            "label": "BGE: Manage",
+            "label": "Boundlexx: Manage",
             "type": "shell",
             "command": "source ${workspaceFolder}/.env && python ${workspaceFolder}/manage.py ${input:commandName}",
             "problemMatcher": []
         },
         {
-            "label": "BGE: Migrate Database",
+            "label": "Boundlexx: Migrate Database",
             "type": "shell",
             "command": "source ${workspaceFolder}/.env && python ${workspaceFolder}/manage.py migrate ${input:appName}",
             "problemMatcher": []
         },
         {
-            "label": "BGE: Make Migrations",
+            "label": "Boundlexx: Make Migrations",
             "type": "shell",
             "command": "source ${workspaceFolder}/.env && python ${workspaceFolder}/manage.py makemigrations ${input:appName}",
             "problemMatcher": []
         },
         {
-            "label": "BGE: Tail Output",
+            "label": "Boundlexx: Tail Output",
             "type": "shell",
             "command": "tail -f /tmp/django.log",
             "problemMatcher": []
@@ -43,7 +43,7 @@
     "inputs": [
         {
             "id": "appName",
-            "description": "BGE App (blank for all)",
+            "description": "Boundlexx App (blank for all)",
             "type": "promptString"
         },
         {

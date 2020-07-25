@@ -5,7 +5,6 @@ django-admin-tools
 django-allauth
 django-celery-results
 django-click
-django-compressor
 django-crispy-forms
 django-environ
 django-filter
@@ -13,11 +12,9 @@ django-model-utils
 django-oidc-provider
 django-polymorphic
 django-redis
-django<3.1
-djangocodemirror
+django<4
 djangorestframework
 python-redis-lock[django]
-whitenoise
 
 # Celery
 celery<5

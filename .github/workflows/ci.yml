@@ -1,4 +1,4 @@
-name: BGE Build
+name: Boundlexx Build
 
 on:
   push:
@@ -28,19 +28,19 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Pull Cached Postgres Images
-        run: docker pull docker.pkg.github.com/AngellusMortis/bge/build-cache-postgres || true
+        run: docker pull docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres || true
 
       - name: Pull Cached Django Images
-        run: docker pull docker.pkg.github.com/AngellusMortis/bge/build-cache-django || true
+        run: docker pull docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django || true
 
       - name: Build CI Images
-        run: docker-compose -f docker-compose.yml -f docker-compose.ci.yml build --build-arg DJANGO_UID=$(id -u) postgres test lint
+        run: docker-compose -f docker-compose.yml build --build-arg DJANGO_UID=$(id -u) postgres test lint
 
       - name: Push Postgres Image Cache
-        run: docker tag bge_postgres docker.pkg.github.com/AngellusMortis/bge/build-cache-postgres && docker push docker.pkg.github.com/arkutils/bge/build-cache-postgres || true
+        run: docker tag boundlexx_postgres docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres && docker push docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres || true
 
       - name: Push Django Image Cache
-        run: docker tag bge_dev_django docker.pkg.github.com/AngellusMortis/bge/build-cache-django && docker push docker.pkg.github.com/arkutils/bge/build-cache-django || true
+        run: docker tag boundlexx_dev_django docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django && docker push docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django || true
 
       - name: Run Linters
         run: docker-compose run --rm lint
@@ -62,17 +62,17 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Build Postgres Image
-        run: docker build -t bge_postgres -f docker/postgres/Dockerfile .
+        run: docker build -t boundlexx_postgres -f docker/postgres/Dockerfile .
 
       - name: Build Django Image
-        run: docker build -t bge_django --target production -f docker/django/Dockerfile .
+        run: docker build -t boundlexx_django --target production -f docker/django/Dockerfile .
 
       - name: Log into Registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Push Postgres Image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/bge_postgres
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/boundlexx_postgres
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -89,12 +89,12 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag bge_postgres $IMAGE_ID:$VERSION
+          docker tag boundlexx_postgres $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION
 
       - name: Push Django Image
         run: |
-          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/bge_django
+          IMAGE_ID=docker.pkg.github.com/${{ github.repository }}/boundlexx_django
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -111,5 +111,5 @@ jobs:
           echo IMAGE_ID=$IMAGE_ID
           echo VERSION=$VERSION
 
-          docker tag bge_django $IMAGE_ID:$VERSION
+          docker tag boundlexx_django $IMAGE_ID:$VERSION
           docker push $IMAGE_ID:$VERSION

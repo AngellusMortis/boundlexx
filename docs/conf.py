@@ -22,8 +22,8 @@ from typing import List
 
 # -- Project information -----------------------------------------------------
 
-project = "BGE"
-copyright = """2020, bge"""
+project = "Boundlexx"
+copyright = """2020, Boundlexx"""
 author = "AngellusMorits"
 
 

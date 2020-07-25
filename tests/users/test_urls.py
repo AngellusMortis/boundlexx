@@ -1,7 +1,7 @@
 import pytest
 from django.urls import resolve, reverse
 
-from bge.users.models import User
+from boundlexx.users.models import User
 
 pytestmark = pytest.mark.django_db
 

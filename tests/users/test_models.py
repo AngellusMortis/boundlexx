@@ -1,6 +1,6 @@
 import pytest
 
-from bge.users.models import User
+from boundlexx.users.models import User
 
 pytestmark = pytest.mark.django_db
 

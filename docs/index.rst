@@ -1,9 +1,9 @@
-.. BGE documentation master file, created by
+.. Boundlexx documentation master file, created by
    sphinx-quickstart.
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-Welcome to BGE's documentation!
+Welcome to Boundlexx's documentation!
 ======================================================================
 
 .. toctree::

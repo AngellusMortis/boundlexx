@@ -5,7 +5,7 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "BGE: Django",
+            "name": "Boundlexx: Django",
             "type": "python",
             "request": "attach",
             "port": 3000,
@@ -18,7 +18,7 @@
             ]
         },
         {
-            "name": "BGE: Celery",
+            "name": "Boundlexx: Celery",
             "type": "python",
             "request": "launch",
             "module": "celery",
@@ -35,7 +35,7 @@
             ]
         },
         {
-            "name": "BGE: Debug Import Items",
+            "name": "Boundlexx: Debug Import Items",
             "type": "python",
             "request": "launch",
             "module": "manage",
@@ -44,7 +44,7 @@
             ]
         },
         {
-            "name": "BGE: Shell",
+            "name": "Boundlexx: Shell",
             "type": "python",
             "request": "launch",
             "module": "manage",

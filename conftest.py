@@ -1,7 +1,7 @@
 import pytest
 from tests.users.factories import UserFactory
 
-from bge.users.models import User
+from boundlexx.users.models import User
 
 
 @pytest.fixture(autouse=True)

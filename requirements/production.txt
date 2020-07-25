@@ -20,11 +20,9 @@ coloredlogs==14.0         # via -r /app/requirements/in/base.in
 defusedxml==0.6.0         # via python3-openid
 django-admin-tools==0.9.0  # via -r /app/requirements/in/base.in
 django-allauth==0.42.0    # via -r /app/requirements/in/base.in
-django-appconf==1.0.4     # via django-compressor
 django-celery-beat==2.0.0  # via -r /app/requirements/in/base.in
 django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
-django-compressor==2.4    # via -r /app/requirements/in/base.in
 django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
@@ -33,8 +31,7 @@ django-oidc-provider==0.7.0  # via -r /app/requirements/in/base.in
 django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.8             # via -r /app/requirements/in/base.in, django-allauth, django-appconf, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangocodemirror, djangorestframework
-djangocodemirror==2.1.0   # via -r /app/requirements/in/base.in
+django==3.0.8             # via -r /app/requirements/in/base.in, django-allauth, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
 djangorestframework==3.11.0  # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
 future==0.18.2            # via celery, pyjwkest
@@ -52,17 +49,15 @@ pycryptodomex==3.9.8      # via pyjwkest
 pyjwkest==1.4.2           # via django-oidc-provider
 python-crontab==2.5.1     # via django-celery-beat
 python-dateutil==2.8.1    # via python-crontab
-python-redis-lock[django]==3.5.0  # via -r /app/requirements/in/base.in
+python-redis-lock[django]==3.6.0  # via -r /app/requirements/in/base.in
 python-slugify==4.0.1     # via -r /app/requirements/in/base.in
 python3-openid==3.2.0     # via django-allauth
 pytz==2020.1              # via celery, django, django-timezone-field, flower
 pyyaml==5.3.1             # via -r /app/requirements/in/base.in
-rcssmin==1.0.6            # via django-compressor
 redis==3.5.3              # via django-redis, python-redis-lock
 requests-oauthlib==1.3.0  # via django-allauth
 requests==2.24.0          # via django-allauth, pyjwkest, requests-oauthlib
-rjsmin==1.1.0             # via django-compressor
-six==1.15.0               # via argon2-cffi, django-compressor, pyjwkest, python-dateutil
+six==1.15.0               # via argon2-cffi, pyjwkest, python-dateutil
 sqlparse==0.3.1           # via django
 text-unidecode==1.3       # via python-slugify
 tornado==6.0.4            # via flower
@@ -70,4 +65,3 @@ uritemplate==3.0.1        # via -r /app/requirements/in/base.in
 urllib3==1.25.10          # via requests
 uwsgi==2.0.19.1           # via -r /app/requirements/in/production.in
 vine==1.3.0               # via amqp, celery
-whitenoise==5.1.0         # via -r /app/requirements/in/base.in

@@ -22,7 +22,7 @@ exclude = '''
 
 [tool.coverage.run]
 include = [
-  'bge/*',
+  'boundlexx/*',
 ]
 omit = [
   '*migrations*',
@@ -88,7 +88,7 @@ generated-members = [
 ]
 
 [tool.pytest.ini_options]
-addopts = "--ds=config.settings.test --reuse-db --cov-report xml --cov-report term:skip-covered --cov=bge"
+addopts = "--ds=config.settings.test --reuse-db --cov-report xml --cov-report term:skip-covered --cov=boundlexx"
 python_files = "tests.py test_*.py"
 env_override_existing_values = 1
 env_files= '.test.env'

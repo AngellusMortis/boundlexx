@@ -6,12 +6,12 @@ from celery.app.task import Task
 from celery.signals import after_setup_task_logger, task_postrun
 from django.core.cache import cache
 
-from bge.utils.logging import RedisTaskLogger
+from boundlexx.utils.logging import RedisTaskLogger
 
 # set the default Django settings module for the 'celery' program.
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
-app = Celery("bge")
+app = Celery("boundlexx")
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
@@ -36,10 +36,10 @@ def setup_loggers(logger: logging.Logger, *args, **kwargs):
 def after_task(task_id: str, task: Task, *args, **kwargs):
     # Django not loaded until here
     # pylint: disable=import-outside-toplevel
-    from bge.celery.models import TaskOutput
+    from boundlexx.celery.models import TaskOutput
     from django_celery_results.models import TaskResult
 
-    if not task.name.startswith("bge"):
+    if not task.name.startswith("boundlexx"):
         return
 
     output = []

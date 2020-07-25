@@ -1,8 +1,8 @@
 import pytest
 from django.test import RequestFactory
 
-from bge.users.models import User
-from bge.users.views import UserRedirectView, UserUpdateView
+from boundlexx.users.models import User
+from boundlexx.users.views import UserRedirectView, UserUpdateView
 
 pytestmark = pytest.mark.django_db
 

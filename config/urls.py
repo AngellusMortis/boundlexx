@@ -5,21 +5,21 @@ from django.urls import include, path
 from django.views import defaults as default_views
 from django.views.generic import TemplateView
 
-from bge.api.urls import schema_view
+from boundlexx.api.urls import schema_view
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("admin_tools/", include("admin_tools.urls")),
     path("accounts/", include("allauth.urls")),
-    path("users/", include("bge.users.urls", namespace="users")),
+    path("users/", include("boundlexx.users.urls", namespace="users")),
     path("openid/", include("oidc_provider.urls", namespace="oidc_provider")),
     path(f"{settings.API_BASE}auth/", include("rest_framework.urls")),
     path(f"{settings.API_BASE}schema/", schema_view, name="openapi_schema"),
     path(
         f"{settings.API_BASE}docs/",
-        TemplateView.as_view(template_name="bge/api/docs.html"),
+        TemplateView.as_view(template_name="boundlexx/api/docs.html"),
     ),
-    path(settings.API_BASE, include("bge.api.urls")),
+    path(settings.API_BASE, include("boundlexx.api.urls")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
