@@ -10,6 +10,8 @@ from steam.client import SteamClient
 def command():
     client = SteamClient()
     client.set_credential_location(settings.STEAM_SENTRY_DIR)
+
+    click.echo("Logging into Steam...")
     client.cli_login(
         username=settings.STEAM_USERNAME, password=settings.STEAM_PASSWORD
     )
