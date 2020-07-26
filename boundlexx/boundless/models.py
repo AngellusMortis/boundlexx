@@ -105,7 +105,7 @@ class World(models.Model):
 
     REGION_CHOICES = [
         (REGION_USE, "US East"),
-        (REGION_USE, "US West"),
+        (REGION_USW, "US West"),
         (REGION_EUC, "EU Central"),
         (REGION_AUS, "Australia"),
         (REGION_CREATIVE, "Creative"),

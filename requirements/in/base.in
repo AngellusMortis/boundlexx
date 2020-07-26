@@ -2,14 +2,11 @@
 argon2-cffi
 click
 django-admin-tools
-django-allauth
 django-celery-results
 django-click
-django-crispy-forms
 django-environ
 django-filter
 django-model-utils
-django-oidc-provider
 django-polymorphic
 django-redis
 django<4

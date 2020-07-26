@@ -5,6 +5,4 @@ __all__ = ["BoundlexxAdminSite", "ADMIN_APPS"]
 ADMIN_APPS = (
     "django.contrib.*",
     "boundlexx.users.*",
-    "allauth.*",
-    "oidc_provider.*",
 )

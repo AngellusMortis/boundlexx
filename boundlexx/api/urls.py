@@ -22,7 +22,7 @@ def get_site():
 schema_view = get_schema_view(
     title="Boundlexx",
     description="Boundless Lexicon API. Everything about the game Boundless",
-    version="0.0.1",
+    version="v1",
     url=f"{settings.API_PROTOCOL}://{get_site()}/{settings.API_BASE}",
     urlconf="boundlexx.api.urls",
 )

@@ -13,14 +13,12 @@ billiard==3.6.3.0         # via celery
 cachetools==4.1.1         # via steam
 celery==4.4.6             # via -r /app/requirements/in/base.in, django-celery-beat, django-celery-results, flower
 certifi==2020.6.20        # via requests
-cffi==1.14.0              # via argon2-cffi
+cffi==1.14.1              # via argon2-cffi
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r /app/requirements/in/base.in, django-click
 colorama==0.4.3           # via -r /app/requirements/in/base.in
 coloredlogs==14.0         # via -r /app/requirements/in/base.in
-defusedxml==0.6.0         # via python3-openid
 django-admin-tools==0.9.0  # via -r /app/requirements/in/base.in
-django-allauth==0.42.0    # via -r /app/requirements/in/base.in
 django-celery-beat==2.0.0  # via -r /app/requirements/in/base.in
 django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
@@ -28,14 +26,13 @@ django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
 django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
-django-oidc-provider==0.7.0  # via -r /app/requirements/in/base.in
 django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.8             # via -r /app/requirements/in/base.in, django-allauth, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
+django==3.0.8             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
 djangorestframework==3.11.0  # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
-future==0.18.2            # via celery, pyjwkest
+future==0.18.2            # via celery
 gevent-eventemitter==2.1  # via steam
 gevent==20.6.2            # via gevent-eventemitter, steam
 greenlet==0.4.16          # via gevent
@@ -44,25 +41,21 @@ humanize==2.5.0           # via flower
 idna==2.10                # via requests
 kombu==4.6.11             # via celery
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
-oauthlib==3.1.0           # via requests-oauthlib
 pillow==7.2.0             # via -r /app/requirements/in/base.in
 prometheus-client==0.8.0  # via flower
 protobuf==3.12.2          # via steam
 psycopg2==2.8.5           # via -r /app/requirements/in/base.in
 pycparser==2.20           # via cffi
-pycryptodomex==3.9.8      # via pyjwkest, steam
-pyjwkest==1.4.2           # via django-oidc-provider
+pycryptodomex==3.9.8      # via steam
 python-crontab==2.5.1     # via django-celery-beat
 python-dateutil==2.8.1    # via python-crontab
 python-redis-lock[django]==3.6.0  # via -r /app/requirements/in/base.in
 python-slugify==4.0.1     # via -r /app/requirements/in/base.in
-python3-openid==3.2.0     # via django-allauth
 pytz==2020.1              # via celery, django, django-timezone-field, flower
 pyyaml==5.3.1             # via -r /app/requirements/in/base.in
 redis==3.5.3              # via django-redis, python-redis-lock
-requests-oauthlib==1.3.0  # via django-allauth
-requests==2.24.0          # via django-allauth, pyjwkest, requests-oauthlib, steam
-six==1.15.0               # via argon2-cffi, protobuf, pyjwkest, python-dateutil, steam
+requests==2.24.0          # via steam
+six==1.15.0               # via argon2-cffi, protobuf, python-dateutil, steam
 sqlparse==0.3.1           # via django
 steam[client]==1.0.2      # via -r /app/requirements/in/base.in
 text-unidecode==1.3       # via python-slugify

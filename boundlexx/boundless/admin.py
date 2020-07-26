@@ -217,7 +217,6 @@ class WorldPollResultInline(admin.StackedInline):
     model = WorldPollResult
 
     readonly_fields = [
-        "time",
         "player_count",
         "beacon_count",
         "plot_count",
@@ -230,8 +229,11 @@ class WorldPollResultInline(admin.StackedInline):
 class ResourceCountInline(admin.TabularInline):
     model = ResourceCount
 
+    fields = [
+        "item",
+        "count",
+    ]
     readonly_fields = [
-        "time",
         "item",
         "count",
     ]
@@ -243,7 +245,6 @@ class LeaderboardRecordInline(admin.TabularInline):
     model = LeaderboardRecord
 
     fields = [
-        "time",
         "world_rank",
         "guild_tag",
         "mayor_name",
@@ -251,7 +252,6 @@ class LeaderboardRecordInline(admin.TabularInline):
         "prestige",
     ]
     readonly_fields = [
-        "time",
         "world_rank",
         "guild_tag",
         "mayor_name",
@@ -266,9 +266,11 @@ class LeaderboardRecordInline(admin.TabularInline):
 class WorldPollAdmin(admin.ModelAdmin):
     list_display = ["world", "time", "active"]
 
+    fields = ["active", "world", "time"]
+    readonly_fields = ["time"]
+
     inlines = [
         WorldPollResultInline,
         LeaderboardRecordInline,
         ResourceCountInline,
     ]
-
