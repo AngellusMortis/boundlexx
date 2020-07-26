@@ -1,7 +1,9 @@
+.local
 .vscode/setting.json
 docker-compose.override.yml
 .env.local
-itemsmapping*.json
+.steam/*
+!.steam/.gitkeep
 
 ### Python template
 # Byte-compiled / optimized / DLL files

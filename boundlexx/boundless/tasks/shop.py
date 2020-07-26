@@ -105,7 +105,7 @@ def _update_prices():
     items = Item.objects.filter(active=True)
     logger.info("Updating the prices for %s items", len(items))
 
-    all_worlds = list(World.objects.filter(active=True, is_perm=True))
+    all_worlds = list(World.objects.filter(active=True, end__isnull=True))
     for item in items:
         buy_updated = _update_item_prices(
             item, ItemBuyRank, "shop_buy", ItemRequestBasketPrice, all_worlds
@@ -123,29 +123,3 @@ def _update_prices():
             )
         else:
             logger.info("Skipped %s", item)
-
-
-@app.task
-def update_worlds():
-    client = BoundlessClient()
-
-    worlds = client.gameservers.values()
-    logger.info("Found %s worlds from discovery server.", len(worlds))
-
-    worlds_created = 0
-    for world_dict in worlds:
-        _, created = World.objects.get_or_create(
-            id=world_dict["id"],
-            name=world_dict["name"],
-            display_name=world_dict["displayName"],
-            region=world_dict["region"],
-            tier=world_dict["tier"],
-            description=world_dict["worldDescription"],
-            size=world_dict["worldSize"],
-            world_type=world_dict["worldType"],
-        )
-
-        if created:
-            worlds_created += 1
-
-    logger.info("Import %s world(s)", worlds_created)

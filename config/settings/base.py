@@ -152,7 +152,6 @@ AUTH_PASSWORD_VALIDATORS = [
 # https://docs.djangoproject.com/en/dev/ref/settings/#middleware
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
-    "whitenoise.middleware.WhiteNoiseMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -361,7 +360,13 @@ REST_FRAMEWORK = {
 
 # base URL for discovery server
 BOUNDLESS_API_URL_BASE = env(
-    "BOUNDLESS_API_URL_BASE", default="http://127.0.0.1:8950"
+    "BOUNDLESS_API_URL_BASE", default="http://host.docker.internal:8950"
+)
+BOUNDLESS_ACCOUNTS_BASE_URL = "https://account.playboundless.com"
+BOUNDLESS_USERNAME = env("BOUNDLESS_USERNAME")
+BOUNDLESS_PASSWORD = env("BOUNDLESS_PASSWORD", default=None)
+BOUNDLESS_DS_REQUIRES_AUTH = env.bool(
+    "BOUNDLESS_DS_REQUIRES_AUTH", default=False
 )
 
 # number of seconds between calls to each world
@@ -382,6 +387,24 @@ BOUNDLESS_BASE_ITEM_DELAY = 30
 BOUNDLESS_POPULAR_ITEM_DELAY_OFFSET = 5
 BOUNDLESS_INACTIVE_ITEM_DELAY_OFFSET = 10
 BOUNDLESS_MAX_ITEM_DELAY = 360
+BOUNDLESS_EXO_SEARCH_RADIUS = 10
+BOUNDLESS_MAX_WORLD_ID = 1000
+BOUNDLESS_MAX_SCAN_CHUNK = 50
 
 API_PROTOCOL = "http"
 API_BASE = "api/"
+
+STEAM_USERNAME = env("STEAM_USERNAME", default=None)
+STEAM_PASSWORD = env("STEAM_PASSWORD", default=None)
+STEAM_SENTRY_DIR = "/app/.steam"
+STEAM_APP_ID = 324510
+STEAM_AUTH_SCRIPT = "/auth-ticket.js"
+STEAM_AUTH_NODE_MODULES = "/usr/local/lib/node_modules"
+
+
+if BOUNDLESS_DS_REQUIRES_AUTH:
+    if not (BOUNDLESS_PASSWORD or STEAM_USERNAME or STEAM_PASSWORD):
+        raise ValueError(
+            "BOUNDLESS_PASSWORD, STEAM_USERNAME, and STEAM_PASSWORD required "
+            "if the Boundless DS server requires auth"
+        )

@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from datetime import timedelta
+from datetime import datetime, timedelta
 
+import pytz
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
@@ -11,6 +12,7 @@ from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 
 from boundlexx.boundless.client import Location, ShopItem
+from boundlexx.boundless.utils import convert_linear_rgb_to_hex
 
 
 class GameObjManager(models.Manager):
@@ -109,19 +111,97 @@ class World(models.Model):
         (REGION_CREATIVE, "Creative"),
     ]
 
-    name = models.CharField(max_length=64)
-    display_name = models.CharField(max_length=64)
-    region = models.CharField(max_length=16, choices=REGION_CHOICES)
-    tier = models.IntegerField()
-    description = models.CharField(max_length=16)
-    size = models.IntegerField()
-    world_type = models.CharField(max_length=16)
+    name = models.CharField(_("Name"), max_length=64)
+    display_name = models.CharField(_("Display Name"), max_length=64)
+    region = models.CharField(
+        _("Server Region"), max_length=16, choices=REGION_CHOICES
+    )
+    tier = models.IntegerField(_("Tier"))
+    description = models.CharField(_("Description"), max_length=16)
+    size = models.IntegerField(_("World Size"))
+    world_type = models.CharField(_("World Type"), max_length=16)
+    address = models.CharField(_("Server Address"), max_length=128)
+    ip_address = models.GenericIPAddressField(_("Server IP Address"))
+    api_url = models.URLField(_("API URL"))
+    planets_url = models.URLField(_("Planets URL"))
+    chunks_url = models.URLField(_("Chunks URL"))
+    time_offset = models.DateTimeField(_("Time Offset"))
+
+    websocket_url = models.URLField(_("Websocket URL"))
+
+    atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"))
+    atmosphere_color_g = models.FloatField(_("Atmosphere Linear G Color"))
+    atmosphere_color_b = models.FloatField(_("Atmosphere Linear B Color"))
+    water_color_r = models.FloatField(_("Water Linear R Color"))
+    water_color_g = models.FloatField(_("Water Linear G Color"))
+    water_color_b = models.FloatField(_("Water Linear B Color"))
 
     active = models.BooleanField(default=True, db_index=True)
-    is_perm = models.BooleanField(default=True, db_index=True)
+
+    start = models.DateTimeField(blank=True, null=True)
+    end = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return self.display_name
+
+    @staticmethod
+    def from_world_dict(world_dict):
+        data = {
+            "id": world_dict["id"],
+            "name": world_dict["name"],
+            "display_name": world_dict["displayName"],
+            "region": world_dict["region"],
+            "tier": world_dict["tier"],
+            "description": world_dict["worldDescription"],
+            "size": world_dict["worldSize"],
+            "world_type": world_dict["worldType"],
+            "address": world_dict["addr"],
+            "ip_address": world_dict["ipAddr"],
+            "api_url": world_dict["apiURL"],
+            "atmosphere_color_r": world_dict["atmosphereColor"][0],
+            "atmosphere_color_g": world_dict["atmosphereColor"][1],
+            "atmosphere_color_b": world_dict["atmosphereColor"][2],
+            "chunks_url": world_dict["chunksURL"],
+            "time_offset": datetime.utcfromtimestamp(
+                world_dict["timeOffset"]
+            ).replace(tzinfo=pytz.utc),
+            "water_color_r": world_dict["waterColor"][0],
+            "water_color_g": world_dict["waterColor"][1],
+            "water_color_b": world_dict["waterColor"][2],
+            "websocket_url": world_dict["websocketURL"],
+        }
+
+        if "lifetime" in world_dict:
+            data["start"] = (
+                datetime.utcfromtimestamp(world_dict["lifetime"][0]).replace(
+                    tzinfo=pytz.utc
+                ),
+            )
+            data["end"] = (
+                datetime.utcfromtimestamp(world_dict["lifetime"][1]).replace(
+                    tzinfo=pytz.utc
+                ),
+            )
+
+        return World.objects.get_or_create(**data)
+
+    @property
+    def is_perm(self):
+        return self.end is None
+
+    @property
+    def atmosphere_color(self):
+        return convert_linear_rgb_to_hex(
+            self.atmosphere_color_r,
+            self.atmosphere_color_g,
+            self.atmosphere_color_b,
+        )
+
+    @property
+    def water_color(self):
+        return convert_linear_rgb_to_hex(
+            self.water_color_r, self.water_color_g, self.water_color_b,
+        )
 
 
 class ItemShopPrice(models.Model):

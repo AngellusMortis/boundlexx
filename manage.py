@@ -1,7 +1,14 @@
 #!/usr/bin/env python
-import os
-import sys
-from pathlib import Path
+import sys  # noqa
+
+if "prompt_steam_guard" in sys.argv:
+    from gevent import monkey
+
+    monkey.patch_all()
+
+import os  # noqa
+
+from pathlib import Path  # noqa
 
 
 def configure_logging():

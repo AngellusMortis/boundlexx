@@ -8,18 +8,19 @@ ENV PYTEST ""
 ENV DJANGO_MANAGE ""
 
 RUN apt-get update \
-  # dependencies for building Python packages
-  && apt-get install -y build-essential \
-  # psycopg2 dependencies
-  && apt-get install -y libpq-dev \
-  # Translations dependencies
-  && apt-get install -y gettext \
+  && apt-get install -y build-essential libpq-dev gettext nodejs npm \
+  && npm install -g steam-user \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
 
 RUN addgroup --system --gid ${DJANGO_UID} django \
     && adduser --system --uid ${DJANGO_UID} --ingroup django django
+
+COPY ./docker/bin/auth-ticket.js /auth-ticket.js
+RUN chmod +x /auth-ticket.js
+RUN mkdir -p /app/.steam
+RUN chown -R django:django /app
 
 
 ## Development/CI image

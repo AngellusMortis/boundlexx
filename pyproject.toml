@@ -51,6 +51,7 @@ skip = [
   "*/static/CACHE/*",
   "docs",
   "node_modules",
+  "manage.py",
 ]
 
 [tool.pylint.master]
