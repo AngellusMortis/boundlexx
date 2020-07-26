@@ -33,7 +33,6 @@ django-celery-beat==2.0.0  # via -r /app/requirements/in/base.in
 django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
 django-coverage-plugin==1.8.0  # via -r /app/requirements/in/dev.in
-django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
 django-debug-toolbar==2.2  # via -r /app/requirements/in/dev.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-extensions==3.0.3  # via -r /app/requirements/in/dev.in
@@ -101,6 +100,7 @@ pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via ipython, sphinx
+pyjwt==1.7.1              # via -r /app/requirements/in/base.in
 pylint-celery==0.3        # via -r /app/requirements/in/dev.in
 pylint-django==2.2.0      # via -r /app/requirements/in/dev.in
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django

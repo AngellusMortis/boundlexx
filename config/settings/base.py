@@ -109,6 +109,7 @@ MIGRATION_MODULES = {"sites": "boundlexx.contrib.sites.migrations"}
 # https://docs.djangoproject.com/en/dev/ref/settings/#authentication-backends
 AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
+    "boundlexx.boundless.backends.BoundlessAuthenticationBackend",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
@@ -358,6 +359,7 @@ BOUNDLESS_COMPILED_ITEMS_FILE = (
 
 # timeout for making an API request
 BOUNDLESS_API_TIMEOUT = 5
+BOUNDLESS_AUTH_AUTO_CREATE = True
 
 # minutes
 BOUNDLESS_MIN_ITEM_DELAY = 10

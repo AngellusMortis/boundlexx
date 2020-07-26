@@ -23,6 +23,7 @@ coloredlogs
 msgpack
 pillow
 psycopg2 --no-binary psycopg2
+pyjwt
 python-slugify
 pyyaml
 steam[client]

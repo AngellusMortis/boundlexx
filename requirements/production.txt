@@ -22,7 +22,6 @@ django-admin-tools==0.9.0  # via -r /app/requirements/in/base.in
 django-celery-beat==2.0.0  # via -r /app/requirements/in/base.in
 django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
-django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
 django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
@@ -47,6 +46,7 @@ protobuf==3.12.2          # via steam
 psycopg2==2.8.5           # via -r /app/requirements/in/base.in
 pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
+pyjwt==1.7.1              # via -r /app/requirements/in/base.in
 python-crontab==2.5.1     # via django-celery-beat
 python-dateutil==2.8.1    # via python-crontab
 python-redis-lock[django]==3.6.0  # via -r /app/requirements/in/base.in
