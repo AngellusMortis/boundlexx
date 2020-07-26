@@ -10,14 +10,14 @@ from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemSellRank,
     ItemShopStandPrice,
+    LeaderboardRecord,
     LocalizedName,
     Metal,
+    ResourceCount,
     Subtitle,
     World,
     WorldPoll,
     WorldPollResult,
-    ResourceCount,
-    LeaderboardRecord,
 )
 
 

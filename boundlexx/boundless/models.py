@@ -225,7 +225,7 @@ class WorldPoll(models.Model):
         if world is None:
             world, _ = World.from_world_dict(world_dict)
 
-        world_poll = WorldPoll.objects.create(world=world,)
+        world_poll = WorldPoll.objects.create(world=world)
 
         WorldPollResult.objects.create(
             world_poll=world_poll,

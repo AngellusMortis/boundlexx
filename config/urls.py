@@ -13,7 +13,7 @@ urlpatterns = [
     path(f"{settings.API_BASE}auth/", include("rest_framework.urls")),
     path(f"{settings.API_BASE}schema/", schema_view, name="openapi_schema"),
     path(settings.API_BASE, include("boundlexx.api.urls")),
-    path("", TemplateView.as_view(template_name="boundlexx/api/docs.html"),),
+    path("", TemplateView.as_view(template_name="boundlexx/api/docs.html")),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 
