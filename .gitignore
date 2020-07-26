@@ -2,6 +2,8 @@
 .vscode/setting.json
 docker-compose.override.yml
 .env.local
+.env.testing
+.env.live
 .steam/*
 !.steam/.gitkeep
 
