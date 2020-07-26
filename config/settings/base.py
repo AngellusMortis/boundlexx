@@ -390,6 +390,67 @@ BOUNDLESS_MAX_ITEM_DELAY = 360
 BOUNDLESS_EXO_SEARCH_RADIUS = 10
 BOUNDLESS_MAX_WORLD_ID = 1000
 BOUNDLESS_MAX_SCAN_CHUNK = 50
+BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
+    32800,  # Rough Amethyst
+    32803,  # Rough Diamond
+    32804,  # Rough Emerald
+    32809,  # Rough Topaz
+    32807,  # Rough Ruby
+    32808,  # Rough Sapphire
+    32806,  # Rough Rift
+    32801,  # Rough Blink
+    32785,  # Copper Ore
+    32787,  # Iron Ore
+    32788,  # Silver Ore
+    32786,  # Gold Ore
+    32789,  # Titanium Ore
+    32779,  # Soft Coal
+    32777,  # Medium Coal
+    32778,  # Hard Coal
+    33081,  # Small Fossil
+    33082,  # Medium Fossil
+    33083,  # Large Fossil
+    33080,  # Ancient Tech Remnant
+    33078,  # Ancient Tech Component
+    33079,  # Ancient Tech Device
+    32802,  # Rough Umbris
+    32805,  # Rough Oortstone
+    10775,  # Trumpet Root
+    10774,  # Travller's Perch
+    10776,  # Rosetta Nox
+    10777,  # Desert Sword
+    10778,  # Spineback Plant
+    10779,  # Twisted Aloba
+    10780,  # Stardrop Plant
+    10781,  # Oortian's Staff
+    10782,  # Basic Boulder
+    10783,  # Beanstalk Boulder
+    10784,  # Boulder Tower
+    10785,  # Boulder Ring
+    10786,  # Boulder Chip
+    10787,  # Tapered Boulder
+    10788,  # Mottled Tar Spot Fungus
+    10789,  # Clustered Tongue Fungus
+    10790,  # Branch Funnel Fungus
+    10791,  # Tinted-Burst Fungus
+    10792,  # Weeping Waxcap Fungus
+    10793,  # Glow Cap Fungus
+    11632,  # Oortian Rice
+    11633,  # Oorum Wheat
+    11634,  # Ancient Oat
+    11642,  # Starberry Vine
+    11636,  # Waxy Tuber Plant
+    11644,  # Juicy Starberry Vine
+    11641,  # Kranut Plant
+    11635,  # Tuber Plant
+    11643,  # Glossy Starberry Vine
+    11637,  # Exotic Tuber Plant
+    11645,  # Combustion Fraction
+    11646,  # Kindling Mass
+    11647,  # Goo
+    33561,  # Pertrolim
+    33562,  # Primordial Resin
+]
 
 API_PROTOCOL = "http"
 API_BASE = "api/"

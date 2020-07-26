@@ -2,9 +2,11 @@ from typing import List
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.utils import timezone
+from django.db.models import Q
 
 from boundlexx.boundless.client import BoundlessClient
-from boundlexx.boundless.models import World
+from boundlexx.boundless.models import World, WorldPoll
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -46,13 +48,11 @@ def search_exo_worlds():
     logger.info(
         "Starting scan for exo worlds (%s, %s)", worlds_lower, worlds_upper
     )
-    worlds = get_worlds(worlds_lower, worlds_upper)
+    _, worlds = _scan_worlds(worlds_lower, worlds_upper)
 
     worlds_found = 0
-    for world_dict in worlds:
-        world, created = World.from_world_dict(world_dict["worldData"])
-
-        if created and not world.is_perm:
+    for world in worlds:
+        if not world.is_perm:
             worlds_found += 1
 
     logger.info("Found %s exo world(s)", worlds_found)
@@ -71,28 +71,41 @@ def discover_all_worlds():
     for chunk in chunks:
         logger.info("Starting scan for worlds (%s, %s)", chunk[0], chunk[1])
 
-        worlds_found += _scan_worlds(chunk[0], chunk[1])
+        created, _ = _scan_worlds(chunk[0], chunk[1])
+        worlds_found += created
 
     logger.info("Scan Complete. Found %s world(s)", worlds_found)
 
 
 def _scan_worlds(lower, upper):
-    worlds = get_worlds(lower, upper)
+    client = BoundlessClient()
+    worlds = get_worlds(lower, upper, client=client)
 
     worlds_found = 0
+    world_objs = []
     for world_dict in worlds:
-        _, created = World.from_world_dict(world_dict["worldData"])
+        world, created = World.from_world_dict(world_dict["worldData"])
 
         if created:
             worlds_found += 1
+            world_objs.append(world)
+
+            poll_dict = client.get_world_poll(
+                world_dict["pollData"], world_dict["worldData"]
+            )
+
+            WorldPoll.from_world_poll_dict(
+                world_dict["worldData"], poll_dict, world=world
+            )
 
     logger.info("Found %s world(s)", worlds_found)
 
-    return worlds_found
+    return worlds_found, world_objs
 
 
-def get_worlds(lower, upper):
-    client = BoundlessClient()
+def get_worlds(lower, upper, client=None):
+    if client is None:
+        client = BoundlessClient()
 
     worlds: List[dict] = []
 
@@ -103,3 +116,20 @@ def get_worlds(lower, upper):
             worlds.append(world_data)
 
     return worlds
+
+
+@app.task
+def poll_worlds():
+    client = BoundlessClient()
+    now = timezone.now()
+    worlds = World.objects.filter(active=True).filter(
+        Q(end__isnull=True) | Q(end__gt=now)
+    )
+
+    for world in worlds:
+        WorldPoll.objects.filter(world=world, active=True).update(active=False)
+
+        logger.info("Polling world %s", world.display_name)
+        world_data, poll_data = client.get_world_poll_by_id(world.id)
+
+        WorldPoll.from_world_poll_dict(world_data, poll_data, world=world)

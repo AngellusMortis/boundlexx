@@ -13,6 +13,11 @@ from boundlexx.boundless.models import (
     LocalizedName,
     Metal,
     Subtitle,
+    World,
+    WorldPoll,
+    WorldPollResult,
+    ResourceCount,
+    LeaderboardRecord,
 )
 
 
@@ -148,3 +153,122 @@ class ItemRequestBasketPriceAdmin(ItemPriceAdmin):
 @admin.register(ItemShopStandPrice)
 class ItemShopStandPriceAdmin(ItemPriceAdmin):
     pass
+
+
+class WorldPollInline(admin.TabularInline):
+    model = WorldPoll
+
+    show_change_link = True
+    fields = ["active", "time"]
+    readonly_fields = ["time"]
+    can_delete = False
+    max_num = 0
+
+
+@admin.register(World)
+class WorldAdmin(admin.ModelAdmin):
+    list_display = ["display_name", "region", "tier", "world_type", "is_perm"]
+    fields = [
+        "active",
+        "name",
+        "display_name",
+        "region",
+        "tier",
+        "description",
+        "size",
+        "world_type",
+        "address",
+        "ip_address",
+        "api_url",
+        "planets_url",
+        "chunks_url",
+        "time_offset",
+        "websocket_url",
+        "atmosphere_color",
+        "water_color",
+        "start",
+        "end",
+    ]
+    readonly_fields = [
+        "name",
+        "display_name",
+        "region",
+        "tier",
+        "description",
+        "size",
+        "world_type",
+        "address",
+        "ip_address",
+        "api_url",
+        "planets_url",
+        "chunks_url",
+        "time_offset",
+        "websocket_url",
+        "atmosphere_color",
+        "water_color",
+        "start",
+        "end",
+    ]
+
+    inlines = [WorldPollInline]
+
+
+class WorldPollResultInline(admin.StackedInline):
+    model = WorldPollResult
+
+    readonly_fields = [
+        "time",
+        "player_count",
+        "beacon_count",
+        "plot_count",
+        "total_prestige",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+class ResourceCountInline(admin.TabularInline):
+    model = ResourceCount
+
+    readonly_fields = [
+        "time",
+        "item",
+        "count",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+class LeaderboardRecordInline(admin.TabularInline):
+    model = LeaderboardRecord
+
+    fields = [
+        "time",
+        "world_rank",
+        "guild_tag",
+        "mayor_name",
+        "name",
+        "prestige",
+    ]
+    readonly_fields = [
+        "time",
+        "world_rank",
+        "guild_tag",
+        "mayor_name",
+        "name",
+        "prestige",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+@admin.register(WorldPoll)
+class WorldPollAdmin(admin.ModelAdmin):
+    list_display = ["world", "time", "active"]
+
+    inlines = [
+        WorldPollResultInline,
+        LeaderboardRecordInline,
+        ResourceCountInline,
+    ]
+

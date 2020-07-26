@@ -126,7 +126,6 @@ class World(models.Model):
     planets_url = models.URLField(_("Planets URL"))
     chunks_url = models.URLField(_("Chunks URL"))
     time_offset = models.DateTimeField(_("Time Offset"))
-
     websocket_url = models.URLField(_("Websocket URL"))
 
     atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"))
@@ -201,6 +200,117 @@ class World(models.Model):
     def water_color(self):
         return convert_linear_rgb_to_hex(
             self.water_color_r, self.water_color_g, self.water_color_b,
+        )
+
+
+class WorldPoll(models.Model):
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
+    active = models.BooleanField(db_index=True, default=True)
+    time = models.DateTimeField(auto_now=True)
+
+    @property
+    def result(self):
+        return self.worldpollresult_set.first()
+
+    @property
+    def resources(self):
+        return self.resourcecount_set.all()
+
+    @property
+    def leaderboard(self):
+        return self.leaderboardrecord_set.all()
+
+    @staticmethod
+    def from_world_poll_dict(world_dict, poll_dict, world=None):
+        if world is None:
+            world, _ = World.from_world_dict(world_dict)
+
+        world_poll = WorldPoll.objects.create(world=world,)
+
+        WorldPollResult.objects.create(
+            world_poll=world_poll,
+            player_count=world_dict["info"]["players"],
+            beacon_count=poll_dict["beacons"],
+            plot_count=poll_dict["plots"],
+            total_prestige=poll_dict["prestige"],
+        )
+
+        for index, amount in enumerate(poll_dict["resources"]):
+            if amount == 0:
+                continue
+
+            item_id = settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[index]
+
+            item = Item.objects.get(game_id=item_id)
+
+            ResourceCount.objects.create(
+                world_poll=world_poll, item=item, count=amount
+            )
+
+        for rank, leader in enumerate(poll_dict["leaderboard"]):
+            rank += 1
+
+            LeaderboardRecord.objects.create(
+                world_poll=world_poll,
+                world_rank=rank,
+                guild_tag=leader["mayor"]["guildTag"],
+                mayor_id=leader["mayor"]["id"],
+                mayor_name=leader["mayor"]["name"],
+                mayor_type=leader["mayor"]["type"],
+                name=leader["name"],
+                prestige=leader["prestige"],
+            )
+
+        world_poll.refresh_from_db()
+
+        return world_poll
+
+
+class WorldPollResult(models.Model):
+    time = models.DateTimeField(auto_now=True, primary_key=True)
+    world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
+    player_count = models.PositiveSmallIntegerField(_("Player Count"))
+    beacon_count = models.PositiveIntegerField(_("Beacon Count"))
+    plot_count = models.PositiveIntegerField(_("Plot Count"))
+    total_prestige = models.PositiveIntegerField(_("Total Prestige"))
+
+    class Meta:
+        unique_together = (
+            "time",
+            "world_poll",
+        )
+
+
+class ResourceCount(models.Model):
+    time = models.DateTimeField(auto_now=True, primary_key=True)
+    world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
+    item = models.ForeignKey("Item", on_delete=models.CASCADE)
+    count = models.PositiveIntegerField(_("Plot Count"))
+
+    class Meta:
+        unique_together = (
+            "time",
+            "world_poll",
+            "item",
+        )
+
+
+class LeaderboardRecord(models.Model):
+    time = models.DateTimeField(auto_now=True, primary_key=True)
+    world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
+    world_rank = models.PositiveSmallIntegerField(_("World Rank"))
+    guild_tag = models.CharField(_("Guild Tag"), max_length=7)
+    mayor_id = models.PositiveSmallIntegerField()
+    mayor_name = models.CharField(max_length=64)
+    mayor_type = models.PositiveSmallIntegerField()
+    name = models.CharField(max_length=64)
+    prestige = models.PositiveIntegerField()
+
+    class Meta:
+        unique_together = (
+            "time",
+            "world_poll",
+            "world_rank",
         )
 
 
