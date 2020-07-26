@@ -90,12 +90,12 @@ def _scan_worlds(lower, upper):
             worlds_found += 1
             world_objs.append(world)
 
-            poll_dict = client.get_world_poll(
+            world_data, poll_dict = client.get_world_poll(
                 world_dict["pollData"], world_dict["worldData"]
             )
 
             WorldPoll.from_world_poll_dict(
-                world_dict["worldData"], poll_dict, world=world
+                world_data, poll_dict, world=world
             )
 
     logger.info("Found %s world(s)", worlds_found)
