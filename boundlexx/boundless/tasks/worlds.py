@@ -94,9 +94,7 @@ def _scan_worlds(lower, upper):
                 world_dict["pollData"], world_dict["worldData"]
             )
 
-            WorldPoll.from_world_poll_dict(
-                world_data, poll_dict, world=world
-            )
+            WorldPoll.from_world_poll_dict(world_data, poll_dict, world=world)
 
     logger.info("Found %s world(s)", worlds_found)
 
