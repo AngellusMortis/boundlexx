@@ -28,19 +28,19 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login docker.pkg.github.com -u ${{ github.actor }} --password-stdin
 
       - name: Pull Cached Postgres Images
-        run: docker pull docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres || true
+        run: docker pull docker.pkg.github.com/angellusmortis/boundlexx/build-cache-postgres || true
 
       - name: Pull Cached Django Images
-        run: docker pull docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django || true
+        run: docker pull docker.pkg.github.com/angellusmortis/boundlexx/build-cache-django || true
 
       - name: Build CI Images
         run: docker-compose -f docker-compose.yml build --build-arg DJANGO_UID=$(id -u) postgres test lint
 
       - name: Push Postgres Image Cache
-        run: docker tag boundlexx_postgres docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres && docker push docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres || true
+        run: docker tag boundlexx_postgres docker.pkg.github.com/angellusmortis/boundlexx/build-cache-postgres && docker push docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-postgres || true
 
       - name: Push Django Image Cache
-        run: docker tag boundlexx_dev_django docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django && docker push docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django || true
+        run: docker tag boundlexx_dev_django docker.pkg.github.com/angellusmortis/boundlexx/build-cache-django && docker push docker.pkg.github.com/AngellusMortis/boundlexx/build-cache-django || true
 
       - name: Run Linters
         run: docker-compose run --rm lint
