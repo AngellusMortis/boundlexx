@@ -432,7 +432,7 @@ BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
     33562,  # Primordial Resin
 ]
 
-API_PROTOCOL = "http"
+API_PROTOCOL = env("API_PROTOCOL", default="http")
 API_BASE = "api/v1"
 
 STEAM_USERNAME = env("STEAM_USERNAME", default=None)

@@ -167,15 +167,35 @@ class WorldPollInline(admin.TabularInline):
 
 @admin.register(World)
 class WorldAdmin(admin.ModelAdmin):
-    list_display = ["display_name", "region", "tier", "world_type", "is_perm"]
+    def is_perm(self, obj):
+        return obj.is_perm
+
+    is_perm.boolean = True
+
+    list_display = [
+        "display_name",
+        "region",
+        "tier",
+        "world_type",
+        "protection",
+        "active",
+        "is_perm",
+        "creative",
+        "public",
+        "locked",
+    ]
     fields = [
         "active",
+        "creative",
+        "public",
+        "locked",
         "name",
         "display_name",
         "region",
         "tier",
         "description",
         "size",
+        "number_of_regions",
         "world_type",
         "address",
         "ip_address",
@@ -190,12 +210,16 @@ class WorldAdmin(admin.ModelAdmin):
         "end",
     ]
     readonly_fields = [
+        "creative",
+        "public",
+        "locked",
         "name",
         "display_name",
         "region",
         "tier",
         "description",
         "size",
+        "number_of_regions",
         "world_type",
         "address",
         "ip_address",

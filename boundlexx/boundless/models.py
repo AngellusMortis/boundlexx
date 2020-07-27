@@ -97,36 +97,65 @@ class Item(GameObj):
 
 
 class World(models.Model):
-    REGION_USE = "use"
-    REGION_USW = "usw"
-    REGION_EUC = "ecu"
-    REGION_AUS = "aus"
-    REGION_CREATIVE = "creative"
+    class Region(models.TextChoices):
+        REGION_USE = "use", _("US East")
+        REGION_USW = "usw", _("US West")
+        REGION_EUC = "euc", _("EU Central")
+        REGION_AUS = "aus", _("Australia")
+        REGION_CREATIVE = "creative", _("Creative")
 
-    REGION_CHOICES = [
-        (REGION_USE, "US East"),
-        (REGION_USW, "US West"),
-        (REGION_EUC, "EU Central"),
-        (REGION_AUS, "Australia"),
-        (REGION_CREATIVE, "Creative"),
-    ]
+    class Tier(models.IntegerChoices):
+        TIER_1 = 0, _("Placid (1)")
+        TIER_2 = 1, _("Temperate (2)")
+        TIER_3 = 2, _("Rugged (3)")
+        TIER_4 = 3, _("Inhospitable (4)")
+        TIER_5 = 4, _("Turbulent (5)")
+        TIER_6 = 5, _("Fierce (6)")
+        TIER_7 = 6, _("Savage (7)")
+        TIER_8 = 7, _("Brutal (8)")
+
+    class WorldType(models.TextChoices):
+        TYPE_LUSH = "LUSH", _("Lush")
+        TYPE_METAL = "METAL", _("Metal")
+        TYPE_COAL = "COAL", _("Coal")
+        TYPE_CORROSIVE = "CORROSIVE", _("Corrosive")
+        TYPE_SHOCK = "SHOCK", _("Shock")
+        TYPE_BLAST = "BLAST", _("Blast")
+        TYPE_TOXIC = "TOXIC", _("Toxic")
+        TYPE_CHILL = "CHILL", _("Chill")
+        TYPE_BURN = "BURN", _("Burn")
+        TYPE_UMBRIS = "UMBRIS", _("Umbris")
+        TYPE_RIFT = "RIFT", _("Rift")
+        TYPE_BLINK = "BLINK", _("Blink")
 
     name = models.CharField(_("Name"), max_length=64)
     display_name = models.CharField(_("Display Name"), max_length=64)
     region = models.CharField(
-        _("Server Region"), max_length=16, choices=REGION_CHOICES
+        _("Server Region"), max_length=16, choices=Region.choices
     )
-    tier = models.IntegerField(_("Tier"))
-    description = models.CharField(_("Description"), max_length=16)
+    tier = models.PositiveSmallIntegerField(_("Tier"), choices=Tier.choices)
+    description = models.CharField(_("Description"), max_length=32)
     size = models.IntegerField(_("World Size"))
-    world_type = models.CharField(_("World Type"), max_length=16)
-    address = models.CharField(_("Server Address"), max_length=128)
-    ip_address = models.GenericIPAddressField(_("Server IP Address"))
-    api_url = models.URLField(_("API URL"))
-    planets_url = models.URLField(_("Planets URL"))
-    chunks_url = models.URLField(_("Chunks URL"))
+    world_type = models.CharField(
+        _("World Type"), choices=WorldType.choices, max_length=9
+    )
+    address = models.CharField(
+        _("Server Address"), max_length=128, blank=True, null=True
+    )
+    ip_address = models.GenericIPAddressField(
+        _("Server IP Address"), blank=True, null=True
+    )
+    api_url = models.URLField(_("API URL"), blank=True, null=True)
+    planets_url = models.URLField(_("Planets URL"), blank=True, null=True)
+    chunks_url = models.URLField(_("Chunks URL"), blank=True, null=True)
     time_offset = models.DateTimeField(_("Time Offset"))
-    websocket_url = models.URLField(_("Websocket URL"))
+    websocket_url = models.URLField(_("Websocket URL"), blank=True, null=True)
+    assignment = models.PositiveSmallIntegerField(blank=True, null=True)
+    owner = models.PositiveSmallIntegerField(blank=True, null=True)
+    creative = models.BooleanField(default=False, db_index=True)
+    locked = models.BooleanField(default=False, db_index=True)
+    public = models.BooleanField(default=True, db_index=True)
+    number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
 
     atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"))
     atmosphere_color_g = models.FloatField(_("Atmosphere Linear G Color"))
@@ -145,44 +174,47 @@ class World(models.Model):
 
     @staticmethod
     def from_world_dict(world_dict):
-        data = {
-            "id": world_dict["id"],
-            "name": world_dict["name"],
-            "display_name": world_dict["displayName"],
-            "region": world_dict["region"],
-            "tier": world_dict["tier"],
-            "description": world_dict["worldDescription"],
-            "size": world_dict["worldSize"],
-            "world_type": world_dict["worldType"],
-            "address": world_dict["addr"],
-            "ip_address": world_dict["ipAddr"],
-            "api_url": world_dict["apiURL"],
-            "atmosphere_color_r": world_dict["atmosphereColor"][0],
-            "atmosphere_color_g": world_dict["atmosphereColor"][1],
-            "atmosphere_color_b": world_dict["atmosphereColor"][2],
-            "chunks_url": world_dict["chunksURL"],
-            "time_offset": datetime.utcfromtimestamp(
-                world_dict["timeOffset"]
-            ).replace(tzinfo=pytz.utc),
-            "water_color_r": world_dict["waterColor"][0],
-            "water_color_g": world_dict["waterColor"][1],
-            "water_color_b": world_dict["waterColor"][2],
-            "websocket_url": world_dict["websocketURL"],
-        }
+        world, created = World.objects.get_or_create(
+            id=world_dict["id"],
+            name=world_dict["name"],
+            display_name=world_dict["displayName"],
+        )
+
+        world.region = world_dict["region"]
+        world.tier = world_dict["tier"]
+        world.description = world_dict["worldDescription"]
+        world.size = world_dict["worldSize"]
+        world.world_type = world_dict["worldType"]
+        world.address = world_dict.get("addr")
+        world.ip_address = world_dict.get("ipAddr")
+        world.api_url = world_dict.get("apiURL")
+        world.atmosphere_color_r = world_dict["atmosphereColor"][0]
+        world.atmosphere_color_g = world_dict["atmosphereColor"][1]
+        world.atmosphere_color_b = world_dict["atmosphereColor"][2]
+        world.chunks_url = world_dict.get("chunksURL")
+        world.time_offset = datetime.utcfromtimestamp(
+            world_dict["timeOffset"]
+        ).replace(tzinfo=pytz.utc)
+        world.water_color_r = world_dict["waterColor"][0]
+        world.water_color_g = world_dict["waterColor"][1]
+        world.water_color_b = world_dict["waterColor"][2]
+        world.websocket_url = world_dict.get("websocketURL")
+        world.creative = world_dict.get("creative", False)
+        world.owner = world_dict.get("owner", None)
+        world.assignment = world_dict.get("assignment", None)
+        world.locked = world_dict.get("locked", False)
+        world.number_of_regions = world_dict["numRegions"]
 
         if "lifetime" in world_dict:
-            data["start"] = (
-                datetime.utcfromtimestamp(world_dict["lifetime"][0]).replace(
-                    tzinfo=pytz.utc
-                ),
-            )
-            data["end"] = (
-                datetime.utcfromtimestamp(world_dict["lifetime"][1]).replace(
-                    tzinfo=pytz.utc
-                ),
-            )
+            world.start = datetime.utcfromtimestamp(
+                world_dict["lifetime"][0]
+            ).replace(tzinfo=pytz.utc)
+            world.end = datetime.utcfromtimestamp(
+                world_dict["lifetime"][1]
+            ).replace(tzinfo=pytz.utc)
+        world.save()
 
-        return World.objects.get_or_create(**data)
+        return world, created
 
     @property
     def is_perm(self):
@@ -201,6 +233,39 @@ class World(models.Model):
         return convert_linear_rgb_to_hex(
             self.water_color_r, self.water_color_g, self.water_color_b,
         )
+
+    @property
+    def protection(self):
+        if self.tier < World.Tier.TIER_4:
+            return None
+
+        amount = 5
+        if self.tier == World.Tier.TIER_4:
+            amount = 1
+        elif self.tier == World.Tier.TIER_5:
+            amount = 3
+        elif self.tier == World.Tier.TIER_6:
+            amount = 4
+        elif self.tier == World.Tier.TIER_7:
+            amount = 5
+
+        protection_type = "Volatile"
+        if self.world_type in (
+            World.WorldType.TYPE_LUSH,
+            World.WorldType.TYPE_CORROSIVE,
+            World.WorldType.TYPE_TOXIC,
+            World.WorldType.TYPE_UMBRIS,
+        ):
+            protection_type = "Caustic"
+        elif self.world_type in (
+            World.WorldType.TYPE_METAL,
+            World.WorldType.TYPE_SHOCK,
+            World.WorldType.TYPE_CHILL,
+            World.WorldType.TYPE_RIFT,
+        ):
+            protection_type = "Potent"
+
+        return f"Lvl {amount} {protection_type}"
 
 
 class WorldPoll(models.Model):
@@ -253,7 +318,7 @@ class WorldPoll(models.Model):
             LeaderboardRecord.objects.create(
                 world_poll=world_poll,
                 world_rank=rank,
-                guild_tag=leader["mayor"]["guildTag"],
+                guild_tag=leader["mayor"].get("guildTag", ""),
                 mayor_id=leader["mayor"]["id"],
                 mayor_name=leader["mayor"]["name"],
                 mayor_type=leader["mayor"]["type"],

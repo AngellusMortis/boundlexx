@@ -2,7 +2,6 @@ from typing import List
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
-from django.db.models import Q
 from django.utils import timezone
 
 from boundlexx.boundless.client import BoundlessClient
@@ -48,6 +47,7 @@ def search_exo_worlds():
     logger.info(
         "Starting scan for exo worlds (%s, %s)", worlds_lower, worlds_upper
     )
+
     _, worlds = _scan_worlds(worlds_lower, worlds_upper)
 
     worlds_found = 0
@@ -59,12 +59,18 @@ def search_exo_worlds():
 
 
 @app.task
-def discover_all_worlds():
+def discover_all_worlds(start_id=None):
+    if start_id is None:
+        start_id = 1
+
     chunks = []
-    chunk_lower, chunk_upper = 0, 0
+    chunk_lower, chunk_upper = 0, start_id - 1
     while chunk_upper < settings.BOUNDLESS_MAX_WORLD_ID:
         chunk_lower = chunk_upper + 1
-        chunk_upper = chunk_lower + settings.BOUNDLESS_MAX_SCAN_CHUNK - 1
+        chunk_upper = min(
+            chunk_lower + settings.BOUNDLESS_MAX_SCAN_CHUNK - 1,
+            settings.BOUNDLESS_MAX_WORLD_ID,
+        )
         chunks.append((chunk_lower, chunk_upper))
 
     worlds_found = 0
@@ -117,12 +123,11 @@ def get_worlds(lower, upper, client=None):
 
 
 @app.task
-def poll_worlds():
+def poll_worlds(worlds=None):
+    if worlds is None:
+        worlds = World.objects.filter(active=True)
+
     client = BoundlessClient()
-    now = timezone.now()
-    worlds = World.objects.filter(active=True).filter(
-        Q(end__isnull=True) | Q(end__gt=now)
-    )
 
     for world in worlds:
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
@@ -130,4 +135,12 @@ def poll_worlds():
         logger.info("Polling world %s", world.display_name)
         world_data, poll_data = client.get_world_poll_by_id(world.id)
 
-        WorldPoll.from_world_poll_dict(world_data, poll_data, world=world)
+        if world_data is None:
+            world.active = False
+            world.save()
+            continue
+
+        World.from_world_dict(world_data)
+
+        if poll_data is not None:
+            WorldPoll.from_world_poll_dict(world_data, poll_data, world=world)
