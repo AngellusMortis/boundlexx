@@ -100,7 +100,6 @@ pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via ipython, sphinx
-pyjwt==1.7.1              # via -r /app/requirements/in/base.in
 pylint-celery==0.3        # via -r /app/requirements/in/dev.in
 pylint-django==2.2.0      # via -r /app/requirements/in/dev.in
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django

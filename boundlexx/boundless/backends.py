@@ -1,4 +1,3 @@
-import jwt
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
@@ -14,17 +13,19 @@ class BoundlessAuthenticationBackend(ModelBackend):
         client = BoundlessClient()
 
         try:
-            boundless_jwt = client.login_user(username, password)
+            boundless_user = client.login_user(username, password)
         except HTTPError:
             return None
-
-        boundless_user = jwt.decode(boundless_jwt, verify=False)
 
         try:
             user = User.objects.get(username=boundless_user["username"])
         except User.DoesNotExist:
             user = None  # type: ignore
             if settings.BOUNDLESS_AUTH_AUTO_CREATE:
-                user = User.objects.create(username=boundless_user["username"])
+                user = User.objects.create(
+                    username=boundless_user["username"],
+                    email=boundless_user["email"],
+                    boundless_account_uid=boundless_user["public_uid"],
+                )
 
         return user

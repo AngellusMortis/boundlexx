@@ -350,7 +350,7 @@ class ResourceCount(models.Model):
     time = models.DateTimeField(auto_now=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    count = models.PositiveIntegerField(_("Plot Count"))
+    count = models.PositiveIntegerField(_("Count"))
 
     class Meta:
         unique_together = (

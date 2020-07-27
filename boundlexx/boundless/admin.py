@@ -164,6 +164,9 @@ class WorldPollInline(admin.TabularInline):
     can_delete = False
     max_num = 0
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).order_by("-time")
+
 
 @admin.register(World)
 class WorldAdmin(admin.ModelAdmin):
@@ -173,6 +176,7 @@ class WorldAdmin(admin.ModelAdmin):
     is_perm.boolean = True  # type: ignore
 
     list_display = [
+        "id",
         "display_name",
         "region",
         "tier",
@@ -185,6 +189,7 @@ class WorldAdmin(admin.ModelAdmin):
         "locked",
     ]
     fields = [
+        "id",
         "active",
         "creative",
         "public",
@@ -210,6 +215,7 @@ class WorldAdmin(admin.ModelAdmin):
         "end",
     ]
     readonly_fields = [
+        "id",
         "creative",
         "public",
         "locked",
@@ -264,6 +270,9 @@ class ResourceCountInline(admin.TabularInline):
     can_delete = False
     max_num = 0
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).order_by("-count")
+
 
 class LeaderboardRecordInline(admin.TabularInline):
     model = LeaderboardRecord
@@ -284,6 +293,9 @@ class LeaderboardRecordInline(admin.TabularInline):
     ]
     can_delete = False
     max_num = 0
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).order_by("world_rank")
 
 
 @admin.register(WorldPoll)
