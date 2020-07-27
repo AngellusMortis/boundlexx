@@ -336,6 +336,8 @@ REST_FRAMEWORK = {
     ]
 }
 
+SERVE_STATIC_FILES_DEV = env.bool("SERVE_STATIC_FILES_DEV", False)
+
 
 # base URL for discovery server
 BOUNDLESS_API_URL_BASE = env(

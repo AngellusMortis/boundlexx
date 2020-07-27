@@ -1,7 +1,10 @@
+from datetime import timedelta
 from typing import Sequence, Type
 
+from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
+from django.utils import timezone
 
 from boundlexx.boundless.models import (
     Color,
@@ -19,6 +22,8 @@ from boundlexx.boundless.models import (
     WorldPoll,
     WorldPollResult,
 )
+
+TIMESERIES_CUTOFF = 7
 
 
 class LocalizationInline(admin.TabularInline):
@@ -49,7 +54,10 @@ class ItemPriceInline(admin.TabularInline):
     max_num = 0
 
     def get_queryset(self, request):
-        return super().get_queryset(request).filter(active=True)
+        cutoff = timezone.now() - timedelta(days=TIMESERIES_CUTOFF)
+        return (
+            super().get_queryset(request).filter(active=True, time__gt=cutoff)
+        )
 
 
 class ItemRankInline(admin.TabularInline):
@@ -80,15 +88,48 @@ class ItemShopStandPriceInline(ItemPriceInline):
     model = ItemShopStandPrice
 
 
+class ItemResourceCountInline(admin.TabularInline):
+    model = ResourceCount
+    can_delete = False
+    max_num = 0
+    raw_id_fields = ["world_poll"]
+
+    def world(self, obj):
+        return obj.world_poll.world
+
+    fields = [
+        "world",
+        "count",
+    ]
+    readonly_fields = [
+        "world",
+        "count",
+    ]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .filter(world_poll__active=True)
+            .select_related("world_poll__world")
+            .order_by("-count")
+        )
+
+
 class GameObjAdmin(admin.ModelAdmin):
     list_display = ["default_name", "game_id", "active"]
-    search_fields = ["game_id", "localizedname"]
+    # search_fields = ["game_id", "localizedname"]
     readonly_fields = ["game_id"]
 
     inlines: Sequence[Type[InlineModelAdmin]] = [LocalizationInline]
 
     def has_delete_permission(self, request, obj=None):
         return False
+
+    def get_queryset(self, request):
+        return (
+            super().get_queryset(request).prefetch_related("localizedname_set")
+        )
 
 
 @admin.register(Subtitle)
@@ -110,13 +151,20 @@ class MetalAdmin(GameObjAdmin):
 class ItemAdmin(GameObjAdmin):
     readonly_fields = ["game_id", "string_id"]
     raw_id_fields = ["item_subtitle"]
-    inlines = [
-        LocalizationInline,
-        ItemBuyRankInline,
-        ItemRequestBasketPriceInline,
-        ItemSellRankInline,
-        ItemShopStandPriceInline,
-    ]
+
+    def get_inlines(self, request, obj):
+        inlines = [
+            LocalizationInline,
+            ItemBuyRankInline,
+            ItemRequestBasketPriceInline,
+            ItemSellRankInline,
+            ItemShopStandPriceInline,
+        ]
+
+        if obj.game_id in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
+            inlines.insert(1, ItemResourceCountInline)
+
+        return inlines
 
 
 class ItemPriceAdmin(admin.ModelAdmin):
@@ -142,7 +190,7 @@ class ItemPriceAdmin(admin.ModelAdmin):
         "guild_tag",
         "shop_activity",
     ]
-    search_fields = ["item__default_name", "world", "beacon_name"]
+    # search_fields = ["item__default_name", "world", "beacon_name"]
 
 
 @admin.register(ItemRequestBasketPrice)
@@ -165,7 +213,13 @@ class WorldPollInline(admin.TabularInline):
     max_num = 0
 
     def get_queryset(self, request):
-        return super().get_queryset(request).order_by("-time")
+        cutoff = timezone.now() - timedelta(days=TIMESERIES_CUTOFF)
+        return (
+            super()
+            .get_queryset(request)
+            .filter(time__gt=cutoff)
+            .order_by("-time")
+        )
 
 
 @admin.register(World)
@@ -310,3 +364,16 @@ class WorldPollAdmin(admin.ModelAdmin):
         LeaderboardRecordInline,
         ResourceCountInline,
     ]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .select_related("world")
+            .prefetch_related(
+                "worldpollresult_set",
+                "leaderboardrecord_set",
+                "resourcecount_set",
+                "resourcecount_set__item",
+            )
+        )

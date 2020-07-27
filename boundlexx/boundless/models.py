@@ -174,25 +174,30 @@ class World(models.Model):
 
     @staticmethod
     def from_world_dict(world_dict):
-        world, created = World.objects.get_or_create(
-            id=world_dict["id"],
-            name=world_dict["name"],
-            display_name=world_dict["displayName"],
-            region=world_dict["region"],
-            tier=world_dict["tier"],
-            description=world_dict["worldDescription"],
-            size=world_dict["worldSize"],
-            world_type=world_dict["worldType"],
-            time_offset=datetime.utcfromtimestamp(
-                world_dict["timeOffset"]
-            ).replace(tzinfo=pytz.utc),
-            atmosphere_color_r=world_dict["atmosphereColor"][0],
-            atmosphere_color_g=world_dict["atmosphereColor"][1],
-            atmosphere_color_b=world_dict["atmosphereColor"][2],
-            water_color_r=world_dict["waterColor"][0],
-            water_color_g=world_dict["waterColor"][1],
-            water_color_b=world_dict["waterColor"][2],
-        )
+        created = False
+        try:
+            world = World.objects.get(id=world_dict["id"])
+        except World.DoesNotExist:
+            world = World.objects.create(
+                id=world_dict["id"],
+                name=world_dict["name"],
+                display_name=world_dict["displayName"],
+                region=world_dict["region"],
+                tier=world_dict["tier"],
+                description=world_dict["worldDescription"],
+                size=world_dict["worldSize"],
+                world_type=world_dict["worldType"],
+                time_offset=datetime.utcfromtimestamp(
+                    world_dict["timeOffset"]
+                ).replace(tzinfo=pytz.utc),
+                atmosphere_color_r=world_dict["atmosphereColor"][0],
+                atmosphere_color_g=world_dict["atmosphereColor"][1],
+                atmosphere_color_b=world_dict["atmosphereColor"][2],
+                water_color_r=world_dict["waterColor"][0],
+                water_color_g=world_dict["waterColor"][1],
+                water_color_b=world_dict["waterColor"][2],
+            )
+            created = True
 
         world.address = world_dict.get("addr")
         world.ip_address = world_dict.get("ipAddr")
