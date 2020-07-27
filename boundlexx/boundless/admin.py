@@ -170,7 +170,7 @@ class WorldAdmin(admin.ModelAdmin):
     def is_perm(self, obj):
         return obj.is_perm
 
-    is_perm.boolean = True
+    is_perm.boolean = True  # type: ignore
 
     list_display = [
         "display_name",
