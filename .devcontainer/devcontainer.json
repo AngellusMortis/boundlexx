@@ -24,6 +24,7 @@
         "files.trimTrailingWhitespace": true,
         "python.analysis.openFilesOnly": false,
         "python.envFile": "${workspaceFolder}/.env",
+        "python.pythonPath": "/usr/local/bin/python",
         "python.formatting.blackArgs": [
             "--line-length",
             "79"
@@ -65,7 +66,7 @@
     // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "root",
     "forwardPorts": [
-        5555,
-        9000
+        6555,
+        9050
     ],
 }
