@@ -3,6 +3,7 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views import defaults as default_views
+from django.views.static import serve
 from django.views.generic import TemplateView
 
 from boundlexx.api.urls import schema_view
@@ -49,7 +50,7 @@ elif settings.SERVE_STATIC_FILES_DEV:
     urlpatterns += [
         re_path(
             r"^static/(?P<path>.*)$",
-            "django.views.static.serve",
+            serve,
             {"document_root": settings.STATIC_ROOT},
         ),
     ]
