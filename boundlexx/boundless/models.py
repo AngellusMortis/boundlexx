@@ -178,26 +178,25 @@ class World(models.Model):
             id=world_dict["id"],
             name=world_dict["name"],
             display_name=world_dict["displayName"],
+            region=world_dict["region"],
+            tier=world_dict["tier"],
+            description=world_dict["worldDescription"],
+            size=world_dict["worldSize"],
+            world_type=world_dict["worldType"],
+            time_offset=datetime.utcfromtimestamp(
+                world_dict["timeOffset"]
+            ).replace(tzinfo=pytz.utc),
+            atmosphere_color_r=world_dict["atmosphereColor"][0],
+            atmosphere_color_g=world_dict["atmosphereColor"][1],
+            atmosphere_color_b=world_dict["atmosphereColor"][2],
+            water_color_r=world_dict["waterColor"][0],
+            water_color_g=world_dict["waterColor"][1],
+            water_color_b=world_dict["waterColor"][2],
         )
 
-        world.region = world_dict["region"]
-        world.tier = world_dict["tier"]
-        world.description = world_dict["worldDescription"]
-        world.size = world_dict["worldSize"]
-        world.world_type = world_dict["worldType"]
         world.address = world_dict.get("addr")
         world.ip_address = world_dict.get("ipAddr")
         world.api_url = world_dict.get("apiURL")
-        world.atmosphere_color_r = world_dict["atmosphereColor"][0]
-        world.atmosphere_color_g = world_dict["atmosphereColor"][1]
-        world.atmosphere_color_b = world_dict["atmosphereColor"][2]
-        world.chunks_url = world_dict.get("chunksURL")
-        world.time_offset = datetime.utcfromtimestamp(
-            world_dict["timeOffset"]
-        ).replace(tzinfo=pytz.utc)
-        world.water_color_r = world_dict["waterColor"][0]
-        world.water_color_g = world_dict["waterColor"][1]
-        world.water_color_b = world_dict["waterColor"][2]
         world.websocket_url = world_dict.get("websocketURL")
         world.creative = world_dict.get("creative", False)
         world.owner = world_dict.get("owner", None)
