@@ -15,7 +15,7 @@ RUN apt-get update \
   && rm -rf /var/lib/apt/lists/*
 
 RUN addgroup --system --gid ${DJANGO_UID} django \
-    && adduser --system --shell /bin/bash --uid ${DJANGO_UID} --ingroup django django
+  && adduser --system --shell /bin/bash --uid ${DJANGO_UID} --ingroup django django
 
 COPY ./docker/bin/auth-ticket.js /auth-ticket.js
 RUN chmod +x /auth-ticket.js
@@ -54,10 +54,10 @@ RUN chmod +x /start-celerybeat
 COPY --chown=django:django ./docker/celery/dev/flower/start /start-flower
 RUN chmod +x /start-flower
 
-COPY --chown=django:django ./docker/bin/lint.sh /format.sh
+COPY --chown=django:django ./docker/bin/lint.sh /lint.sh
 RUN chmod +x /lint.sh
 
-COPY --chown=django:django ./docker/bin/lint.sh /format.sh
+COPY --chown=django:django ./docker/bin/format.sh /format.sh
 RUN chmod +x /format.sh
 
 USER django
@@ -73,7 +73,7 @@ FROM base as production
 # Requirements are installed here to ensure they will be cached.
 COPY ./requirements /requirements
 RUN pip install --no-cache-dir -r /requirements/production.txt \
-    && rm -rf /requirements
+  && rm -rf /requirements
 
 COPY --chown=django:django ./docker/django/entrypoint /entrypoint
 RUN chmod +x /entrypoint
@@ -98,7 +98,5 @@ COPY --chown=django:django ./boundlexx /app/boundlexx
 USER django
 
 WORKDIR /app
-
-VOLUME /ark /obelisk /logs
 
 ENTRYPOINT ["/entrypoint"]
