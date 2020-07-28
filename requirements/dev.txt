@@ -43,8 +43,9 @@ django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lo
 django-stubs==1.5.0       # via -r /app/requirements/in/dev.in
 django-timezone-field==4.0  # via django-celery-beat
 django==3.0.8             # via -r /app/requirements/in/base.in, django-celery-beat, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-stubs, django-timezone-field, djangorestframework
-djangorestframework==3.11.0  # via -r /app/requirements/in/base.in
+djangorestframework==3.11.0  # via -r /app/requirements/in/base.in, drf-extensions
 docutils==0.16            # via sphinx
+drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 factory-boy==2.12.0       # via -r /app/requirements/in/dev.in
 faker==4.1.1              # via factory-boy
 flake8-bugbear==20.1.4    # via -r /app/requirements/in/dev.in

@@ -56,7 +56,7 @@ class GameObj(PolymorphicModel):
 class LocalizedName(PolymorphicModel):
     game_obj = models.ForeignKey(GameObj, on_delete=models.CASCADE)
     lang = models.CharField(_("Language"), max_length=16)
-    name = models.CharField(_("Name"), max_length=128)
+    name = models.CharField(_("Name"), max_length=128, db_index=True)
 
     class Meta:
         unique_together = ("game_obj", "lang")

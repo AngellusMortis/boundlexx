@@ -29,7 +29,8 @@ django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
 django-timezone-field==4.0  # via django-celery-beat
 django==3.0.8             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
-djangorestframework==3.11.0  # via -r /app/requirements/in/base.in
+djangorestframework==3.11.0  # via -r /app/requirements/in/base.in, drf-extensions
+drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
 future==0.18.2            # via celery
 gevent-eventemitter==2.1  # via steam

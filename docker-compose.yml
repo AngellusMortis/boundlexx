@@ -73,7 +73,7 @@ services:
 
   celery:
     <<: *django
-    image: boundlexx_dev_celeryworker
+    image: boundlexx_dev_celery
     depends_on:
       - redis
       - postgres

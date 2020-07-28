@@ -1,34 +1,26 @@
-from django.conf import settings
-from django.contrib.sites.models import Site
-from django.db.utils import ProgrammingError
 from django.urls import include, path
-from rest_framework import routers
-from rest_framework.schemas import get_schema_view
+from django.views.generic import TemplateView
 
 from boundlexx.api import views
+from boundlexx.api.routers import APIDocsRouter
 
-router = routers.DefaultRouter()
-router.register(r"color", views.ColorViewSet)
-router.register(r"item", views.ItemViewSet)
-
-
-def get_site():
-    try:
-        return Site.objects.get_current()
-    except ProgrammingError:
-        return "example.com"
-
-
-schema_view = get_schema_view(
-    title="Boundlexx",
-    description="Boundless Lexicon API. Everything about the game Boundless",
-    version="v1",
-    url=f"{settings.API_PROTOCOL}://{get_site()}/{settings.API_BASE}",
-    urlconf="boundlexx.api.urls",
+router = APIDocsRouter()
+router.register(r"colors", views.ColorViewSet, basename="color")
+router.register(r"items", views.ItemViewSet, basename="item").register(
+    r"resource-counts",
+    views.ItemResourceCountViewSet,
+    basename="item-resource-count",
+    parents_query_lookups=["item__game_id"],
 )
+
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [
-    path("", include(router.urls)),
+    path(
+        "",
+        TemplateView.as_view(template_name="boundlexx/api/docs.html"),
+        name="api-docs",
+    ),
+    path("v1/", include((router.urls, "api"), namespace="v1")),
 ]

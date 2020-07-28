@@ -282,17 +282,11 @@ LOGGING = {
             "class": "logging.StreamHandler",
             "formatter": "colored",
         },
-        "file": {
-            "level": "DEBUG",
-            "class": "logging.FileHandler",
-            "filename": "/tmp/django.log",
-            "formatter": "colored",
-        },
     },
     "loggers": {
-        "django": {"handlers": ["console", "file"], "level": "INFO"},
+        "django": {"handlers": ["console"], "level": "INFO"},
         "django.server": {
-            "handlers": ["django.server", "file"],
+            "handlers": ["django.server"],
             "level": "INFO",
             "propagate": False,
         },
@@ -333,7 +327,13 @@ REST_FRAMEWORK = {
     # or allow read-only access for unauthenticated users.
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
-    ]
+    ],
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
+    "ALLOWED_VERSIONS": ["v1"],
+}
+
+REST_FRAMEWORK_EXTENSIONS = {
+    "DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX": "",
 }
 
 SERVE_STATIC_FILES_DEV = env.bool("SERVE_STATIC_FILES_DEV", False)
@@ -435,7 +435,6 @@ BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
 ]
 
 API_PROTOCOL = env("API_PROTOCOL", default="http")
-API_BASE = "api/v1"
 
 STEAM_USERNAME = env("STEAM_USERNAME", default=None)
 STEAM_PASSWORD = env("STEAM_PASSWORD", default=None)

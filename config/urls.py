@@ -3,18 +3,14 @@ from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import include, path, re_path
 from django.views import defaults as default_views
-from django.views.generic import TemplateView
+from django.views.generic.base import RedirectView
 from django.views.static import serve
-
-from boundlexx.api.urls import schema_view
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("admin_tools/", include("admin_tools.urls")),
-    path(f"{settings.API_BASE}auth/", include("rest_framework.urls")),
-    path(f"{settings.API_BASE}schema/", schema_view, name="openapi_schema"),
-    path(settings.API_BASE, include("boundlexx.api.urls")),
-    path("", TemplateView.as_view(template_name="boundlexx/api/docs.html")),
+    path("api/", include("boundlexx.api.urls")),
+    path("", RedirectView.as_view(url="/api/"), name="go-to-api"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

@@ -4,6 +4,7 @@ from typing import Dict
 
 from celery.utils.log import get_task_logger
 from django.core.cache import cache
+from django.db.models import Q
 from django.utils import timezone
 
 from boundlexx.boundless.client import BoundlessClient
@@ -65,7 +66,7 @@ def _update_item_prices(
     ranks = _get_ranks(item, rank_klass, all_worlds)
 
     if len(ranks) == 0:
-        return 0
+        return -1
 
     total = 0
     shops = getattr(client, client_method)(
@@ -74,7 +75,7 @@ def _update_item_prices(
 
     # set all existing price records to inactive
     price_klass.objects.filter(
-        item=item, active=True, world___name__in=list(ranks.keys())
+        item=item, active=True, world__name__in=list(ranks.keys())
     ).update(active=False)
 
     for world_name, shops in shops.items():
@@ -105,7 +106,11 @@ def _update_prices():
     items = Item.objects.filter(active=True)
     logger.info("Updating the prices for %s items", len(items))
 
-    all_worlds = list(World.objects.filter(active=True, end__isnull=True))
+    all_worlds = list(
+        World.objects.filter(active=True, creative=False).filter(
+            Q(owner__isnull=False) | Q(end__isnull=True)
+        )
+    )
     for item in items:
         buy_updated = _update_item_prices(
             item, ItemBuyRank, "shop_buy", ItemRequestBasketPrice, all_worlds
@@ -114,7 +119,7 @@ def _update_prices():
             item, ItemSellRank, "shop_sell", ItemShopStandPrice, all_worlds
         )
 
-        if buy_updated > 0 or sell_updated > 0:
+        if buy_updated >= 0 or sell_updated >= 0:
             logger.info(
                 "Updated %s (Baskets: %s, Stands: %s)",
                 item,

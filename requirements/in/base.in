@@ -11,6 +11,7 @@ django-polymorphic
 django-redis
 django<4
 djangorestframework
+drf-extensions
 python-redis-lock[django]
 
 # Celery

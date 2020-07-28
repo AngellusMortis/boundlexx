@@ -110,7 +110,9 @@ class ItemResourceCountInline(admin.TabularInline):
         return (
             super()
             .get_queryset(request)
-            .filter(world_poll__active=True)
+            .filter(
+                world_poll__active=True
+            )  # , world_poll__world__active=True)
             .select_related("world_poll__world")
             .order_by("-count")
         )
@@ -118,7 +120,7 @@ class ItemResourceCountInline(admin.TabularInline):
 
 class GameObjAdmin(admin.ModelAdmin):
     list_display = ["default_name", "game_id", "active"]
-    # search_fields = ["game_id", "localizedname"]
+    search_fields = ["game_id", "localizedname__name"]
     readonly_fields = ["game_id"]
 
     inlines: Sequence[Type[InlineModelAdmin]] = [LocalizationInline]
@@ -190,7 +192,12 @@ class ItemPriceAdmin(admin.ModelAdmin):
         "guild_tag",
         "shop_activity",
     ]
-    # search_fields = ["item__default_name", "world", "beacon_name"]
+    search_fields = [
+        "item__string_id",
+        "item__localizedname__name",
+        "world__display_name",
+        "beacon_name",
+    ]
 
 
 @admin.register(ItemRequestBasketPrice)

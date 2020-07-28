@@ -57,16 +57,11 @@
         "redis",
         "celery",
         "celerybeat",
-        "flower",
     ],
     // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
     // "shutdownAction": "none",
     // Uncomment the next line to run commands after the container is created - for example installing git.
-    "postCreateCommand": "cp /app/.devcontainer/bashrc /root/.bashrc && sed -i 's/\r$//g' /root/.bashrc && apt-get update && apt-get install -y git",
+    "postCreateCommand": "cp /app/.devcontainer/bashrc /home/django/.bashrc && sed -i 's/\r$//g' /home/django/.bashrc",
     // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
-    "remoteUser": "root",
-    "forwardPorts": [
-        6555,
-        9050
-    ],
+    "remoteUser": "django",
 }
