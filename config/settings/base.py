@@ -330,6 +330,8 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
     "ALLOWED_VERSIONS": ["v1"],
+    "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.LimitOffsetPagination",  # noqa
+    "PAGE_SIZE": 255,
 }
 
 REST_FRAMEWORK_EXTENSIONS = {

@@ -38,26 +38,36 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
 
 
 class ColorSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="game_id")  # noqa A003
+    url = serializers.HyperlinkedIdentityField(
+        view_name="color-detail", lookup_field="game_id", read_only=True
+    )
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True
     )
 
     class Meta:
         model = Color
-        fields = ["id", "localization"]
+        fields = ["url", "game_id", "localization"]
 
 
 class ItemSerializer(serializers.ModelSerializer):
-    id = serializers.IntegerField(source="game_id")  # noqa A003
+    url = serializers.HyperlinkedIdentityField(
+        view_name="color-detail", lookup_field="game_id", read_only=True
+    )
+    resource_counts_url = ResourceCountLinkField()
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True
     )
-    resource_counts = ResourceCountLinkField()
 
     class Meta:
         model = Item
-        fields = ["id", "string_id", "resource_counts", "localization"]
+        fields = [
+            "url",
+            "game_id",
+            "string_id",
+            "resource_counts_url",
+            "localization",
+        ]
 
 
 class SimpleWorldSerializer(serializers.ModelSerializer):
