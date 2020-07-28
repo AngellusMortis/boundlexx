@@ -11,12 +11,13 @@ class DescriptiveAutoSchema(AutoSchema):
         operation = super().get_operation(path, method)
 
         tags = [self.view.basename.title()]
-        operation_id = f"{self.view.action} {self.view.basename}"
-        operation_id = operation_id.title().replace("-", " ")
+        operation_id = f"{self.view.action}-{self.view.basename}".lower()
+        summary = operation_id.title().replace("-", " ")
 
         if self.view.action.lower() == "list":
             operation_id += "s"
 
+        operation["summary"] = summary
         operation["operationId"] = operation_id
         operation["tags"] = self._tags or tags
 
