@@ -12,7 +12,12 @@ router.register(r"items", views.ItemViewSet, basename="item").register(
     basename="item-resource-count",
     parents_query_lookups=["item__game_id"],
 )
-router.register(r"worlds", views.WorldViewSet, basename="world")
+router.register(r"worlds", views.WorldViewSet, basename="world").register(
+    r"polls",
+    views.WorldPollViewSet,
+    basename="world-poll",
+    parents_query_lookups=["world_id"],
+)
 
 
 # Wire up our API using automatic URL routing.

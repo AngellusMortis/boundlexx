@@ -12,10 +12,9 @@ class DescriptiveAutoSchema(AutoSchema):
 
         tags = [self.view.basename.title()]
         operation_id = f"{self.view.action}-{self.view.basename}".lower()
-        summary = operation_id.title().replace("-", " ")
-
         if self.view.action.lower() == "list":
             operation_id += "s"
+        summary = operation_id.title().replace("-", " ")
 
         operation["summary"] = summary
         operation["operationId"] = operation_id
@@ -28,6 +27,25 @@ class DescriptiveAutoSchema(AutoSchema):
             ] = action.example
 
         return operation
+
+    def _get_path_parameters(self, path, method):
+        params = super()._get_path_parameters(path, method)
+
+        if getattr(self.view, "is_timeseries", False):
+            for param in params:
+                lookup_field = self.view.lookup_field
+                if lookup_field == "pk":
+                    lookup_field = "id"
+                if param["name"] == lookup_field:
+                    param[
+                        "description"
+                    ] += " Pass `latest` to get newest item."
+                    param["schema"] = {
+                        "type": "string",
+                        "pattern": r"^(\d+|latest)$",
+                    }
+
+        return params
 
 
 class BoundlexxSchemaGenerator(SchemaGenerator):

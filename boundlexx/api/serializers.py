@@ -6,9 +6,11 @@ from rest_framework.reverse import reverse
 from boundlexx.boundless.models import (
     Color,
     Item,
+    LeaderboardRecord,
     LocalizedName,
     ResourceCount,
     World,
+    WorldPoll,
 )
 
 
@@ -179,4 +181,74 @@ class WorldSerializer(serializers.ModelSerializer):
             "end",
             "atmosphere_color",
             "water_color",
+        ]
+
+
+class LeaderboardSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LeaderboardRecord
+        fields = ["world_rank", "guild_tag", "mayor_name", "name", "prestige"]
+
+
+class SimpleItemSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="item-detail", lookup_field="game_id", read_only=True
+    )
+
+    class Meta:
+        model = Item
+        fields = [
+            "url",
+            "game_id",
+            "string_id",
+        ]
+
+
+class ResourcesSerializer(serializers.ModelSerializer):
+    item = SimpleItemSerializer()
+
+    class Meta:
+        model = ResourceCount
+        fields = ["item", "count"]
+
+
+class WorldPollSerializer(serializers.ModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name="world-poll-detail",
+        lookup_field=["world.id", "id"],
+        lookup_url_kwarg=["world_id", "id"],
+        read_only=True,
+    )
+    world = SimpleWorldSerializer()
+
+    player_count = serializers.IntegerField(
+        source="result.player_count", read_only=True
+    )
+    beacon_count = serializers.IntegerField(
+        source="result.beacon_count", read_only=True
+    )
+    plot_count = serializers.IntegerField(
+        source="result.plot_count", read_only=True
+    )
+    total_prestige = serializers.IntegerField(
+        source="result.total_prestige", read_only=True
+    )
+    leaderboard = LeaderboardSerializer(
+        many=True, source="leaderboardrecord_set"
+    )
+    resources = ResourcesSerializer(many=True, source="resourcecount_set")
+
+    class Meta:
+        model = WorldPoll
+        fields = [
+            "url",
+            "id",
+            "time",
+            "world",
+            "player_count",
+            "beacon_count",
+            "plot_count",
+            "total_prestige",
+            "leaderboard",
+            "resources",
         ]

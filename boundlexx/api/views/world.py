@@ -1,9 +1,14 @@
 from rest_framework import filters, viewsets
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
-from boundlexx.api.serializers import WorldSerializer
+from boundlexx.api.schemas import DescriptiveAutoSchema
+from boundlexx.api.serializers import WorldPollSerializer, WorldSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
-from boundlexx.boundless.models import World
+from boundlexx.api.views.mixins import (
+    DescriptiveAutoSchemaMixin,
+    TimeseriesMixin,
+)
+from boundlexx.boundless.models import World, WorldPoll
 
 WORLD_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
@@ -65,3 +70,25 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         )
 
     retrieve.example = {"retrieve": {"value": WORLD_EXAMPLE}}  # type: ignore # noqa E501
+
+
+class WorldPollViewSet(
+    TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    schema = DescriptiveAutoSchema(tags=["World"])
+    queryset = (
+        WorldPoll.objects.filter(world__active=True)
+        .prefetch_related(
+            "worldpollresult_set",
+            "leaderboardrecord_set",
+            "resourcecount_set",
+            "resourcecount_set__item",
+        )
+        .order_by("-time")
+    )
+    serializer_class = WorldPollSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset
