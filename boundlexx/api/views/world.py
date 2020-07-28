@@ -8,8 +8,8 @@ from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
     TimeseriesMixin,
 )
-from boundlexx.boundless.models import World, WorldPoll
 from boundlexx.api.views.pagination import WorldPollPagination
+from boundlexx.boundless.models import World, WorldPoll
 
 WORLD_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
