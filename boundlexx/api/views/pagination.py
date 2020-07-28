@@ -2,8 +2,8 @@ from rest_framework.pagination import LimitOffsetPagination
 
 
 class TimeseriesPagination(LimitOffsetPagination):
-    page_size = 50
+    default_limit = 50
 
 
 class WorldPollPagination(LimitOffsetPagination):
-    page_size = 10
+    default_limit = 10
