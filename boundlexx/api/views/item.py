@@ -1,6 +1,7 @@
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
@@ -10,6 +11,7 @@ from boundlexx.api.serializers import (
     ItemSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
+from boundlexx.api.views.filters import LocalizationFilterSet
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Item, ResourceCount
 
@@ -45,7 +47,8 @@ class ItemViewSet(
     )
     serializer_class = ItemSerializer
     lookup_field = "game_id"
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = LocalizationFilterSet
     search_fields = ["game_id", "string_id", "localizedname__name"]
 
     def list(self, request, *args, **kwargs):  # noqa A003

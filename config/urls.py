@@ -10,7 +10,7 @@ urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("admin_tools/", include("admin_tools.urls")),
     path("api/", include("boundlexx.api.urls")),
-    path("", RedirectView.as_view(url="/api/"), name="go-to-api"),
+    path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 

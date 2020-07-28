@@ -64,9 +64,27 @@ class ResourceCountLinkField(serializers.ModelField):
         return None
 
 
+class LangFilterListSerializer(
+    serializers.ListSerializer
+):  # pylint: disable=abstract-method
+    def to_representation(self, data):
+        data = super().to_representation(data)
+
+        if "lang" in self.context["request"].query_params:
+            lang = self.context["request"].query_params["lang"]
+            new_data = []
+            for item in data:
+                if item["lang"] == lang:
+                    new_data.append(item)
+            data = new_data
+
+        return data
+
+
 class LocalizedNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocalizedName
+        list_serializer_class = LangFilterListSerializer
         fields = ["lang", "name"]
 
 

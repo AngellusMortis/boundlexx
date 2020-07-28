@@ -377,6 +377,13 @@ BOUNDLESS_MAX_ITEM_DELAY = 360
 BOUNDLESS_EXO_SEARCH_RADIUS = 10
 BOUNDLESS_MAX_WORLD_ID = 1000
 BOUNDLESS_MAX_SCAN_CHUNK = 50
+BOUNDLESS_LANGUAGES = [
+    ("english", "English"),
+    ("french", "French"),
+    ("german", "German"),
+    ("italian", "Italian"),
+    ("spanish", "Spanish"),
+]
 BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
     32800,  # Rough Amethyst
     32803,  # Rough Diamond
