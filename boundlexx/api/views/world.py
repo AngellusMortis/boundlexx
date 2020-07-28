@@ -9,6 +9,7 @@ from boundlexx.api.views.mixins import (
     TimeseriesMixin,
 )
 from boundlexx.boundless.models import World, WorldPoll
+from boundlexx.api.views.pagination import WorldPollPagination
 
 WORLD_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
@@ -88,7 +89,7 @@ class WorldPollViewSet(
     )
     serializer_class = WorldPollSerializer
     lookup_field = "id"
-    page_size = 10
+    pagination_class = WorldPollPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()

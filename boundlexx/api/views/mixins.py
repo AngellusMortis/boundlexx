@@ -2,14 +2,11 @@ from django.http import Http404
 from rest_framework.pagination import LimitOffsetPagination
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
+from boundlexx.api.views.pagination import TimeseriesPagination
 
 
 class DescriptiveAutoSchemaMixin:
     schema = DescriptiveAutoSchema()
-
-
-class TimeseriesPagination(LimitOffsetPagination):
-    page_size = 50
 
 
 class TimeseriesMixin:
