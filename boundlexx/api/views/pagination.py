@@ -6,4 +6,4 @@ class TimeseriesPagination(LimitOffsetPagination):
 
 
 class WorldPollPagination(LimitOffsetPagination):
-    default_limit = 10
+    default_limit = 25
