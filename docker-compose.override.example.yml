@@ -2,10 +2,10 @@ version: '3.4'
 
 services:
     django: &django
-    ## enable .env.local file
+    ## enable .local.env file
       env_file:
         - ./.env
-        - ./.env.local
+        - ./.local.env
       ports:
         - "9000:8000"
       volumes:
@@ -41,3 +41,9 @@ services:
       <<: *django
       ports:
         - "6555:5555"
+
+    postgres:
+    ## enable .local.env file
+      env_file:
+        - ./.env
+        - ./.local.env

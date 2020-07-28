@@ -18,19 +18,19 @@
         {
             "label": "Boundlexx: Manage",
             "type": "shell",
-            "command": "source <(cat ${workspaceFolder}/.env ${workspaceFolder}/.env.local | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py ${input:commandName}",
+            "command": "source <(cat ${workspaceFolder}/.local.env | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py ${input:commandName}",
             "problemMatcher": []
         },
         {
             "label": "Boundlexx: Migrate Database",
             "type": "shell",
-            "command": "source <(cat ${workspaceFolder}/.env ${workspaceFolder}/.env.local | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py migrate ${input:appName}",
+            "command": "source <(cat ${workspaceFolder}/.local.env | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py migrate ${input:appName}",
             "problemMatcher": []
         },
         {
             "label": "Boundlexx: Make Migrations",
             "type": "shell",
-            "command": "source <(cat ${workspaceFolder}/.env ${workspaceFolder}/.env.local | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py makemigrations ${input:appName}",
+            "command": "source <(cat ${workspaceFolder}/.local.env | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py makemigrations ${input:appName}",
             "problemMatcher": []
         },
         {

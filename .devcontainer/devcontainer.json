@@ -23,7 +23,7 @@
         "files.insertFinalNewline": true,
         "files.trimTrailingWhitespace": true,
         "python.analysis.openFilesOnly": false,
-        "python.envFile": "${workspaceFolder}/.env",
+        "python.envFile": "${workspaceFolder}/.local.env",
         "python.pythonPath": "/usr/local/bin/python",
         "python.formatting.blackArgs": [
             "--line-length",
@@ -49,6 +49,7 @@
         "eamodio.gitlens",
         "brainfit.vscode-coverage-highlighter",
         "bungcip.better-toml",
+        "mikestead.dotenv",
     ],
     // Uncomment the next line if you want start specific services in your Docker Compose config.
     "runServices": [

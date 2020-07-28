@@ -280,7 +280,7 @@ class World(models.Model):
 class WorldPoll(models.Model):
     world = models.ForeignKey("World", on_delete=models.CASCADE)
     active = models.BooleanField(db_index=True, default=True)
-    time = models.DateTimeField(auto_now=True)
+    time = models.DateTimeField(auto_now_add=True)
 
     @property
     def result(self):
