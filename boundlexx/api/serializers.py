@@ -12,6 +12,39 @@ from boundlexx.boundless.models import (
 )
 
 
+class NestedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
+    def get_url(
+        self,
+        obj,
+        view_name,
+        request,
+        format,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Given an object, return the URL that hyperlinks to the object.
+
+        May raise a `NoReverseMatch` if the `view_name` and `lookup_field`
+        attributes are not configured to correctly match the URL conf.
+        """
+        # Unsaved objects will not yet have a valid URL.
+        if hasattr(obj, "pk") and obj.pk in (None, ""):
+            return None
+
+        kwargs = {}
+        for index, lookup_field in enumerate(self.lookup_field):
+            attrs = lookup_field.split(".")
+
+            lookup_value = obj
+            for attr in attrs:
+                lookup_value = getattr(lookup_value, attr)
+
+            kwargs[self.lookup_url_kwarg[index]] = lookup_value
+
+        return self.reverse(
+            view_name, kwargs=kwargs, request=request, format=format
+        )
+
+
 class ResourceCountLinkField(serializers.ModelField):
     def __init__(self, *args, **kwargs):
         kwargs["read_only"] = True
@@ -52,7 +85,7 @@ class ColorSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="color-detail", lookup_field="game_id", read_only=True
+        view_name="item-detail", lookup_field="game_id", read_only=True
     )
     resource_counts_url = ResourceCountLinkField()
     localization = LocalizedNameSerializer(
@@ -77,8 +110,20 @@ class SimpleWorldSerializer(serializers.ModelSerializer):
 
 
 class ItemResourceCountSerializer(serializers.ModelSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name="item-resource-count-detail",
+        lookup_field=["item.game_id", "world_poll.world.id"],
+        lookup_url_kwarg=["item__game_id", "world_id"],
+        read_only=True,
+    )
+    item_url = NestedHyperlinkedIdentityField(
+        view_name="item-detail",
+        lookup_field=["item.game_id"],
+        lookup_url_kwarg=["game_id"],
+        read_only=True,
+    )
     world = SimpleWorldSerializer(source="world_poll.world")
 
     class Meta:
         model = ResourceCount
-        fields = ["world", "count"]
+        fields = ["url", "item_url", "world", "count"]

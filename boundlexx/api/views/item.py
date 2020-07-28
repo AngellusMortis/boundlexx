@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
@@ -28,6 +28,8 @@ ITEM_EXAMPLE = {
 }
 
 ITEM_RESOURCE_COUNT_EXAMPLE = {
+    "url": f"{get_base_url()}/api/v1/items/10787/resource-counts/10/",
+    "item_url": f"{get_base_url()}/api/v1/items/10787/",
     "world": {"id": 10, "display_name": "Serpensarindi"},
     "count": 100000,
 }
@@ -43,6 +45,8 @@ class ItemViewSet(
     )
     serializer_class = ItemSerializer
     lookup_field = "game_id"
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["game_id", "string_id", "localizedname__name"]
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -84,6 +88,8 @@ class ItemResourceCountViewSet(
 
     serializer_class = ItemResourceCountSerializer
     lookup_field = "world_id"
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["world_poll__world__display_name"]
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

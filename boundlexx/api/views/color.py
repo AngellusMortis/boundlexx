@@ -1,4 +1,4 @@
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
 
 from boundlexx.api.serializers import ColorSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
@@ -26,6 +26,8 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = ColorSerializer
     lookup_field = "game_id"
+    filter_backends = [filters.SearchFilter]
+    search_fields = ["game_id", "localizedname__name"]
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

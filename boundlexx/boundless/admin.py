@@ -153,6 +153,7 @@ class MetalAdmin(GameObjAdmin):
 class ItemAdmin(GameObjAdmin):
     readonly_fields = ["game_id", "string_id"]
     raw_id_fields = ["item_subtitle"]
+    search_fields = ["game_id", "string_id", "localizedname__name"]
 
     def get_inlines(self, request, obj):
         inlines = [

@@ -54,6 +54,12 @@ RUN chmod +x /start-celerybeat
 COPY --chown=django:django ./docker/celery/dev/flower/start /start-flower
 RUN chmod +x /start-flower
 
+COPY --chown=django:django ./docker/bin/lint.sh /format.sh
+RUN chmod +x /lint.sh
+
+COPY --chown=django:django ./docker/bin/lint.sh /format.sh
+RUN chmod +x /format.sh
+
 USER django
 
 WORKDIR /app
