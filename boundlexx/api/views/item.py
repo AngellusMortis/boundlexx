@@ -78,9 +78,10 @@ class ItemResourceCountViewSet(
     schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = (
         ResourceCount.objects.filter(world_poll__active=True)
-        .prefetch_related("localizedname_set")
+        .select_related("world_poll", "world_poll__world")
         .order_by("world_poll__world_id")
     )
+
     serializer_class = ItemResourceCountSerializer
     lookup_field = "world_id"
 
