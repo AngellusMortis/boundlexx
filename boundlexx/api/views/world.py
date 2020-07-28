@@ -88,6 +88,7 @@ class WorldPollViewSet(
     )
     serializer_class = WorldPollSerializer
     lookup_field = "id"
+    page_size = 10
 
     def get_queryset(self):
         queryset = super().get_queryset()

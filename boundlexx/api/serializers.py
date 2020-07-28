@@ -157,11 +157,18 @@ class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail", lookup_field="id", read_only=True
     )
+    polls_url = NestedHyperlinkedIdentityField(
+        view_name="world-poll-list",
+        lookup_field=["id"],
+        lookup_url_kwarg=["world_id"],
+        read_only=True,
+    )
 
     class Meta:
         model = World
         fields = [
             "url",
+            "polls_url",
             "id",
             "name",
             "display_name",
