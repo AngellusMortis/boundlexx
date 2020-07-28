@@ -57,6 +57,7 @@
         "redis",
         "celery",
         "celerybeat",
+        "flower",
     ],
     // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
     // "shutdownAction": "none",
@@ -64,4 +65,8 @@
     "postCreateCommand": "cp /app/.devcontainer/bashrc /home/django/.bashrc && sed -i 's/\r$//g' /home/django/.bashrc",
     // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "django",
+    "forwardPorts": [
+        9000,
+        6555,
+    ],
 }

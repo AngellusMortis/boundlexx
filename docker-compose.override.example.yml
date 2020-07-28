@@ -6,6 +6,8 @@ services:
       env_file:
         - ./.env
         - ./.env.local
+      ports:
+        - "9000:8000"
       volumes:
         - .:/app
         ## Replace with path your Boundless install
@@ -13,22 +15,29 @@ services:
 
     manage:
       <<: *django
+      ports: []
 
     test:
       <<: *django
+      ports: []
 
     lint:
       <<: *django
+      ports: []
 
     format:
       <<: *django
+      ports: []
 
     celery:
       <<: *django
+      ports: []
 
     celerybeat:
       <<: *django
-
+      ports: []
 
     flower:
       <<: *django
+      ports:
+        - "6555:5555"

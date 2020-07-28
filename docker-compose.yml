@@ -21,8 +21,6 @@ services:
       - .:/app
     env_file:
       - ./.env
-    ports:
-      - "9000:8000"
     command: /start
 
   manage:
@@ -30,28 +28,24 @@ services:
     environment:
       - DJANGO_MANAGE=1
     command: ""
-    ports: []
 
   test:
     <<: *django
     environment:
       - PYTEST=1
     command: ""
-    ports: []
 
   lint:
     <<: *django
     depends_on: []
     entrypoint: /bin/bash
     command: -c "/lint.sh"
-    ports: []
 
   format:
     <<: *django
     depends_on: []
     entrypoint: /bin/bash
     command: -c "/format.sh"
-    ports: []
 
   postgres:
     build:
@@ -77,8 +71,6 @@ services:
     depends_on:
       - redis
       - postgres
-
-    ports: []
     command: /start-celeryworker
 
   celerybeat:
@@ -87,13 +79,9 @@ services:
     depends_on:
       - redis
       - postgres
-
-    ports: []
     command: /start-celerybeat
 
   flower:
     <<: *django
     image: boundlexx_dev_flower
-    ports:
-      - "5555:5555"
     command: /start-flower
