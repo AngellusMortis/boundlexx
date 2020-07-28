@@ -110,9 +110,7 @@ class ItemResourceCountInline(admin.TabularInline):
         return (
             super()
             .get_queryset(request)
-            .filter(
-                world_poll__active=True
-            )  # , world_poll__world__active=True)
+            .filter(world_poll__active=True, world_poll__world__active=True)
             .select_related("world_poll__world")
             .order_by("-count")
         )
@@ -235,7 +233,11 @@ class WorldAdmin(admin.ModelAdmin):
     def is_perm(self, obj):
         return obj.is_perm
 
+    def is_sovereign(self, obj):
+        return obj.is_sovereign
+
     is_perm.boolean = True  # type: ignore
+    is_sovereign.boolean = True  # type: ignore
 
     list_display = [
         "id",
@@ -246,16 +248,19 @@ class WorldAdmin(admin.ModelAdmin):
         "protection",
         "active",
         "is_perm",
-        "creative",
-        "public",
-        "locked",
+        "is_creative",
+        "is_sovereign",
+        "is_public",
+        "is_locked",
     ]
     fields = [
         "id",
         "active",
-        "creative",
-        "public",
-        "locked",
+        "is_perm",
+        "is_creative",
+        "is_sovereign",
+        "is_public",
+        "is_locked",
         "name",
         "display_name",
         "region",
@@ -278,9 +283,11 @@ class WorldAdmin(admin.ModelAdmin):
     ]
     readonly_fields = [
         "id",
-        "creative",
-        "public",
-        "locked",
+        "is_perm",
+        "is_creative",
+        "is_sovereign",
+        "is_public",
+        "is_locked",
         "name",
         "display_name",
         "region",

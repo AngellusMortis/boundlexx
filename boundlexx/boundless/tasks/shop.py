@@ -107,7 +107,7 @@ def _update_prices():
     logger.info("Updating the prices for %s items", len(items))
 
     all_worlds = list(
-        World.objects.filter(active=True, creative=False).filter(
+        World.objects.filter(active=True, is_creative=False).filter(
             Q(owner__isnull=False) | Q(end__isnull=True)
         )
     )

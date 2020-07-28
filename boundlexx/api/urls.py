@@ -12,6 +12,7 @@ router.register(r"items", views.ItemViewSet, basename="item").register(
     basename="item-resource-count",
     parents_query_lookups=["item__game_id"],
 )
+router.register(r"worlds", views.WorldViewSet, basename="world")
 
 
 # Wire up our API using automatic URL routing.

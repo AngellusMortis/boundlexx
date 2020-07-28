@@ -152,9 +152,9 @@ class World(models.Model):
     websocket_url = models.URLField(_("Websocket URL"), blank=True, null=True)
     assignment = models.PositiveSmallIntegerField(blank=True, null=True)
     owner = models.PositiveSmallIntegerField(blank=True, null=True)
-    creative = models.BooleanField(default=False, db_index=True)
-    locked = models.BooleanField(default=False, db_index=True)
-    public = models.BooleanField(default=True, db_index=True)
+    is_creative = models.BooleanField(default=False, db_index=True)
+    is_locked = models.BooleanField(default=False, db_index=True)
+    is_public = models.BooleanField(default=True, db_index=True)
     number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
 
     atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"))
@@ -203,10 +203,11 @@ class World(models.Model):
         world.ip_address = world_dict.get("ipAddr")
         world.api_url = world_dict.get("apiURL")
         world.websocket_url = world_dict.get("websocketURL")
-        world.creative = world_dict.get("creative", False)
+        world.is_creative = world_dict.get("creative", False)
         world.owner = world_dict.get("owner", None)
         world.assignment = world_dict.get("assignment", None)
-        world.locked = world_dict.get("locked", False)
+        world.is_locked = world_dict.get("locked", False)
+        world.is_public = world_dict.get("public", True)
         world.number_of_regions = world_dict["numRegions"]
 
         if "lifetime" in world_dict:
@@ -223,6 +224,10 @@ class World(models.Model):
     @property
     def is_perm(self):
         return self.end is None
+
+    @property
+    def is_sovereign(self):
+        return self.owner is not None
 
     @property
     def atmosphere_color(self):

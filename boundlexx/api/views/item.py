@@ -32,7 +32,11 @@ ITEM_EXAMPLE = {
 ITEM_RESOURCE_COUNT_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/items/10787/resource-counts/10/",
     "item_url": f"{get_base_url()}/api/v1/items/10787/",
-    "world": {"id": 10, "display_name": "Serpensarindi"},
+    "world": {
+        "url": f"{get_base_url()}/api/v1/worlds/10/",
+        "id": 10,
+        "display_name": "Serpensarindi",
+    },
     "count": 100000,
 }
 
@@ -84,7 +88,9 @@ class ItemResourceCountViewSet(
 ):
     schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = (
-        ResourceCount.objects.filter(world_poll__active=True)
+        ResourceCount.objects.filter(
+            world_poll__active=True, world_poll__world__active=True
+        )
         .select_related("world_poll", "world_poll__world")
         .order_by("world_poll__world_id")
     )

@@ -122,9 +122,13 @@ class ItemSerializer(serializers.ModelSerializer):
 
 
 class SimpleWorldSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="world-detail", lookup_field="id", read_only=True
+    )
+
     class Meta:
         model = World
-        fields = ["id", "display_name"]
+        fields = ["url", "id", "display_name"]
 
 
 class ItemResourceCountSerializer(serializers.ModelSerializer):
@@ -145,3 +149,34 @@ class ItemResourceCountSerializer(serializers.ModelSerializer):
     class Meta:
         model = ResourceCount
         fields = ["url", "item_url", "world", "count"]
+
+
+class WorldSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="world-detail", lookup_field="id", read_only=True
+    )
+
+    class Meta:
+        model = World
+        fields = [
+            "url",
+            "id",
+            "name",
+            "display_name",
+            "region",
+            "tier",
+            "description",
+            "size",
+            "world_type",
+            "time_offset",
+            "is_sovereign",
+            "is_perm",
+            "is_creative",
+            "is_locked",
+            "is_public",
+            "number_of_regions",
+            "start",
+            "end",
+            "atmosphere_color",
+            "water_color",
+        ]
