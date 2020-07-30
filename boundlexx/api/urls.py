@@ -5,20 +5,19 @@ from boundlexx.api import views
 from boundlexx.api.routers import APIDocsRouter
 
 router = APIDocsRouter()
-router.register(r"colors", views.ColorViewSet, basename="color")
-router.register(r"items", views.ItemViewSet, basename="item").register(
-    r"resource-counts",
+router.register("colors", views.ColorViewSet, basename="color")
+router.register("items", views.ItemViewSet, basename="item").register(
+    "resource-counts",
     views.ItemResourceCountViewSet,
     basename="item-resource-count",
     parents_query_lookups=["item__game_id"],
 )
-router.register(r"worlds", views.WorldViewSet, basename="world").register(
-    r"polls",
+router.register("worlds", views.WorldViewSet, basename="world").register(
+    "polls",
     views.WorldPollViewSet,
     basename="world-poll",
     parents_query_lookups=["world_id"],
 )
-
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

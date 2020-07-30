@@ -1,15 +1,27 @@
-from rest_framework import filters, viewsets
+from rest_framework import filters, viewsets, generics
 from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_framework.decorators import action
+from rest_framework.response import Response
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
-from boundlexx.api.serializers import WorldPollSerializer, WorldSerializer
+from boundlexx.api.serializers import (
+    WorldPollSerializer,
+    WorldSerializer,
+    WorldPollLeaderboardSerializer,
+    WorldPollResourcesSerializer,
+)
+from rest_framework.reverse import reverse
+
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
     TimeseriesMixin,
 )
-from boundlexx.api.views.pagination import WorldPollPagination
-from boundlexx.boundless.models import World, WorldPoll
+from boundlexx.boundless.models import (
+    World,
+    WorldPoll,
+    ResourceCount,
+)
 
 WORLD_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
@@ -407,7 +419,6 @@ class WorldPollViewSet(
     )
     serializer_class = WorldPollSerializer
     lookup_field = "id"
-    pagination_class = WorldPollPagination
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -437,3 +448,48 @@ class WorldPollViewSet(
         )
 
     retrieve.example = {"retrieve": {"value": WORLD_POLL_EXAMPLE}}  # type: ignore # noqa E501
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=WorldPollLeaderboardSerializer,
+    )
+    def leaderboard(self, request, world_id=None, id=None):  # noqa A002
+        """
+        Retrieves the leaderboard for a given world poll result
+        """
+
+        world_poll = self.get_object()
+
+        serializer = self.get_serializer_class()(
+            world_poll, context={"request": request}
+        )
+
+        return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=WorldPollResourcesSerializer,
+    )
+    def resources(self, request, world_id=None, id=None):  # noqa A002
+        """
+        Retrieves the count of resources for a given world poll result
+        """
+        world_poll = self.get_object()
+
+        serializer = self.get_serializer_class()(
+            world_poll, context={"request": request}
+        )
+
+        return Response(
+            {
+                "world_poll_id": id,
+                "world_poll_url": reverse(
+                    "world-poll-detail",
+                    kwargs={"world_id": world_id, "id": id},
+                    request=request,
+                ),
+                "resources": serializer.data,
+            }
+        )

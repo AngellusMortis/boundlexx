@@ -52,6 +52,7 @@ class ResourceCountLinkField(serializers.ModelField):
     def __init__(self, *args, **kwargs):
         kwargs["read_only"] = True
         kwargs["model_field"] = None
+        kwargs["allow_null"] = True
         super().__init__(*args, **kwargs)
 
     def to_representation(self, value):  # pylint: disable=arguments-differ
@@ -93,10 +94,10 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
 
 class ColorSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="color-detail", lookup_field="game_id", read_only=True
+        view_name="color-detail", lookup_field="game_id", read_only=True,
     )
     localization = LocalizedNameSerializer(
-        source="localizedname_set", many=True
+        source="localizedname_set", many=True,
     )
 
     class Meta:
@@ -106,7 +107,7 @@ class ColorSerializer(serializers.ModelSerializer):
 
 class SubtitleSerializer(serializers.ModelSerializer):
     localization = LocalizedNameSerializer(
-        source="localizedname_set", many=True
+        source="localizedname_set", many=True,
     )
 
     class Meta:
@@ -116,11 +117,11 @@ class SubtitleSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="item-detail", lookup_field="game_id", read_only=True
+        view_name="item-detail", lookup_field="game_id", read_only=True,
     )
     resource_counts_url = ResourceCountLinkField()
     localization = LocalizedNameSerializer(
-        source="localizedname_set", many=True
+        source="localizedname_set", many=True,
     )
     item_subtitle = SubtitleSerializer()
 
@@ -138,7 +139,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
 class SimpleWorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="world-detail", lookup_field="id", read_only=True
+        view_name="world-detail", lookup_field="id", read_only=True,
     )
 
     class Meta:
@@ -168,7 +169,7 @@ class ItemResourceCountSerializer(serializers.ModelSerializer):
 
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="world-detail", lookup_field="id", read_only=True
+        view_name="world-detail", lookup_field="id", read_only=True,
     )
     polls_url = NestedHyperlinkedIdentityField(
         view_name="world-poll-list",
@@ -212,7 +213,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 
 class SimpleItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="item-detail", lookup_field="game_id", read_only=True
+        view_name="item-detail", lookup_field="game_id", read_only=True,
     )
 
     class Meta:
@@ -232,6 +233,32 @@ class ResourcesSerializer(serializers.ModelSerializer):
         fields = ["item", "count"]
 
 
+class WorldPollExtraSerializer(serializers.ModelSerializer):
+    world_poll_id = serializers.IntegerField(source="id")
+    world_poll_url = NestedHyperlinkedIdentityField(
+        view_name="world-poll-detail",
+        lookup_field=["world.id", "id"],
+        lookup_url_kwarg=["world_id", "id"],
+        read_only=True,
+    )
+
+
+class WorldPollLeaderboardSerializer(WorldPollExtraSerializer):
+    leaderboard = LeaderboardSerializer(many=True)
+
+    class Meta:
+        model = WorldPoll
+        fields = ["world_poll_id", "world_poll_url", "leaderboard"]
+
+
+class WorldPollResourcesSerializer(WorldPollExtraSerializer):
+    resources = ResourcesSerializer(many=True)
+
+    class Meta:
+        model = WorldPoll
+        fields = ["world_poll_id", "world_poll_url", "resources"]
+
+
 class WorldPollSerializer(serializers.ModelSerializer):
     url = NestedHyperlinkedIdentityField(
         view_name="world-poll-detail",
@@ -239,36 +266,44 @@ class WorldPollSerializer(serializers.ModelSerializer):
         lookup_url_kwarg=["world_id", "id"],
         read_only=True,
     )
+    leaderboard_url = NestedHyperlinkedIdentityField(
+        view_name="world-poll-leaderboard",
+        lookup_field=["world.id", "id"],
+        lookup_url_kwarg=["world_id", "id"],
+        read_only=True,
+    )
+    resources_url = NestedHyperlinkedIdentityField(
+        view_name="world-poll-resources",
+        lookup_field=["world.id", "id"],
+        lookup_url_kwarg=["world_id", "id"],
+        read_only=True,
+    )
     world = SimpleWorldSerializer()
 
     player_count = serializers.IntegerField(
-        source="result.player_count", read_only=True
+        source="result.player_count", read_only=True,
     )
     beacon_count = serializers.IntegerField(
-        source="result.beacon_count", read_only=True
+        source="result.beacon_count", read_only=True,
     )
     plot_count = serializers.IntegerField(
-        source="result.plot_count", read_only=True
+        source="result.plot_count", read_only=True,
     )
     total_prestige = serializers.IntegerField(
         source="result.total_prestige", read_only=True
     )
-    leaderboard = LeaderboardSerializer(
-        many=True, source="leaderboardrecord_set"
-    )
-    resources = ResourcesSerializer(many=True, source="resourcecount_set")
 
     class Meta:
         model = WorldPoll
         fields = [
             "url",
             "id",
+            "leaderboard_url",
+            "resources_url",
             "time",
             "world",
             "player_count",
             "beacon_count",
             "plot_count",
             "total_prestige",
-            "leaderboard",
-            "resources",
         ]
