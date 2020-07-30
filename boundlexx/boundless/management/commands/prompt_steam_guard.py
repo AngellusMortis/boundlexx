@@ -1,4 +1,5 @@
 import os
+import time
 from shutil import copy2
 
 import djclick as click
@@ -15,6 +16,8 @@ def command():
     client.cli_login(
         username=settings.STEAM_USERNAME, password=settings.STEAM_PASSWORD
     )
+
+    time.sleep(5)
 
     # copy to correct location for `auth-ticket.js`
     src = os.path.join(
