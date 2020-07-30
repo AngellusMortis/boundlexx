@@ -27,6 +27,15 @@ ITEM_EXAMPLE = {
         {"lang": "italian", "name": "Sedimenti compatti"},
         {"lang": "spanish", "name": "Cieno compacto"},
     ],
+    "item_subtitle": {
+        "localization": [
+            {"lang": "spanish", "name": "Bloque compacto común"},
+            {"lang": "english", "name": "Common Compacted Block"},
+            {"lang": "french", "name": "Bloc compacté commun"},
+            {"lang": "german", "name": "Gewöhnlicher kompaktierter Block"},
+            {"lang": "italian", "name": "Blocco compresso comune"},
+        ]
+    },
 }
 
 ITEM_RESOURCE_COUNT_EXAMPLE = {
@@ -46,7 +55,10 @@ class ItemViewSet(
 ):
     queryset = (
         Item.objects.filter(active=True)
-        .prefetch_related("localizedname_set")
+        .select_related("item_subtitle")
+        .prefetch_related(
+            "localizedname_set", "item_subtitle__localizedname_set"
+        )
         .order_by("game_id")
     )
     serializer_class = ItemSerializer

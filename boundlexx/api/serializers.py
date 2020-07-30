@@ -11,6 +11,7 @@ from boundlexx.boundless.models import (
     ResourceCount,
     World,
     WorldPoll,
+    Subtitle,
 )
 
 
@@ -103,6 +104,16 @@ class ColorSerializer(serializers.ModelSerializer):
         fields = ["url", "game_id", "localization"]
 
 
+class SubtitleSerializer(serializers.ModelSerializer):
+    localization = LocalizedNameSerializer(
+        source="localizedname_set", many=True
+    )
+
+    class Meta:
+        model = Subtitle
+        fields = ["localization"]
+
+
 class ItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="item-detail", lookup_field="game_id", read_only=True
@@ -111,6 +122,7 @@ class ItemSerializer(serializers.ModelSerializer):
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True
     )
+    item_subtitle = SubtitleSerializer()
 
     class Meta:
         model = Item
@@ -120,6 +132,7 @@ class ItemSerializer(serializers.ModelSerializer):
             "string_id",
             "resource_counts_url",
             "localization",
+            "item_subtitle",
         ]
 
 

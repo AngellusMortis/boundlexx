@@ -320,13 +320,14 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
                 ).update(active=False)
                 continue
 
-            item, was_created = Item.objects.get_or_create(
+            item_obj, was_created = Item.objects.get_or_create(
                 game_id=item.item_id,
                 string_id=compiled_items[item.item_id]["stringID"],
-                item_subtitle=subtitles[item.subtitle_id],
             )
+            item_obj.item_subtitle = subtitles[item.subtitle_id]
+            item_obj.save()
 
-            items[item.game_id] = item
+            items[item_obj.game_id] = item_obj
 
             if was_created:
                 items_created += 1
@@ -366,9 +367,11 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
 
             localizations_created = 0
             for index, name in color_strings.items():
-                _, was_created = LocalizedName.objects.get_or_create(
-                    game_obj=colors[index], lang=language.name, name=name
+                l, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=colors[index], lang=language.name
                 )
+                l.name = name
+                l.save()
 
                 if was_created:
                     localizations_created += 1
@@ -377,9 +380,11 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
                 bar.render_progress()
 
             for index, name in metal_strings.items():
-                _, was_created = LocalizedName.objects.get_or_create(
-                    game_obj=metals[index], lang=language.name, name=name
+                l, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=metals[index], lang=language.name
                 )
+                l.name = name
+                l.save()
 
                 if was_created:
                     localizations_created += 1
@@ -403,11 +408,11 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
                 if was_created:
                     localizations_created += 1
 
-                _, was_created = LocalizedName.objects.get_or_create(
-                    game_obj=item.item_subtitle,
-                    lang=language.name,
-                    name=game_item.subtitle,
+                l, was_created = LocalizedName.objects.get_or_create(
+                    game_obj=item.item_subtitle, lang=language.name,
                 )
+                l.name = game_item.subtitle
+                l.save()
 
                 if was_created:
                     localizations_created += 1
