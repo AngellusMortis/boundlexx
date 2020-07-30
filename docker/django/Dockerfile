@@ -34,7 +34,6 @@ RUN pip install -r /requirements/dev.txt
 
 RUN apt-get update \
   && apt-get install -y git \
-  && npm install -g steam-user \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
