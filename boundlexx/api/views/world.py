@@ -1,27 +1,22 @@
-from rest_framework import filters, viewsets, generics
-from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
+from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
-    WorldPollSerializer,
-    WorldSerializer,
     WorldPollLeaderboardSerializer,
     WorldPollResourcesSerializer,
+    WorldPollSerializer,
+    WorldSerializer,
 )
-from rest_framework.reverse import reverse
-
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
     TimeseriesMixin,
 )
-from boundlexx.boundless.models import (
-    World,
-    WorldPoll,
-    ResourceCount,
-)
+from boundlexx.boundless.models import World, WorldPoll
 
 WORLD_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
@@ -49,6 +44,8 @@ WORLD_EXAMPLE = {
 WORLD_POLL_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/10/polls/3/",
     "id": 3,
+    "leaderboard_url": f"{get_base_url()}/api/v1/worlds/10/polls/3/leaderboard/",  # noqa E501
+    "resources_url": f"{get_base_url()}/api/v1/worlds/10/polls/3/resources/",
     "time": "2020-07-28T13:25:50.688813-04:00",
     "world": {
         "url": f"{get_base_url()}/api/v1/worlds/10/",
@@ -59,6 +56,11 @@ WORLD_POLL_EXAMPLE = {
     "beacon_count": 787,
     "plot_count": 44478,
     "total_prestige": 66227813,
+}
+
+WORLD_POLL_LEADERBOARD_EXAMPLE = {
+    "world_poll_id": 3,
+    "world_poll_url": f"{get_base_url()}/api/v1/worlds/10/polls/3/",
     "leaderboard": [
         {
             "world_rank": 1,
@@ -96,6 +98,11 @@ WORLD_POLL_EXAMPLE = {
             "prestige": 4324847,
         },
     ],
+}
+
+WORLD_POLL_RESOURCES_EXAMPLE = {
+    "world_poll_id": 3,
+    "world_poll_url": f"{get_base_url()}/api/v1/worlds/10/polls/3/",
     "resources": [
         {
             "item": {
@@ -454,7 +461,12 @@ class WorldPollViewSet(
         methods=["get"],
         serializer_class=WorldPollLeaderboardSerializer,
     )
-    def leaderboard(self, request, world_id=None, id=None):  # noqa A002
+    def leaderboard(
+        self,
+        request,
+        world_id=None,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
         """
         Retrieves the leaderboard for a given world poll result
         """
@@ -467,12 +479,21 @@ class WorldPollViewSet(
 
         return Response(serializer.data)
 
+    leaderboard.example = {
+        "leaderboard": {"value": WORLD_POLL_LEADERBOARD_EXAMPLE}
+    }
+
     @action(
         detail=True,
         methods=["get"],
         serializer_class=WorldPollResourcesSerializer,
     )
-    def resources(self, request, world_id=None, id=None):  # noqa A002
+    def resources(
+        self,
+        request,
+        world_id=None,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
         """
         Retrieves the count of resources for a given world poll result
         """
@@ -493,3 +514,7 @@ class WorldPollViewSet(
                 "resources": serializer.data,
             }
         )
+
+    resources.example = {
+        "leaderboard": {"value": WORLD_POLL_RESOURCES_EXAMPLE}
+    }

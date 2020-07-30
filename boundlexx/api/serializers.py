@@ -9,9 +9,9 @@ from boundlexx.boundless.models import (
     LeaderboardRecord,
     LocalizedName,
     ResourceCount,
+    Subtitle,
     World,
     WorldPoll,
-    Subtitle,
 )
 
 

@@ -4,22 +4,21 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0010_auto_20200727_1012'), ('boundless', '0011_auto_20200728_0423')]
-
     dependencies = [
-        ('boundless', '0009_246_testing_updates'),
+        ("boundless", "0009_246_testing_updates"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='resourcecount',
-            name='count',
-            field=models.PositiveIntegerField(verbose_name='Count'),
+            model_name="resourcecount",
+            name="count",
+            field=models.PositiveIntegerField(verbose_name="Count"),
         ),
         migrations.AlterField(
-            model_name='localizedname',
-            name='name',
-            field=models.CharField(db_index=True, max_length=128, verbose_name='Name'),
+            model_name="localizedname",
+            name="name",
+            field=models.CharField(
+                db_index=True, max_length=128, verbose_name="Name"
+            ),
         ),
     ]

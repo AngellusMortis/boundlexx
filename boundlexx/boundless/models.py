@@ -368,6 +368,8 @@ class ResourceCount(models.Model):
             "item",
         )
 
+        ordering = ["-count"]
+
 
 class LeaderboardRecord(models.Model):
     time = models.DateTimeField(auto_now=True, primary_key=True)
@@ -386,6 +388,8 @@ class LeaderboardRecord(models.Model):
             "world_poll",
             "world_rank",
         )
+
+        ordering = ["world_rank"]
 
 
 class ItemShopPrice(models.Model):
