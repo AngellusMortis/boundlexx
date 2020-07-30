@@ -6,13 +6,15 @@ import pytz
 from django.conf import settings
 from django.core.cache import cache
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
 
 from boundlexx.boundless.client import Location, ShopItem
-from boundlexx.boundless.utils import convert_linear_rgb_to_hex
+from boundlexx.boundless.utils import convert_linear_rgb_to_hex, purge_cache
 
 
 class GameObjManager(models.Manager):
@@ -548,3 +550,10 @@ class ItemBuyRank(ItemRank):
 
 class ItemSellRank(ItemRank):
     pass
+
+
+@receiver(post_save)
+def check_purge_cache(sender, **kwargs):
+    # only purge for Boundless related models
+    if "boundlexx.boundless.models" in repr(sender):
+        purge_cache()

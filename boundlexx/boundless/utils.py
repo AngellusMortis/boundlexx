@@ -1,4 +1,13 @@
 import struct
+from datetime import timedelta
+
+from CloudFlare import CloudFlare
+from django.conf import settings
+from django.core.cache import cache
+from django.utils import timezone
+
+CLOUDFLARE_CACHE_KEY = "boundless:cloudflare_identifier"
+CLOUDFLARE_PURGE_KEY = "boundless:cloudflare_last_purge"
 
 
 def convert_linear_to_s(linear):
@@ -67,3 +76,38 @@ ticket_length: {ticket_length}
 app_ownership_ticket: {app_ownership_ticket.hex()}
 """
     )
+
+
+def purge_cache():
+    if (
+        settings.CLOUDFLARE_API_TOKEN is None
+        or len(settings.CLOUDFLARE_API_TOKEN) == 0
+    ):
+        return False
+
+    next_purge = cache.get(CLOUDFLARE_PURGE_KEY)
+    now = timezone.now()
+
+    if next_purge is not None and now <= next_purge:
+        return False
+
+    cf = CloudFlare(token=settings.CLOUDFLARE_API_TOKEN)
+
+    identifier = cache.get(CLOUDFLARE_CACHE_KEY)
+
+    if identifier is None:
+        r = cf.zones.get(  # pylint: disable=no-member
+            params={"name": settings.CLOUDFLARE_ZONE}
+        )
+
+        identifier = r[0]["id"]
+        cache.set(CLOUDFLARE_CACHE_KEY, identifier)
+
+    cf.zones.purge_cache.post(  # pylint: disable=no-member
+        identifier, data={"purge_everything": True}
+    )
+
+    next_purge = timezone.now() + timedelta(minutes=1)
+    cache.set(CLOUDFLARE_PURGE_KEY, next_purge)
+
+    return True

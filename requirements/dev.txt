@@ -16,6 +16,7 @@ attrs==19.3.0             # via black, flake8-bugbear, pytest
 babel==2.8.0              # via sphinx
 backcall==0.2.0           # via ipython
 bandit==1.6.2             # via -r /app/requirements/in/dev.in
+beautifulsoup4==4.9.1     # via cloudflare
 billiard==3.6.3.0         # via celery
 black==19.10b0            # via -r /app/requirements/in/dev.in
 cachetools==4.1.1         # via steam
@@ -24,6 +25,7 @@ certifi==2020.6.20        # via requests
 cffi==1.14.1              # via argon2-cffi
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r /app/requirements/in/base.in, black, django-click, pip-tools
+cloudflare==2.8.8         # via -r /app/requirements/in/base.in
 colorama==0.4.3           # via -r /app/requirements/in/base.in
 coloredlogs==14.0         # via -r /app/requirements/in/base.in
 coverage[toml]==5.2.1     # via -r /app/requirements/in/dev.in, django-coverage-plugin, pytest-cov
@@ -72,6 +74,7 @@ ipython==7.16.1           # via ipdb
 isort[pyproject]==4.3.21  # via flake8-isort, pylint
 jedi==0.17.2              # via ipython
 jinja2==2.11.2            # via sphinx
+jsonlines==1.2.0          # via cloudflare
 kombu==4.6.11             # via celery
 lazy-object-proxy==1.4.3  # via astroid
 markupsafe==1.1.1         # via jinja2
@@ -91,7 +94,7 @@ pip-tools==5.3.0          # via -r /app/requirements/in/dev.in
 pluggy==0.13.1            # via pytest
 prometheus-client==0.8.0  # via flower
 prompt-toolkit==3.0.5     # via ipython
-protobuf==3.12.2          # via steam
+protobuf==3.12.4          # via steam
 psycopg2==2.8.5           # via -r /app/requirements/in/base.in
 ptvsd==4.3.2              # via -r /app/requirements/in/dev.in
 ptyprocess==0.6.0         # via pexpect
@@ -117,13 +120,14 @@ python-dotenv==0.14.0     # via pytest-dotenv
 python-redis-lock[django]==3.6.0  # via -r /app/requirements/in/base.in
 python-slugify==4.0.1     # via -r /app/requirements/in/base.in
 pytz==2020.1              # via babel, celery, django, django-timezone-field, flower
-pyyaml==5.3.1             # via -r /app/requirements/in/base.in, bandit
+pyyaml==5.3.1             # via -r /app/requirements/in/base.in, bandit, cloudflare
 redis==3.5.3              # via django-redis, python-redis-lock
 regex==2020.7.14          # via black
-requests==2.24.0          # via sphinx, steam
-six==1.15.0               # via argon2-cffi, astroid, bandit, django-coverage-plugin, django-extensions, packaging, pip-tools, protobuf, python-dateutil, steam, traitlets
+requests==2.24.0          # via cloudflare, sphinx, steam
+six==1.15.0               # via argon2-cffi, astroid, bandit, django-coverage-plugin, django-extensions, jsonlines, packaging, pip-tools, protobuf, python-dateutil, steam, traitlets
 smmap==3.0.4              # via gitdb
 snowballstemmer==2.0.0    # via sphinx
+soupsieve==2.0.1          # via beautifulsoup4
 sphinx==3.1.2             # via -r /app/requirements/in/dev.in
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx

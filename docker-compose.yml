@@ -67,7 +67,6 @@ services:
 
   celery:
     <<: *django
-    image: boundlexx_dev_celery
     depends_on:
       - redis
       - postgres
@@ -75,7 +74,6 @@ services:
 
   celerybeat:
     <<: *django
-    image: boundlexx_dev_celerybeat
     depends_on:
       - redis
       - postgres
@@ -83,5 +81,4 @@ services:
 
   flower:
     <<: *django
-    image: boundlexx_dev_flower
     command: /start-flower
