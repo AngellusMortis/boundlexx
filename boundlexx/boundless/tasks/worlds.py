@@ -29,7 +29,11 @@ def update_perm_worlds():
 
 @app.task
 def search_exo_worlds():
-    most_recent_world = World.objects.all().order_by("-id").first()
+    most_recent_world = (
+        World.objects.filter(id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID)
+        .order_by("-id")
+        .first()
+    )
 
     if most_recent_world is None:
         logger.warning("No worlds found to use as a start")
