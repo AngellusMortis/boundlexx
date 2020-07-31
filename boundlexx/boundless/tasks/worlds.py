@@ -19,7 +19,7 @@ def update_perm_worlds():
 
     worlds_created = 0
     for world_dict in worlds:
-        _, created = World.from_world_dict(world_dict)
+        _, created = World.objects.get_or_create_from_game_dict(world_dict)
 
         if created:
             worlds_created += 1
@@ -89,7 +89,9 @@ def _scan_worlds(lower, upper):
     worlds_found = 0
     world_objs = []
     for world_dict in worlds:
-        world, created = World.from_world_dict(world_dict["worldData"])
+        world, created = World.objects.get_or_create_from_game_dict(
+            world_dict["worldData"]
+        )
 
         if created:
             worlds_found += 1
@@ -99,7 +101,9 @@ def _scan_worlds(lower, upper):
                 world_dict["pollData"], world_dict["worldData"]
             )
 
-            WorldPoll.from_world_poll_dict(world_data, poll_dict, world=world)
+            WorldPoll.objects.create_from_game_dict(
+                world_data, poll_dict, world=world
+            )
 
     logger.info("Found %s world(s)", worlds_found)
 
@@ -139,7 +143,9 @@ def poll_worlds(worlds=None):
             world.save()
             continue
 
-        World.from_world_dict(world_data)
+        World.objects.get_or_create_from_game_dict(world_data)
 
         if poll_data is not None:
-            WorldPoll.from_world_poll_dict(world_data, poll_data, world=world)
+            WorldPoll.objects.create_from_game_dict(
+                world_data, poll_data, world=world
+            )

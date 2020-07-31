@@ -83,7 +83,9 @@ def _update_item_prices(
 
         shops = sorted(shops, key=lambda s: s.location)
         for shop in shops:
-            item_price = price_klass.from_shop_item(world_name, item, shop)
+            item_price = price_klass.objects.create_from_shop_item(
+                world_name, item, shop
+            )
 
             state_hash.update(item_price.state_hash)
             total += 1

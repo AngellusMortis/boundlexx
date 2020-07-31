@@ -174,7 +174,116 @@ class Item(GameObj):
         return self.itemrequestbasketprice_set.filter(active=True)
 
 
+class WorldManager(models.Manager):
+    def get_or_create_from_game_dict(self, world_dict):
+        created = False
+
+        world = self.get(id=world_dict["id"])
+
+        if world is None:
+            old_world = World.objects.filter(
+                display_name=world_dict["displayName"],
+                id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
+            ).first()
+
+            if old_world is not None:
+                old_id = old_world.id
+
+                world = old_world
+                world.id = world_dict["id"]
+                world.active = True
+                world.save()
+
+                WorldBlockColor.objects.filter(world_id=old_id).update(
+                    world_id=world.id
+                )
+                World.objects.filter(id=old_id).delete()
+            else:
+                world = World.objects.create(
+                    id=world_dict["id"],
+                    name=world_dict["name"],
+                    display_name=world_dict["displayName"],
+                    region=world_dict["region"],
+                    tier=world_dict["tier"],
+                    description=world_dict["worldDescription"],
+                    size=world_dict["worldSize"],
+                    world_type=world_dict["worldType"],
+                    time_offset=datetime.utcfromtimestamp(
+                        world_dict["timeOffset"]
+                    ).replace(tzinfo=pytz.utc),
+                    atmosphere_color_r=world_dict["atmosphereColor"][0],
+                    atmosphere_color_g=world_dict["atmosphereColor"][1],
+                    atmosphere_color_b=world_dict["atmosphereColor"][2],
+                    water_color_r=world_dict["waterColor"][0],
+                    water_color_g=world_dict["waterColor"][1],
+                    water_color_b=world_dict["waterColor"][2],
+                )
+                created = True
+
+        world.address = world_dict.get("addr")
+        world.ip_address = world_dict.get("ipAddr")
+        world.api_url = world_dict.get("apiURL")
+        world.websocket_url = world_dict.get("websocketURL")
+        world.is_creative = world_dict.get("creative", False)
+        world.owner = world_dict.get("owner", None)
+        world.assignment = world_dict.get("assignment", None)
+        world.is_locked = world_dict.get("locked", False)
+        world.is_public = world_dict.get("public", True)
+        world.number_of_regions = world_dict["numRegions"]
+
+        if "lifetime" in world_dict:
+            world.start = datetime.utcfromtimestamp(
+                world_dict["lifetime"][0]
+            ).replace(tzinfo=pytz.utc)
+            world.end = datetime.utcfromtimestamp(
+                world_dict["lifetime"][1]
+            ).replace(tzinfo=pytz.utc)
+        world.save()
+
+        return world, created
+
+    def get_or_create_unknown_world(self, world_info):
+        created = False
+        world = self.filter(display_name=world_info["name"]).first()
+
+        if world is None:
+            highest_world = (
+                self.filter(id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID)
+                .order_by("-id")
+                .first()
+            )
+
+            if highest_world is None:
+                highest_id = settings.BOUNDLESS_EXO_EXPIRED_BASE_ID - 1
+            else:
+                highest_id = highest_world.id
+
+            world = self.create(
+                active=False,
+                id=highest_id + 1,
+                display_name=world_info["name"],
+            )
+            created = True
+
+        if "tier" in world_info and world.tier is None:
+            world.tier = world_info["tier"]
+        if "type" in world_info and world.world_type is None:
+            world.world_type = world_info["type"]
+        if "start" in world_info and world.start is None:
+            world.start = world_info["start"]
+        if "end" in world_info and world.end is None:
+            world.end = world_info["end"]
+        if "server" in world_info and world.region is None:
+            world.region = world_info["server"]
+
+        world.save()
+
+        return world, created
+
+
 class World(models.Model):
+    objects = WorldManager()
+
     class Region(models.TextChoices):
         REGION_USE = "use", _("US East")
         REGION_USW = "usw", _("US West")
@@ -257,55 +366,6 @@ class World(models.Model):
 
     def __str__(self):
         return self.display_name
-
-    @staticmethod
-    def from_world_dict(world_dict):
-        created = False
-        try:
-            world = World.objects.get(id=world_dict["id"])
-        except World.DoesNotExist:
-            world = World.objects.create(
-                id=world_dict["id"],
-                name=world_dict["name"],
-                display_name=world_dict["displayName"],
-                region=world_dict["region"],
-                tier=world_dict["tier"],
-                description=world_dict["worldDescription"],
-                size=world_dict["worldSize"],
-                world_type=world_dict["worldType"],
-                time_offset=datetime.utcfromtimestamp(
-                    world_dict["timeOffset"]
-                ).replace(tzinfo=pytz.utc),
-                atmosphere_color_r=world_dict["atmosphereColor"][0],
-                atmosphere_color_g=world_dict["atmosphereColor"][1],
-                atmosphere_color_b=world_dict["atmosphereColor"][2],
-                water_color_r=world_dict["waterColor"][0],
-                water_color_g=world_dict["waterColor"][1],
-                water_color_b=world_dict["waterColor"][2],
-            )
-            created = True
-
-        world.address = world_dict.get("addr")
-        world.ip_address = world_dict.get("ipAddr")
-        world.api_url = world_dict.get("apiURL")
-        world.websocket_url = world_dict.get("websocketURL")
-        world.is_creative = world_dict.get("creative", False)
-        world.owner = world_dict.get("owner", None)
-        world.assignment = world_dict.get("assignment", None)
-        world.is_locked = world_dict.get("locked", False)
-        world.is_public = world_dict.get("public", True)
-        world.number_of_regions = world_dict["numRegions"]
-
-        if "lifetime" in world_dict:
-            world.start = datetime.utcfromtimestamp(
-                world_dict["lifetime"][0]
-            ).replace(tzinfo=pytz.utc)
-            world.end = datetime.utcfromtimestamp(
-                world_dict["lifetime"][1]
-            ).replace(tzinfo=pytz.utc)
-        world.save()
-
-        return world, created
 
     @property
     def is_perm(self):
@@ -407,29 +467,12 @@ class WorldCreatureColor(models.Model):
         unique_together = ("world", "creature_type")
 
 
-class WorldPoll(models.Model):
-    world = models.ForeignKey("World", on_delete=models.CASCADE)
-    active = models.BooleanField(db_index=True, default=True)
-    time = models.DateTimeField(auto_now_add=True)
-
-    @property
-    def result(self):
-        return self.worldpollresult_set.first()
-
-    @property
-    def resources(self):
-        return self.resourcecount_set.all()
-
-    @property
-    def leaderboard(self):
-        return self.leaderboardrecord_set.all()
-
-    @staticmethod
-    def from_world_poll_dict(world_dict, poll_dict, world=None):
+class WorldPollManager(models.Manager):
+    def create_from_game_dict(self, world_dict, poll_dict, world=None):
         if world is None:
-            world, _ = World.from_world_dict(world_dict)
+            world, _ = World.objects.get_or_create_from_game_dict(world_dict)
 
-        world_poll = WorldPoll.objects.create(world=world)
+        world_poll = self.create(world=world)
 
         WorldPollResult.objects.create(
             world_poll=world_poll,
@@ -468,6 +511,26 @@ class WorldPoll(models.Model):
         world_poll.refresh_from_db()
 
         return world_poll
+
+
+class WorldPoll(models.Model):
+    objects = WorldPollManager()
+
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
+    active = models.BooleanField(db_index=True, default=True)
+    time = models.DateTimeField(auto_now_add=True)
+
+    @property
+    def result(self):
+        return self.worldpollresult_set.first()
+
+    @property
+    def resources(self):
+        return self.resourcecount_set.all()
+
+    @property
+    def leaderboard(self):
+        return self.leaderboardrecord_set.all()
 
 
 class WorldPollResult(models.Model):
@@ -522,6 +585,24 @@ class LeaderboardRecord(models.Model):
         ordering = ["world_rank"]
 
 
+class ItemShopPriceManager(models.Manager):
+    def create_from_shop_item(
+        self, world: str, item: Item, shop_item: ShopItem
+    ) -> ItemShopPrice:
+        return self.create(
+            item_id=item.id,
+            beacon_name=shop_item.beacon_name,
+            guild_tag=shop_item.guild_tag,
+            item_count=shop_item.item_count,
+            shop_activity=shop_item.shop_activity,
+            price=shop_item.price,
+            location_x=shop_item.location.x,
+            location_y=shop_item.location.y,
+            location_z=shop_item.location.z,
+            world=World.objects.get(name=world),
+        )
+
+
 class ItemShopPrice(models.Model):
     time = models.DateTimeField(auto_now=True, primary_key=True)
     world = models.ForeignKey("World", on_delete=models.CASCADE)
@@ -566,23 +647,6 @@ class ItemShopPrice(models.Model):
         self._location = None
         return super().refresh_from_db(using, fields)
 
-    @staticmethod
-    def from_shop_item(
-        manager, world: str, item: Item, shop_item: ShopItem
-    ) -> ItemShopPrice:
-        return manager.create(
-            item_id=item.id,
-            beacon_name=shop_item.beacon_name,
-            guild_tag=shop_item.guild_tag,
-            item_count=shop_item.item_count,
-            shop_activity=shop_item.shop_activity,
-            price=shop_item.price,
-            location_x=shop_item.location.x,
-            location_y=shop_item.location.y,
-            location_z=shop_item.location.z,
-            world=World.objects.get(name=world),
-        )
-
     @property
     def state_hash(self):
         return (
@@ -593,23 +657,11 @@ class ItemShopPrice(models.Model):
 
 
 class ItemShopStandPrice(ItemShopPrice):
-    @staticmethod
-    def from_shop_item(  # type: ignore # pylint: disable=arguments-differ
-        world: str, item: Item, shop_item: ShopItem
-    ) -> ItemShopPrice:
-        return ItemShopPrice.from_shop_item(
-            ItemShopStandPrice.objects, world, item, shop_item
-        )
+    objects = ItemShopPriceManager()
 
 
 class ItemRequestBasketPrice(ItemShopPrice):
-    @staticmethod
-    def from_shop_item(  # type: ignore # pylint: disable=arguments-differ
-        world: str, item: Item, shop_item: ShopItem
-    ) -> ItemShopPrice:
-        return ItemShopPrice.from_shop_item(
-            ItemRequestBasketPrice.objects, world, item, shop_item
-        )
+    objects = ItemShopPriceManager()
 
 
 class ItemRank(models.Model):

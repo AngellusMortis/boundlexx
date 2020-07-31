@@ -1,7 +1,9 @@
 import re
 import time
+from datetime import timezone
 from typing import Optional
 
+import dateparser
 import requests
 from bs4 import BeautifulSoup
 from celery.utils.log import get_task_logger
@@ -23,7 +25,6 @@ FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_exo_topics"
 
 def _get_topics():
     topics_to_parse = []
-    archive_topic = None
     parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
 
     next_url: Optional[str] = "/c/creations/exoworlds/31.json"
@@ -42,77 +43,17 @@ def _get_topics():
         topics = topic_list["topics"]
 
         for topic in topics:
-            if "The Exoworlds Archives" in topic["title"]:
-                archive_topic = topic["id"]
-            elif (
+            if (
                 topic["id"] in settings.BOUNDLESS_FORUM_EXO_BAD_TOPICS
                 or topic["id"] in parse_cache
             ):
                 continue
-            else:
-                topics_to_parse.append(topic["id"])
+
+            topics_to_parse.append(topic["id"])
 
         time.sleep(1)
 
-    return archive_topic, topics_to_parse
-
-
-def _parse_forum_topic(topic):
-    response = requests.get(
-        f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json"
-    )
-    response.raise_for_status()
-
-    data = response.json()
-
-    title = data["title"]
-    title = (
-        title.split("--")[0]
-        .strip()
-        .replace("[", "")
-        .replace("]", "")
-        .split(" –")[0]
-        .split(" - ")[0]
-        .split(" :")[0]
-    )
-
-    soup = BeautifulSoup(
-        data["post_stream"]["posts"][0]["cooked"], "html.parser"
-    )
-
-    details = soup.find_all("details")
-
-    block_details = None
-    for detail in details:
-        if "Blocks Color" in detail.summary.get_text().strip():
-            block_details = detail
-            break
-
-    return title, block_details
-
-
-def _get_or_create_world(title):
-    try:
-        world = World.objects.get(display_name=title)
-    except World.DoesNotExist:
-        highest_world = (
-            World.objects.filter(
-                id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID
-            )
-            .order_by("-id")
-            .first()
-        )
-
-        if highest_world is None:
-            highest_id = settings.BOUNDLESS_EXO_EXPIRED_BASE_ID - 1
-        else:
-            highest_id = highest_world.id
-
-        world = World.objects.create(
-            active=False, id=highest_id + 1, display_name=title
-        )
-
-    return world
+    return topics_to_parse
 
 
 def _clean_line(line):
@@ -198,19 +139,167 @@ def _parse_block_details(block_details):
     return block_colors
 
 
+def _parse_title(title):
+    parts = title.split("--")
+    parts = [p.strip() for p in parts]
+
+    if len(parts) == 1:
+        parts = parts[0].split(" - ", 1)
+
+        if len(parts) == 1:
+            parts = parts[0].split(" –", 1)
+
+    # name
+    name = parts[0].replace("[", "").replace("]", "")
+    tier = None
+    world_type = None
+    end = None
+
+    # tier + world_type
+    type_str = parts[1].lower()
+    match = re.search(r"(t|tier )(\d)", type_str)
+    if match:
+        tier = int(match.group(2)) - 1
+
+    for choice in World.WorldType.choices:
+        if choice[0].lower() in type_str:
+            world_type = choice[0]
+            break
+
+    # end
+    if len(parts) > 2:
+        end_str = parts[2].lower()
+        if "]" in end_str:
+            end_str = end_str.split("]")[0].strip()
+
+        if "last seen" in end_str:
+            end = end_str.split("last seen")[-1].strip()
+
+    world_info = {"name": name}
+
+    if tier is not None:
+        world_info["tier"] = tier
+    if world_type is not None:
+        world_info["type"] = world_type
+    if end is not None:
+        world_info["end"] = end
+
+    return world_info
+
+
+def _parse_world_info(raw_html):
+    lines = raw_html.get_text().split("\n")
+
+    parsed_lines = []
+    for raw_line in lines:
+        line = raw_line.strip().lower()
+
+        # nothing else to parse
+        if "blocks color" in line:
+            break
+
+        if " : " in line:
+            parts = [
+                p.encode("utf8").decode("ascii", errors="ignore").strip()
+                for p in line.split(" : ")
+            ]
+
+            if parts[0] == "world":
+                parts[0] = "name"
+
+            if len(parts[0]) == 0 or parts[0] in ("∞", ">= 0"):
+                continue
+
+            if parts[0] == "name":
+                parts[1] = raw_line.split(" : ")[-1].strip()
+
+            parsed_lines.append(parts)
+        elif "appeared" in line:
+            parsed_lines.append(["start", line.split("appeared ")[-1].strip()])
+        elif "last until" in line:
+            parsed_lines.append(["end", line.split("last until ")[-1].strip()])
+        elif "last seen" in line:
+            parsed_lines.append(["end", line.split("last seen ")[-1].strip()])
+
+    parsed_data = {}
+    for line in parsed_lines:
+        if line[0] in ("name", "type", "tier", "start", "end", "server"):
+            parsed_data[line[0]] = line[1]
+
+    return parsed_data
+
+
+def _normalize_world_info(world_info):
+    if "type" in world_info:
+        world_info["type"] = world_info["type"].upper()
+
+    if "server" in world_info:
+        for region_choice in World.Region.choices:
+            choices = [region_choice[0].lower(), region_choice[1].lower()]
+            if world_info["server"] in choices:
+                world_info["server"] = region_choice[0]
+                break
+
+    if "start" in world_info:
+        world_info["start"] = dateparser.parse(world_info["start"]).replace(
+            tzinfo=timezone.utc
+        )
+
+    if "end" in world_info:
+        world_info["end"] = dateparser.parse(world_info["end"]).replace(
+            tzinfo=timezone.utc
+        )
+
+    return world_info
+
+
+def _parse_forum_topic(topic):
+    response = requests.get(
+        f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json"
+    )
+    response.raise_for_status()
+
+    data = response.json()
+
+    world_info = _parse_title(data["title"])
+    raw_html = BeautifulSoup(
+        data["post_stream"]["posts"][0]["cooked"], "html.parser"
+    )
+
+    world_info.update(_parse_world_info(raw_html))
+    world_info = _normalize_world_info(world_info)
+
+    if len(world_info) < 6:
+        logger.warning(
+            "Could not parse all world data for topic %s\nFound %s\n%s",
+            topic,
+            world_info.keys(),
+            raw_html.get_text().split("\n"),
+        )
+
+    details = raw_html.find_all("details")
+
+    block_details = None
+    for detail in details:
+        if "Blocks Color" in detail.summary.get_text().strip():
+            block_details = detail
+            break
+
+    return world_info, block_details
+
+
 @app.task
 def ingest_exo_world_data():
-    _, topics = _get_topics()
+    topics = _get_topics()
 
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:
-        display_name, block_details = _parse_forum_topic(topic)
+        world_info, block_details, = _parse_forum_topic(topic)
 
-        world = _get_or_create_world(display_name)
         block_colors = _parse_block_details(block_details)
+        world = World.objects.get_or_create_unknown_world(world_info)
 
         number_created = 0
-
         for block_color in block_colors:
             _, created = WorldBlockColor.objects.get_or_create(
                 world=world,

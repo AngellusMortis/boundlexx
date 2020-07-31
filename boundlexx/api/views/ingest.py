@@ -47,34 +47,38 @@ class WorldWSDataView(views.APIView):
 
         world = World.objects.filter(display_name=data[0]).first()
 
+        if world is None:
+            world = World.objects.get_or_create_unknown_world(
+                {"name": data[0]}
+            )
+
         block_colors_created = 0
         creature_colors_created = 0
-        if world is not None:
-            block_colors_created = 0
-            for block_color in data[1]:
-                item = Item.objects.filter(
-                    string_id=f"ITEM_TYPE_{block_color[0]}"
-                ).first()
+        block_colors_created = 0
+        for block_color in data[1]:
+            item = Item.objects.filter(
+                string_id=f"ITEM_TYPE_{block_color[0]}"
+            ).first()
 
-                if item is not None:
-                    color = Color.objects.get(game_id=block_color[1])
+            if item is not None:
+                color = Color.objects.get(game_id=block_color[1])
 
-                    _, created = WorldBlockColor.objects.get_or_create(
-                        world=world, item=item, defaults={"color": color}
-                    )
-
-                    if created:
-                        block_colors_created += 1
-
-            for creature_color in data[2]:
-                _, created = WorldCreatureColor.objects.get_or_create(
-                    world=world,
-                    creature_type=creature_color[0],
-                    defaults={"color_data": json.dumps(creature_color[1])},
+                _, created = WorldBlockColor.objects.get_or_create(
+                    world=world, item=item, defaults={"color": color}
                 )
 
                 if created:
-                    creature_colors_created += 1
+                    block_colors_created += 1
+
+        for creature_color in data[2]:
+            _, created = WorldCreatureColor.objects.get_or_create(
+                world=world,
+                creature_type=creature_color[0],
+                defaults={"color_data": json.dumps(creature_color[1])},
+            )
+
+            if created:
+                creature_colors_created += 1
 
         return Response(
             status=200,
