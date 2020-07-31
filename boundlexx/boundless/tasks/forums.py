@@ -95,9 +95,14 @@ def _get_or_create_world(title):
     try:
         world = World.objects.get(display_name=title)
     except World.DoesNotExist:
-        highest_world = World.objects.filter(
-            id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID
-        ).first()
+        highest_world = (
+            World.objects.filter(
+                id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID
+            )
+            .order_by("-id")
+            .first()
+        )
+
         if highest_world is None:
             highest_id = settings.BOUNDLESS_EXO_EXPIRED_BASE_ID - 1
         else:
@@ -106,7 +111,6 @@ def _get_or_create_world(title):
         world = World.objects.create(
             active=False, id=highest_id + 1, display_name=title
         )
-        highest_id = world.id
 
     return world
 
