@@ -309,7 +309,7 @@ class World(models.Model):
 
     @property
     def is_perm(self):
-        if self.id > settings.BOUNDLESS_EXO_EXPIRED_BASE_ID:
+        if self.id >= settings.BOUNDLESS_EXO_EXPIRED_BASE_ID:
             return False
         return self.end is None
 
