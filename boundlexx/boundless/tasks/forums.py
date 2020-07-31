@@ -297,7 +297,7 @@ def ingest_exo_world_data():
         world_info, block_details, = _parse_forum_topic(topic)
 
         block_colors = _parse_block_details(block_details)
-        world = World.objects.get_or_create_unknown_world(world_info)
+        world, _ = World.objects.get_or_create_unknown_world(world_info)
 
         number_created = 0
         for block_color in block_colors:

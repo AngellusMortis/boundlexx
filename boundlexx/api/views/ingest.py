@@ -48,7 +48,7 @@ class WorldWSDataView(views.APIView):
         world = World.objects.filter(display_name=data[0]).first()
 
         if world is None:
-            world = World.objects.get_or_create_unknown_world(
+            world, _ = World.objects.get_or_create_unknown_world(
                 {"name": data[0]}
             )
 
