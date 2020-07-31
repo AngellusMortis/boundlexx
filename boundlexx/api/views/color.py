@@ -10,6 +10,8 @@ from boundlexx.boundless.models import Color
 COLOR_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/colors/1/",
     "game_id": 1,
+    "base_color": "#1b1b1b",
+    "gleam_color": "#1b1b1b",
     "localization": [
         {"lang": "english", "name": "Black"},
         {"lang": "french", "name": "Noir"},
@@ -23,7 +25,7 @@ COLOR_EXAMPLE = {
 class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
         Color.objects.filter(active=True)
-        .prefetch_related("localizedname_set")
+        .prefetch_related("localizedname_set", "colorvalue_set")
         .order_by("game_id")
     )
     serializer_class = ColorSerializer

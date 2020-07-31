@@ -8,6 +8,7 @@ from django.utils import timezone
 
 from boundlexx.boundless.models import (
     Color,
+    ColorValue,
     Item,
     ItemBuyRank,
     ItemRequestBasketPrice,
@@ -88,6 +89,20 @@ class ItemShopStandPriceInline(ItemPriceInline):
     model = ItemShopStandPrice
 
 
+class ColorValueInline(admin.TabularInline):
+    model = ColorValue
+
+    readonly_fields = [
+        "color_type",
+        "shade",
+        "base",
+        "hlight",
+        "rgb_color",
+    ]
+    can_delete = False
+    max_num = 0
+
+
 class ItemResourceCountInline(admin.TabularInline):
     model = ResourceCount
     can_delete = False
@@ -139,7 +154,20 @@ class SubtitleAdmin(GameObjAdmin):
 
 @admin.register(Color)
 class ColorAdmin(GameObjAdmin):
-    pass
+    readonly_fields = [
+        "game_id",
+        "base_color",
+        "gleam_color",
+    ]
+
+    inlines = [ColorValueInline]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("localizedname_set", "colorvalue_set")
+        )
 
 
 @admin.register(Metal)

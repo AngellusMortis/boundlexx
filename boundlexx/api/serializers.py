@@ -102,7 +102,13 @@ class ColorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Color
-        fields = ["url", "game_id", "localization"]
+        fields = [
+            "url",
+            "game_id",
+            "base_color",
+            "gleam_color",
+            "localization",
+        ]
 
 
 class SubtitleSerializer(serializers.ModelSerializer):

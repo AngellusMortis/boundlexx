@@ -366,6 +366,9 @@ BOUNDLESS_ITEMS_FILE = "/boundless/assets/archetypes/itemcolorstrings.dat"
 BOUNDLESS_COMPILED_ITEMS_FILE = (
     "/boundless/assets/archetypes/compileditems.msgpack"
 )
+BOUNDLESS_COMPILED_COLOR_PALETTES_FILE = (
+    "/boundless/assets/archetypes/compiledcolorpalettelists.msgpack"
+)
 
 # timeout for making an API request
 BOUNDLESS_API_TIMEOUT = 5

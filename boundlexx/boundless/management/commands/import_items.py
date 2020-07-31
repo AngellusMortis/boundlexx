@@ -8,6 +8,7 @@ from django.conf import settings
 
 from boundlexx.boundless.models import (
     Color,
+    ColorValue,
     Item,
     LocalizedName,
     Metal,
@@ -244,6 +245,22 @@ def construct_item_list(compileditems_binary):
     return items
 
 
+def construct_color_list(compiledcolorpaletteslists_binary):
+    data = msgpack.unpackb(
+        compiledcolorpaletteslists_binary, strict_map_key=False
+    )
+
+    colors_palettes = {}
+    for color in data[0]:
+        if len(color[4]) == 255:
+            colors = {}
+            for color_values in color[4]:
+                colors[color_values[1]] = color_values[0]
+            colors_palettes[color[1]] = colors
+
+    return colors_palettes
+
+
 def print_result(name, created, action="imported"):
     if created > 0:
         click.echo(f"{action.title()} {created} new {name}(s)")
@@ -254,13 +271,27 @@ def print_result(name, created, action="imported"):
 @click.command()
 @click.argument("itemcolorstrings_file", type=click.File("rb"), required=False)
 @click.argument("compileditems_file", type=click.File("rb"), required=False)
-def command(itemcolorstrings_file=None, compileditems_file=None):
+@click.argument(
+    "compiledcolorpaletteslists_file", type=click.File("rb"), required=False
+)
+def command(
+    itemcolorstrings_file=None,
+    compileditems_file=None,
+    compiledcolorpaletteslists_file=None,
+):
     if itemcolorstrings_file is None:
         itemcolorstrings_file = open(settings.BOUNDLESS_ITEMS_FILE, "rb")
     if compileditems_file is None:
         compileditems_file = open(settings.BOUNDLESS_COMPILED_ITEMS_FILE, "rb")
+    if compiledcolorpaletteslists_file is None:
+        compiledcolorpaletteslists_file = open(
+            settings.BOUNDLESS_COMPILED_COLOR_PALETTES_FILE, "rb"
+        )
 
     compiled_items = construct_item_list(compileditems_file.read())
+    color_palettes = construct_color_list(
+        compiledcolorpaletteslists_file.read()
+    )
     binary_data = itemcolorstrings_file.read()
 
     (
@@ -337,6 +368,7 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
 
     click.echo("Creating Colors...")
     colors_created = 0
+    color_values_created = 0
     colors = {}
     with click.progressbar(range(255)) as bar:
         for index in bar:
@@ -346,6 +378,20 @@ def command(itemcolorstrings_file=None, compileditems_file=None):
 
             if was_created:
                 colors_created += 1
+
+            for color_type in color_palettes.keys():
+                color_values = color_palettes[color_type][color.game_id]
+                _, was_created = ColorValue.objects.get_or_create(
+                    color=color,
+                    color_type=color_type,
+                    shade=color_values[0],
+                    base=color_values[1],
+                    hlight=color_values[2],
+                )
+
+                if was_created:
+                    color_values_created += 1
+
     print_result("color", colors_created)
 
     click.echo("Processing localization data...")

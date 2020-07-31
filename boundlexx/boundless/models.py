@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from typing import Dict
 
 import pytz
 from django.conf import settings
@@ -72,7 +73,79 @@ class Subtitle(GameObj):
 
 
 class Color(GameObj):
-    pass
+    @cached_property
+    def base_color(self):
+        colors: Dict[int, int] = {}
+
+        for color in self.colorvalue_set.all():
+            color_count = colors.get(color.base, 0) + 1
+
+            colors[color.base] = color_count
+
+        base_color = None
+        highest_count = -1
+        for color_value, count in colors.items():
+            if count > highest_count:
+                highest_count = count
+                base_color = color_value
+
+        return f"#{base_color:06x}"
+
+    @cached_property
+    def gleam_color(self):
+        for color in self.colorvalue_set.all():
+            if color.color_type == ColorValue.ColorType.GLEAM:
+                return color.rgb_color
+        return None
+
+
+class ColorValue(models.Model):
+    class ColorType(models.TextChoices):
+        CHARACTER = "CHARACTER", _("CHARACTER")
+        CHARACTER_DECAL = "CHARACTER_DECAL", _("CHARACTER_DECAL")
+        CREATURE_BASE = "CREATURE_BASE", _("CREATURE_BASE")
+        CREATURE_AUX = "CREATURE_AUX", _("CREATURE_AUX")
+        CREATURE_EXOTIC = "CREATURE_EXOTIC", _("CREATURE_EXOTIC")
+        WOOD = "WOOD", _("WOOD")
+        ROCK = "ROCK", _("ROCK")
+        GRASS = "GRASS", _("GRASS")
+        ICE = "ICE", _("ICE")
+        GLACIER = "GLACIER", _("GLACIER")
+        SOIL = "SOIL", _("SOIL")
+        ASH = "ASH", _("ASH")
+        GLEAM = "GLEAM", _("GLEAM")
+        GRAVEL = "GRAVEL", _("GRAVEL")
+        GROWTH = "GROWTH", _("GROWTH")
+        MOULD = "MOULD", _("MOULD")
+        SAND = "SAND", _("SAND")
+        SPONGE = "SPONGE", _("SPONGE")
+        LEAVES = "LEAVES", _("LEAVES")
+        MANTLE = "MANTLE", _("MANTLE")
+        MUD = "MUD", _("MUD")
+        TANGLE = "TANGLE", _("TANGLE")
+        THORNS = "THORNS", _("THORNS")
+        FLORA_1 = "FLORA_1", _("FLORA_1")
+        FLORA_DECAL_1 = "FLORA_DECAL_1", _("FLORA_DECAL_1")
+        FLORA_2 = "FLORA_2", _("FLORA_2")
+        FLORA_DECAL_2 = "FLORA_DECAL_2", _("FLORA_DECAL_2")
+        FLORA_3 = "FLORA_3", _("FLORA_3")
+        FLORA_DECAL_3 = "FLORA_DECAL_3", _("FLORA_DECAL_3")
+        FLORA_4 = "FLORA_4", _("FLORA_4")
+        FLORA_DECAL_4 = "FLORA_DECAL_4", _("FLORA_DECAL_4")
+        INK = "INK", _("INK")
+        FIBER = "FIBER", _("FIBER")
+
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
+    color_type = models.CharField(max_length=16, choices=ColorType.choices)
+    shade = models.IntegerField()
+    base = models.IntegerField()
+    hlight = models.IntegerField()
+
+    @property
+    def rgb_color(self):
+        if self.base is None:
+            return None
+        return f"#{self.base:06x}"
 
 
 class Metal(GameObj):
