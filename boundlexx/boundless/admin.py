@@ -377,6 +377,9 @@ class WorldAdmin(admin.ModelAdmin):
             .prefetch_related(
                 "worldpoll_set",
                 "worldblockcolor_set",
+                "worldblockcolor_set__item",
+                "worldblockcolor_set__color",
+                "worldblockcolor_set__color__localizedname_set",
                 "worldcreaturecolor_set",
             )
         )

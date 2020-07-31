@@ -384,6 +384,33 @@ BOUNDLESS_MAX_ITEM_DELAY = 360
 BOUNDLESS_EXO_SEARCH_RADIUS = 10
 BOUNDLESS_MAX_WORLD_ID = 1000
 BOUNDLESS_MAX_SCAN_CHUNK = 50
+BOUNDLESS_EXO_EXPIRED_BASE_ID = 2000000000
+BOUNDLESS_FORUM_EXO_BAD_TOPICS = [28592, 28593, 38617]
+BOUNDLESS_FORUM_BASE_URL = "https://forum.playboundless.com"
+BOUNDLESS_FORUM_NAME_MAPPINGS = {
+    "Ancient": "Ancient Wood Trunk",
+    "Barbed": "Barbed Grass",
+    "Branch Funnel": "Branch Funnel Fungus",
+    "Clay": "Clay Soil",
+    "Clustered Tongue": "Clustered Tongue Fungus",
+    "Exotic": "Exotic Foliage",
+    "Glow Cap": "Glow Cap Fungus",
+    "Gnarled": "Gnarled Grass",
+    "Igneous": "Igneous Rock",
+    "Lush": "Lush Foliage",
+    "Lustrous": "Lustrous Wood Trunk",
+    "Metamorphic": "Metamorphic Rock",
+    "Tar Spot": "Mottled Tar Spot Fungus",
+    "Oortians Staff": "Oortian's Staff",
+    "Peaty": "Peaty Soil",
+    "Silty": "Silty Soil",
+    "Sedimentary": "Sedimentary Rock",
+    "Thorn": "Thorns",
+    "Tinted-Burst": "Tinted-Burst Fungus",
+    "Travellers Perch": "Traveller's Perch",
+    "Verdant": "Verdant Grass",
+    "Weeping Waxcap": "Weeping Waxcap Fungus",
+}
 BOUNDLESS_LANGUAGES = [
     ("english", "English"),
     ("french", "French"),

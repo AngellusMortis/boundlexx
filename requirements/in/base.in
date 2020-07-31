@@ -19,6 +19,7 @@ celery<5
 django-celery-beat
 flower
 
+beautifulsoup4
 cloudflare
 colorama
 coloredlogs

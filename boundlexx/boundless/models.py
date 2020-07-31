@@ -206,16 +206,18 @@ class World(models.Model):
         TYPE_RIFT = "RIFT", _("Rift")
         TYPE_BLINK = "BLINK", _("Blink")
 
-    name = models.CharField(_("Name"), max_length=64)
+    name = models.CharField(_("Name"), max_length=64, null=True)
     display_name = models.CharField(_("Display Name"), max_length=64)
     region = models.CharField(
-        _("Server Region"), max_length=16, choices=Region.choices
+        _("Server Region"), max_length=16, choices=Region.choices, null=True
     )
-    tier = models.PositiveSmallIntegerField(_("Tier"), choices=Tier.choices)
-    description = models.CharField(_("Description"), max_length=32)
-    size = models.IntegerField(_("World Size"))
+    tier = models.PositiveSmallIntegerField(
+        _("Tier"), choices=Tier.choices, null=True
+    )
+    description = models.CharField(_("Description"), max_length=32, null=True)
+    size = models.IntegerField(_("World Size"), null=True)
     world_type = models.CharField(
-        _("World Type"), choices=WorldType.choices, max_length=9
+        _("World Type"), choices=WorldType.choices, max_length=9, null=True
     )
     address = models.CharField(
         _("Server Address"), max_length=128, blank=True, null=True
@@ -226,21 +228,27 @@ class World(models.Model):
     api_url = models.URLField(_("API URL"), blank=True, null=True)
     planets_url = models.URLField(_("Planets URL"), blank=True, null=True)
     chunks_url = models.URLField(_("Chunks URL"), blank=True, null=True)
-    time_offset = models.DateTimeField(_("Time Offset"))
+    time_offset = models.DateTimeField(_("Time Offset"), null=True)
     websocket_url = models.URLField(_("Websocket URL"), blank=True, null=True)
     assignment = models.PositiveSmallIntegerField(blank=True, null=True)
     owner = models.PositiveSmallIntegerField(blank=True, null=True)
-    is_creative = models.BooleanField(default=False, db_index=True)
-    is_locked = models.BooleanField(default=False, db_index=True)
-    is_public = models.BooleanField(default=True, db_index=True)
+    is_creative = models.BooleanField(default=False, db_index=True, null=True)
+    is_locked = models.BooleanField(default=False, db_index=True, null=True)
+    is_public = models.BooleanField(default=True, db_index=True, null=True)
     number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
 
-    atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"))
-    atmosphere_color_g = models.FloatField(_("Atmosphere Linear G Color"))
-    atmosphere_color_b = models.FloatField(_("Atmosphere Linear B Color"))
-    water_color_r = models.FloatField(_("Water Linear R Color"))
-    water_color_g = models.FloatField(_("Water Linear G Color"))
-    water_color_b = models.FloatField(_("Water Linear B Color"))
+    atmosphere_color_r = models.FloatField(
+        _("Atmosphere Linear R Color"), null=True
+    )
+    atmosphere_color_g = models.FloatField(
+        _("Atmosphere Linear G Color"), null=True
+    )
+    atmosphere_color_b = models.FloatField(
+        _("Atmosphere Linear B Color"), null=True
+    )
+    water_color_r = models.FloatField(_("Water Linear R Color"), null=True)
+    water_color_g = models.FloatField(_("Water Linear G Color"), null=True)
+    water_color_b = models.FloatField(_("Water Linear B Color"), null=True)
 
     active = models.BooleanField(default=True, db_index=True)
 
@@ -301,6 +309,8 @@ class World(models.Model):
 
     @property
     def is_perm(self):
+        if self.id > settings.BOUNDLESS_EXO_EXPIRED_BASE_ID:
+            return False
         return self.end is None
 
     @property
@@ -309,6 +319,13 @@ class World(models.Model):
 
     @property
     def atmosphere_color(self):
+        if (
+            self.atmosphere_color_r is None
+            or self.atmosphere_color_g is None
+            or self.atmosphere_color_b is None
+        ):
+            return None
+
         return convert_linear_rgb_to_hex(
             self.atmosphere_color_r,
             self.atmosphere_color_g,
@@ -317,13 +334,20 @@ class World(models.Model):
 
     @property
     def water_color(self):
+        if (
+            self.water_color_r is None
+            or self.water_color_g is None
+            or self.water_color_g is None
+        ):
+            return None
+
         return convert_linear_rgb_to_hex(
-            self.water_color_r, self.water_color_g, self.water_color_b,
+            self.water_color_r, self.water_color_g, self.water_color_g,
         )
 
     @property
     def protection(self):
-        if self.tier < World.Tier.TIER_4:
+        if self.tier is None or self.tier < World.Tier.TIER_4:
             return None
 
         amount = 5
