@@ -184,12 +184,16 @@ class WorldSerializer(serializers.ModelSerializer):
         lookup_url_kwarg=["world_id"],
         read_only=True,
     )
+    block_colors_url = serializers.HyperlinkedIdentityField(
+        view_name="world-block-colors", lookup_field="id", read_only=True,
+    )
 
     class Meta:
         model = World
         fields = [
             "url",
             "polls_url",
+            "block_colors_url",
             "id",
             "name",
             "display_name",
