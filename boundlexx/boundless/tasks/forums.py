@@ -191,7 +191,9 @@ def _parse_block_details(block_details):
                     parts = _clean_line(line)
 
         if len(parts) == 2:
-            block_colors.append(_get_item_and_color(colors, parts))
+            item, color = _get_item_and_color(colors, parts)
+            if item is None and color is not None:
+                block_colors.append([item, color])
 
     return block_colors
 
