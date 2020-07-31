@@ -12,6 +12,7 @@ class DescriptiveAutoSchema(AutoSchema):
 
         tags = [self.view.basename.title()]
         operation_id = f"{self.view.action}-{self.view.basename}".lower()
+        operation_id = operation_id.replace("_", "-")
         if self.view.action.lower() == "list":
             operation_id += "s"
         summary = operation_id.title().replace("-", " ")

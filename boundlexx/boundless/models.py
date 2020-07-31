@@ -141,6 +141,9 @@ class ColorValue(models.Model):
     base = models.IntegerField()
     hlight = models.IntegerField()
 
+    class Meta:
+        unique_together = ("color", "color_type")
+
     @property
     def rgb_color(self):
         if self.base is None:
@@ -350,6 +353,34 @@ class World(models.Model):
             protection_type = "Potent"
 
         return f"Lvl {amount} {protection_type}"
+
+
+class WorldBlockColor(models.Model):
+    world = models.ForeignKey(World, on_delete=models.CASCADE)
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("world", "item")
+
+
+class WorldCreatureColor(models.Model):
+    class CreatureType(models.TextChoices):
+        CUTTLETRUNK = "CUTTLETRUNK", _("Cuttletrunk")
+        HOPPER = "HOPPER", _("Hopper")
+        HUNTER = "HUNTER", _("Hunter")
+        ROADRUNNER = "ROADRUNNER", _("Roadrunner")
+        SPITTER = "SPITTER", _("Spitter")
+        WILDSTOCK = "WILDSTOCK", _("Wildstock")
+
+    world = models.ForeignKey(World, on_delete=models.CASCADE)
+    creature_type = models.CharField(
+        max_length=16, choices=CreatureType.choices
+    )
+    color_data = models.TextField()
+
+    class Meta:
+        unique_together = ("world", "creature_type")
 
 
 class WorldPoll(models.Model):

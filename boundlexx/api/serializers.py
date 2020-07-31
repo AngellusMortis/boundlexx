@@ -11,6 +11,7 @@ from boundlexx.boundless.models import (
     ResourceCount,
     Subtitle,
     World,
+    WorldBlockColor,
     WorldPoll,
 )
 
@@ -231,6 +232,19 @@ class SimpleItemSerializer(serializers.ModelSerializer):
         ]
 
 
+class SimpleColorSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="color-detail", lookup_field="game_id", read_only=True,
+    )
+
+    class Meta:
+        model = Item
+        fields = [
+            "url",
+            "game_id",
+        ]
+
+
 class ResourcesSerializer(serializers.ModelSerializer):
     item = SimpleItemSerializer()
 
@@ -263,6 +277,28 @@ class WorldPollResourcesSerializer(WorldPollExtraSerializer):
     class Meta:
         model = WorldPoll
         fields = ["world_poll_id", "world_poll_url", "resources"]
+
+
+class WorldBlockColorSerializer(serializers.ModelSerializer):
+    item = SimpleItemSerializer()
+    color = SimpleColorSerializer()
+
+    class Meta:
+        model = WorldBlockColor
+        fields = ["item", "color"]
+
+
+class WorldBlockColorsViewSerializer(serializers.ModelSerializer):
+    world_url = serializers.HyperlinkedIdentityField(
+        view_name="world-detail", lookup_field="id", read_only=True,
+    )
+    block_colors = WorldBlockColorSerializer(
+        many=True, read_only=True, source="worldblockcolor_set"
+    )
+
+    class Meta:
+        model = World
+        fields = ["world_url", "block_colors"]
 
 
 class WorldPollSerializer(serializers.ModelSerializer):

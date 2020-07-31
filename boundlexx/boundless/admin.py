@@ -20,6 +20,8 @@ from boundlexx.boundless.models import (
     ResourceCount,
     Subtitle,
     World,
+    WorldBlockColor,
+    WorldCreatureColor,
     WorldPoll,
     WorldPollResult,
 )
@@ -132,7 +134,7 @@ class ItemResourceCountInline(admin.TabularInline):
 
 
 class GameObjAdmin(admin.ModelAdmin):
-    list_display = ["default_name", "game_id", "active"]
+    list_display = ["game_id", "default_name", "active"]
     search_fields = ["game_id", "localizedname__name"]
     readonly_fields = ["game_id"]
 
@@ -154,6 +156,13 @@ class SubtitleAdmin(GameObjAdmin):
 
 @admin.register(Color)
 class ColorAdmin(GameObjAdmin):
+    list_display = [
+        "game_id",
+        "default_name",
+        "base_color",
+        "gleam_color",
+        "active",
+    ]
     readonly_fields = [
         "game_id",
         "base_color",
@@ -256,6 +265,24 @@ class WorldPollInline(admin.TabularInline):
         )
 
 
+class WorldBlockColorInline(admin.TabularInline):
+    model = WorldBlockColor
+
+    fields = ["item", "color"]
+    readonly_fields = ["item", "color"]
+    can_delete = False
+    max_num = 0
+
+
+class WorldCreatureColorInline(admin.TabularInline):
+    model = WorldCreatureColor
+
+    fields = ["creature_type", "color_data"]
+    readonly_fields = ["creature_type", "color_data"]
+    can_delete = False
+    max_num = 0
+
+
 @admin.register(World)
 class WorldAdmin(admin.ModelAdmin):
     def is_perm(self, obj):
@@ -337,7 +364,22 @@ class WorldAdmin(admin.ModelAdmin):
         "end",
     ]
 
-    inlines = [WorldPollInline]
+    inlines = [
+        WorldPollInline,
+        WorldBlockColorInline,
+        WorldCreatureColorInline,
+    ]
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related(
+                "worldpoll_set",
+                "worldblockcolor_set",
+                "worldcreaturecolor_set",
+            )
+        )
 
 
 class WorldPollResultInline(admin.StackedInline):
