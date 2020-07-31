@@ -5,13 +5,27 @@ from boundlexx.api import views
 from boundlexx.api.routers import APIDocsRouter
 
 router = APIDocsRouter()
-router.register("colors", views.ColorViewSet, basename="color")
-router.register("items", views.ItemViewSet, basename="item").register(
+router.register("colors", views.ColorViewSet, basename="color").register(
+    "blocks",
+    views.BlockColorViewSet,
+    basename="color-blocks",
+    parents_query_lookups=["color__game_id"],
+)
+
+item_viewset = router.register("items", views.ItemViewSet, basename="item")
+item_viewset.register(
     "resource-counts",
     views.ItemResourceCountViewSet,
     basename="item-resource-count",
     parents_query_lookups=["item__game_id"],
 )
+item_viewset.register(
+    "colors",
+    views.ItemColorsViewSet,
+    basename="item-colors",
+    parents_query_lookups=["item__game_id"],
+)
+
 router.register("worlds", views.WorldViewSet, basename="world").register(
     "polls",
     views.WorldPollViewSet,

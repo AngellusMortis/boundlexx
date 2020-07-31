@@ -7,16 +7,18 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
+    ItemColorSerializer,
     ItemResourceCountSerializer,
     ItemSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import LocalizationFilterSet
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
-from boundlexx.boundless.models import Item, ResourceCount
+from boundlexx.boundless.models import Item, ResourceCount, WorldBlockColor
 
 ITEM_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/items/9427/",
+    "colors_url": f"{get_base_url()}/api/v1/items/9427/colors/",
     "game_id": 9427,
     "string_id": "ITEM_TYPE_SOIL_SILTY_COMPACT",
     "resource_counts_url": None,
@@ -49,6 +51,11 @@ ITEM_RESOURCE_COUNT_EXAMPLE = {
     "count": 100000,
 }
 
+ITEM_COLORS_EXAMPLE = {
+    "color": {"url": f"{get_base_url()}/api/v1/colors/1/", "game_id": 1},
+    "world": {"url": None, "id": 2000000075, "display_name": "Spination"},
+}
+
 
 class ItemViewSet(
     DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet,
@@ -57,7 +64,9 @@ class ItemViewSet(
         Item.objects.filter(active=True)
         .select_related("item_subtitle")
         .prefetch_related(
-            "localizedname_set", "item_subtitle__localizedname_set"
+            "localizedname_set",
+            "item_subtitle__localizedname_set",
+            "worldblockcolor_set",
         )
         .order_by("game_id")
     )
@@ -165,3 +174,40 @@ class ItemResourceCountViewSet(
                     raise Http404()
 
         return kwargs
+
+
+class ItemColorsViewSet(
+    NestedViewSetMixin, viewsets.ReadOnlyModelViewSet,
+):
+    schema = DescriptiveAutoSchema(tags=["Color"])
+    queryset = WorldBlockColor.objects.select_related(
+        "color", "world"
+    ).order_by("color__game_id")
+
+    serializer_class = ItemColorSerializer
+    lookup_field = "color__game_id"
+
+    def list(self, request, *args, **kwargs):  # noqa A003
+        """
+        Retrieves the list of colors for a given item
+        """
+
+        return super().list(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    list.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
+    list.operation_id = "item-colors"  # type: ignore # noqa E501
+
+    def retrieve(
+        self, request, *args, **kwargs,
+    ):  # pylint: disable=arguments-differ
+        """
+        Retrieves the list worlds for specific color/item combination
+        """
+        return super().list(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    retrieve.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
+    retrieve.operation_id = "item-colors-color"  # type: ignore # noqa E501

@@ -1,4 +1,3 @@
-from django.conf import settings
 from rest_framework import serializers
 from rest_framework.relations import Hyperlink
 from rest_framework.reverse import reverse
@@ -49,6 +48,23 @@ class NestedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
         )
 
 
+class ActiveWorldUrlHyperlinkField(serializers.HyperlinkedIdentityField):
+    def get_url(
+        self,
+        obj,
+        view_name,
+        request,
+        format,  # pylint: disable=redefined-builtin  # noqa A002
+    ):
+        if hasattr(obj, "pk") and obj.pk in (None, ""):
+            return None
+
+        if not obj.active:
+            return None
+
+        return super().get_url(obj, view_name, request, format)
+
+
 class ResourceCountLinkField(serializers.ModelField):
     def __init__(self, *args, **kwargs):
         kwargs["read_only"] = True
@@ -60,9 +76,29 @@ class ResourceCountLinkField(serializers.ModelField):
         return Hyperlink(value, None)
 
     def get_attribute(self, obj):
-        if obj.game_id in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
+        if obj.is_resource:
             return reverse(
                 "item-resource-count-list",
+                kwargs={"item__game_id": obj.game_id},
+                request=self.context["request"],
+            )
+        return None
+
+
+class ItemColorsLinkField(serializers.ModelField):
+    def __init__(self, *args, **kwargs):
+        kwargs["read_only"] = True
+        kwargs["model_field"] = None
+        kwargs["allow_null"] = True
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, value):  # pylint: disable=arguments-differ
+        return Hyperlink(value, None)
+
+    def get_attribute(self, obj):
+        if obj.has_colors:
+            return reverse(
+                "item-colors-list",
                 kwargs={"item__game_id": obj.game_id},
                 request=self.context["request"],
             )
@@ -97,6 +133,12 @@ class ColorSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="color-detail", lookup_field="game_id", read_only=True,
     )
+    blocks_url = serializers.HyperlinkedIdentityField(
+        view_name="color-blocks-list",
+        lookup_field="game_id",
+        lookup_url_kwarg="color__game_id",
+        read_only=True,
+    )
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True,
     )
@@ -105,6 +147,7 @@ class ColorSerializer(serializers.ModelSerializer):
         model = Color
         fields = [
             "url",
+            "blocks_url",
             "game_id",
             "base_color",
             "gleam_color",
@@ -127,6 +170,7 @@ class ItemSerializer(serializers.ModelSerializer):
         view_name="item-detail", lookup_field="game_id", read_only=True,
     )
     resource_counts_url = ResourceCountLinkField()
+    colors_url = ItemColorsLinkField()
     localization = LocalizedNameSerializer(
         source="localizedname_set", many=True,
     )
@@ -136,6 +180,7 @@ class ItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             "url",
+            "colors_url",
             "game_id",
             "string_id",
             "resource_counts_url",
@@ -145,7 +190,7 @@ class ItemSerializer(serializers.ModelSerializer):
 
 
 class SimpleWorldSerializer(serializers.ModelSerializer):
-    url = serializers.HyperlinkedIdentityField(
+    url = ActiveWorldUrlHyperlinkField(
         view_name="world-detail", lookup_field="id", read_only=True,
     )
 
@@ -290,6 +335,24 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
     class Meta:
         model = WorldBlockColor
         fields = ["item", "color"]
+
+
+class BlockColorSerializer(serializers.ModelSerializer):
+    item = SimpleItemSerializer()
+    world = SimpleWorldSerializer()
+
+    class Meta:
+        model = WorldBlockColor
+        fields = ["item", "world"]
+
+
+class ItemColorSerializer(serializers.ModelSerializer):
+    color = SimpleColorSerializer()
+    world = SimpleWorldSerializer()
+
+    class Meta:
+        model = WorldBlockColor
+        fields = ["color", "world"]
 
 
 class WorldBlockColorsViewSerializer(serializers.ModelSerializer):

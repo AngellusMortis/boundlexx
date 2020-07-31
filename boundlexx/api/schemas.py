@@ -11,17 +11,21 @@ class DescriptiveAutoSchema(AutoSchema):
         operation = super().get_operation(path, method)
 
         tags = [self.view.basename.title()]
-        operation_id = f"{self.view.action}-{self.view.basename}".lower()
-        operation_id = operation_id.replace("_", "-")
-        if self.view.action.lower() == "list":
-            operation_id += "s"
+
+        action = getattr(self.view, self.view.action)
+        if hasattr(action, "operation_id"):
+            operation_id = action.operation_id
+        else:
+            operation_id = f"{self.view.action}-{self.view.basename}".lower()
+            operation_id = operation_id.replace("_", "-")
+            if self.view.action.lower() == "list":
+                operation_id += "s"
         summary = operation_id.title().replace("-", " ")
 
         operation["summary"] = summary
         operation["operationId"] = operation_id
         operation["tags"] = self._tags or tags
 
-        action = getattr(self.view, self.view.action)
         if hasattr(action, "example"):
             operation["responses"]["200"]["content"]["application/json"][
                 "examples"

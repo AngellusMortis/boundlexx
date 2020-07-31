@@ -186,7 +186,28 @@ class MetalAdmin(GameObjAdmin):
 
 @admin.register(Item)
 class ItemAdmin(GameObjAdmin):
-    readonly_fields = ["game_id", "string_id"]
+    def is_resource(self, obj):
+        return obj.is_resource
+
+    def has_colors(self, obj):
+        return obj.has_colors
+
+    is_resource.boolean = True  # type: ignore
+    has_colors.boolean = True  # type: ignore
+
+    list_display = [
+        "game_id",
+        "default_name",
+        "is_resource",
+        "has_colors",
+        "active",
+    ]
+    readonly_fields = [
+        "game_id",
+        "string_id",
+        "is_resource",
+        "has_colors",
+    ]
     raw_id_fields = ["item_subtitle"]
     search_fields = ["game_id", "string_id", "localizedname__name"]
 
@@ -203,6 +224,13 @@ class ItemAdmin(GameObjAdmin):
             inlines.insert(1, ItemResourceCountInline)
 
         return inlines
+
+    def get_queryset(self, request):
+        return (
+            super()
+            .get_queryset(request)
+            .prefetch_related("localizedname_set", "worldblockcolor_set")
+        )
 
 
 class ItemPriceAdmin(admin.ModelAdmin):

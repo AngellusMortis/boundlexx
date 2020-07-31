@@ -29,6 +29,7 @@ class GameObj(PolymorphicModel):
 
     class Meta:
         unique_together = ("game_id", "polymorphic_ctype")
+        ordering = ["game_id"]
 
     def __str__(self):
         if self.default_name:
@@ -172,6 +173,14 @@ class Item(GameObj):
     @property
     def sell_locations(self):
         return self.itemrequestbasketprice_set.filter(active=True)
+
+    @property
+    def is_resource(self):
+        return self.game_id in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
+
+    @property
+    def has_colors(self):
+        return self.worldblockcolor_set.count() > 0
 
 
 class WorldManager(models.Manager):
