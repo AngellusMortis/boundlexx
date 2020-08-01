@@ -253,7 +253,6 @@ MANAGERS = ADMINS
 # https://docs.djangoproject.com/en/dev/ref/settings/#logging
 # See https://docs.djangoproject.com/en/dev/topics/logging for
 # more details on how to customize your logging configuration.
-LOGGING_CONFIG = None
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": True,
@@ -264,11 +263,13 @@ LOGGING = {
     "formatters": {
         "default": {
             "()": "logging.Formatter",
-            "format": "%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s",  # noqa E501
+            "format": "%(levelname)s %(asctime)s %(module)s "
+            "%(process)d %(thread)d %(message)s",  # noqa E501
         },
         "colored": {
             "()": "coloredlogs.ColoredFormatter",
-            "format": "%(asctime)s %(name)s[%(process)d] %(levelname)s %(message)s",  # noqa E501
+            "format": "%(levelname)s %(asctime)s %(module)s "
+            "%(process)d %(thread)d %(message)s",  # noqa E501
         },
     },
     "handlers": {

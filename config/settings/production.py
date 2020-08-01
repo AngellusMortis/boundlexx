@@ -82,49 +82,50 @@ EMAIL_SUBJECT_PREFIX = env(
 # the site admins on every HTTP 500 error when DEBUG=False.
 LOGGING = {
     "version": 1,
-    "disable_existing_loggers": False,
+    "disable_existing_loggers": True,
     "filters": {
-        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"}
+        "require_debug_false": {"()": "django.utils.log.RequireDebugFalse"},
+        "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
     },
     "formatters": {
-        "verbose": {
-            "format": (
-                "%(levelname)s %(asctime)s %(module)s "
-                "%(process)d %(thread)d %(message)s"
-            )
-        }
+        "colored": {
+            "()": "coloredlogs.ColoredFormatter",
+            "format": "%(levelname)s %(asctime)s %(module)s "
+            "%(process)d %(thread)d %(message)s",  # noqa E501
+        },
     },
     "handlers": {
-        # "discord": {
-        #     "level": "ERROR",
-        #     "filters": ["require_debug_false"],
-        #     "class": "django.utils.log.AdminEmailHandler",
-        # },
         "console": {
-            "level": "DEBUG",
+            "level": "INFO",
             "class": "logging.StreamHandler",
-            "formatter": "verbose",
+            "formatter": "colored",
+        },
+        "django.server": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "colored",
         },
         "file": {
             "class": "logging.handlers.RotatingFileHandler",
             "level": "INFO",
-            "formatter": "verbose",
+            "formatter": "colored",
             "filename": "/logs/django.log",
             "maxBytes": 52428800,  # 50MB
             "backupCount": 10,
             "encoding": "utf8",
         },
     },
-    "root": {"level": "INFO", "handlers": ["console", "file"]},
     "loggers": {
+        "root": {"level": "INFO", "handlers": ["console", "file"]},
+        "django": {"handlers": ["console", "file"], "level": "INFO"},
         "django.request": {
-            "handlers": [],
+            "handlers": ["console", "file"],
             "level": "ERROR",
             "propagate": True,
         },
         "django.security.DisallowedHost": {
             "level": "ERROR",
-            "handlers": ["console"],
+            "handlers": ["console", "file"],
             "propagate": True,
         },
     },
