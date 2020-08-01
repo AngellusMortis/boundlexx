@@ -179,7 +179,7 @@ class ItemResourceCountViewSet(
 class ItemColorsViewSet(
     NestedViewSetMixin, viewsets.ReadOnlyModelViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Color"])
+    schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = WorldBlockColor.objects.select_related(
         "color", "world"
     ).order_by("color__game_id")
