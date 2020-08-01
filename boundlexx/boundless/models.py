@@ -187,7 +187,7 @@ class WorldManager(models.Manager):
     def get_or_create_from_game_dict(self, world_dict):
         created = False
 
-        world = self.get(id=world_dict["id"])
+        world = self.filter(id=world_dict["id"]).first()
 
         if world is None:
             old_world = World.objects.filter(
