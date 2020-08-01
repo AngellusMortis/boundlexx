@@ -90,6 +90,9 @@ class Color(GameObj):
                 highest_count = count
                 base_color = color_value
 
+        if base_color is None:
+            return None
+
         return f"#{base_color:06x}"
 
     @cached_property
