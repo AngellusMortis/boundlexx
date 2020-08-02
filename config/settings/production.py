@@ -114,6 +114,7 @@ LOGGING = {
     },
     "loggers": {
         "root": {"level": "INFO", "handlers": ["console", "file"]},
+        "ingest": {"level": "INFO", "handlers": ["console", "file"]},
         "django": {"handlers": ["console", "file"], "level": "INFO"},
         "django.request": {
             "handlers": ["console", "file"],

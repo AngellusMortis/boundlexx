@@ -16,7 +16,7 @@ from boundlexx.boundless.models import (
 )
 from boundlexx.boundless.tasks import poll_worlds
 
-logger = logging.getLogger(__name__)
+logger = logging.getLogger("ingest")
 
 
 class WorldWSDataView(views.APIView):
