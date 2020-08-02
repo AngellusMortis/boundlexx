@@ -261,11 +261,6 @@ LOGGING = {
         "require_debug_true": {"()": "django.utils.log.RequireDebugTrue"},
     },
     "formatters": {
-        "default": {
-            "()": "logging.Formatter",
-            "format": "%(levelname)s %(asctime)s %(module)s "
-            "%(process)d %(thread)d %(message)s",  # noqa E501
-        },
         "colored": {
             "()": "coloredlogs.ColoredFormatter",
             "format": "%(levelname)s %(asctime)s %(module)s "
@@ -285,7 +280,8 @@ LOGGING = {
         },
     },
     "loggers": {
-        "django": {"handlers": ["console"], "level": "INFO"},
+        "root": {"level": "INFO", "handlers": ["console", "file"]},
+        "django": {"handlers": ["console", "file"], "level": "INFO"},
         "django.server": {
             "handlers": ["django.server"],
             "level": "INFO",
