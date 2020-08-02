@@ -280,8 +280,8 @@ LOGGING = {
         },
     },
     "loggers": {
-        "root": {"level": "INFO", "handlers": ["console", "file"]},
-        "django": {"handlers": ["console", "file"], "level": "INFO"},
+        "root": {"level": "INFO", "handlers": ["console"]},
+        "django": {"handlers": ["console"], "level": "INFO"},
         "django.server": {
             "handlers": ["django.server"],
             "level": "INFO",
