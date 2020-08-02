@@ -1,10 +1,12 @@
 import json
+import logging
 
 from rest_framework import views
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 
+from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models import (
     Color,
     Item,
@@ -12,6 +14,9 @@ from boundlexx.boundless.models import (
     WorldBlockColor,
     WorldCreatureColor,
 )
+from boundlexx.boundless.tasks import poll_worlds
+
+logger = logging.getLogger(__name__)
 
 
 class WorldWSDataView(views.APIView):
@@ -19,12 +24,21 @@ class WorldWSDataView(views.APIView):
     permission_classes = [IsAuthenticated]
 
     def _get_data(self, request):
+        world_id = None
         display_name = None
         block_colors = []
         creature_colors = []
 
         try:
-            display_name = request.data["config"]["displayName"]
+            if "world_id" in request.data:
+                world_id = int(request.data["world_id"])
+            elif "display_name" in request.data:
+                display_name = int(request.data["display_name"])
+            else:
+                display_name = request.data.get("config", {}).get(
+                    "displayName"
+                )
+
             for key, value in request.data["config"]["world"][
                 "blockColors"
             ].items():
@@ -37,20 +51,41 @@ class WorldWSDataView(views.APIView):
         except Exception:  # pylint: disable=broad-except
             return None
 
-        return (display_name, block_colors, creature_colors)
+        if world_id is None and display_name is None:
+            return None
+
+        return (world_id, display_name, block_colors, creature_colors)
+
+    def _get_world(self, world_id, display_name):
+        if world_id is not None:
+            world = World.objects.filter(id=world_id).first()
+            if world is None:
+                c = BoundlessClient()
+                world_data = c.get_world_data(world_id)
+                world, _ = World.objects.get_or_create_from_game_dict(
+                    world_data["worldData"]
+                )
+        else:
+            world = World.objects.filter(display_name=display_name).first()
+
+            if world is None:
+                world, created = World.objects.get_or_create_unknown_world(
+                    {"name": display_name}
+                )
+
+                if created:
+                    poll_worlds.delay([world])
+
+        return world
 
     def post(self, request, *args, **kwargs):
         data = self._get_data(request)
 
         if data is None:
+            logger.warning("Bad ingest data:\n%s", request.data)
             return Response(status=400)
 
-        world = World.objects.filter(display_name=data[0]).first()
-
-        if world is None:
-            world, _ = World.objects.get_or_create_unknown_world(
-                {"name": data[0]}
-            )
+        world = self._get_world(data[0], data[1])
 
         block_colors_created = 0
         creature_colors_created = 0
