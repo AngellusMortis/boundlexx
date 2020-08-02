@@ -31,6 +31,9 @@ COLOR_BLOCKS_EXAMPLE = {
         "string_id": "ITEM_TYPE_GRASS_VERDANT_BASE",
     },
     "world": {"url": None, "id": 2000000075, "display_name": "Spination"},
+    "can_be_found": False,
+    "new_color": None,
+    "exist_via_transformation": None,
 }
 
 

@@ -296,8 +296,20 @@ class WorldPollInline(admin.TabularInline):
 class WorldBlockColorInline(admin.TabularInline):
     model = WorldBlockColor
 
-    fields = ["item", "color"]
-    readonly_fields = ["item", "color"]
+    fields = [
+        "item",
+        "color",
+        "can_be_found",
+        "new_color",
+        "exist_via_transformation",
+    ]
+    readonly_fields = [
+        "item",
+        "color",
+        "can_be_found",
+        "new_color",
+        "exist_via_transformation",
+    ]
     can_delete = False
     max_num = 0
 
@@ -363,6 +375,11 @@ class WorldAdmin(admin.ModelAdmin):
         "water_color",
         "start",
         "end",
+        "closest_world",
+        "closest_world_distance",
+        "surface_liquid",
+        "core_liquid",
+        "forum_id",
     ]
     readonly_fields = [
         "id",
@@ -390,7 +407,13 @@ class WorldAdmin(admin.ModelAdmin):
         "water_color",
         "start",
         "end",
+        "closest_world",
+        "closest_world_distance",
+        "surface_liquid",
+        "core_liquid",
+        "forum_id",
     ]
+    search_fields = ["display_name", "world_type"]
 
     inlines = [
         WorldPollInline,

@@ -144,10 +144,10 @@ def _parse_title(title):
     parts = [p.strip() for p in parts]
 
     if len(parts) == 1:
-        parts = parts[0].split(" - ", 1)
+        parts = parts[0].split(" –", 1)
 
-        if len(parts) == 1:
-            parts = parts[0].split(" –", 1)
+    if len(parts) == 1:
+        parts = parts[0].split(" - ", 1)
 
     # name
     name = parts[0].replace("[", "").replace("]", "")
@@ -224,6 +224,8 @@ def _parse_world_info(raw_html):
     parsed_data = {}
     for line in parsed_lines:
         if line[0] in ("name", "type", "tier", "start", "end", "server"):
+            if line[0] == "tier":
+                line[1] = int(line[1]) - 1
             parsed_data[line[0]] = line[1]
 
     return parsed_data

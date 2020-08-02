@@ -54,7 +54,11 @@ def _create_block_colors(world, block_colors, item_names):
     for index, item_name in enumerate(item_names):
         raw_block_color = block_colors[index].strip().split(",")
 
-        if len(raw_block_color) == 0:
+        if len(raw_block_color) == 0 or raw_block_color[0].strip() == "":
+            continue
+
+        color_id = int(raw_block_color[0].strip())
+        if color_id == 0:
             continue
 
         item = Item.objects.filter(string_id=f"ITEM_TYPE_{item_name}").first()
@@ -62,7 +66,7 @@ def _create_block_colors(world, block_colors, item_names):
         if item is None:
             continue
 
-        color = Color.objects.get(game_id=raw_block_color[0])
+        color = Color.objects.get(game_id=int(raw_block_color[0].strip()))
         block_color, created = WorldBlockColor.objects.get_or_create(
             world=world, item=item, color=color
         )
@@ -94,7 +98,7 @@ def ingest_world_data():
     gc = gspread.service_account()
     sheet = gc.open_by_url(settings.BOUNDLESS_SHEETS_WORLDS_URL).sheet1
 
-    rows = list(sheet.get_all_values())[1:]
+    rows = list(sheet.get_all_values())
     header_columns = rows[0]
     rows = rows[1:]
 

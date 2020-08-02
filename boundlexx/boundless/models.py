@@ -354,7 +354,7 @@ class World(models.Model):
 
     class LiquidChoice(models.TextChoices):
         LAVA = "lava", _("Lava")
-        WATER = "water", _("WATER")
+        WATER = "water", _("Water")
 
     class Meta:
         ordering = ["id"]

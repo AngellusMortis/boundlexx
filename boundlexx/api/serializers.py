@@ -334,7 +334,13 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorldBlockColor
-        fields = ["item", "color"]
+        fields = [
+            "item",
+            "color",
+            "can_be_found",
+            "new_color",
+            "exist_via_transformation",
+        ]
 
 
 class BlockColorSerializer(serializers.ModelSerializer):
@@ -343,7 +349,13 @@ class BlockColorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorldBlockColor
-        fields = ["item", "world"]
+        fields = [
+            "item",
+            "world",
+            "can_be_found",
+            "new_color",
+            "exist_via_transformation",
+        ]
 
 
 class ItemColorSerializer(serializers.ModelSerializer):
@@ -352,7 +364,13 @@ class ItemColorSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WorldBlockColor
-        fields = ["color", "world"]
+        fields = [
+            "color",
+            "world",
+            "can_be_found",
+            "new_color",
+            "exist_via_transformation",
+        ]
 
 
 class WorldBlockColorsViewSerializer(serializers.ModelSerializer):
