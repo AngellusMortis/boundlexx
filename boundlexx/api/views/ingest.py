@@ -15,7 +15,6 @@ from boundlexx.boundless.models import (
     WorldBlockColor,
     WorldCreatureColor,
 )
-from boundlexx.boundless.tasks import poll_worlds
 
 logger = logging.getLogger("ingest")
 
@@ -71,12 +70,11 @@ class WorldWSDataView(views.APIView):
             world = World.objects.filter(display_name=display_name).first()
 
             if world is None:
-                world, created = World.objects.get_or_create_unknown_world(
-                    {"name": display_name}
-                )
-
-                if created:
-                    poll_worlds.delay([world])
+                world = World.objects.filter(
+                    display_name={"name": display_name},
+                    active=True,
+                    owner__isnull=True,
+                ).get()
 
         return world
 
@@ -88,6 +86,9 @@ class WorldWSDataView(views.APIView):
             return Response(status=400)
 
         world = self._get_world(data[0], data[1])
+
+        if world is None:
+            return Response(status=425)
 
         block_colors_created = 0
         creature_colors_created = 0

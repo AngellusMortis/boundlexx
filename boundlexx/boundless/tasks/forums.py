@@ -266,8 +266,17 @@ def _parse_forum_topic(topic):
         data["post_stream"]["posts"][0]["cooked"], "html.parser"
     )
 
+    title_name = world_info["name"]
     world_info.update(_parse_world_info(raw_html))
     world_info = _normalize_world_info(world_info)
+
+    if world_info["name"] != title_name:
+        logger.warning(
+            "Different between world name in title and forum post: %s vs. %s",
+            title_name,
+            world_info["name"],
+        )
+        world_info["name"] = title_name
 
     if len(world_info) < 6:
         logger.warning(
@@ -297,7 +306,7 @@ def ingest_exo_world_data():
         world_info, block_details, = _parse_forum_topic(topic)
 
         block_colors = _parse_block_details(block_details)
-        world, _ = World.objects.get_or_create_unknown_world(world_info)
+        world, _ = World.objects.get_or_create_forum_world(topic, world_info)
 
         number_created = 0
         for block_color in block_colors:

@@ -24,6 +24,7 @@ cloudflare
 colorama
 coloredlogs
 dateparser
+gspread
 msgpack
 pillow
 psycopg2 --no-binary psycopg2

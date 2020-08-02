@@ -10,6 +10,8 @@ services:
         - "9000:8000"
       volumes:
         - .:/app
+        ## Replace with path to your Google Service Account credentials
+        - ./path/to/crednetials.json:/home/django/.config/gspread/service_account.json
         ## Replace with path your Boundless install
         - C:\Program Files\Steam\steamapps\common\Boundless:/boundless
 

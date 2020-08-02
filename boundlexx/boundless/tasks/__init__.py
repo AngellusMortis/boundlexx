@@ -1,4 +1,5 @@
 from boundlexx.boundless.tasks.forums import ingest_exo_world_data
+from boundlexx.boundless.tasks.sheets import ingest_world_data
 from boundlexx.boundless.tasks.shop import try_update_prices
 from boundlexx.boundless.tasks.worlds import (
     discover_all_worlds,
@@ -14,4 +15,5 @@ __all__ = [
     "discover_all_worlds",
     "poll_worlds",
     "ingest_exo_world_data",
+    "ingest_world_data",
 ]

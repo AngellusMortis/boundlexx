@@ -187,51 +187,75 @@ class Item(GameObj):
 
 
 class WorldManager(models.Manager):
+    def get_and_replace_expired_exo(self, world_id, display_name, end):
+        end_lower = end - timedelta(days=1)
+        end_upper = end + timedelta(days=1)
+
+        old_world = World.objects.filter(
+            display_name=display_name,
+            id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
+            end__gte=end_lower,
+            end__lte=end_upper,
+            owner__isnull=True,
+        ).first()
+
+        if old_world is not None:
+            old_id = old_world.id
+
+            world = old_world
+            world.id = world_id
+            world.active = True
+            world.save()
+
+            WorldBlockColor.objects.filter(world_id=old_id).update(
+                world_id=world.id
+            )
+            World.objects.filter(id=old_id).delete()
+
+            return world
+        return None
+
     def get_or_create_from_game_dict(self, world_dict):
         created = False
 
         world = self.filter(id=world_dict["id"]).first()
 
+        start = None
+        end = None
+        if "lifetime" in world_dict:
+            start = datetime.utcfromtimestamp(
+                world_dict["lifetime"][0]
+            ).replace(tzinfo=pytz.utc)
+            end = datetime.utcfromtimestamp(world_dict["lifetime"][1]).replace(
+                tzinfo=pytz.utc
+            )
+
+        if world is None and end is not None:
+            world = self.get_and_replace_expired_exo(
+                world_dict["id"], world_dict["displayName"], end
+            )
+
         if world is None:
-            old_world = World.objects.filter(
-                display_name=world_dict["displayName"],
-                id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
-            ).first()
+            world = World.objects.create(
+                id=world_dict["id"], display_name=world_dict["displayName"],
+            )
+            created = True
 
-            if old_world is not None:
-                old_id = old_world.id
-
-                world = old_world
-                world.id = world_dict["id"]
-                world.active = True
-                world.save()
-
-                WorldBlockColor.objects.filter(world_id=old_id).update(
-                    world_id=world.id
-                )
-                World.objects.filter(id=old_id).delete()
-            else:
-                world = World.objects.create(
-                    id=world_dict["id"],
-                    name=world_dict["name"],
-                    display_name=world_dict["displayName"],
-                    region=world_dict["region"],
-                    tier=world_dict["tier"],
-                    description=world_dict["worldDescription"],
-                    size=world_dict["worldSize"],
-                    world_type=world_dict["worldType"],
-                    time_offset=datetime.utcfromtimestamp(
-                        world_dict["timeOffset"]
-                    ).replace(tzinfo=pytz.utc),
-                    atmosphere_color_r=world_dict["atmosphereColor"][0],
-                    atmosphere_color_g=world_dict["atmosphereColor"][1],
-                    atmosphere_color_b=world_dict["atmosphereColor"][2],
-                    water_color_r=world_dict["waterColor"][0],
-                    water_color_g=world_dict["waterColor"][1],
-                    water_color_b=world_dict["waterColor"][2],
-                )
-                created = True
-
+        world.name = world_dict["name"]
+        world.region = world_dict["region"]
+        world.tier = world_dict["tier"]
+        world.description = world_dict["worldDescription"]
+        world.size = world_dict["worldSize"]
+        world.world_type = world_dict["worldType"]
+        world.time_offset = datetime.utcfromtimestamp(
+            world_dict["timeOffset"]
+        ).replace(tzinfo=pytz.utc)
+        world.atmosphere_color_r = world_dict["atmosphereColor"][0]
+        world.atmosphere_color_g = world_dict["atmosphereColor"][1]
+        world.atmosphere_color_b = world_dict["atmosphereColor"][2]
+        world.water_color_r = world_dict["waterColor"][0]
+        world.water_color_g = world_dict["waterColor"][1]
+        world.water_color_b = world_dict["waterColor"][2]
         world.address = world_dict.get("addr")
         world.ip_address = world_dict.get("ipAddr")
         world.api_url = world_dict.get("apiURL")
@@ -243,39 +267,38 @@ class WorldManager(models.Manager):
         world.is_public = world_dict.get("public", True)
         world.number_of_regions = world_dict["numRegions"]
 
-        if "lifetime" in world_dict:
-            world.start = datetime.utcfromtimestamp(
-                world_dict["lifetime"][0]
-            ).replace(tzinfo=pytz.utc)
-            world.end = datetime.utcfromtimestamp(
-                world_dict["lifetime"][1]
-            ).replace(tzinfo=pytz.utc)
+        if start is not None:
+            world.start = start
+            world.end = end
+
         world.save()
 
         return world, created
 
-    def get_or_create_unknown_world(self, world_info):
+    def get_or_create_forum_world(self, forum_id, world_info):
         created = False
-        world = self.filter(display_name=world_info["name"]).first()
 
+        # see if world exists that was created by this method before
+        world = self.filter(forum_id=forum_id).first()
+
+        # else, see if world exist from elsewhere
         if world is None:
-            highest_world = (
-                self.filter(id__gte=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID)
-                .order_by("-id")
-                .first()
-            )
+            world = self.filter(
+                display_name=world_info["name"],
+                owner__isnull=True,
+                active=True,
+            ).first()
 
-            if highest_world is None:
-                highest_id = settings.BOUNDLESS_EXO_EXPIRED_BASE_ID - 1
-            else:
-                highest_id = highest_world.id
+            # wrong world, this one comes from another forum post
+            if world is not None and world.forum_id is not None:
+                world = None
 
-            world = self.create(
-                active=False,
-                id=highest_id + 1,
+        # otherwise, create it
+        if world is None:
+            world, created = self.get_or_create(
+                id=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID + forum_id,
                 display_name=world_info["name"],
             )
-            created = True
 
         if "tier" in world_info and world.tier is None:
             world.tier = world_info["tier"]
@@ -287,6 +310,8 @@ class WorldManager(models.Manager):
             world.end = world_info["end"]
         if "server" in world_info and world.region is None:
             world.region = world_info["server"]
+        if world.forum_id is None:
+            world.forum_id = forum_id
 
         world.save()
 
@@ -326,6 +351,13 @@ class World(models.Model):
         TYPE_UMBRIS = "UMBRIS", _("Umbris")
         TYPE_RIFT = "RIFT", _("Rift")
         TYPE_BLINK = "BLINK", _("Blink")
+
+    class LiquidChoice(models.TextChoices):
+        LAVA = "lava", _("Lava")
+        WATER = "water", _("WATER")
+
+    class Meta:
+        ordering = ["id"]
 
     name = models.CharField(_("Name"), max_length=64, null=True)
     display_name = models.CharField(_("Display Name"), max_length=64)
@@ -370,6 +402,18 @@ class World(models.Model):
     water_color_r = models.FloatField(_("Water Linear R Color"), null=True)
     water_color_g = models.FloatField(_("Water Linear G Color"), null=True)
     water_color_b = models.FloatField(_("Water Linear B Color"), null=True)
+
+    closest_world = models.ForeignKey(
+        "World", on_delete=models.CASCADE, blank=True, null=True
+    )
+    closest_world_distance = models.IntegerField(blank=True, null=True)
+    surface_liquid = models.TextField(
+        max_length=5, choices=LiquidChoice.choices, blank=True, null=True
+    )
+    core_liquid = models.TextField(
+        max_length=5, choices=LiquidChoice.choices, blank=True, null=True
+    )
+    forum_id = models.IntegerField(null=True, blank=True)
 
     active = models.BooleanField(default=True, db_index=True)
 
@@ -455,6 +499,10 @@ class WorldBlockColor(models.Model):
     world = models.ForeignKey(World, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
+
+    can_be_found = models.NullBooleanField()
+    new_color = models.NullBooleanField()
+    exist_via_transformation = models.NullBooleanField()
 
     class Meta:
         unique_together = ("world", "item")
