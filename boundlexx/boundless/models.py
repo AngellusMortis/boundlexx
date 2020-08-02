@@ -404,16 +404,27 @@ class World(models.Model):
     water_color_b = models.FloatField(_("Water Linear B Color"), null=True)
 
     closest_world = models.ForeignKey(
-        "World", on_delete=models.CASCADE, blank=True, null=True
+        "World",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        help_text="Closest world to this one. Only populated for Exoworlds",
     )
-    closest_world_distance = models.IntegerField(blank=True, null=True)
+    closest_world_distance = models.PositiveSmallIntegerField(
+        blank=True,
+        null=True,
+        help_text=(
+            "Distance (in blinksecs) to closest world. Only populated "
+            "for Exoworlds"
+        ),
+    )
     surface_liquid = models.TextField(
         max_length=5, choices=LiquidChoice.choices, blank=True, null=True
     )
     core_liquid = models.TextField(
         max_length=5, choices=LiquidChoice.choices, blank=True, null=True
     )
-    forum_id = models.IntegerField(null=True, blank=True)
+    forum_id = models.PositiveIntegerField(null=True, blank=True)
 
     active = models.BooleanField(default=True, db_index=True)
 
