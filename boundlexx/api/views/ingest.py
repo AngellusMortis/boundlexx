@@ -86,13 +86,11 @@ class WorldWSDataView(views.APIView):
             return Response(status=400)
 
         world = self._get_world(data[0], data[1])
-        block_colors = data[2]
-        creature_colors = data[3]
 
         block_colors_created = 0
         creature_colors_created = 0
         block_colors_created = 0
-        for block_color in block_colors:
+        for block_color in data[2]:
             item = Item.objects.filter(
                 string_id=f"ITEM_TYPE_{block_color[0]}"
             ).first()
@@ -107,7 +105,7 @@ class WorldWSDataView(views.APIView):
                 if created:
                     block_colors_created += 1
 
-        for creature_color in creature_colors:
+        for creature_color in data[3]:
             _, created = WorldCreatureColor.objects.get_or_create(
                 world=world,
                 creature_type=creature_color[0],
