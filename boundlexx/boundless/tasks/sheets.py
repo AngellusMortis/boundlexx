@@ -74,16 +74,13 @@ def _create_block_colors(world, block_colors, item_names):
         if created:
             block_colors_created += 1
 
-        if block_color.can_be_found is None and len(raw_block_color) > 1:
+        if len(raw_block_color) > 1:
             block_color.can_be_found = strtobool(raw_block_color[1].strip())
 
-        if block_color.new_color is None and len(raw_block_color) > 2:
+        if len(raw_block_color) > 2:
             block_color.new_color = strtobool(raw_block_color[2].strip())
 
-        if (
-            block_color.exist_via_transformation is None
-            and len(raw_block_color) > 3
-        ):
+        if len(raw_block_color) > 3:
             block_color.exist_via_transformation = strtobool(
                 raw_block_color[3].strip()
             )
