@@ -1,11 +1,11 @@
 import json
 import logging
+import traceback
 
 from rest_framework import views
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-import traceback
 
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models import (
