@@ -5,6 +5,7 @@ from rest_framework import views
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+import traceback
 
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models import (
@@ -33,7 +34,7 @@ class WorldWSDataView(views.APIView):
             if "world_id" in request.data:
                 world_id = int(request.data["world_id"])
             elif "display_name" in request.data:
-                display_name = int(request.data["display_name"])
+                display_name = request.data["display_name"]
             else:
                 display_name = request.data.get("config", {}).get(
                     "displayName"
@@ -49,6 +50,7 @@ class WorldWSDataView(views.APIView):
             ].items():
                 creature_colors.append((key, value))
         except Exception:  # pylint: disable=broad-except
+            logger.warning(traceback.format_exc())
             return None
 
         if world_id is None and display_name is None:
