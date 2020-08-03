@@ -106,7 +106,7 @@ def _scan_worlds(lower, upper):
             )
 
             WorldPoll.objects.create_from_game_dict(
-                world_data, poll_dict, world=world
+                world_data, poll_dict, world=world, new_world=True
             )
 
     logger.info("Found %s world(s)", worlds_found)

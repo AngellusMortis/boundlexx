@@ -7,6 +7,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 
 from boundlexx.boundless.models import Color, Item, World, WorldBlockColor
+from boundlexx.notifications.models import ExoworldNotification
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -27,6 +28,8 @@ def _get_lifetimes(raw_lifetime):
 
 
 def _update_world(world, start, end, row):
+    new_data = False
+
     if world.start is None and start is not None:
         world.start = start
     if world.end is None and end is not None:
@@ -46,7 +49,12 @@ def _update_world(world, start, end, row):
         world.surface_liquid = surface_liquid.strip().lower()
         world.core_liquid = core_liquid.strip().lower()
 
+        new_data = True
+
     world.save()
+
+    if new_data and world.address is not None and world.is_exo:
+        ExoworldNotification.objects.send_update_notification(world)
 
 
 def _create_block_colors(world, block_colors, item_names):

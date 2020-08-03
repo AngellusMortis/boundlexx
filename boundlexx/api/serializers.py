@@ -250,6 +250,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "time_offset",
             "is_sovereign",
             "is_perm",
+            "is_exo",
             "is_creative",
             "is_locked",
             "is_public",

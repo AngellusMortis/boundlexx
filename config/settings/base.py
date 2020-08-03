@@ -96,6 +96,7 @@ LOCAL_APPS = [
     "boundlexx.celery",
     "boundlexx.boundless",
     "boundlexx.api",
+    "boundlexx.notifications",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS

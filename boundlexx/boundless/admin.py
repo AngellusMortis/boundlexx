@@ -328,10 +328,14 @@ class WorldAdmin(admin.ModelAdmin):
     def is_perm(self, obj):
         return obj.is_perm
 
+    def is_exo(self, obj):
+        return obj.is_exo
+
     def is_sovereign(self, obj):
         return obj.is_sovereign
 
     is_perm.boolean = True  # type: ignore
+    is_exo.boolean = True  # type: ignore
     is_sovereign.boolean = True  # type: ignore
 
     list_display = [
@@ -343,6 +347,7 @@ class WorldAdmin(admin.ModelAdmin):
         "protection",
         "active",
         "is_perm",
+        "is_exo",
         "is_creative",
         "is_sovereign",
         "is_public",

@@ -12,13 +12,14 @@ from django.dispatch import receiver
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from polymorphic.models import PolymorphicModel
+from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.boundless.client import Location, ShopItem
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex, purge_cache
+from boundlexx.notifications.models import ExoworldNotification
 
 
-class GameObjManager(models.Manager):
+class GameObjManager(PolymorphicManager):
     def get_queryset(self):
         return super().get_queryset().prefetch_related("localizedname")
 
@@ -170,6 +171,10 @@ class Item(GameObj):
         return self.string_id
 
     @property
+    def english(self):
+        return super().default_name
+
+    @property
     def buy_locations(self):
         return self.itemshopstandprice_set.filter(active=True)
 
@@ -240,6 +245,8 @@ class WorldManager(models.Manager):
                 id=world_dict["id"], display_name=world_dict["displayName"],
             )
             created = True
+
+        created = created or world.address is None
 
         world.name = world_dict["name"]
         world.region = world_dict["region"]
@@ -445,6 +452,10 @@ class World(models.Model):
         return self.owner is not None
 
     @property
+    def is_exo(self):
+        return self.owner is None and not self.is_perm
+
+    @property
     def atmosphere_color(self):
         if (
             self.atmosphere_color_r is None
@@ -539,9 +550,13 @@ class WorldCreatureColor(models.Model):
 
 
 class WorldPollManager(models.Manager):
-    def create_from_game_dict(self, world_dict, poll_dict, world=None):
+    def create_from_game_dict(
+        self, world_dict, poll_dict, world=None, new_world=False
+    ):
         if world is None:
-            world, _ = World.objects.get_or_create_from_game_dict(world_dict)
+            world, new_world = World.objects.get_or_create_from_game_dict(
+                world_dict
+            )
 
         world_poll = self.create(world=world)
 
@@ -580,6 +595,9 @@ class WorldPollManager(models.Manager):
             )
 
         world_poll.refresh_from_db()
+
+        if new_world and world.is_exo:
+            ExoworldNotification.objects.send_new_notification(world_poll)
 
         return world_poll
 
