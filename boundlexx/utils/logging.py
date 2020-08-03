@@ -7,7 +7,7 @@ LOG_TIMEOUT = 43200  # 12 hours
 
 class RedisTaskLogger(logging.Handler):
     def emit(self, record: logging.LogRecord):
-        if not hasattr(record, "task_name"):
+        if not (hasattr(record, "task_name") and hasattr(record, "asctime")):
             return
 
         if not record.task_name.startswith("boundlexx"):  # type: ignore

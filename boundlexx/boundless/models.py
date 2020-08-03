@@ -522,12 +522,60 @@ class WorldBlockColor(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
 
-    can_be_found = models.NullBooleanField()
-    new_color = models.NullBooleanField()
-    exist_via_transformation = models.NullBooleanField()
+    _new_color = models.NullBooleanField()
 
     class Meta:
         unique_together = ("world", "item")
+
+    @property
+    def new_color(self):
+        if self._new_color is None:
+            if self.world.start is None:
+                new_color = True
+            else:
+                new_color = (
+                    WorldBlockColor.objects.filter(
+                        item=self.item,
+                        color=self.color,
+                        world__end__isnull=False,
+                        world__end__lt=self.world.start,
+                    ).count()
+                    == 0
+                )
+
+            self._new_color = new_color
+            self.save()
+        return self._new_color
+
+    @cached_property
+    def days_since_last(self):
+        if self._new_color:
+            return None
+
+        # color exists on perm world
+        if (
+            WorldBlockColor.objects.filter(
+                item=self.item, color=self.color, world__end__isnull=True
+            ).count()
+            > 0
+        ):
+            return None
+
+        last = (
+            WorldBlockColor.objects.filter(
+                item=self.item,
+                color=self.color,
+                world__end__isnull=False,
+                world__end__lt=self.world.start,
+            )
+            .order_by("-world__end")
+            .first()
+        )
+
+        if last is None:
+            return None
+
+        return (self.world.start - last.world.end).days  # type: ignore
 
 
 class WorldCreatureColor(models.Model):

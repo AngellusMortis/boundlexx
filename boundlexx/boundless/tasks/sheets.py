@@ -1,5 +1,4 @@
 from datetime import datetime
-from distutils.util import strtobool
 
 import gspread
 import pytz
@@ -53,12 +52,13 @@ def _update_world(world, start, end, row):
 
     world.save()
 
-    if new_data and world.address is not None and world.is_exo:
-        ExoworldNotification.objects.send_update_notification(world)
+    send_notification = new_data and world.address is not None and world.is_exo
+    return world, send_notification
 
 
 def _create_block_colors(world, block_colors, item_names):
     block_colors_created = 0
+    block_color_objs = []
     for index, item_name in enumerate(item_names):
         raw_block_color = block_colors[index].strip().split(",")
 
@@ -82,20 +82,11 @@ def _create_block_colors(world, block_colors, item_names):
         if created:
             block_colors_created += 1
 
-        if len(raw_block_color) > 1:
-            block_color.can_be_found = strtobool(raw_block_color[1].strip())
-
-        if len(raw_block_color) > 2:
-            block_color.new_color = strtobool(raw_block_color[2].strip())
-
-        if len(raw_block_color) > 3:
-            block_color.exist_via_transformation = strtobool(
-                raw_block_color[3].strip()
-            )
-
         block_color.save()
+        block_color_objs.append(block_color)
 
     logger.info("%s: created %s color(s)", world, block_colors_created)
+    return block_color_objs
 
 
 @app.task
@@ -106,6 +97,8 @@ def ingest_world_data():
     rows = list(sheet.get_all_values())
     header_columns = rows[0]
     rows = rows[1:]
+    # do new worlds first
+    rows.reverse()
 
     for row in rows:
         if len(row[0].strip()) == 0:
@@ -127,5 +120,12 @@ def ingest_world_data():
                 id=world_id, display_name=display_name
             )
 
-        _update_world(world, start, end, row)
-        _create_block_colors(world, row[11:-5], header_columns[11:-5])
+        world, send_notification = _update_world(world, start, end, row)
+        block_colors = _create_block_colors(
+            world, row[11:-5], header_columns[11:-5]
+        )
+
+        if send_notification:
+            ExoworldNotification.objects.send_update_notification(
+                world, colors=block_colors
+            )

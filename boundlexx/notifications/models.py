@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import time
 
 import requests
 from django.contrib.auth import get_user_model
@@ -53,18 +54,28 @@ class DiscordWebhookSubscription(SubscriptionBase):
         return data
 
     def send(self, message):
-        data = {"content": message}
+        messages = message.split("%SPLIT_MESSAGE%")
 
-        data = self._add_meantions_to_data(data, "roles", self.roles)
-        data = self._add_meantions_to_data(data, "users", self.users)
+        send_meantions = False
+        for m in messages:
+            if len(m.strip()) == 0:
+                continue
 
-        response = requests.post(
-            self.webhook_url,
-            data=json.dumps(data),
-            headers={"Content-Type": "application/json"},
-        )
-        print(response.text)
-        response.raise_for_status()
+            data = {"content": m}
+
+            if not send_meantions:
+                data = self._add_meantions_to_data(data, "roles", self.roles)
+                data = self._add_meantions_to_data(data, "users", self.users)
+                send_meantions = True
+
+            response = requests.post(
+                self.webhook_url,
+                data=json.dumps(data),
+                headers={"Content-Type": "application/json"},
+            )
+            response.raise_for_status()
+
+            time.sleep(1)
 
 
 class NotificationBase(PolymorphicModel):
@@ -86,33 +97,44 @@ class ExoworldNotificationManager(PolymorphicManager):
                 notification.markdown(world_poll.world, world_poll.resources)
             )
 
-    def send_update_notification(self, world):
+    def send_update_notification(self, world, colors=None):
         notifications = self.filter(active=True)
 
         for notification in notifications:
-            notification.subscription.send(notification.markdown(world))
+            notification.subscription.send(
+                notification.markdown(world, colors=colors)
+            )
 
 
 class ExoworldNotification(NotificationBase):
     objects = ExoworldNotificationManager()
 
     def markdown(
-        self, world, resources=None
+        self, world, resources=None, colors=None
     ):  # pylint: disable=arguments-differ
+
+        if colors is None:
+            colors = world.worldblockcolor_set.all()
+            if colors.count() == 0:
+                colors = None
+
+        if colors is not None:
+            colors = list(colors)
+            if len(colors) > 30:
+                colors = [colors[:30], colors[30:]]
+            else:
+                colors = [colors]
+
+        message = ""
         if resources is None:
-            return (
-                render_to_string(
-                    "boundlexx/notifications/exoworld_update.md",
-                    {"world": world},
-                )
-                .replace("\xa0", " ")
-                .replace("&#x27;", "'")
+            message = render_to_string(
+                "boundlexx/notifications/exoworld_update.md",
+                {"world": world, "colors": colors},
             )
-        return (
-            render_to_string(
+        else:
+            message = render_to_string(
                 "boundlexx/notifications/exoworld.md",
-                {"world": world, "resources": resources},
+                {"world": world, "resources": resources, "colors": colors},
             )
-            .replace("\xa0", " ")
-            .replace("&#x27;", "'")
-        )
+
+        return message.replace("\xa0", " ").replace("&#x27;", "'")

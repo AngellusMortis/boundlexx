@@ -19,4 +19,5 @@ Number of Regions: {{ world.number_of_regions }}
 World Resources:
 ```{% for resource in resources %}
 {{ resource.item.english|stringformat:"25s" }}: {{ resource.count|intcomma }}{% endfor %}
-```
+```{% if colors %}%SPLIT_MESSAGE%
+{% include 'boundlexx/notifications/exoworld_colors.md' %}{% endif %}

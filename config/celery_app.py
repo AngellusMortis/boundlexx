@@ -46,7 +46,7 @@ def after_task(task_id: str, task: Task, *args, **kwargs):
     with cache.lock(f"logger_lock.{task_id}"):
         cache_key = f"logger.{task_id}"
 
-        output = cache.get(cache_key)
+        output = cache.get(cache_key, [])
         cache.delete(cache_key)
 
     try:

@@ -299,16 +299,12 @@ class WorldBlockColorInline(admin.TabularInline):
     fields = [
         "item",
         "color",
-        "can_be_found",
         "new_color",
-        "exist_via_transformation",
     ]
     readonly_fields = [
         "item",
         "color",
-        "can_be_found",
         "new_color",
-        "exist_via_transformation",
     ]
     can_delete = False
     max_num = 0
