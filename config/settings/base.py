@@ -420,6 +420,14 @@ BOUNDLESS_LANGUAGES = [
     ("italian", "Italian"),
     ("spanish", "Spanish"),
 ]
+BOUNDLESS_WORLD_LIQUIDS = {
+    "DEFAULT": ("Water", "Lava"),
+    "LUSH": ("Water", "Water"),
+    "METAL": ("Lava", "Lava"),
+    "CHILL": ("Water", "Water"),
+    "BURN": ("Lava", "Lava"),
+    "UMBRIS": ("Lava", "Water"),
+}
 BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
     32800,  # Rough Amethyst
     32803,  # Rough Diamond

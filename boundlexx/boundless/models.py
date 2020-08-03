@@ -14,7 +14,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
-from boundlexx.boundless.client import Location, ShopItem
+from boundlexx.boundless.client import BoundlessClient, Location, ShopItem
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex, purge_cache
 from boundlexx.notifications.models import ExoworldNotification
 
@@ -269,7 +269,7 @@ class WorldManager(models.Manager):
         world.websocket_url = world_dict.get("websocketURL")
         world.is_creative = world_dict.get("creative", False)
         world.owner = world_dict.get("owner", None)
-        world.assignment = world_dict.get("assignment", None)
+        world.assignment_id = world_dict.get("assignment", None)
         world.is_locked = world_dict.get("locked", False)
         world.is_public = world_dict.get("public", True)
         world.number_of_regions = world_dict["numRegions"]
@@ -359,10 +359,6 @@ class World(models.Model):
         TYPE_RIFT = "RIFT", _("Rift")
         TYPE_BLINK = "BLINK", _("Blink")
 
-    class LiquidChoice(models.TextChoices):
-        LAVA = "lava", _("Lava")
-        WATER = "water", _("Water")
-
     class Meta:
         ordering = ["id"]
 
@@ -390,7 +386,9 @@ class World(models.Model):
     chunks_url = models.URLField(_("Chunks URL"), blank=True, null=True)
     time_offset = models.DateTimeField(_("Time Offset"), null=True)
     websocket_url = models.URLField(_("Websocket URL"), blank=True, null=True)
-    assignment = models.PositiveSmallIntegerField(blank=True, null=True)
+    assignment = models.ForeignKey(
+        "World", on_delete=models.CASCADE, blank=True, null=True
+    )
     owner = models.PositiveSmallIntegerField(blank=True, null=True)
     is_creative = models.BooleanField(default=False, db_index=True, null=True)
     is_locked = models.BooleanField(default=False, db_index=True, null=True)
@@ -410,27 +408,6 @@ class World(models.Model):
     water_color_g = models.FloatField(_("Water Linear G Color"), null=True)
     water_color_b = models.FloatField(_("Water Linear B Color"), null=True)
 
-    closest_world = models.ForeignKey(
-        "World",
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-        help_text="Closest world to this one. Only populated for Exoworlds",
-    )
-    closest_world_distance = models.PositiveSmallIntegerField(
-        blank=True,
-        null=True,
-        help_text=(
-            "Distance (in blinksecs) to closest world. Only populated "
-            "for Exoworlds"
-        ),
-    )
-    surface_liquid = models.TextField(
-        max_length=5, choices=LiquidChoice.choices, blank=True, null=True
-    )
-    core_liquid = models.TextField(
-        max_length=5, choices=LiquidChoice.choices, blank=True, null=True
-    )
     forum_id = models.PositiveIntegerField(null=True, blank=True)
 
     active = models.BooleanField(default=True, db_index=True)
@@ -515,6 +492,59 @@ class World(models.Model):
             protection_type = "Potent"
 
         return f"Lvl {amount} {protection_type}"
+
+    @property
+    def surface_liquid(self):
+        key = "DEFAULT"
+        if (
+            self.world_type is not None
+            and self.world_type in settings.BOUNDLESS_WORLD_LIQUIDS
+        ):
+            key = self.world_type
+        return settings.BOUNDLESS_WORLD_LIQUIDS[key][0]
+
+    @property
+    def core_liquid(self):
+        key = "DEFAULT"
+        if (
+            self.world_type is not None
+            and self.world_type in settings.BOUNDLESS_WORLD_LIQUIDS
+        ):
+            key = self.world_type
+        return settings.BOUNDLESS_WORLD_LIQUIDS[key][1]
+
+    def get_distance_to_world(self, world):
+        distance_obj = WorldDistance.objects.filter(
+            models.Q(world_1=self, world_2=world)
+            | models.Q(world_1=world, world_2=self)
+        ).first()
+
+        if distance_obj is None:
+            client = BoundlessClient()
+            distance = client.get_world_distance(self.id, world.id)
+            distance_obj = WorldDistance.objects.create(
+                world_1=self, world_2=world, distance=int(distance)
+            )
+
+        return distance_obj.distance
+
+    @cached_property
+    def assignment_distance(self):
+        if self.assignment is None:
+            return None
+        return self.get_distance_to_world(self.assignment)
+
+
+class WorldDistance(models.Model):
+    world_1 = models.ForeignKey(
+        World, on_delete=models.CASCADE, related_name="+"
+    )
+    world_2 = models.ForeignKey(
+        World, on_delete=models.CASCADE, related_name="+"
+    )
+    distance = models.PositiveSmallIntegerField(
+        _("Distance to work in blinksecs")
+    )
 
 
 class WorldBlockColor(models.Model):

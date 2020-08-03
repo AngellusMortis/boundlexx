@@ -27,33 +27,22 @@ def _get_lifetimes(raw_lifetime):
 
 
 def _update_world(world, start, end, row):
-    new_data = False
-
     if world.start is None and start is not None:
         world.start = start
     if world.end is None and end is not None:
         world.end = end
     if world.region is None:
         world.region = row[4].strip()
-    if len(row[5].strip()) > 0 and world.closest_world_id is None:
-        world.closest_world_id = int(row[5].strip())
-        world.closest_world_distance = int(row[6].strip())
+    if len(row[5].strip()) > 0 and world.assignment_id is None:
+        world.assignment_id = int(row[5].strip())
     if world.tier is None:
         world.tier = int(row[7].strip()) - 1
     if world.world_type is None:
         world.world_type = row[8].strip().upper()
-    if world.surface_liquid is None:
-        surface_liquid, core_liquid = row[10].strip().split(",")
-
-        world.surface_liquid = surface_liquid.strip().lower()
-        world.core_liquid = core_liquid.strip().lower()
-
-        new_data = True
 
     world.save()
 
-    send_notification = new_data and world.address is not None and world.is_exo
-    return world, send_notification
+    return world
 
 
 def _create_block_colors(world, block_colors, item_names):
@@ -85,8 +74,12 @@ def _create_block_colors(world, block_colors, item_names):
         block_color.save()
         block_color_objs.append(block_color)
 
+    if block_colors_created > 0 and world.address is not None and world.is_exo:
+        ExoworldNotification.objects.send_update_notification(
+            world, colors=block_color_objs
+        )
+
     logger.info("%s: created %s color(s)", world, block_colors_created)
-    return block_color_objs
 
 
 @app.task
@@ -120,12 +113,5 @@ def ingest_world_data():
                 id=world_id, display_name=display_name
             )
 
-        world, send_notification = _update_world(world, start, end, row)
-        block_colors = _create_block_colors(
-            world, row[11:-5], header_columns[11:-5]
-        )
-
-        if send_notification:
-            ExoworldNotification.objects.send_update_notification(
-                world, colors=block_colors
-            )
+        world = _update_world(world, start, end, row)
+        _create_block_colors(world, row[11:-5], header_columns[11:-5])

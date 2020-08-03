@@ -21,10 +21,8 @@ WORLD_EXAMPLE = {
     "end": "2020-07-31T15:07:13Z",
     "atmosphere_color": "#b4d2ff",
     "water_color": "#c359ff",
-    "closest_world": None,
-    "closest_world_distance": None,
-    "surface_liquid": "water",
-    "core_liquid": "lava",
+    "surface_liquid": "Water",
+    "core_liquid": "Lava",
 }
 
 WORLD_COLORS_EXAMPLE = {

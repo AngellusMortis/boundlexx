@@ -259,8 +259,6 @@ class WorldSerializer(serializers.ModelSerializer):
             "end",
             "atmosphere_color",
             "water_color",
-            "closest_world",
-            "closest_world_distance",
             "surface_liquid",
             "core_liquid",
         ]

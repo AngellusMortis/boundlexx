@@ -15,6 +15,7 @@ from boundlexx.boundless.models import (
     WorldBlockColor,
     WorldCreatureColor,
 )
+from boundlexx.notifications.models import ExoworldNotification
 
 logger = logging.getLogger("ingest")
 
@@ -78,6 +79,43 @@ class WorldWSDataView(views.APIView):
 
         return world
 
+    def _create_colors(self, world, block_colors, creature_colors):
+        block_colors_created = 0
+        creature_colors_created = 0
+        block_color_objs = []
+
+        for block_color in block_colors:
+            item = Item.objects.filter(
+                string_id=f"ITEM_TYPE_{block_color[0]}"
+            ).first()
+
+            if item is not None:
+                color = Color.objects.get(game_id=block_color[1])
+
+                (
+                    block_color_obj,
+                    created,
+                ) = WorldBlockColor.objects.get_or_create(
+                    world=world, item=item, defaults={"color": color}
+                )
+
+                block_color_objs.append(block_color_obj)
+
+                if created:
+                    block_colors_created += 1
+
+        for creature_color in creature_colors:
+            _, created = WorldCreatureColor.objects.get_or_create(
+                world=world,
+                creature_type=creature_color[0],
+                defaults={"color_data": json.dumps(creature_color[1])},
+            )
+
+            if created:
+                creature_colors_created += 1
+
+        return block_color_objs, block_colors_created, creature_colors_created
+
     def post(self, request, *args, **kwargs):
         data = self._get_data(request)
 
@@ -90,33 +128,20 @@ class WorldWSDataView(views.APIView):
         if world is None:
             return Response(status=425)
 
-        block_colors_created = 0
-        creature_colors_created = 0
-        block_colors_created = 0
-        for block_color in data[2]:
-            item = Item.objects.filter(
-                string_id=f"ITEM_TYPE_{block_color[0]}"
-            ).first()
+        (
+            block_color_objs,
+            block_colors_created,
+            creature_colors_created,
+        ) = self._create_colors(world, data[2], data[3])
 
-            if item is not None:
-                color = Color.objects.get(game_id=block_color[1])
-
-                _, created = WorldBlockColor.objects.get_or_create(
-                    world=world, item=item, defaults={"color": color}
-                )
-
-                if created:
-                    block_colors_created += 1
-
-        for creature_color in data[3]:
-            _, created = WorldCreatureColor.objects.get_or_create(
-                world=world,
-                creature_type=creature_color[0],
-                defaults={"color_data": json.dumps(creature_color[1])},
+        if (
+            block_colors_created > 0
+            and world.address is not None
+            and world.is_exo
+        ):
+            ExoworldNotification.objects.send_update_notification(
+                world, colors=block_color_objs
             )
-
-            if created:
-                creature_colors_created += 1
 
         return Response(
             status=200,

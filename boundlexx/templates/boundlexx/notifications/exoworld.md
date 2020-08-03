@@ -13,7 +13,9 @@ Server Region: {{ world.get_region_display }}
 World Type: {{ world.get_world_type_display }}
 World Size (16-block chunks): {{ world.size }}
 Number of Regions: {{ world.number_of_regions }}
-{% if world.closest_world %}{% include 'boundlexx/notifications/exoworld_partial.md' %}{% endif %}
+Closest Planet: {{ world.assignment }} @{{ world.assignment_distance }} blinksecs
+Surface Liquid: {{ world.surface_liquid }}
+Core Liquid: {{ world.core_liquid }}
 ```
 
 World Resources:

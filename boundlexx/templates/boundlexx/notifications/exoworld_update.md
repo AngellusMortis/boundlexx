@@ -2,8 +2,4 @@
 
 Name: **{{ world.display_name }}**
 
-New Details:
-```
-{% include 'boundlexx/notifications/exoworld_partial.md' %}
-```{% if colors %}%SPLIT_MESSAGE%
-{% include 'boundlexx/notifications/exoworld_colors.md' %}{% endif %}
+{% include 'boundlexx/notifications/exoworld_colors.md' %}
