@@ -31,7 +31,7 @@ django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
 django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.8             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
+django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
 djangorestframework==3.11.0  # via -r /app/requirements/in/base.in, drf-extensions
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
@@ -47,6 +47,7 @@ idna==2.10                # via requests
 jsonlines==1.2.0          # via cloudflare
 kombu==4.6.11             # via celery
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
+newrelic==5.14.1.144      # via -r /app/requirements/in/base.in
 oauthlib==3.1.0           # via requests-oauthlib
 pillow==7.2.0             # via -r /app/requirements/in/base.in
 prometheus-client==0.8.0  # via flower

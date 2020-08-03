@@ -26,6 +26,7 @@ coloredlogs
 dateparser
 gspread
 msgpack
+newrelic
 pillow
 psycopg2 --no-binary psycopg2
 python-slugify

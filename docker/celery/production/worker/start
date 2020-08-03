@@ -5,4 +5,9 @@ set -o pipefail
 set -o nounset
 
 
-celery -A config.celery_app worker -E -l INFO
+if [ -n "${NEW_RELIC_CONFIG_FILE}" ]; then
+    echo "Starting with New Relic support..."
+    newrelic-admin run-program celery -A config.celery_app worker -E -l INFO
+else
+    celery -A config.celery_app worker -E -l INFO
+fi
