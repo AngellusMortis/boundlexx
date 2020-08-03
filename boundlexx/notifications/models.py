@@ -44,7 +44,7 @@ class DiscordWebhookSubscription(SubscriptionBase):
 
                 meantions_prefix = ""
                 for meantion in meantions:
-                    meantions_prefix = f"@{meantion} {meantions_prefix}"
+                    meantions_prefix = f"<@{meantion}> {meantions_prefix}"
 
                 data[
                     "content"
