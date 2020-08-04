@@ -111,19 +111,19 @@ class ExoworldNotification(NotificationBase):
         self, world, resources=None
     ):  # pylint: disable=arguments-differ
 
-        colors = world.worldblockcolor_set.all()
+        colors = world.worldblockcolor_set.all().order_by("item__game_id")
         if colors.count() == 0:
             colors = None
 
         if colors is not None:
-            colors = sorted(colors, key=lambda s: s.item.english.lower())
+            colors = list(colors)
             if len(colors) > 30:
                 colors = [colors[:30], colors[30:]]
             else:
                 colors = [colors]
 
         if resources is not None:
-            resources = sorted(resources, key=lambda s: s.item.english.lower())
+            resources = resources.order_by("item__game_id")
 
         message = ""
         if resources is None:
