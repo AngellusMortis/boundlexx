@@ -363,18 +363,33 @@ class World(models.Model):
     class Meta:
         ordering = ["id"]
 
-    name = models.CharField(_("Name"), max_length=64, null=True)
-    display_name = models.CharField(_("Display Name"), max_length=64)
+    name = models.CharField(_("Name"), max_length=64, null=True, db_index=True)
+    display_name = models.CharField(
+        _("Display Name"), max_length=64, db_index=True
+    )
     region = models.CharField(
-        _("Server Region"), max_length=16, choices=Region.choices, null=True
+        _("Server Region"),
+        max_length=16,
+        choices=Region.choices,
+        null=True,
+        db_index=True,
+        help_text=_("Server Region"),
     )
     tier = models.PositiveSmallIntegerField(
-        _("Tier"), choices=Tier.choices, null=True
+        _("Tier"),
+        choices=Tier.choices,
+        null=True,
+        db_index=True,
+        help_text=_("Tier of the world. Starts at 0."),
     )
     description = models.CharField(_("Description"), max_length=32, null=True)
     size = models.IntegerField(_("World Size"), null=True)
     world_type = models.CharField(
-        _("World Type"), choices=WorldType.choices, max_length=9, null=True
+        _("World Type"),
+        choices=WorldType.choices,
+        max_length=9,
+        null=True,
+        db_index=True,
     )
     address = models.CharField(
         _("Server Address"), max_length=128, blank=True, null=True
@@ -388,12 +403,34 @@ class World(models.Model):
     time_offset = models.DateTimeField(_("Time Offset"), null=True)
     websocket_url = models.URLField(_("Websocket URL"), blank=True, null=True)
     assignment = models.ForeignKey(
-        "World", on_delete=models.CASCADE, blank=True, null=True
+        "World",
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        db_index=True,
+        help_text=_("The world this planet orbits, if any"),
     )
     owner = models.PositiveSmallIntegerField(blank=True, null=True)
-    is_creative = models.BooleanField(default=False, db_index=True, null=True)
-    is_locked = models.BooleanField(default=False, db_index=True, null=True)
-    is_public = models.BooleanField(default=True, db_index=True, null=True)
+    is_creative = models.BooleanField(
+        default=False,
+        db_index=True,
+        null=True,
+        help_text=_("If the world is a creative one"),
+    )
+    is_locked = models.BooleanField(
+        default=False,
+        db_index=True,
+        null=True,
+        help_text=_(
+            "If this world is locked (only `true` for Soverign worlds)"
+        ),
+    )
+    is_public = models.BooleanField(
+        default=True,
+        db_index=True,
+        null=True,
+        help_text=_("If this world is public"),
+    )
     number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
 
     atmosphere_color_r = models.FloatField(
@@ -413,8 +450,8 @@ class World(models.Model):
 
     active = models.BooleanField(default=True, db_index=True)
 
-    start = models.DateTimeField(blank=True, null=True)
-    end = models.DateTimeField(blank=True, null=True)
+    start = models.DateTimeField(blank=True, null=True, db_index=True)
+    end = models.DateTimeField(blank=True, null=True, db_index=True)
 
     def __str__(self):
         return self.display_name

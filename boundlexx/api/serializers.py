@@ -232,6 +232,7 @@ class WorldSerializer(serializers.ModelSerializer):
     block_colors_url = serializers.HyperlinkedIdentityField(
         view_name="world-block-colors", lookup_field="id", read_only=True,
     )
+    assignment = SimpleWorldSerializer()
 
     class Meta:
         model = World
@@ -242,6 +243,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "display_name",
+            "assignment",
             "region",
             "tier",
             "description",

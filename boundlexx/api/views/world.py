@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -14,6 +15,7 @@ from boundlexx.api.serializers import (
     WorldSerializer,
 )
 from boundlexx.api.utils import get_list_example
+from boundlexx.api.views.filters import WorldFilterSet
 from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
     TimeseriesMixin,
@@ -33,7 +35,8 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     )
     serializer_class = WorldSerializer
     lookup_field = "id"
-    filter_backends = [filters.SearchFilter]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_class = WorldFilterSet
     search_fields = [
         "id",
         "name",
