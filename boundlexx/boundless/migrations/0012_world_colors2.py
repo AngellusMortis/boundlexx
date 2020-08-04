@@ -5,9 +5,6 @@ import django.db.models.deletion
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0012_world_colors'), ('boundless', '0013_auto_20200802_1514'), ('boundless', '0014_auto_20200802_1738'), ('boundless', '0015_auto_20200802_1740')]
-
     dependencies = [
         ('boundless', '0011_colorvalue'),
     ]

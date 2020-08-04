@@ -38,9 +38,9 @@ WORLD_COLORS_EXAMPLE = {
                 "url": f"{get_base_url()}/api/v1/colors/66/",
                 "game_id": 66,
             },
-            "can_be_found": False,
-            "new_color": None,
-            "exist_via_transformation": None,
+            "is_new_color": True,
+            "exist_on_perm": True,
+            "exist_via_transform": None,
         },
     ],
 }

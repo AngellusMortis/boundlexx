@@ -553,14 +553,36 @@ class WorldBlockColor(models.Model):
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
 
     _new_color = models.NullBooleanField()
+    _exist_on_perm = models.NullBooleanField()
+    _exist_via_transform = models.NullBooleanField()
 
     class Meta:
         unique_together = ("world", "item")
 
     @property
-    def new_color(self):
-        if self._new_color is None:
+    def exist_on_perm(self):
+        if self._exist_on_perm is None:
             if self.world.start is None:
+                exist_on_perm = True
+            else:
+                exist_on_perm = (
+                    WorldBlockColor.objects.filter(
+                        item=self.item,
+                        color=self.color,
+                        world__start__isnull=True,
+                    ).count()
+                    > 0
+                )
+            self._exist_on_perm = exist_on_perm
+            self.save()
+        return self._exist_on_perm
+
+    @property
+    def is_new_color(self):
+        if self._new_color is None:
+            if self.exist_on_perm:
+                new_color = False
+            elif self.world.start is None:
                 new_color = True
             else:
                 new_color = (
@@ -576,6 +598,39 @@ class WorldBlockColor(models.Model):
             self._new_color = new_color
             self.save()
         return self._new_color
+
+    @property
+    def transform_group(self):
+        return settings.BOUNDLESS_TRANSFORMATION_GROUPS.get(self.item.game_id)
+
+    @property
+    def exist_via_transform(self):
+        if self._exist_via_transform is None:
+            if self.transform_group is None or self.exist_on_perm:
+                return None
+
+            if (
+                WorldBlockColor.objects.filter(
+                    item=self.item,
+                    color=self.color,
+                    world__start__isnull=True,
+                ).count()
+                > 0
+            ):
+                exist_via_transform = False
+
+            exist_via_transform = (
+                WorldBlockColor.objects.filter(
+                    item__game_id__in=self.transform_group,
+                    color=self.color,
+                    world__start__isnull=True,
+                ).count()
+                > 0
+            )
+
+            self._exist_via_transform = exist_via_transform
+            self.save()
+        return self._exist_via_transform
 
     @cached_property
     def days_since_last(self):

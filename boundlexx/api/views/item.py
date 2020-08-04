@@ -54,9 +54,9 @@ ITEM_RESOURCE_COUNT_EXAMPLE = {
 ITEM_COLORS_EXAMPLE = {
     "color": {"url": f"{get_base_url()}/api/v1/colors/1/", "game_id": 1},
     "world": {"url": None, "id": 2000000075, "display_name": "Spination"},
-    "can_be_found": False,
-    "new_color": None,
-    "exist_via_transformation": None,
+    "is_new_color": True,
+    "exist_on_perm": True,
+    "exist_via_transform": None,
 }
 
 

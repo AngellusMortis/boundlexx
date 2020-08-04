@@ -47,7 +47,6 @@ def _update_world(world, start, end, row):
 
 def _create_block_colors(world, block_colors, item_names):
     block_colors_created = 0
-    block_color_objs = []
     for index, item_name in enumerate(item_names):
         raw_block_color = block_colors[index].strip().split(",")
 
@@ -72,12 +71,9 @@ def _create_block_colors(world, block_colors, item_names):
             block_colors_created += 1
 
         block_color.save()
-        block_color_objs.append(block_color)
 
     if block_colors_created > 0 and world.address is not None and world.is_exo:
-        ExoworldNotification.objects.send_update_notification(
-            world, colors=block_color_objs
-        )
+        ExoworldNotification.objects.send_update_notification(world)
 
     logger.info("%s: created %s color(s)", world, block_colors_created)
 

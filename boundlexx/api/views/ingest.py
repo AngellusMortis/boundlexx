@@ -82,7 +82,6 @@ class WorldWSDataView(views.APIView):
     def _create_colors(self, world, block_colors, creature_colors):
         block_colors_created = 0
         creature_colors_created = 0
-        block_color_objs = []
 
         for block_color in block_colors:
             item = Item.objects.filter(
@@ -92,14 +91,9 @@ class WorldWSDataView(views.APIView):
             if item is not None:
                 color = Color.objects.get(game_id=block_color[1])
 
-                (
-                    block_color_obj,
-                    created,
-                ) = WorldBlockColor.objects.get_or_create(
+                _, created = WorldBlockColor.objects.get_or_create(
                     world=world, item=item, defaults={"color": color}
                 )
-
-                block_color_objs.append(block_color_obj)
 
                 if created:
                     block_colors_created += 1
@@ -114,7 +108,7 @@ class WorldWSDataView(views.APIView):
             if created:
                 creature_colors_created += 1
 
-        return block_color_objs, block_colors_created, creature_colors_created
+        return block_colors_created, creature_colors_created
 
     def post(self, request, *args, **kwargs):
         data = self._get_data(request)
@@ -128,20 +122,16 @@ class WorldWSDataView(views.APIView):
         if world is None:
             return Response(status=425)
 
-        (
-            block_color_objs,
-            block_colors_created,
-            creature_colors_created,
-        ) = self._create_colors(world, data[2], data[3])
+        block_colors_created, creature_colors_created = self._create_colors(
+            world, data[2], data[3]
+        )
 
         if (
             block_colors_created > 0
             and world.address is not None
             and world.is_exo
         ):
-            ExoworldNotification.objects.send_update_notification(
-                world, colors=block_color_objs
-            )
+            ExoworldNotification.objects.send_update_notification(world)
 
         return Response(
             status=200,

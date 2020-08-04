@@ -97,33 +97,33 @@ class ExoworldNotificationManager(PolymorphicManager):
                 notification.markdown(world_poll.world, world_poll.resources)
             )
 
-    def send_update_notification(self, world, colors=None):
+    def send_update_notification(self, world):
         notifications = self.filter(active=True)
 
         for notification in notifications:
-            notification.subscription.send(
-                notification.markdown(world, colors=colors)
-            )
+            notification.subscription.send(notification.markdown(world))
 
 
 class ExoworldNotification(NotificationBase):
     objects = ExoworldNotificationManager()
 
     def markdown(
-        self, world, resources=None, colors=None
+        self, world, resources=None
     ):  # pylint: disable=arguments-differ
 
-        if colors is None:
-            colors = world.worldblockcolor_set.all()
-            if colors.count() == 0:
-                colors = None
+        colors = world.worldblockcolor_set.all()
+        if colors.count() == 0:
+            colors = None
 
         if colors is not None:
-            colors = list(colors)
+            colors = sorted(colors, key=lambda s: s.item.english.lower())
             if len(colors) > 30:
                 colors = [colors[:30], colors[30:]]
             else:
                 colors = [colors]
+
+        if resources is not None:
+            resources = sorted(resources, key=lambda s: s.item.english.lower())
 
         message = ""
         if resources is None:

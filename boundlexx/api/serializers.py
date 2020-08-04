@@ -340,7 +340,9 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
         fields = [
             "item",
             "color",
-            "new_color",
+            "is_new_color",
+            "exist_on_perm",
+            "exist_via_transform",
         ]
 
 
@@ -353,7 +355,9 @@ class BlockColorSerializer(serializers.ModelSerializer):
         fields = [
             "item",
             "world",
-            "new_color",
+            "is_new_color",
+            "exist_on_perm",
+            "exist_via_transform",
         ]
 
 
@@ -366,7 +370,9 @@ class ItemColorSerializer(serializers.ModelSerializer):
         fields = [
             "color",
             "world",
-            "new_color",
+            "is_new_color",
+            "exist_on_perm",
+            "exist_via_transform",
         ]
 
 

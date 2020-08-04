@@ -428,6 +428,28 @@ BOUNDLESS_WORLD_LIQUIDS = {
     "BURN": ("Lava", "Lava"),
     "UMBRIS": ("Lava", "Water"),
 }
+BOUNDLESS_TRANSFORMATION_GROUPS = {
+    10842: [10806],  # Ice
+    10806: [10842],  # Glacier
+    10798: [10794, 10802],  # Igneous Rock
+    10794: [10798, 10802],  # Metamorphic Rock
+    10802: [10798, 10794],  # Sedimentary Rock
+    11588: [11592, 11584],  # Clay Soil
+    11592: [11588, 11584],  # Peaty Soil
+    11584: [11588, 11592],  # Silty Soil
+    10814: [10798, 10794, 10802],  # Gravel
+    10810: [10814, 10798, 10794, 10802],  # Sand
+    10826: [10822, 10818],  # Waxy Foliage
+    10822: [10826, 10818],  # Exotic Foliage
+    10818: [10826, 10822],  # Lush Foliage
+    10830: [10838, 10834],  # Ancient Wood Trunk
+    10838: [10830, 10834],  # Lustrous Wood Trunk
+    10834: [10830, 10838],  # Twisted Wood Trunk
+    3085: [6157, 13],  # Barbed Grass
+    6157: [3085, 13],  # Gnarled Grass
+    13: [3085, 6157],  # Verdant Grass
+}
+
 BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
     32800,  # Rough Amethyst
     32803,  # Rough Diamond
