@@ -1,4 +1,4 @@
-{% load humanize %}A new exoworld world as appeared!
+{% load humanize tz %}A new exoworld world as appeared!
 
 Name: **{{ world.display_name }}**
 
@@ -6,8 +6,8 @@ World Details:
 ```
 ID: {{ world.name }} ({{ world.id }})
 Server: {{ world.address }}
-Start: {{ world.start|naturaltime }} ({{ world.start }} UTC)
-End: {{ world.end|naturaltime }} ({{ world.end }} UTC)
+Start: {{ world.start|naturaltime }} ({{ world.start|utc }} UTC)
+End: {{ world.end|naturaltime }} ({{ world.end|utc }} UTC)
 Tier: {{ world.get_tier_display }}
 Server Region: {{ world.get_region_display }}
 World Type: {{ world.get_world_type_display }}
