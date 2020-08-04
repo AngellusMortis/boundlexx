@@ -248,6 +248,7 @@ class WorldManager(models.Manager):
 
         created = created or world.address is None
 
+        world.display_name = world_dict["displayName"]
         world.name = world_dict["name"]
         world.region = world_dict["region"]
         world.tier = world_dict["tier"]

@@ -2,6 +2,7 @@ from typing import List
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.utils import timezone
 
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models import World, WorldPoll
@@ -140,14 +141,26 @@ def poll_worlds(worlds=None):
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
 
         logger.info("Polling world %s", world.display_name)
-        world_data, poll_data = client.get_world_poll_by_id(world.id)
+        world_data = client.get_world_data(world.id)
 
         if world_data is None:
             world.active = False
             world.save()
             continue
 
-        World.objects.get_or_create_from_game_dict(world_data)
+        world, _ = World.objects.get_or_create_from_game_dict(
+            world_data["worldData"]
+        )
+
+        if world.is_locked or (
+            world.end is not None and timezone.now() > world.end
+        ):
+            logger.info("World %s expired, not polling...", world)
+            continue
+
+        world_data, poll_data = client.get_world_poll(
+            world_data["pollData"], world_data["worldData"]
+        )
 
         if poll_data is not None:
             WorldPoll.objects.create_from_game_dict(
