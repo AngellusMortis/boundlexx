@@ -2,6 +2,8 @@ from boundlexx.api.utils import get_base_url
 
 WORLD_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
+    "polls_url": f"{get_base_url()}/api/v1/worlds/1/polls/",
+    "block_colors_url": f"{get_base_url()}/api/v1/worlds/1/block-colors/",
     "id": 251,
     "name": "aus3_t6_3",
     "display_name": "Typhuchis",
@@ -13,6 +15,7 @@ WORLD_EXAMPLE = {
     "time_offset": "2020-07-14T12:01:11.160609Z",
     "is_sovereign": False,
     "is_perm": False,
+    "is_exo": True,
     "is_creative": False,
     "is_locked": False,
     "is_public": True,
