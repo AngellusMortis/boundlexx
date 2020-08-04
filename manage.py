@@ -21,7 +21,10 @@ def configure_logging():
 
 
 if __name__ == "__main__":
-    if "NEW_RELIC_CONFIG_FILE" in os.environ:
+    if (
+        "NEW_RELIC_CONFIG_FILE" in os.environ
+        and os.environ["NEW_RELIC_CONFIG_FILE"] is not None
+    ):
         print("Enabling New Relic integration...")
         print(
             f"Config: {os.environ['NEW_RELIC_CONFIG_FILE']}, "
