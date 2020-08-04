@@ -40,12 +40,12 @@ class DiscordWebhookSubscription(SubscriptionBase):
                     meantions.append(m.strip())
 
             if len(meantions) > 0:
-                data["allowed_mentions"] = data.get("allowed_mentions", {})
-                data["allowed_mentions"]["key"] = meantions
-
                 meantions_prefix = ""
                 for meantion in meantions:
-                    meantions_prefix = f"<@{meantion}> {meantions_prefix}"
+                    if key == "roles":
+                        meantions_prefix = f"<@&{meantion}> {meantions_prefix}"
+                    else:
+                        meantions_prefix = f"<@{meantion}> {meantions_prefix}"
 
                 data[
                     "content"
