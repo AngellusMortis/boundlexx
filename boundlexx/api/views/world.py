@@ -208,8 +208,12 @@ class WorldPollViewSet(
 
 
 class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = WorldDistance.objects.filter(
-        world_source__active=True, world_dest__active=True
+    queryset = (
+        WorldDistance.objects.filter(
+            world_source__active=True, world_dest__active=True
+        )
+        .select_related("world_source", "world_dest")
+        .order_by("distance")
     )
     schema = DescriptiveAutoSchema(tags=["World"])
     serializer_class = WorldDistanceSerializer
