@@ -157,9 +157,7 @@ def poll_worlds(worlds=None):
             world.save()
             continue
 
-        world, _ = World.objects.get_or_create_from_game_dict(
-            world_data["worldData"]
-        )
+        world, _ = World.objects.get_or_create_from_game_dict(world_data)
 
         if world.is_locked or (
             world.end is not None and timezone.now() > world.end
