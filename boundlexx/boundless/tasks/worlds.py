@@ -110,13 +110,14 @@ def _scan_worlds(lower, upper):
             worlds_found += 1
             world_objs.append(world)
 
-            world_data, poll_dict = client.get_world_poll(
-                world_dict["pollData"], world_dict["worldData"]
-            )
+            if not world.is_locked:
+                world_data, poll_dict = client.get_world_poll(
+                    world_dict["pollData"], world_dict["worldData"]
+                )
 
-            WorldPoll.objects.create_from_game_dict(
-                world_data, poll_dict, world=world, new_world=True
-            )
+                WorldPoll.objects.create_from_game_dict(
+                    world_data, poll_dict, world=world, new_world=True
+                )
 
     logger.info("Found %s world(s)", worlds_found)
 
@@ -149,7 +150,7 @@ def poll_worlds(worlds=None):
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
 
         logger.info("Polling world %s", world.display_name)
-        world_data = client.get_world_data(world.id)
+        world_data, poll_data = client.get_world_poll_by_id(world.id)
 
         if world_data is None:
             world.active = False
@@ -165,10 +166,6 @@ def poll_worlds(worlds=None):
         ):
             logger.info("World %s expired, not polling...", world)
             continue
-
-        world_data, poll_data = client.get_world_poll(
-            world_data["pollData"], world_data["worldData"]
-        )
 
         if poll_data is not None:
             WorldPoll.objects.create_from_game_dict(

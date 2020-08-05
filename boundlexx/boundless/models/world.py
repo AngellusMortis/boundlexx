@@ -97,6 +97,7 @@ class WorldManager(models.Manager):
         world.is_locked = world_dict.get("locked", False)
         world.is_public = world_dict.get("public", True)
         world.number_of_regions = world_dict["numRegions"]
+        world.active = True
 
         if start is not None:
             world.start = start
