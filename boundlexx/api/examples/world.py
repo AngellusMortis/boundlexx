@@ -377,3 +377,17 @@ WORLD_POLL_RESOURCES_EXAMPLE = {
         },
     ],
 }
+
+WORLD_DISTANCES_EXAMPLE = {
+    "world_source": {
+        "url": f"{get_base_url()}/api/v1/worlds/1/",
+        "id": 1,
+        "display_name": "Sochaltin I",
+    },
+    "world_dest": {
+        "url": f"{get_base_url()}/api/v1/worlds/10/",
+        "id": 10,
+        "display_name": "Serpensarindi",
+    },
+    "distance": 26,
+}

@@ -233,7 +233,7 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     def filter_queryset_by_parents_lookups(self, queryset):
         parents_query_dict = self.get_parents_query_dict()
 
-        world_id = parents_query_dict.pop("world_source__id")
+        world_id = parents_query_dict.pop("world_source__id", None)
         if world_id:
             try:
                 return queryset.filter(
@@ -253,7 +253,7 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
             request, *args, **kwargs
         )
 
-    # list.example = {"list": {"value": get_list_example(examples.WORLD_POLL_EXAMPLE)}}  # type: ignore # noqa E501
+    list.example = {"list": {"value": get_list_example(examples.WORLD_DISTANCES_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
         self, request, *args, **kwargs,
@@ -265,4 +265,4 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
             request, *args, **kwargs
         )
 
-    # retrieve.example = {"retrieve": {"value": examples.WORLD_POLL_EXAMPLE}}  # type: ignore # noqa E501
+    retrieve.example = {"retrieve": {"value": examples.WORLD_DISTANCES_EXAMPLE}}  # type: ignore # noqa E501
