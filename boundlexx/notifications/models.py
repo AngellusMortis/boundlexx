@@ -88,6 +88,16 @@ class NotificationBase(PolymorphicModel):
     def markdown(self, **kwargs):
         raise NotImplementedError()
 
+    def _markdown_replace(self, message):
+        return (
+            message.replace("\xa0", " ")
+            .replace("&#x27;", "'")
+            .replace("&quot;", "'")
+            .replace("&quot;", "'")
+            .replace("&lt;", "<")
+            .replace("&gt;", ">")
+        )
+
 
 class BaseNotificationManager(PolymorphicManager):
     def send_notification(self, message):
@@ -148,11 +158,7 @@ class ExoworldNotification(NotificationBase):
                 {"world": world, "resources": resources, "colors": colors},
             )
 
-        return (
-            message.replace("\xa0", " ")
-            .replace("&#x27;", "'")
-            .replace("&quot;", "'")
-        )
+        return self._markdown_replace(message)
 
 
 class FailedTaskNotification(NotificationBase):
@@ -171,18 +177,15 @@ class FailedTaskNotification(NotificationBase):
             message.append(line)
         messages.append(message)
 
-        return (
+        return self._markdown_replace(
             render_to_string(
                 "boundlexx/notifications/failed_task.md",
                 {
                     "task": task,
                     "messages": messages,
-                    "base_url": get_base_url(),
+                    "base_url": get_base_url(admin=True),
                 },
             )
-            .replace("\xa0", " ")
-            .replace("&#x27;", "'")
-            .replace("&quot;", "'")
         )
 
 

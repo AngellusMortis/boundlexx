@@ -521,6 +521,11 @@ STEAM_APP_ID = 324510
 STEAM_AUTH_SCRIPT = "/auth-ticket.js"
 STEAM_AUTH_NODE_MODULES = "/usr/local/lib/node_modules"
 
+ADMIN_DOMAIN_REPLACEMENTS = {
+    "boundlexx.app": "boundlexx.wl.mort.is",
+    "local.boundlexx.app": "local-boundlexx.wl.mort.is",
+}
+
 
 if BOUNDLESS_DS_REQUIRES_AUTH:
     if not (BOUNDLESS_PASSWORD or STEAM_USERNAME or STEAM_PASSWORD):

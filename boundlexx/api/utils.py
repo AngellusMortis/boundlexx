@@ -12,12 +12,15 @@ def get_list_example(example_item):
     }
 
 
-def get_base_url():
+def get_base_url(admin=False):
     try:
         site = Site.objects.get_current()
     except ProgrammingError:
         domain = "example.com"
     else:
         domain = site.domain
+
+    if admin:
+        domain = settings.ADMIN_DOMAIN_REPLACEMENTS.get(domain, domain)
 
     return f"{settings.API_PROTOCOL}://{domain}"
