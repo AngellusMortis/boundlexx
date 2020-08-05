@@ -5,7 +5,11 @@ from boundlexx.api.views.item import (
     ItemResourceCountViewSet,
     ItemViewSet,
 )
-from boundlexx.api.views.world import WorldPollViewSet, WorldViewSet
+from boundlexx.api.views.world import (
+    WorldDistanceViewSet,
+    WorldPollViewSet,
+    WorldViewSet,
+)
 
 __all__ = [
     "ColorViewSet",
@@ -16,4 +20,5 @@ __all__ = [
     "WorldPollViewSet",
     "WorldWSDataView",
     "BlockColorViewSet",
+    "WorldDistanceViewSet",
 ]

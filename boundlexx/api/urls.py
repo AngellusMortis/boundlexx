@@ -26,11 +26,18 @@ item_viewset.register(
     parents_query_lookups=["item__game_id"],
 )
 
-router.register("worlds", views.WorldViewSet, basename="world").register(
+world_viewset = router.register("worlds", views.WorldViewSet, basename="world")
+world_viewset.register(
     "polls",
     views.WorldPollViewSet,
     basename="world-poll",
     parents_query_lookups=["world_id"],
+)
+world_viewset.register(
+    "distances",
+    views.WorldDistanceViewSet,
+    basename="world-distances",
+    parents_query_lookups=["world_source__id"],
 )
 
 # Wire up our API using automatic URL routing.

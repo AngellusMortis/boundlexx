@@ -11,6 +11,7 @@ from boundlexx.boundless.models import (
     Subtitle,
     World,
     WorldBlockColor,
+    WorldDistance,
     WorldPoll,
 )
 
@@ -232,6 +233,12 @@ class WorldSerializer(serializers.ModelSerializer):
     block_colors_url = serializers.HyperlinkedIdentityField(
         view_name="world-block-colors", lookup_field="id", read_only=True,
     )
+    distances_url = NestedHyperlinkedIdentityField(
+        view_name="world-distances-list",
+        lookup_field=["id"],
+        lookup_url_kwarg=["world_source__id"],
+        read_only=True,
+    )
     assignment = SimpleWorldSerializer()
 
     class Meta:
@@ -240,6 +247,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "url",
             "polls_url",
             "block_colors_url",
+            "distances_url",
             "id",
             "name",
             "display_name",
@@ -345,6 +353,19 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
             "is_new_color",
             "exist_on_perm",
             "exist_via_transform",
+        ]
+
+
+class WorldDistanceSerializer(serializers.ModelSerializer):
+    world_source = SimpleWorldSerializer()
+    world_dest = SimpleWorldSerializer()
+
+    class Meta:
+        model = WorldDistance
+        fields = [
+            "world_source",
+            "world_dest",
+            "distance",
         ]
 
 

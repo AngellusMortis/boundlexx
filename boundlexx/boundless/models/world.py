@@ -1,194 +1,17 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Dict
 
 import pytz
 from django.conf import settings
-from django.core.cache import cache
 from django.db import models
-from django.db.models.signals import post_save
-from django.dispatch import receiver
-from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from polymorphic.models import PolymorphicManager, PolymorphicModel
 
-from boundlexx.boundless.client import BoundlessClient, Location, ShopItem
-from boundlexx.boundless.utils import convert_linear_rgb_to_hex, purge_cache
+from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.models.game import Color, Item
+from boundlexx.boundless.utils import convert_linear_rgb_to_hex
 from boundlexx.notifications.models import ExoworldNotification
-
-
-class GameObjManager(PolymorphicManager):
-    def get_queryset(self):
-        return super().get_queryset().prefetch_related("localizedname")
-
-
-class GameObj(PolymorphicModel):
-    active = models.BooleanField(_("Active"), default=True)
-    game_id = models.IntegerField(_("Game ID"), db_index=True)
-
-    class Meta:
-        unique_together = ("game_id", "polymorphic_ctype")
-        ordering = ["game_id"]
-
-    def __str__(self):
-        if self.default_name:
-            return f"{self.game_id}: {self.default_name}"
-        return str(self.game_id)
-
-    @cached_property
-    def localized_names(self):
-        names = {}
-        for name in self.localizedname_set.all():
-            names[name.lang] = name.name
-        return names
-
-    @cached_property
-    def localization_cache_key(self):
-        return f"localized_name:{self.polymorphic_ctype_id}_{self.game_id}"
-
-    @cached_property
-    def default_name(self):
-        localized_name = cache.get(self.localization_cache_key)
-
-        if localized_name is None:
-            localized_name = self.localized_names.get("english")
-            cache.set(self.localization_cache_key, localized_name)
-        return localized_name
-
-
-class LocalizedName(PolymorphicModel):
-    game_obj = models.ForeignKey(GameObj, on_delete=models.CASCADE)
-    lang = models.CharField(_("Language"), max_length=16)
-    name = models.CharField(_("Name"), max_length=128, db_index=True)
-
-    class Meta:
-        unique_together = ("game_obj", "lang")
-
-    def __str__(self):
-        return f"{self.lang}: {self.name}"
-
-
-class Subtitle(GameObj):
-    pass
-
-
-class Color(GameObj):
-    @cached_property
-    def base_color(self):
-        colors: Dict[int, int] = {}
-
-        for color in self.colorvalue_set.all():
-            color_count = colors.get(color.base, 0) + 1
-
-            colors[color.base] = color_count
-
-        base_color = None
-        highest_count = -1
-        for color_value, count in colors.items():
-            if count > highest_count:
-                highest_count = count
-                base_color = color_value
-
-        if base_color is None:
-            return None
-
-        return f"#{base_color:06x}"
-
-    @cached_property
-    def gleam_color(self):
-        for color in self.colorvalue_set.all():
-            if color.color_type == ColorValue.ColorType.GLEAM:
-                return color.rgb_color
-        return None
-
-
-class ColorValue(models.Model):
-    class ColorType(models.TextChoices):
-        CHARACTER = "CHARACTER", _("CHARACTER")
-        CHARACTER_DECAL = "CHARACTER_DECAL", _("CHARACTER_DECAL")
-        CREATURE_BASE = "CREATURE_BASE", _("CREATURE_BASE")
-        CREATURE_AUX = "CREATURE_AUX", _("CREATURE_AUX")
-        CREATURE_EXOTIC = "CREATURE_EXOTIC", _("CREATURE_EXOTIC")
-        WOOD = "WOOD", _("WOOD")
-        ROCK = "ROCK", _("ROCK")
-        GRASS = "GRASS", _("GRASS")
-        ICE = "ICE", _("ICE")
-        GLACIER = "GLACIER", _("GLACIER")
-        SOIL = "SOIL", _("SOIL")
-        ASH = "ASH", _("ASH")
-        GLEAM = "GLEAM", _("GLEAM")
-        GRAVEL = "GRAVEL", _("GRAVEL")
-        GROWTH = "GROWTH", _("GROWTH")
-        MOULD = "MOULD", _("MOULD")
-        SAND = "SAND", _("SAND")
-        SPONGE = "SPONGE", _("SPONGE")
-        LEAVES = "LEAVES", _("LEAVES")
-        MANTLE = "MANTLE", _("MANTLE")
-        MUD = "MUD", _("MUD")
-        TANGLE = "TANGLE", _("TANGLE")
-        THORNS = "THORNS", _("THORNS")
-        FLORA_1 = "FLORA_1", _("FLORA_1")
-        FLORA_DECAL_1 = "FLORA_DECAL_1", _("FLORA_DECAL_1")
-        FLORA_2 = "FLORA_2", _("FLORA_2")
-        FLORA_DECAL_2 = "FLORA_DECAL_2", _("FLORA_DECAL_2")
-        FLORA_3 = "FLORA_3", _("FLORA_3")
-        FLORA_DECAL_3 = "FLORA_DECAL_3", _("FLORA_DECAL_3")
-        FLORA_4 = "FLORA_4", _("FLORA_4")
-        FLORA_DECAL_4 = "FLORA_DECAL_4", _("FLORA_DECAL_4")
-        INK = "INK", _("INK")
-        FIBER = "FIBER", _("FIBER")
-
-    color = models.ForeignKey(Color, on_delete=models.CASCADE)
-    color_type = models.CharField(max_length=16, choices=ColorType.choices)
-    shade = models.IntegerField()
-    base = models.IntegerField()
-    hlight = models.IntegerField()
-
-    class Meta:
-        unique_together = ("color", "color_type")
-
-    @property
-    def rgb_color(self):
-        if self.base is None:
-            return None
-        return f"#{self.base:06x}"
-
-
-class Metal(GameObj):
-    pass
-
-
-class Item(GameObj):
-    item_subtitle = models.ForeignKey(
-        Subtitle, on_delete=models.SET_NULL, blank=True, null=True
-    )
-    string_id = models.CharField(_("String ID"), max_length=64)
-
-    @property
-    def default_name(self):  # pylint: disable=invalid-overridden-method
-        return self.string_id
-
-    @property
-    def english(self):
-        return super().default_name
-
-    @property
-    def buy_locations(self):
-        return self.itemshopstandprice_set.filter(active=True)
-
-    @property
-    def sell_locations(self):
-        return self.itemrequestbasketprice_set.filter(active=True)
-
-    @property
-    def is_resource(self):
-        return self.game_id in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
-
-    @property
-    def has_colors(self):
-        return self.worldblockcolor_set.count() > 0
 
 
 class WorldManager(models.Manager):
@@ -551,17 +374,19 @@ class World(models.Model):
             key = self.world_type
         return settings.BOUNDLESS_WORLD_LIQUIDS[key][1]
 
-    def get_distance_to_world(self, world):
+    def get_distance_to_world(self, world, client=None):
         distance_obj = WorldDistance.objects.filter(
-            models.Q(world_1=self, world_2=world)
-            | models.Q(world_1=world, world_2=self)
+            models.Q(world_source=self, world_dest=world)
+            | models.Q(world_source=world, world_dest=self)
         ).first()
 
         if distance_obj is None:
-            client = BoundlessClient()
+            if client is None:
+                client = BoundlessClient()
+
             distance = client.get_world_distance(self.id, world.id)
             distance_obj = WorldDistance.objects.create(
-                world_1=self, world_2=world, distance=int(distance)
+                world_source=self, world_dest=world, distance=int(distance)
             )
 
         return distance_obj.distance
@@ -574,10 +399,10 @@ class World(models.Model):
 
 
 class WorldDistance(models.Model):
-    world_1 = models.ForeignKey(
+    world_source = models.ForeignKey(
         World, on_delete=models.CASCADE, related_name="+"
     )
-    world_2 = models.ForeignKey(
+    world_dest = models.ForeignKey(
         World, on_delete=models.CASCADE, related_name="+"
     )
     distance = models.PositiveSmallIntegerField(
@@ -843,157 +668,3 @@ class LeaderboardRecord(models.Model):
         )
 
         ordering = ["world_rank"]
-
-
-class ItemShopPriceManager(models.Manager):
-    def create_from_shop_item(
-        self, world: str, item: Item, shop_item: ShopItem
-    ) -> ItemShopPrice:
-        return self.create(
-            item_id=item.id,
-            beacon_name=shop_item.beacon_name,
-            guild_tag=shop_item.guild_tag,
-            item_count=shop_item.item_count,
-            shop_activity=shop_item.shop_activity,
-            price=shop_item.price,
-            location_x=shop_item.location.x,
-            location_y=shop_item.location.y,
-            location_z=shop_item.location.z,
-            world=World.objects.get(name=world),
-        )
-
-
-class ItemShopPrice(models.Model):
-    time = models.DateTimeField(auto_now=True, primary_key=True)
-    world = models.ForeignKey("World", on_delete=models.CASCADE)
-    location_x = models.IntegerField()
-    location_y = models.IntegerField()
-    location_z = models.IntegerField()
-    price = models.DecimalField(max_digits=10, decimal_places=2)
-    item = models.ForeignKey("Item", on_delete=models.CASCADE)
-    item_count = models.IntegerField()
-
-    beacon_name = models.CharField(max_length=64, db_index=True)
-    guild_tag = models.CharField(max_length=8)
-    shop_activity = models.IntegerField()
-    active = models.BooleanField(db_index=True, default=True)
-
-    _location = None
-
-    class Meta:
-        abstract = True
-        unique_together = (
-            "time",
-            "world",
-            "location_x",
-            "location_y",
-            "item",
-            "price",
-            "item_count",
-        )
-
-    def __str__(self):
-        return f"{self.item.default_name}: {self.item_count} @ {self.price}c"
-
-    @property
-    def location(self) -> Location:
-        if self._location is None:
-            self._location = Location(
-                self.location_x, self.location_y, self.location_z
-            )
-        return self._location
-
-    def refresh_from_db(self, using=None, fields=None):
-        self._location = None
-        return super().refresh_from_db(using, fields)
-
-    @property
-    def state_hash(self):
-        return (
-            f"{self.item.id}:{self.world.id}:{self.location_x}:"
-            f"{self.location_y}:{self.location_z}:{self.price}:"
-            f"{self.item_count}"
-        ).encode("utf8")
-
-
-class ItemShopStandPrice(ItemShopPrice):
-    objects = ItemShopPriceManager()
-
-
-class ItemRequestBasketPrice(ItemShopPrice):
-    objects = ItemShopPriceManager()
-
-
-class ItemRank(models.Model):
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
-    world = models.ForeignKey(World, on_delete=models.CASCADE)
-    rank = models.PositiveSmallIntegerField(default=5)
-    last_update = models.DateTimeField(blank=True, null=True)
-    state_hash = models.CharField(max_length=128, default="")
-
-    class Meta:
-        abstract = True
-
-    def __str__(self):
-        return f"Rank: {self.rank} for {self.item} @ {self.world}"
-
-    def increase_rank(self):
-        if self.rank >= 20:
-            self.rank = 10
-        elif self.rank >= 10:
-            self.rank = 5
-        elif self.rank > 1:
-            self.rank -= 1
-
-    def decrease_rank(self):
-        if self.rank < 30:
-            self.rank += 1
-
-    @property
-    def query_delay(self):
-        delay = settings.BOUNDLESS_BASE_ITEM_DELAY
-
-        # decrease delay for more popular items
-        # default: 30
-        # popular (1-10) goes 10 * 6, 15, 20, 25, 30
-        offset = settings.BOUNDLESS_INACTIVE_ITEM_DELAY_OFFSET
-        if self.rank <= 10:
-            offset = settings.BOUNDLESS_POPULAR_ITEM_DELAY_OFFSET
-            delay = max(
-                delay - offset * (10 - self.rank),
-                settings.BOUNDLESS_MIN_ITEM_DELAY,
-            )
-        # inactive (11-19) goes 30, 40, 50, 60, 70, 80, 90, 100, 110, 120
-        elif self.rank <= 20:
-            delay = delay + offset * (self.rank - 11)
-        # dead (20-30) goes 150, 180, 210, 240, 270, 300, 330, 360 * 3
-        else:
-            delay = min(
-                delay
-                + offset * (self.rank - 11)
-                + offset * (self.rank - 20) * 2,
-                settings.BOUNDLESS_MAX_ITEM_DELAY,
-            )
-
-        return delay
-
-    @property
-    def next_update(self):
-        if self.last_update is None:
-            return timezone.now() - timedelta(minutes=1)
-        return self.last_update + timedelta(minutes=self.query_delay)
-
-
-class ItemBuyRank(ItemRank):
-    pass
-
-
-class ItemSellRank(ItemRank):
-    pass
-
-
-@receiver(post_save)
-def check_purge_cache(sender, **kwargs):
-    # only purge for Boundless related models
-    if "boundlexx.boundless.models" in repr(sender):
-        purge_cache()

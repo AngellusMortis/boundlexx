@@ -1,3 +1,6 @@
+from django.db.models import Q
+from django.http import Http404
+from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
@@ -9,6 +12,7 @@ from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
     WorldBlockColorsViewSerializer,
+    WorldDistanceSerializer,
     WorldPollLeaderboardSerializer,
     WorldPollResourcesSerializer,
     WorldPollSerializer,
@@ -20,7 +24,7 @@ from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
     TimeseriesMixin,
 )
-from boundlexx.boundless.models import World, WorldPoll
+from boundlexx.boundless.models import World, WorldDistance, WorldPoll
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
@@ -114,10 +118,6 @@ class WorldPollViewSet(
     serializer_class = WorldPollSerializer
     lookup_field = "id"
 
-    def get_queryset(self):
-        queryset = super().get_queryset()
-        return queryset
-
     def list(self, request, *args, **kwargs):  # noqa A003
         """
         Retrieves the list polls avaiable for give World
@@ -205,3 +205,64 @@ class WorldPollViewSet(
     resources.example = {
         "leaderboard": {"value": examples.WORLD_POLL_RESOURCES_EXAMPLE}
     }
+
+
+class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
+    queryset = WorldDistance.objects.filter(
+        world_source__active=True, world_dest__active=True
+    )
+    schema = DescriptiveAutoSchema(tags=["World"])
+    serializer_class = WorldDistanceSerializer
+    lookup_field = "world_id"
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+
+        lookup_field = self.lookup_url_kwarg or self.lookup_field
+        world_id = self.kwargs[lookup_field]
+
+        obj = get_object_or_404(
+            queryset, Q(world_source__id=world_id) | Q(world_dest__id=world_id)
+        )
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
+
+    def filter_queryset_by_parents_lookups(self, queryset):
+        parents_query_dict = self.get_parents_query_dict()
+
+        world_id = parents_query_dict.pop("world_source__id")
+        if world_id:
+            try:
+                return queryset.filter(
+                    Q(world_source__id=world_id) | Q(world_dest__id=world_id)
+                )
+            except ValueError:
+                raise Http404
+        else:
+            return queryset
+
+    def list(self, request, *args, **kwargs):  # noqa A003
+        """
+        Retrieves the list of distances to know worlds
+        """
+
+        return super().list(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    # list.example = {"list": {"value": get_list_example(examples.WORLD_POLL_EXAMPLE)}}  # type: ignore # noqa E501
+
+    def retrieve(
+        self, request, *args, **kwargs,
+    ):  # pylint: disable=arguments-differ
+        """
+        Retrieves the distance to a specific world
+        """
+        return super().retrieve(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    # retrieve.example = {"retrieve": {"value": examples.WORLD_POLL_EXAMPLE}}  # type: ignore # noqa E501

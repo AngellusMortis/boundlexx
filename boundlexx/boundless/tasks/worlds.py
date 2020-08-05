@@ -2,10 +2,11 @@ from typing import List
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.db.models import Q
 from django.utils import timezone
 
 from boundlexx.boundless.client import BoundlessClient
-from boundlexx.boundless.models import World, WorldPoll
+from boundlexx.boundless.models import World, WorldDistance, WorldPoll
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -60,6 +61,8 @@ def search_exo_worlds():
             worlds_found += 1
 
     logger.info("Found %s exo world(s)", worlds_found)
+    if len(worlds) > 0:
+        calculate_distances.delay([w.id for w in worlds])
 
 
 @app.task
@@ -78,13 +81,18 @@ def discover_all_worlds(start_id=None):
         chunks.append((chunk_lower, chunk_upper))
 
     worlds_found = 0
+    new_worlds = []
     for chunk in chunks:
         logger.info("Starting scan for worlds (%s, %s)", chunk[0], chunk[1])
 
-        created, _ = _scan_worlds(chunk[0], chunk[1])
+        created, worlds = _scan_worlds(chunk[0], chunk[1])
         worlds_found += created
 
+        new_worlds += worlds
+
     logger.info("Scan Complete. Found %s world(s)", worlds_found)
+    if len(new_worlds) > 0:
+        calculate_distances.delay([w.id for w in new_worlds])
 
 
 def _scan_worlds(lower, upper):
@@ -166,3 +174,40 @@ def poll_worlds(worlds=None):
             WorldPoll.objects.create_from_game_dict(
                 world_data, poll_data, world=world
             )
+
+
+@app.task
+def calculate_distances(world_ids=None):
+    if world_ids is None:
+        worlds = World.objects.filter(active=True)
+        all_worlds = worlds
+    else:
+        worlds = World.objects.filter(id__in=world_ids)
+        all_worlds = World.objects.filter(active=True)
+
+    client = BoundlessClient()
+
+    world_ids = {w.id for w in all_worlds}
+
+    for world in worlds:
+        world_distances = WorldDistance.objects.filter(
+            Q(world_source=world) | Q(world_dest=world)
+        )
+
+        world_distance_ids = set()
+        world_distance_ids.add(world.id)
+        for world_distance in world_distances:
+            world_distance_ids.add(world_distance.world_source.id)
+            world_distance_ids.add(world_distance.world_dest.id)
+
+        missing_distance_ids = world_ids.difference(world_distance_ids)
+
+        logger.info(
+            "Missing %s distance calulcation(s) for %s",
+            len(missing_distance_ids),
+            world,
+        )
+        for world_id in missing_distance_ids:
+            world_dest = World.objects.get(id=world_id)
+
+            world.get_distance_to_world(world_dest, client=client)
