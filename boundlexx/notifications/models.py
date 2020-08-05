@@ -62,6 +62,7 @@ class DiscordWebhookSubscription(SubscriptionBase):
         messages = message.split("%SPLIT_MESSAGE%")
 
         send_meantions = False
+        data_list = []
         for m in messages:
             if len(m.strip()) == 0:
                 continue
@@ -73,7 +74,9 @@ class DiscordWebhookSubscription(SubscriptionBase):
                 data = self._add_meantions_to_data(data, "users", self.users)
                 send_meantions = True
 
-            send_discord_webhook.delay(self.webhook_url, data)
+            data_list.append(data)
+
+        send_discord_webhook.delay(self.webhook_url, data_list)
 
 
 class NotificationBase(PolymorphicModel):

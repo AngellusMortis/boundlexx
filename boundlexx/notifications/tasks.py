@@ -11,21 +11,24 @@ logger = get_task_logger(__name__)
 
 
 @app.task
-def send_discord_webhook(webhook_url, data):
-    with cache.lock("discord_webhook:lock", expire=10):
+def send_discord_webhook(webhook_url, data_list):
+    with cache.lock("discord_webhook:lock", expire=10 * len(data_list)):
         cache_key = "discord_webhook:call"
         last_call = cache.get(cache_key) or 0
-        now = time.monotonic()
 
-        time_since = now - last_call
-        if time_since < 1:
-            time.sleep(1 - time_since)
+        for data in data_list:
+            now = time.monotonic()
 
-        response = requests.post(
-            webhook_url,
-            data=json.dumps(data),
-            headers={"Content-Type": "application/json"},
-        )
-        response.raise_for_status()
+            time_since = now - last_call
+            if time_since < 1:
+                time.sleep(1 - time_since)
 
-        cache.set(cache_key, time.monotonic())
+            response = requests.post(
+                webhook_url,
+                data=json.dumps(data),
+                headers={"Content-Type": "application/json"},
+            )
+            response.raise_for_status()
+
+            last_call = time.monotonic()
+            cache.set(cache_key, last_call)
