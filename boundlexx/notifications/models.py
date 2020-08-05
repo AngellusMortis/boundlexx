@@ -1,13 +1,18 @@
 from __future__ import annotations
 
-import json
-import time
+from typing import List
 
-import requests
 from django.contrib.auth import get_user_model
 from django.db import models
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django_celery_results.models import TaskResult
 from polymorphic.models import PolymorphicManager, PolymorphicModel
+
+from boundlexx.api.utils import get_base_url
+from boundlexx.celery.utils import get_output_for_task
+from boundlexx.notifications.tasks import send_discord_webhook
 
 User = get_user_model()
 
@@ -68,14 +73,7 @@ class DiscordWebhookSubscription(SubscriptionBase):
                 data = self._add_meantions_to_data(data, "users", self.users)
                 send_meantions = True
 
-            response = requests.post(
-                self.webhook_url,
-                data=json.dumps(data),
-                headers={"Content-Type": "application/json"},
-            )
-            response.raise_for_status()
-
-            time.sleep(1)
+            send_discord_webhook.delay(self.webhook_url, data)
 
 
 class NotificationBase(PolymorphicModel):
@@ -88,20 +86,30 @@ class NotificationBase(PolymorphicModel):
         raise NotImplementedError()
 
 
-class ExoworldNotificationManager(PolymorphicManager):
-    def send_new_notification(self, world_poll):
+class BaseNotificationManager(PolymorphicManager):
+    def send_notification(self, message):
         notifications = self.filter(active=True)
 
         for notification in notifications:
-            notification.subscription.send(
-                notification.markdown(world_poll.world, world_poll.resources)
-            )
+            notification.subscription.send(message)
+
+
+class MarkdownNotificationManager(PolymorphicManager):
+    def send_notification(self, *args):
+        notifications = self.filter(active=True)
+
+        for notification in notifications:
+            message = notification.markdown(*args)
+
+            notification.subscription.send(message)
+
+
+class ExoworldNotificationManager(MarkdownNotificationManager):
+    def send_new_notification(self, world_poll):
+        super().send_notification(world_poll.world, world_poll.resources)
 
     def send_update_notification(self, world):
-        notifications = self.filter(active=True)
-
-        for notification in notifications:
-            notification.subscription.send(notification.markdown(world))
+        super().send_notification(world)
 
 
 class ExoworldNotification(NotificationBase):
@@ -137,4 +145,49 @@ class ExoworldNotification(NotificationBase):
                 {"world": world, "resources": resources, "colors": colors},
             )
 
-        return message.replace("\xa0", " ").replace("&#x27;", "'")
+        return (
+            message.replace("\xa0", " ")
+            .replace("&#x27;", "'")
+            .replace("&quot;", "'")
+        )
+
+
+class FailedTaskNotification(NotificationBase):
+    objects = MarkdownNotificationManager()
+
+    def markdown(self, task):  # pylint: disable=arguments-differ
+        output = get_output_for_task(task)
+        output += task.traceback.split("\n")
+
+        messages = []
+        message: List[str] = []
+        for line in output:
+            if len("\n".join(message) + line) >= 1750:
+                messages.append(message)
+                message = []
+            message.append(line)
+        messages.append(message)
+
+        return (
+            render_to_string(
+                "boundlexx/notifications/failed_task.md",
+                {
+                    "task": task,
+                    "messages": messages,
+                    "base_url": get_base_url(),
+                },
+            )
+            .replace("\xa0", " ")
+            .replace("&#x27;", "'")
+            .replace("&quot;", "'")
+        )
+
+
+@receiver(post_save, sender=TaskResult)
+def task_failure_handler(sender, instance, **kwargs):
+    if (
+        instance.status == "FAILURE"
+        and instance.task_name
+        != "boundlexx.notifications.tasks.send_discord_webhook"
+    ):
+        FailedTaskNotification.objects.send_notification(instance)

@@ -140,9 +140,11 @@ def get_worlds(lower, upper, client=None):
 
 
 @app.task
-def poll_worlds(worlds=None):
-    if worlds is None:
+def poll_worlds(world_ids=None):
+    if world_ids is None:
         worlds = World.objects.filter(active=True)
+    else:
+        worlds = World.objects.filter(id__in=world_ids)
 
     client = BoundlessClient()
 
@@ -153,6 +155,9 @@ def poll_worlds(worlds=None):
         world_data, poll_data = client.get_world_poll_by_id(world.id)
 
         if world_data is None:
+            logger.info(
+                "World %s no longer in API, marking inactive...", world
+            )
             world.active = False
             world.save()
             continue

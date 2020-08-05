@@ -3,6 +3,7 @@ from django.contrib import admin
 from boundlexx.notifications.models import (
     DiscordWebhookSubscription,
     ExoworldNotification,
+    FailedTaskNotification,
 )
 
 
@@ -16,6 +17,14 @@ class DiscordWebhookSubscriptionAdmin(admin.ModelAdmin):
 
 @admin.register(ExoworldNotification)
 class ExoworldNotificationAdmin(admin.ModelAdmin):
+    list_display = [
+        "id",
+        "active",
+    ]
+
+
+@admin.register(FailedTaskNotification)
+class FailedTaskNotificationAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "active",
