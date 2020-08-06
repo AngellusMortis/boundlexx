@@ -1,6 +1,8 @@
 from django.http import Http404
+from django_filters.rest_framework import DjangoFilterBackend
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
+from boundlexx.api.views.filters import TimeseriesFilterSet
 from boundlexx.api.views.pagination import TimeseriesPagination
 
 
@@ -11,6 +13,10 @@ class DescriptiveAutoSchemaMixin:
 class TimeseriesMixin:
     is_timeseries = True
     pagination_class = TimeseriesPagination
+    filter_backends = [
+        DjangoFilterBackend,
+    ]
+    filterset_class = TimeseriesFilterSet
 
     def get_parents_query_dict(self):
         kwargs = super().get_parents_query_dict()  # type: ignore

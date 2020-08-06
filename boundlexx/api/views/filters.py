@@ -155,3 +155,15 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
             "world__name",
             "world__display_name",
         ]
+
+
+class TimeseriesFilterSet(FilterSet):
+    time = filters.DateTimeFromToRangeFilter(method="filter_time")
+
+    def filter_time(self, queryset, name, value):
+        if value.start is not None:
+            queryset = queryset.filter(time__gte=value.start)
+        if value.stop is not None:
+            queryset = queryset.filter(time__lte=value.stop)
+
+        return queryset
