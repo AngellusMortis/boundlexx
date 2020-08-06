@@ -13,6 +13,7 @@ from boundlexx.api.serializers import (
     ItemColorSerializer,
     ItemResourceCountSerializer,
     ItemResourceCountTimeSeriesSerializer,
+    ItemResourceCountTimeSeriesTBSerializer,
     ItemSerializer,
     SimpleWorldSerializer,
 )
@@ -154,6 +155,8 @@ class ItemResourceTimeseriesViewSet(
     schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = ResourceCount.objects.filter(world_poll__world__active=True)
     serializer_class = ItemResourceCountTimeSeriesSerializer
+    time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
+    number_fields = ["count"]
     lookup_field = "id"
 
     def get_queryset(self):

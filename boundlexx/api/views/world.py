@@ -19,6 +19,7 @@ from boundlexx.api.serializers import (
     WorldPollLeaderboardSerializer,
     WorldPollResourcesSerializer,
     WorldPollSerializer,
+    WorldPollTBSerializer,
     WorldSerializer,
 )
 from boundlexx.api.utils import get_list_example
@@ -106,17 +107,20 @@ class WorldPollViewSet(
     TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
 ):
     schema = DescriptiveAutoSchema(tags=["World"])
-    queryset = (
-        WorldPoll.objects.filter(world__active=True)
-        .prefetch_related(
-            "worldpollresult_set",
-            "leaderboardrecord_set",
-            "resourcecount_set",
-            "resourcecount_set__item",
-        )
-        .order_by("-time")
+    queryset = WorldPoll.objects.filter(world__active=True).prefetch_related(
+        "worldpollresult_set",
+        "leaderboardrecord_set",
+        "resourcecount_set",
+        "resourcecount_set__item",
     )
     serializer_class = WorldPollSerializer
+    time_bucket_serializer_class = WorldPollTBSerializer
+    number_fields = [
+        "worldpollresult__player_count",
+        "worldpollresult__beacon_count",
+        "worldpollresult__plot_count",
+        "worldpollresult__total_prestige",
+    ]
     lookup_field = "id"
 
     def list(self, request, *args, **kwargs):  # noqa A003

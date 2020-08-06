@@ -16,6 +16,14 @@ from boundlexx.boundless.models import (
 )
 
 
+class NullSerializer(serializers.Serializer):
+    def create(self, validated_data):
+        return
+
+    def update(self, instance, validated_data):
+        return
+
+
 class NestedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
     def get_url(
         self,
@@ -226,6 +234,13 @@ class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
         fields = ["time", "url", "item_url", "world", "count"]
 
 
+class ItemResourceCountTimeSeriesTBSerializer(NullSerializer):
+    time_bucket = serializers.DateTimeField(required=False)
+    average_count = serializers.IntegerField()
+    min_count = serializers.IntegerField()
+    max_count = serializers.IntegerField()
+
+
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail", lookup_field="id", read_only=True,
@@ -240,7 +255,7 @@ class WorldSerializer(serializers.ModelSerializer):
         view_name="world-block-colors", lookup_field="id", read_only=True,
     )
     distances_url = NestedHyperlinkedIdentityField(
-        view_name="world-distances-list",
+        view_name="world-distance-list",
         lookup_field=["id"],
         lookup_url_kwarg=["world_source__id"],
         read_only=True,
@@ -466,3 +481,47 @@ class WorldPollSerializer(serializers.ModelSerializer):
             "plot_count",
             "total_prestige",
         ]
+
+
+class WorldPollTBSerializer(NullSerializer):
+    time_bucket = serializers.DateTimeField(required=False)
+
+    average_player_count = serializers.IntegerField(
+        source="average_worldpollresult__player_count"
+    )
+    min_player_count = serializers.IntegerField(
+        source="min_worldpollresult__player_count"
+    )
+    max_player_count = serializers.IntegerField(
+        source="max_worldpollresult__player_count"
+    )
+
+    average_beacon_count = serializers.IntegerField(
+        source="average_worldpollresult__beacon_count"
+    )
+    min_beacon_count = serializers.IntegerField(
+        source="min_worldpollresult__beacon_count"
+    )
+    max_beacon_count = serializers.IntegerField(
+        source="max_worldpollresult__beacon_count"
+    )
+
+    average_plot_count = serializers.IntegerField(
+        source="average_worldpollresult__plot_count"
+    )
+    min_plot_count = serializers.IntegerField(
+        source="min_worldpollresult__plot_count"
+    )
+    max_plot_count = serializers.IntegerField(
+        source="max_worldpollresult__plot_count"
+    )
+
+    average_total_prestige = serializers.IntegerField(
+        source="average_worldpollresult__total_prestige"
+    )
+    min_total_prestige = serializers.IntegerField(
+        source="min_worldpollresult__total_prestige"
+    )
+    max_total_prestige = serializers.IntegerField(
+        source="max_worldpollresult__total_prestige"
+    )
