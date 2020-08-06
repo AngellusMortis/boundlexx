@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 import pytz
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -186,6 +187,10 @@ class World(models.Model):
 
     class Meta:
         ordering = ["id"]
+        indexes = [
+            GinIndex(fields=["name"]),
+            GinIndex(fields=["display_name"]),
+        ]
 
     name = models.CharField(_("Name"), max_length=64, null=True, db_index=True)
     display_name = models.CharField(

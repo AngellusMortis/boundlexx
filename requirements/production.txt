@@ -17,7 +17,7 @@ certifi==2020.6.20        # via requests
 cffi==1.14.1              # via argon2-cffi
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r /app/requirements/in/base.in, django-click
-cloudflare==2.8.8         # via -r /app/requirements/in/base.in
+cloudflare==2.8.9         # via -r /app/requirements/in/base.in
 colorama==0.4.3           # via -r /app/requirements/in/base.in
 coloredlogs==14.0         # via -r /app/requirements/in/base.in
 dateparser==0.7.6         # via -r /app/requirements/in/base.in
@@ -30,9 +30,10 @@ django-filter==2.3.0      # via -r /app/requirements/in/base.in
 django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
 django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
+django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-timezone-field, djangorestframework
-djangorestframework==3.11.0  # via -r /app/requirements/in/base.in, drf-extensions
+django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-timezone-field, djangorestframework
+djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, drf-extensions
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
 gevent-eventemitter==2.1  # via steam

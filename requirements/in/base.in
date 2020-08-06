@@ -9,6 +9,7 @@ django-filter
 django-model-utils
 django-polymorphic
 django-redis
+django-rest-fuzzysearch
 django<3.1
 djangorestframework
 drf-extensions

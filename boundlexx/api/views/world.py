@@ -1,3 +1,5 @@
+from typing import List
+
 from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
@@ -7,6 +9,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
@@ -28,26 +31,24 @@ from boundlexx.boundless.models import World, WorldDistance, WorldPoll
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = (
-        World.objects.filter(active=True)
-        .prefetch_related(
-            "worldblockcolor_set",
-            "worldblockcolor_set__item",
-            "worldblockcolor_set__color",
-        )
-        .order_by("id")
+    queryset = World.objects.filter(active=True).prefetch_related(
+        "worldblockcolor_set",
+        "worldblockcolor_set__item",
+        "worldblockcolor_set__color",
     )
     serializer_class = WorldSerializer
     lookup_field = "id"
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_class = WorldFilterSet
+    ordering = ["-rank", "id"]
+    ordering_fields: List[str] = []
     search_fields = [
-        "id",
         "name",
         "display_name",
-        "world_type",
-        "tier",
-        "region",
     ]
 
     def list(self, request, *args, **kwargs):  # noqa A003

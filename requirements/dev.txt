@@ -25,7 +25,7 @@ certifi==2020.6.20        # via requests
 cffi==1.14.1              # via argon2-cffi
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r /app/requirements/in/base.in, black, django-click, pip-tools
-cloudflare==2.8.8         # via -r /app/requirements/in/base.in
+cloudflare==2.8.9         # via -r /app/requirements/in/base.in
 colorama==0.4.3           # via -r /app/requirements/in/base.in
 coloredlogs==14.0         # via -r /app/requirements/in/base.in
 coverage[toml]==5.2.1     # via -r /app/requirements/in/dev.in, django-coverage-plugin, pytest-cov
@@ -38,15 +38,16 @@ django-click==2.2.0       # via -r /app/requirements/in/base.in
 django-coverage-plugin==1.8.0  # via -r /app/requirements/in/dev.in
 django-debug-toolbar==2.2  # via -r /app/requirements/in/dev.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
-django-extensions==3.0.3  # via -r /app/requirements/in/dev.in
+django-extensions==3.0.4  # via -r /app/requirements/in/dev.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
 django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
 django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
+django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-stubs==1.5.0       # via -r /app/requirements/in/dev.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-stubs, django-timezone-field, djangorestframework
-djangorestframework==3.11.0  # via -r /app/requirements/in/base.in, drf-extensions
+django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-stubs, django-timezone-field, djangorestframework
+djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, drf-extensions
 docutils==0.16            # via sphinx
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 factory-boy==2.12.0       # via -r /app/requirements/in/dev.in
@@ -112,7 +113,7 @@ pycryptodomex==3.9.8      # via steam
 pyflakes==2.2.0           # via flake8
 pygments==2.6.1           # via ipython, sphinx
 pylint-celery==0.3        # via -r /app/requirements/in/dev.in
-pylint-django==2.2.0      # via -r /app/requirements/in/dev.in
+pylint-django==2.3.0      # via -r /app/requirements/in/dev.in
 pylint-plugin-utils==0.6  # via pylint-celery, pylint-django
 pylint==2.5.3             # via pylint-celery, pylint-django, pylint-plugin-utils
 pyparsing==2.4.7          # via packaging
@@ -133,7 +134,7 @@ regex==2020.7.14          # via black, dateparser
 requests-oauthlib==1.3.0  # via google-auth-oauthlib
 requests==2.24.0          # via cloudflare, gspread, requests-oauthlib, sphinx, steam
 rsa==4.6                  # via google-auth
-six==1.15.0               # via argon2-cffi, astroid, bandit, django-coverage-plugin, django-extensions, google-auth, jsonlines, packaging, pip-tools, protobuf, python-dateutil, steam, traitlets
+six==1.15.0               # via argon2-cffi, astroid, bandit, django-coverage-plugin, google-auth, jsonlines, packaging, pip-tools, protobuf, python-dateutil, steam, traitlets
 smmap==3.0.4              # via gitdb
 snowballstemmer==2.0.0    # via sphinx
 soupsieve==2.0.1          # via beautifulsoup4
