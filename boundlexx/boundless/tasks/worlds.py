@@ -154,6 +154,8 @@ def poll_worlds(world_ids=None):
 
         logger.info("Polling world %s", world.display_name)
         world_data, poll_data = client.get_world_poll_by_id(world.id)
+        logger.debug(world_data)
+        logger.debug(poll_data)
 
         if world_data is None:
             logger.info(
