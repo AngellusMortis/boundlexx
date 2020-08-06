@@ -428,6 +428,21 @@ BOUNDLESS_WORLD_LIQUIDS = {
     "BURN": ("Lava", "Lava"),
     "UMBRIS": ("Lava", "Water"),
 }
+BOUNDLESS_WORLD_TYPE_MAPPING = {
+    1: "LUSH",
+    2: "COAL",
+    3: "METAL",
+    4: "CORROSIVE",
+    5: "BURN",
+    6: "CHILL",
+    7: "TOXIC",
+    8: "SHOCK",
+    9: "BLAST",
+    10: "RIFT",
+    11: "BLINK",
+    12: "UMBRIS",
+}
+
 BOUNDLESS_TRANSFORMATION_GROUPS = {
     10842: [10806],  # Ice
     10806: [10842],  # Glacier

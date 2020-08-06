@@ -21,6 +21,7 @@ def update_perm_worlds():
 
     worlds_created = 0
     for world_dict in worlds:
+        logger.debug(world_dict)
         _, created = World.objects.get_or_create_from_game_dict(world_dict)
 
         if created:
@@ -165,6 +166,7 @@ def poll_worlds(world_ids=None):
             world.save()
             continue
 
+        logger.debug(world_data)
         world, _ = World.objects.get_or_create_from_game_dict(world_data)
 
         if world.is_locked or (

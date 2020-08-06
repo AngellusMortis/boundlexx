@@ -76,9 +76,15 @@ class WorldManager(models.Manager):
         world.name = world_dict["name"]
         world.region = world_dict["region"]
         world.tier = world_dict["tier"]
-        world.description = world_dict.get("worldDescription")
         world.size = world_dict["worldSize"]
-        world.world_type = world_dict["worldType"]
+        if settings.BOUNDLESS_TESTING_FEATURES:
+            world.world_type = settings.BOUNDLESS_WORLD_TYPE_MAPPING.get(
+                world_dict["worldType"]
+            )
+            world.description = None
+        else:
+            world.world_type = world_dict["worldType"]
+            world.description = world_dict["worldDescription"]
         world.time_offset = datetime.utcfromtimestamp(
             world_dict["timeOffset"]
         ).replace(tzinfo=pytz.utc)
@@ -159,7 +165,7 @@ class World(models.Model):
         REGION_USW = "usw", _("US West")
         REGION_EUC = "euc", _("EU Central")
         REGION_AUS = "aus", _("Australia")
-        REGION_CREATIVE = "creative", _("Creative")
+        REGION_CREATIVE = "sandbox", _("Sandbox")
 
     class Tier(models.IntegerChoices):
         TIER_1 = 0, _("Placid (1)")
