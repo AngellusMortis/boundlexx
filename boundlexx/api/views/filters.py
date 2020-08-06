@@ -163,8 +163,9 @@ class TimeseriesFilterSet(FilterSet):
         label=_(
             "Filters based on a given time contraint. `time_after` sets "
             "lower bound and `time_before` sets upper bound. Format is "
-            "`YYYY-MM-DD HH:MM`. Time is specified in local timezone; "
-            "automatically handles and converts to proper time."
+            "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
+            "local timezone;  automatically handles and converts to proper "
+            "time."
         ),
     )
 

@@ -25,6 +25,18 @@ item_viewset.register(
     basename="item-colors",
     parents_query_lookups=["item__game_id"],
 )
+item_viewset.register(
+    "resource-timeseries",
+    views.ItemResourceWorldListViewSet,
+    basename="item-resource-world",
+    parents_query_lookups=["item__game_id"],
+)
+item_viewset.register(
+    r"resource-timeseries/(?P<world_poll__world_id>\d+)",
+    views.ItemResourceTimeseriesViewSet,
+    basename="item-resource-timeseries",
+    parents_query_lookups=["item__game_id"],
+)
 
 world_viewset = router.register("worlds", views.WorldViewSet, basename="world")
 world_viewset.register(

@@ -220,6 +220,12 @@ class ItemResourceCountSerializer(serializers.ModelSerializer):
         fields = ["url", "item_url", "world", "count"]
 
 
+class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
+    class Meta:
+        model = ResourceCount
+        fields = ["time", "url", "item_url", "world", "count"]
+
+
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail", lookup_field="id", read_only=True,

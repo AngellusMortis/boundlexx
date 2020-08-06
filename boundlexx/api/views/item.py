@@ -4,7 +4,7 @@ from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters, mixins, viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
@@ -12,7 +12,9 @@ from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
     ItemColorSerializer,
     ItemResourceCountSerializer,
+    ItemResourceCountTimeSeriesSerializer,
     ItemSerializer,
+    SimpleWorldSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import (
@@ -20,8 +22,16 @@ from boundlexx.api.views.filters import (
     ItemResourceCountFilterSet,
     LocalizationFilterSet,
 )
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
-from boundlexx.boundless.models import Item, ResourceCount, WorldBlockColor
+from boundlexx.api.views.mixins import (
+    DescriptiveAutoSchemaMixin,
+    TimeseriesMixin,
+)
+from boundlexx.boundless.models import (
+    Item,
+    ResourceCount,
+    World,
+    WorldBlockColor,
+)
 
 ITEM_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/items/9427/",
@@ -64,6 +74,25 @@ ITEM_COLORS_EXAMPLE = {
     "is_new_color": True,
     "exist_on_perm": True,
     "exist_via_transform": None,
+}
+
+ITEM_RESOURCES_WORLD_LIST_EXAMPLE = {
+    "url": f"{get_base_url()}/api/v1/worlds/1/",
+    "id": 1,
+    "display_name": "Sochaltin I",
+}
+
+
+ITEM_RESOURCE_TIMESERIES_EXAMPLE = {
+    "time": "2020-08-04T09:09:50.136765-04:00",
+    "url": f"{get_base_url()}/api/v1/items/32779/resource-counts/1/",
+    "item_url": f"{get_base_url()}/api/v1/items/32779/",
+    "world": {
+        "url": f"{get_base_url()}/api/v1/worlds/1/",
+        "id": 1,
+        "display_name": "Sochaltin I",
+    },
+    "count": 6051899,
 }
 
 
@@ -117,6 +146,80 @@ class ItemViewSet(
         )
 
     retrieve.example = {"retrieve": {"value": ITEM_EXAMPLE}}  # type: ignore # noqa E501
+
+
+class ItemResourceTimeseriesViewSet(
+    TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
+):
+    schema = DescriptiveAutoSchema(tags=["Item"])
+    queryset = ResourceCount.objects.filter(world_poll__world__active=True)
+    serializer_class = ItemResourceCountTimeSeriesSerializer
+    lookup_field = "id"
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if queryset.count() == 0:
+            raise Http404
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):  # noqa A003
+        """
+        Retrieves the list resource counts for a give item/world combination
+        """
+
+        return super().list(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_TIMESERIES_EXAMPLE)}}  # type: ignore # noqa E501
+
+    def retrieve(
+        self, request, *args, **kwargs,
+    ):  # pylint: disable=arguments-differ
+        """
+        Retrieves a specific resource counts for a give item/world combination
+        """
+        return super().retrieve(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_TIMESERIES_EXAMPLE}}  # type: ignore # noqa E501
+
+
+class ItemResourceWorldListViewSet(
+    NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    schema = DescriptiveAutoSchema(tags=["Item"])
+    serializer_class = SimpleWorldSerializer
+
+    def get_queryset(self):
+        item_id = self.kwargs.get("item__game_id")
+
+        queryset = World.objects.all()
+
+        if item_id is not None:
+            queryset = queryset.filter(
+                worldpoll__resourcecount__item__game_id=item_id
+            ).distinct("id")
+
+        if queryset.count() == 0:
+            raise Http404
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):  # noqa A003
+        """
+        Retrieves the list of worlds that has this resource on item
+        timeseries lookup
+        """
+
+        return super().list(  # pylint: disable=no-member
+            request, *args, **kwargs
+        )
+
+    list.example = {"list": {"value": get_list_example(ITEM_RESOURCES_WORLD_LIST_EXAMPLE)}}  # type: ignore # noqa E501
 
 
 class ItemResourceCountViewSet(
