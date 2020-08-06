@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Dict
 
 from django.conf import settings
+from django.contrib.postgres.indexes import GinIndex
 from django.core.cache import cache
 from django.db import models
 from django.utils.functional import cached_property
@@ -56,6 +57,9 @@ class LocalizedName(PolymorphicModel):
 
     class Meta:
         unique_together = ("game_obj", "lang")
+        indexes = [
+            GinIndex(fields=["name"]),
+        ]
 
     def __str__(self):
         return f"{self.lang}: {self.name}"
@@ -156,6 +160,11 @@ class Item(GameObj):
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )
     string_id = models.CharField(_("String ID"), max_length=64)
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=["string_id"]),
+        ]
 
     @property
     def default_name(self):  # pylint: disable=invalid-overridden-method

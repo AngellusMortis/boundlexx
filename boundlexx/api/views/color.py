@@ -1,11 +1,17 @@
+from typing import List
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import BlockColorSerializer, ColorSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import LocalizationFilterSet
+from boundlexx.api.views.filters import (
+    LocalizationFilterSet,
+    WorldBlockColorFilterSet,
+)
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Color, WorldBlockColor
 
@@ -38,16 +44,20 @@ COLOR_BLOCKS_EXAMPLE = {
 
 
 class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = (
-        Color.objects.filter(active=True)
-        .prefetch_related("localizedname_set", "colorvalue_set")
-        .order_by("game_id")
+    queryset = Color.objects.filter(active=True).prefetch_related(
+        "localizedname_set", "colorvalue_set"
     )
     serializer_class = ColorSerializer
     lookup_field = "game_id"
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_class = LocalizationFilterSet
-    search_fields = ["game_id", "localizedname__name"]
+    search_fields = ["localizedname__name"]
+    ordering = ["-rank", "game_id"]
+    ordering_fields: List[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -78,11 +88,28 @@ class BlockColorViewSet(
 ):
     schema = DescriptiveAutoSchema(tags=["Color"])
     queryset = WorldBlockColor.objects.select_related(
-        "item", "world"
-    ).order_by("item__game_id")
+        "item", "world", "item__item_subtitle",
+    ).prefetch_related(
+        "item__localizedname_set", "item__item_subtitle__localizedname_set",
+    )
 
     serializer_class = BlockColorSerializer
     lookup_field = "item__game_id"
+    filter_backends = [
+        DjangoFilterBackend,
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = WorldBlockColorFilterSet
+    search_fields = [
+        "item__string_id",
+        "item__item_subtitle__localizedname__name",
+        "item__localizedname__name",
+        "world__name",
+        "world__display_name",
+    ]
+    ordering = ["-rank", "item__game_id"]
+    ordering_fields: List[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
