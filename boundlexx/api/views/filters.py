@@ -17,10 +17,10 @@ class LocalizationFilterSet(FilterSet):
 
 class WorldFilterSet(FilterSet):
     is_exo = filters.BooleanFilter(
-        label="Filter out exo/non exoworlds", method="filter_exo"
+        label=_("Filter out exo/non exoworlds"), method="filter_exo"
     )
     is_sovereign = filters.BooleanFilter(
-        label="Filter out Sovereign/non Sovereign worlds",
+        label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
     )
 
@@ -58,10 +58,10 @@ class WorldFilterSet(FilterSet):
 
 class WorldBlockColorFilterSet(FilterSet):
     is_exo = filters.BooleanFilter(
-        label="Filter out exo/non exoworlds", method="filter_exo"
+        label=_("Filter out exo/non exoworlds"), method="filter_exo"
     )
     is_sovereign = filters.BooleanFilter(
-        label="Filter out Sovereign/non Sovereign worlds",
+        label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
     )
 
@@ -103,10 +103,10 @@ class WorldBlockColorFilterSet(FilterSet):
 
 class ItemResourceCountFilterSet(FilterSet):
     is_exo = filters.BooleanFilter(
-        label="Filter out exo/non exoworlds", method="filter_exo"
+        label=_("Filter out exo/non exoworlds"), method="filter_exo"
     )
     is_sovereign = filters.BooleanFilter(
-        label="Filter out Sovereign/non Sovereign worlds",
+        label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
     )
 
@@ -158,7 +158,15 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
 
 
 class TimeseriesFilterSet(FilterSet):
-    time = filters.DateTimeFromToRangeFilter(method="filter_time")
+    time = filters.DateTimeFromToRangeFilter(
+        method="filter_time",
+        label=_(
+            "Filters based on a given time contraint. `time_after` sets "
+            "lower bound and `time_before` sets upper bound. Format is "
+            "`YYYY-MM-DD HH:MM`. Time is specified in local timezone; "
+            "automatically handles and converts to proper time."
+        ),
+    )
 
     def filter_time(self, queryset, name, value):
         if value.start is not None:
