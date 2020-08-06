@@ -83,12 +83,14 @@ class TimeseriesMixin:
                 values_list.append(variance_field)
 
             if is_bucket:
-                queryset = queryset.annotate(**aggregate_args)
+                queryset = queryset.values("time_bucket").annotate(
+                    **aggregate_args
+                )
             else:
                 queryset = [queryset.aggregate(**aggregate_args)]
 
         if is_bucket:
-            queryset = queryset.values(*values_list).order_by("time_bucket")
+            queryset = queryset.values(*values_list).order_by("-time_bucket")
 
         serializer = self.time_bucket_serializer_class(  # pylint: disable=not-callable  # noqa: E501
             queryset, many=True
