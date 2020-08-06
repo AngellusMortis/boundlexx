@@ -48,7 +48,7 @@ world_viewset.register(
 world_viewset.register(
     "distances",
     views.WorldDistanceViewSet,
-    basename="world-distances",
+    basename="world-distance",
     parents_query_lookups=["world_source__id"],
 )
 

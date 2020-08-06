@@ -174,6 +174,7 @@ class ItemResourceTimeseriesViewSet(
         )
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_TIMESERIES_EXAMPLE)}}  # type: ignore # noqa E501
+    list.operation_id = "list-item-resource-timeseries"  # type: ignore # noqa E501
 
     def retrieve(
         self, request, *args, **kwargs,
