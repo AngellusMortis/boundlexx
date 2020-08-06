@@ -478,19 +478,17 @@ class WorldPollSerializer(serializers.ModelSerializer):
 
 class ItemResourceCountTimeSeriesTBSerializer(NullSerializer):
     time_bucket = serializers.DateTimeField(required=False)
-    count_average = serializers.DecimalField(max_digits=13, decimal_places=3)
+    count_average = serializers.FloatField()
     count_min = serializers.IntegerField()
     count_max = serializers.IntegerField()
-    count_stddev = serializers.DecimalField(max_digits=13, decimal_places=3)
-    count_variance = serializers.DecimalField(max_digits=13, decimal_places=3)
+    count_stddev = serializers.FloatField()
+    count_variance = serializers.FloatField()
 
 
 class WorldPollTBSerializer(NullSerializer):
     time_bucket = serializers.DateTimeField(required=False)
 
-    player_count_average = serializers.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    player_count_average = serializers.FloatField(
         source="worldpollresult__player_count_average",
     )
     player_count_min = serializers.IntegerField(
@@ -499,20 +497,14 @@ class WorldPollTBSerializer(NullSerializer):
     player_count_max = serializers.IntegerField(
         source="worldpollresult__player_count_max"
     )
-    player_count_stddev = serializers.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    player_count_stddev = serializers.FloatField(
         source="worldpollresult__player_count_stddev",
     )
-    player_count_variance = serializers.DecimalField(
-        max_digits=8,
-        decimal_places=3,
+    player_count_variance = serializers.FloatField(
         source="worldpollresult__player_count_variance",
     )
 
-    beacon_count_average = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    beacon_count_average = serializers.FloatField(
         source="worldpollresult__beacon_count_average",
     )
     beacon_count_min = serializers.IntegerField(
@@ -521,20 +513,14 @@ class WorldPollTBSerializer(NullSerializer):
     beacon_count_max = serializers.IntegerField(
         source="worldpollresult__beacon_count_max"
     )
-    beacon_count_stddev = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    beacon_count_stddev = serializers.FloatField(
         source="worldpollresult__beacon_count_stddev",
     )
-    beacon_count_variance = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    beacon_count_variance = serializers.FloatField(
         source="worldpollresult__beacon_count_variance",
     )
 
-    plot_count_average = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    plot_count_average = serializers.FloatField(
         source="worldpollresult__plot_count_average",
     )
     plot_count_min = serializers.IntegerField(
@@ -543,20 +529,14 @@ class WorldPollTBSerializer(NullSerializer):
     plot_count_max = serializers.IntegerField(
         source="worldpollresult__plot_count_max"
     )
-    plot_count_stddev = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    plot_count_stddev = serializers.FloatField(
         source="worldpollresult__plot_count_stddev",
     )
-    plot_count_variance = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    plot_count_variance = serializers.FloatField(
         source="worldpollresult__plot_count_variance",
     )
 
-    total_prestige_average = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    total_prestige_average = serializers.FloatField(
         source="worldpollresult__total_prestige_average",
     )
     total_prestige_min = serializers.IntegerField(
@@ -565,13 +545,9 @@ class WorldPollTBSerializer(NullSerializer):
     total_prestige_max = serializers.IntegerField(
         source="worldpollresult__total_prestige_max"
     )
-    total_prestige_stddev = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    total_prestige_stddev = serializers.FloatField(
         source="worldpollresult__total_prestige_stddev",
     )
-    total_prestige_variance = serializers.DecimalField(
-        max_digits=13,
-        decimal_places=3,
+    total_prestige_variance = serializers.FloatField(
         source="worldpollresult__total_prestige_variance",
     )
