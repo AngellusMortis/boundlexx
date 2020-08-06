@@ -1,9 +1,12 @@
+from typing import List
+
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
@@ -12,7 +15,11 @@ from boundlexx.api.serializers import (
     ItemSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import LocalizationFilterSet
+from boundlexx.api.views.filters import (
+    ItemColorFilterSet,
+    ItemResourceCountFilterSet,
+    LocalizationFilterSet,
+)
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Item, ResourceCount, WorldBlockColor
 
@@ -71,13 +78,18 @@ class ItemViewSet(
             "item_subtitle__localizedname_set",
             "worldblockcolor_set",
         )
-        .order_by("game_id")
     )
     serializer_class = ItemSerializer
     lookup_field = "game_id"
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filter_backends = [
+        DjangoFilterBackend,
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
     filterset_class = LocalizationFilterSet
-    search_fields = ["game_id", "string_id", "localizedname__name"]
+    search_fields = ["string_id", "localizedname__name"]
+    ordering = ["-rank", "game_id"]
+    ordering_fields: List[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -111,18 +123,24 @@ class ItemResourceCountViewSet(
     NestedViewSetMixin, viewsets.ReadOnlyModelViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Item"])
-    queryset = (
-        ResourceCount.objects.filter(
-            world_poll__active=True, world_poll__world__active=True
-        )
-        .select_related("world_poll", "world_poll__world")
-        .order_by("world_poll__world_id")
-    )
+    queryset = ResourceCount.objects.filter(
+        world_poll__active=True, world_poll__world__active=True
+    ).select_related("world_poll", "world_poll__world")
 
     serializer_class = ItemResourceCountSerializer
     lookup_field = "world_id"
-    filter_backends = [filters.SearchFilter]
-    search_fields = ["world_poll__world__display_name"]
+    filter_backends = [
+        DjangoFilterBackend,
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = ItemResourceCountFilterSet
+    search_fields = [
+        "world_poll__world__display_name",
+        "world_poll__world__name",
+    ]
+    ordering = ["-rank", "world_poll__world_id"]
+    ordering_fields: List[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -184,11 +202,23 @@ class ItemColorsViewSet(
 ):
     schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = WorldBlockColor.objects.select_related(
-        "color", "world"
-    ).order_by("color__game_id")
-
+        "color", "world", "item",
+    ).prefetch_related("color__localizedname_set")
     serializer_class = ItemColorSerializer
     lookup_field = "color__game_id"
+    filter_backends = [
+        DjangoFilterBackend,
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
+    filterset_class = ItemColorFilterSet
+    search_fields = [
+        "color__localizedname__name",
+        "world__display_name",
+        "world__name",
+    ]
+    ordering = ["-rank", "color__game_id"]
+    ordering_fields: List[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
