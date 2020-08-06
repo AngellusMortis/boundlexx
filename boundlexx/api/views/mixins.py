@@ -1,6 +1,6 @@
 from typing import Dict, List, Optional
 
-from django.db.models import Avg, Func, Max, Min
+from django.db.models import Avg, Func, Max, Min, StdDev, Variance
 from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.decorators import action
@@ -64,17 +64,23 @@ class TimeseriesMixin:
         if len(self.number_fields) > 0:
             aggregate_args: Dict[str, Func] = {}
             for field in self.number_fields:
-                avg_field = "average_" + field
-                min_field = "min_" + field
-                max_field = "max_" + field
+                avg_field = field + "_average"
+                min_field = field + "_min"
+                max_field = field + "_max"
+                stddev_field = field + "_stddev"
+                variance_field = field + "_variance"
 
                 aggregate_args[avg_field] = Avg(field)
                 aggregate_args[min_field] = Min(field)
                 aggregate_args[max_field] = Max(field)
+                aggregate_args[stddev_field] = StdDev(field)
+                aggregate_args[variance_field] = Variance(field)
 
                 values_list.append(avg_field)
                 values_list.append(min_field)
                 values_list.append(max_field)
+                values_list.append(stddev_field)
+                values_list.append(variance_field)
 
             if is_bucket:
                 queryset = queryset.annotate(**aggregate_args)

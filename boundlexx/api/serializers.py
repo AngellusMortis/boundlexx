@@ -234,13 +234,6 @@ class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
         fields = ["time", "url", "item_url", "world", "count"]
 
 
-class ItemResourceCountTimeSeriesTBSerializer(NullSerializer):
-    time_bucket = serializers.DateTimeField(required=False)
-    average_count = serializers.IntegerField()
-    min_count = serializers.IntegerField()
-    max_count = serializers.IntegerField()
-
-
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail", lookup_field="id", read_only=True,
@@ -483,45 +476,102 @@ class WorldPollSerializer(serializers.ModelSerializer):
         ]
 
 
+class ItemResourceCountTimeSeriesTBSerializer(NullSerializer):
+    time_bucket = serializers.DateTimeField(required=False)
+    count_average = serializers.DecimalField(max_digits=13, decimal_places=3)
+    count_min = serializers.IntegerField()
+    count_max = serializers.IntegerField()
+    count_stddev = serializers.DecimalField(max_digits=13, decimal_places=3)
+    count_variance = serializers.DecimalField(max_digits=13, decimal_places=3)
+
+
 class WorldPollTBSerializer(NullSerializer):
     time_bucket = serializers.DateTimeField(required=False)
 
-    average_player_count = serializers.IntegerField(
-        source="average_worldpollresult__player_count"
+    player_count_average = serializers.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        source="worldpollresult__player_count_average",
     )
-    min_player_count = serializers.IntegerField(
-        source="min_worldpollresult__player_count"
+    player_count_min = serializers.IntegerField(
+        source="worldpollresult__player_count_min"
     )
-    max_player_count = serializers.IntegerField(
-        source="max_worldpollresult__player_count"
+    player_count_max = serializers.IntegerField(
+        source="worldpollresult__player_count_max"
     )
-
-    average_beacon_count = serializers.IntegerField(
-        source="average_worldpollresult__beacon_count"
+    player_count_stddev = serializers.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        source="worldpollresult__player_count_stddev",
     )
-    min_beacon_count = serializers.IntegerField(
-        source="min_worldpollresult__beacon_count"
-    )
-    max_beacon_count = serializers.IntegerField(
-        source="max_worldpollresult__beacon_count"
-    )
-
-    average_plot_count = serializers.IntegerField(
-        source="average_worldpollresult__plot_count"
-    )
-    min_plot_count = serializers.IntegerField(
-        source="min_worldpollresult__plot_count"
-    )
-    max_plot_count = serializers.IntegerField(
-        source="max_worldpollresult__plot_count"
+    player_count_variance = serializers.DecimalField(
+        max_digits=8,
+        decimal_places=3,
+        source="worldpollresult__player_count_variance",
     )
 
-    average_total_prestige = serializers.IntegerField(
-        source="average_worldpollresult__total_prestige"
+    beacon_count_average = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__beacon_count_average",
     )
-    min_total_prestige = serializers.IntegerField(
-        source="min_worldpollresult__total_prestige"
+    beacon_count_min = serializers.IntegerField(
+        source="worldpollresult__beacon_count_min"
     )
-    max_total_prestige = serializers.IntegerField(
-        source="max_worldpollresult__total_prestige"
+    beacon_count_max = serializers.IntegerField(
+        source="worldpollresult__beacon_count_max"
+    )
+    beacon_count_stddev = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__beacon_count_stddev",
+    )
+    beacon_count_variance = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__beacon_count_variance",
+    )
+
+    plot_count_average = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__plot_count_average",
+    )
+    plot_count_min = serializers.IntegerField(
+        source="worldpollresult__plot_count_min"
+    )
+    plot_count_max = serializers.IntegerField(
+        source="worldpollresult__plot_count_max"
+    )
+    plot_count_stddev = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__plot_count_stddev",
+    )
+    plot_count_variance = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__plot_count_variance",
+    )
+
+    total_prestige_average = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__total_prestige_average",
+    )
+    total_prestige_min = serializers.IntegerField(
+        source="worldpollresult__total_prestige_min"
+    )
+    total_prestige_max = serializers.IntegerField(
+        source="worldpollresult__total_prestige_max"
+    )
+    total_prestige_stddev = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__total_prestige_stddev",
+    )
+    total_prestige_variance = serializers.DecimalField(
+        max_digits=13,
+        decimal_places=3,
+        source="worldpollresult__total_prestige_variance",
     )
