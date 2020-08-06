@@ -76,7 +76,7 @@ class WorldManager(models.Manager):
         world.name = world_dict["name"]
         world.region = world_dict["region"]
         world.tier = world_dict["tier"]
-        world.description = world_dict["worldDescription"]
+        world.description = world_dict.get("worldDescription")
         world.size = world_dict["worldSize"]
         world.world_type = world_dict["worldType"]
         world.time_offset = datetime.utcfromtimestamp(
