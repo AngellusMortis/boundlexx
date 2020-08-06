@@ -102,6 +102,7 @@ def _scan_worlds(lower, upper):
     worlds_found = 0
     world_objs = []
     for world_dict in worlds:
+        logger.debug(world_dict)
         world, created = World.objects.get_or_create_from_game_dict(
             world_dict["worldData"]
         )
