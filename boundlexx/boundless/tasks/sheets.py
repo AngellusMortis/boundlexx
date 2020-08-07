@@ -13,9 +13,13 @@ logger = get_task_logger(__name__)
 
 
 def _get_lifetimes(raw_lifetime):
-    start, end = raw_lifetime.strip().split(",")
-    start = int(start)
-    end = int(end)
+    parts = raw_lifetime.strip().split(",")
+
+    if len(parts) != 2:
+        return None, None
+
+    start = int(parts[0])
+    end = int(parts[1])
 
     if end == 0:
         return None, None
