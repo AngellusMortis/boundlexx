@@ -479,6 +479,8 @@ class WorldPollSerializer(serializers.ModelSerializer):
 class ItemResourceCountTimeSeriesTBSerializer(NullSerializer):
     time_bucket = serializers.DateTimeField(required=False)
     count_average = serializers.FloatField()
+    count_mode = serializers.IntegerField()
+    count_median = serializers.IntegerField()
     count_min = serializers.IntegerField()
     count_max = serializers.IntegerField()
     count_stddev = serializers.FloatField()
@@ -490,6 +492,12 @@ class WorldPollTBSerializer(NullSerializer):
 
     player_count_average = serializers.FloatField(
         source="worldpollresult__player_count_average",
+    )
+    player_count_mode = serializers.IntegerField(
+        source="worldpollresult__player_count_mode"
+    )
+    player_count_median = serializers.IntegerField(
+        source="worldpollresult__player_count_median"
     )
     player_count_min = serializers.IntegerField(
         source="worldpollresult__player_count_min"
@@ -507,6 +515,12 @@ class WorldPollTBSerializer(NullSerializer):
     beacon_count_average = serializers.FloatField(
         source="worldpollresult__beacon_count_average",
     )
+    beacon_count_mode = serializers.IntegerField(
+        source="worldpollresult__beacon_count_mode"
+    )
+    beacon_count_median = serializers.IntegerField(
+        source="worldpollresult__beacon_count_median"
+    )
     beacon_count_min = serializers.IntegerField(
         source="worldpollresult__beacon_count_min"
     )
@@ -523,6 +537,12 @@ class WorldPollTBSerializer(NullSerializer):
     plot_count_average = serializers.FloatField(
         source="worldpollresult__plot_count_average",
     )
+    plot_count_mode = serializers.IntegerField(
+        source="worldpollresult__plot_count_mode"
+    )
+    plot_count_median = serializers.IntegerField(
+        source="worldpollresult__plot_count_median"
+    )
     plot_count_min = serializers.IntegerField(
         source="worldpollresult__plot_count_min"
     )
@@ -538,6 +558,12 @@ class WorldPollTBSerializer(NullSerializer):
 
     total_prestige_average = serializers.FloatField(
         source="worldpollresult__total_prestige_average",
+    )
+    total_prestige_mode = serializers.IntegerField(
+        source="worldpollresult__total_prestige_mode"
+    )
+    total_prestige_median = serializers.IntegerField(
+        source="worldpollresult__total_prestige_median"
     )
     total_prestige_min = serializers.IntegerField(
         source="worldpollresult__total_prestige_min"

@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
+from boundlexx.api.db import Median, Mode
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.views.filters import TimeseriesFilterSet
 from boundlexx.api.views.pagination import TimeseriesPagination
@@ -25,6 +26,7 @@ class TimeseriesMixin:
     filterset_class = TimeseriesFilterSet
     time_bucket_serializer_class: Optional[BaseSerializer] = None
     number_fields: List[str] = []
+    stats_functions = [Avg, Mode, Median, Min, Max, StdDev, Variance]
 
     def get_queryset(self):
         return super().get_queryset().order_by("-time")  # type: ignore
@@ -64,23 +66,15 @@ class TimeseriesMixin:
         if len(self.number_fields) > 0:
             aggregate_args: Dict[str, Func] = {}
             for field in self.number_fields:
-                avg_field = field + "_average"
-                min_field = field + "_min"
-                max_field = field + "_max"
-                stddev_field = field + "_stddev"
-                variance_field = field + "_variance"
+                for func in self.stats_functions:
+                    name = func.__name__.lower()
 
-                aggregate_args[avg_field] = Avg(field)
-                aggregate_args[min_field] = Min(field)
-                aggregate_args[max_field] = Max(field)
-                aggregate_args[stddev_field] = StdDev(field)
-                aggregate_args[variance_field] = Variance(field)
+                    if name == "avg":
+                        name = "average"
 
-                values_list.append(avg_field)
-                values_list.append(min_field)
-                values_list.append(max_field)
-                values_list.append(stddev_field)
-                values_list.append(variance_field)
+                    stat_field = f"{field}_{name}"
+                    aggregate_args[stat_field] = func(field)
+                    values_list.append(stat_field)
 
             if is_bucket:
                 queryset = queryset.values("time_bucket").annotate(
