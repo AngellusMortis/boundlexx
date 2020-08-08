@@ -84,13 +84,13 @@ class ItemShopPrice(models.Model):
 
 
 class ItemShopStandPrice(
-    ExportModelOperationsMixin("item_shop_stand_price"), ItemShopPrice
+    ExportModelOperationsMixin("item_shop_stand_price"), ItemShopPrice  # type: ignore  # noqa E501
 ):
     objects = ItemShopPriceManager()
 
 
 class ItemRequestBasketPrice(
-    ExportModelOperationsMixin("item_request_basket_price"), ItemShopPrice
+    ExportModelOperationsMixin("item_request_basket_price"), ItemShopPrice  # type: ignore  # noqa E501
 ):
     objects = ItemShopPriceManager()
 
@@ -155,9 +155,9 @@ class ItemRank(models.Model):
         return self.last_update + timedelta(minutes=self.query_delay)
 
 
-class ItemBuyRank(ExportModelOperationsMixin("item_buy_rank"), ItemRank):
+class ItemBuyRank(ExportModelOperationsMixin("item_buy_rank"), ItemRank):  # type: ignore  # noqa E501
     pass
 
 
-class ItemSellRank(ExportModelOperationsMixin("item_sell_rank"), ItemRank):
+class ItemSellRank(ExportModelOperationsMixin("item_sell_rank"), ItemRank):  # type: ignore  # noqa E501
     pass
