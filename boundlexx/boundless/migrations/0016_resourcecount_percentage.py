@@ -54,6 +54,7 @@ def calulcate_percentages(apps, schema_editor):
     surface_resources_total = 0
     surface_resources = []
 
+    click.echo()
     with click.progressbar(resources) as bar:
         for resource in bar:
             if resource.world_poll_id != current_id:
