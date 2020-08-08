@@ -13,6 +13,10 @@ urlpatterns = [
     path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
+if settings.ENABLE_PROMETHEUS:
+    urlpatterns += [
+        path("prometheus/", include("django_prometheus.urls")),
+    ]
 
 if settings.DEBUG:
     # This allows the error pages to be debugged during development, just visit

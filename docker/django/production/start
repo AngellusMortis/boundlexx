@@ -7,9 +7,4 @@ set -o nounset
 
 python /app/manage.py collectstatic --noinput
 
-if [ -n "${NEW_RELIC_CONFIG_FILE}" ]; then
-    echo "Starting with New Relic support..."
-    /usr/local/bin/newrelic-admin run-program /usr/local/bin/uwsgi --ini config.ini
-else
-    /usr/local/bin/uwsgi --ini config.ini
-fi
+/usr/local/bin/uwsgi --ini config.ini

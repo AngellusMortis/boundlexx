@@ -29,6 +29,7 @@ django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
 django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
 django-polymorphic==2.1.2  # via -r /app/requirements/in/base.in
+django-prometheus==2.0.0  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
 django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-timezone-field==4.0  # via django-celery-beat
@@ -39,7 +40,7 @@ flower==0.9.5             # via -r /app/requirements/in/base.in
 gevent-eventemitter==2.1  # via steam
 gevent==20.6.2            # via gevent-eventemitter, steam
 google-auth-oauthlib==0.4.1  # via gspread
-google-auth==1.20.0       # via google-auth-oauthlib, gspread
+google-auth==1.20.1       # via google-auth-oauthlib, gspread
 greenlet==0.4.16          # via gevent
 gspread==3.6.0            # via -r /app/requirements/in/base.in
 humanfriendly==8.2        # via coloredlogs
@@ -48,10 +49,9 @@ idna==2.10                # via requests
 jsonlines==1.2.0          # via cloudflare
 kombu==4.6.11             # via celery
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
-newrelic==5.14.1.144      # via -r /app/requirements/in/base.in
 oauthlib==3.1.0           # via requests-oauthlib
 pillow==7.2.0             # via -r /app/requirements/in/base.in
-prometheus-client==0.8.0  # via flower
+prometheus-client==0.8.0  # via django-prometheus, flower
 protobuf==3.12.4          # via steam
 psycopg2==2.8.5           # via -r /app/requirements/in/base.in
 pyasn1-modules==0.2.8     # via google-auth

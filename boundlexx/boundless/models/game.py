@@ -8,6 +8,7 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 
@@ -50,7 +51,9 @@ class GameObj(PolymorphicModel):
         return localized_name
 
 
-class LocalizedName(PolymorphicModel):
+class LocalizedName(
+    ExportModelOperationsMixin("localized_name"), PolymorphicModel  # type: ignore  # noqa E501
+):
     game_obj = models.ForeignKey(GameObj, on_delete=models.CASCADE)
     lang = models.CharField(_("Language"), max_length=16)
     name = models.CharField(_("Name"), max_length=128, db_index=True)
@@ -65,11 +68,11 @@ class LocalizedName(PolymorphicModel):
         return f"{self.lang}: {self.name}"
 
 
-class Subtitle(GameObj):
+class Subtitle(ExportModelOperationsMixin("subtitle"), GameObj):  # type: ignore # noqa E501
     pass
 
 
-class Color(GameObj):
+class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore
     @cached_property
     def base_color(self):
         colors: Dict[int, int] = {}
@@ -99,7 +102,7 @@ class Color(GameObj):
         return None
 
 
-class ColorValue(models.Model):
+class ColorValue(ExportModelOperationsMixin("color_value"), models.Model):  # type: ignore # noqa E501
     class ColorType(models.TextChoices):
         CHARACTER = "CHARACTER", _("CHARACTER")
         CHARACTER_DECAL = "CHARACTER_DECAL", _("CHARACTER_DECAL")
@@ -151,11 +154,11 @@ class ColorValue(models.Model):
         return f"#{self.base:06x}"
 
 
-class Metal(GameObj):
+class Metal(ExportModelOperationsMixin("metal"), GameObj):  # type: ignore
     pass
 
 
-class Item(GameObj):
+class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     item_subtitle = models.ForeignKey(
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )

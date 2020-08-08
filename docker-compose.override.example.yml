@@ -49,3 +49,7 @@ services:
       env_file:
         - ./.env
         - ./.local.env
+
+    # Add celery-exporter
+    # celery-exporter:
+    #   image: ovalmoney/celery-exporter

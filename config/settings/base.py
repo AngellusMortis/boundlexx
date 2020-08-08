@@ -20,6 +20,8 @@ if READ_DOT_ENV_FILE:
 # ------------------------------------------------------------------------------
 # https://docs.djangoproject.com/en/dev/ref/settings/#debug
 DEBUG = env.bool("DJANGO_DEBUG", False)
+
+ENABLE_PROMETHEUS = env.bool("ENABLE_PROMETHEUS", default=False)
 # Local time zone. Choices are
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
 # though not all of them may be available with every OS.
@@ -54,6 +56,11 @@ SESSION_CACHE_ALIAS = "default"
 # https://docs.djangoproject.com/en/dev/ref/settings/#databases
 DATABASES = {"default": env.db("DATABASE_URL")}
 DATABASES["default"]["ATOMIC_REQUESTS"] = True
+
+if ENABLE_PROMETHEUS:
+    DATABASES["default"]["ENGINE"] = "django_prometheus.db.backends.postgresql"
+    CACHES["default"]["BACKEND"] = "boundlexx.utils.backends.RedisCache"
+
 
 # URLS
 # ------------------------------------------------------------------------------
@@ -100,6 +107,9 @@ LOCAL_APPS = [
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+if ENABLE_PROMETHEUS:
+    INSTALLED_APPS = ["django_prometheus"] + INSTALLED_APPS
 
 # MIGRATIONS
 # ------------------------------------------------------------------------------
@@ -156,6 +166,13 @@ MIDDLEWARE = [
     # "django.middleware.common.BrokenLinkEmailsMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
 ]
+
+if ENABLE_PROMETHEUS:
+    MIDDLEWARE = (
+        ["django_prometheus.middleware.PrometheusBeforeMiddleware"]
+        + MIDDLEWARE
+        + ["django_prometheus.middleware.PrometheusAfterMiddleware"]
+    )
 
 # STATIC
 # ------------------------------------------------------------------------------

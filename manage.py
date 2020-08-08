@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-import newrelic.agent
 import sys  # noqa
 
 if "prompt_steam_guard" in sys.argv:
@@ -21,17 +20,6 @@ def configure_logging():
 
 
 if __name__ == "__main__":
-    if (
-        "NEW_RELIC_CONFIG_FILE" in os.environ
-        and len(os.environ["NEW_RELIC_CONFIG_FILE"]) > 0
-    ):
-        print("Enabling New Relic integration...")
-        print(
-            f"Config: {os.environ['NEW_RELIC_CONFIG_FILE']}, "
-            f"Env: {os.environ['NEW_RELIC_ENVIRONMENT']}"
-        )
-        newrelic.agent.initialize()
-
     os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
     try:

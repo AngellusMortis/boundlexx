@@ -8,6 +8,7 @@ django-environ
 django-filter
 django-model-utils
 django-polymorphic
+django-prometheus
 django-redis
 django-rest-fuzzysearch
 django<3.1
@@ -27,7 +28,6 @@ coloredlogs
 dateparser
 gspread
 msgpack
-newrelic
 pillow
 psycopg2 --no-binary psycopg2
 python-slugify

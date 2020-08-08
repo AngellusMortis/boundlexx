@@ -4,9 +4,4 @@ set -o errexit
 set -o pipefail
 set -o nounset
 
-if [ -n "${NEW_RELIC_CONFIG_FILE}" ]; then
-    echo "Starting with New Relic support..."
-    newrelic-admin run-program celery -A config.celery_app beat -l INFO
-else
-    celery -A config.celery_app beat -l INFO
-fi
+celery -A config.celery_app beat -l INFO
