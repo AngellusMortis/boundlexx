@@ -15,7 +15,7 @@ urlpatterns = [
 
 if settings.ENABLE_PROMETHEUS:
     urlpatterns += [
-        path("prometheus/", include("django_prometheus.urls")),
+        path("", include("django_prometheus.urls")),
     ]
 
 if settings.DEBUG:
