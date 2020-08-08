@@ -225,13 +225,28 @@ class ItemResourceCountSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ResourceCount
-        fields = ["url", "item_url", "world", "count"]
+        fields = [
+            "url",
+            "item_url",
+            "world",
+            "is_embedded",
+            "percentage",
+            "count",
+        ]
 
 
 class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
     class Meta:
         model = ResourceCount
-        fields = ["time", "url", "item_url", "world", "count"]
+        fields = [
+            "time",
+            "url",
+            "item_url",
+            "world",
+            "is_embedded",
+            "percentage",
+            "count",
+        ]
 
 
 class WorldSerializer(serializers.ModelSerializer):
@@ -326,7 +341,7 @@ class ResourcesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ResourceCount
-        fields = ["item", "count"]
+        fields = ["item", "is_embedded", "percentage", "count"]
 
 
 class WorldPollExtraSerializer(serializers.ModelSerializer):

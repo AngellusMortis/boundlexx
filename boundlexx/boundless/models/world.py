@@ -565,6 +565,44 @@ class WorldCreatureColor(
 
 
 class WorldPollManager(models.Manager):
+    def _create_resource_counts(self, world_poll, resources_list):
+        resource_order = list(
+            settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING.keys()
+        )
+
+        resources = []
+        embedded_total = 0
+        surface_total = 0
+
+        for index, amount in enumerate(resources_list):
+            if amount == 0:
+                continue
+
+            item_id = resource_order[index]
+            resources.append((item_id, amount))
+
+            if settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[item_id]:
+                embedded_total += amount
+            else:
+                surface_total += amount
+
+        for item_data in resources:
+            item_id, amount = item_data[0], item_data[1]
+
+            item = Item.objects.get(game_id=item_id)
+
+            if settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[item_id]:
+                total = embedded_total
+            else:
+                total = surface_total
+
+            ResourceCount.objects.create(
+                world_poll=world_poll,
+                item=item,
+                count=amount,
+                percentage=(amount / total) * 100,
+            )
+
     def create_from_game_dict(
         self, world_dict, poll_dict, world=None, new_world=False
     ):
@@ -583,17 +621,7 @@ class WorldPollManager(models.Manager):
             total_prestige=poll_dict["prestige"],
         )
 
-        for index, amount in enumerate(poll_dict["resources"]):
-            if amount == 0:
-                continue
-
-            item_id = settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[index]
-
-            item = Item.objects.get(game_id=item_id)
-
-            ResourceCount.objects.create(
-                world_poll=world_poll, item=item, count=amount
-            )
+        self._create_resource_counts(world_poll, poll_dict["resources"])
 
         for rank, leader in enumerate(poll_dict["leaderboard"]):
             rank += 1
@@ -661,6 +689,7 @@ class ResourceCount(
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
     count = models.PositiveIntegerField(_("Count"))
+    percentage = models.DecimalField(max_digits=5, decimal_places=2)
 
     class Meta:
         unique_together = (
@@ -670,6 +699,12 @@ class ResourceCount(
         )
 
         ordering = ["-count"]
+
+    @cached_property
+    def is_embedded(self):
+        return settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[
+            self.item.game_id
+        ]
 
 
 class LeaderboardRecord(

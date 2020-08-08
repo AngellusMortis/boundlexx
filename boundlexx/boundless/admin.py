@@ -466,12 +466,21 @@ class WorldPollResultInline(admin.StackedInline):
 class ResourceCountInline(admin.TabularInline):
     model = ResourceCount
 
+    def is_embedded(self, obj):
+        return obj.is_embedded
+
+    is_embedded.boolean = True  # type: ignore
+
     fields = [
         "item",
+        "is_embedded",
+        "percentage",
         "count",
     ]
     readonly_fields = [
         "item",
+        "is_embedded",
+        "percentage",
         "count",
     ]
     can_delete = False

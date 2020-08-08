@@ -18,8 +18,13 @@ Surface Liquid: {{ world.surface_liquid }}
 Core Liquid: {{ world.core_liquid }}
 ```
 
-World Resources:
-```{% for resource in resources %}
-{{ resource.item.english|stringformat:"25s" }}: {{ resource.count|intcomma }}{% endfor %}
+Embedded World Resources:
+```{% for resource in embedded_resources %}
+#{{ forloop.counter|stringformat:"-2s" }} {{ resource.item.english|stringformat:"25s" }}: {{ resource.percentage|stringformat:"5s" }}% ({{ resource.count|intcomma }}){% endfor %}
+```%SPLIT_MESSAGE%
+
+Surface World Resources:
+```{% for resource in surface_resources %}
+#{{ forloop.counter|stringformat:"-2s" }} {{ resource.item.english|stringformat:"25s" }}: {{ resource.percentage|stringformat:"5s" }}% ({{ resource.count|intcomma }}){% endfor %}
 ```{% if colors %}%SPLIT_MESSAGE%
 {% include 'boundlexx/notifications/exoworld_colors.md' %}{% endif %}

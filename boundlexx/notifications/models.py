@@ -144,7 +144,14 @@ class ExoworldNotification(NotificationBase):
                 colors = [colors]
 
         if resources is not None:
-            resources = resources.order_by("item__game_id")
+            embedded_resources = []
+            surface_resources = []
+
+            for resource in resources.order_by("-count"):
+                if resource.is_embedded:
+                    embedded_resources.append(resource)
+                else:
+                    surface_resources.append(resource)
 
         message = ""
         if resources is None:
@@ -155,7 +162,12 @@ class ExoworldNotification(NotificationBase):
         else:
             message = render_to_string(
                 "boundlexx/notifications/exoworld.md",
-                {"world": world, "resources": resources, "colors": colors},
+                {
+                    "world": world,
+                    "embedded_resources": embedded_resources,
+                    "surface_resources": surface_resources,
+                    "colors": colors,
+                },
             )
 
         return self._markdown_replace(message)
