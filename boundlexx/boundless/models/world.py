@@ -223,7 +223,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     world_type = models.CharField(
         _("World Type"),
         choices=WorldType.choices,
-        max_length=9,
+        max_length=10,
         null=True,
         db_index=True,
     )
