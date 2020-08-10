@@ -144,6 +144,9 @@ class WorldManager(models.Manager):
             world.tier = world_info["tier"]
         if "type" in world_info and world.world_type is None:
             world.world_type = world_info["type"]
+
+            if world.world_type == "UMBRIS":
+                world.world_type = "DARKMATTER"
         if "start" in world_info and world.start is None:
             world.start = world_info["start"]
         if "end" in world_info and world.end is None:
@@ -188,7 +191,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         TYPE_TOXIC = "TOXIC", _("Toxic")
         TYPE_CHILL = "CHILL", _("Chill")
         TYPE_BURN = "BURN", _("Burn")
-        TYPE_UMBRIS = "UMBRIS", _("Umbris")
+        TYPE_UMBRIS = "DARKMATTER", _("Umbris")
         TYPE_RIFT = "RIFT", _("Rift")
         TYPE_BLINK = "BLINK", _("Blink")
 

@@ -44,6 +44,9 @@ def _update_world(world, start, end, row):
     if world.world_type is None:
         world.world_type = row[8].strip().upper()
 
+        if world.world_type == "UMBRIS":
+            world.world_type = "DARKMATTER"
+
     world.save()
 
     return world
