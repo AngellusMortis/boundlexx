@@ -8,16 +8,18 @@ ID: {{ world.name }} ({{ world.id }})
 Server: {{ world.address }}
 Start: {{ world.start|naturaltime }} ({{ world.start|utc }} UTC)
 End: {{ world.end|naturaltime }} ({{ world.end|utc }} UTC)
-Tier: {{ world.get_tier_display }}
+
 Server Region: {{ world.get_region_display }}
+Tier: {{ world.get_tier_display }}
 World Type: {{ world.get_world_type_display }}
+Protection: {{ world.protection }}
+Closest Planet: {{ world.assignment }} @{{ world.assignment_distance }} blinksecs
+
 World Size (16-block chunks): {{ world.size }}
 Number of Regions: {{ world.number_of_regions }}
-Closest Planet: {{ world.assignment }} @{{ world.assignment_distance }} blinksecs
 Surface Liquid: {{ world.surface_liquid }}
 Core Liquid: {{ world.core_liquid }}
 ```
-
 Embedded World Resources:
 ```{% for resource in embedded_resources %}
 #{{ forloop.counter|stringformat:"-2s" }} {{ resource.item.english|stringformat:"25s" }}: {{ resource.percentage|stringformat:"5s" }}% ({{ resource.count|intcomma }}){% endfor %}
@@ -26,5 +28,5 @@ Embedded World Resources:
 Surface World Resources:
 ```{% for resource in surface_resources %}
 #{{ forloop.counter|stringformat:"-2s" }} {{ resource.item.english|stringformat:"25s" }}: {{ resource.percentage|stringformat:"5s" }}% ({{ resource.count|intcomma }}){% endfor %}
-```{% if colors %}%SPLIT_MESSAGE%
+```{% if color_groups %}%SPLIT_MESSAGE%
 {% include 'boundlexx/notifications/exoworld_colors.md' %}{% endif %}

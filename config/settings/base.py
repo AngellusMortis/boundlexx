@@ -544,6 +544,67 @@ BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = {
     33562: False,  # Primordial Resin
 }
 
+BOUNDLESS_WORLD_POLL_GROUP_ORDER = {
+    "": [9555],
+    "rock": [10798, 10794, 10802],
+    "wood": [10830, 10838, 10834],
+    "foilage": [10822, 10818, 10826],
+    "soil": [11588, 11592, 11584, 10846, 10850, 10814, 10810],
+    "grass": [3085, 6157, 13],
+    "misc": [10870, 10842, 10806, 10866, 10854, 10858, 10862],
+    "flower": [9839, 9838, 9841, 9840],
+    "plant": [10777, 10781, 10776, 10778, 10780, 10774, 10775, 10779],
+    "fungus": [10790, 10789, 10793, 10788, 10791, 10792],
+}
+
+BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS = {
+    9555: "",  # Gleam
+    10798: "rock",  # Igneous
+    10794: "rock",  # Metamorhic
+    10802: "rock",  # Sedimentary
+    10830: "wood",  # Ancient Trunk
+    10838: "wood",  # Lustrous Trunk
+    10834: "wood",  # Twisted Trunk
+    10822: "foilage",  # Exotic Leaves
+    10818: "foilage",  # Lust Leaves
+    10826: "foilage",  # Waxy Leaves
+    11588: "soil",  # Clay Soil
+    11592: "soil",  # Peaty Soil
+    11584: "soil",  # Silty Soil
+    10846: "soil",  # Mud
+    10850: "soil",  # Ash
+    10814: "soil",  # Gravel
+    10810: "soil",  # Sand
+    3085: "grass",  # Barbed Grass
+    6157: "grass",  # Gnarled Grass
+    13: "grass",  # Verdant Grass
+    10870: "misc",  # Growth
+    10842: "misc",  # Ice
+    10806: "misc",  # Glacier
+    10866: "misc",  # Mould
+    10854: "misc",  # Sponge
+    10858: "misc",  # Tangle
+    10862: "misc",  # Thorns
+    9838: "flower",  # Gladeflower
+    9839: "flower",  # Cloneflower
+    9840: "flower",  # Spineflower
+    9841: "flower",  # Ghostflower
+    10775: "plant",  # Trumpet Root
+    10774: "plant",  # Traveller's Perch
+    10779: "plant",  # Twisted Aloba
+    10778: "plant",  # Spineback Planet
+    10781: "plant",  # Oortian's Staff
+    10776: "plant",  # Rosetta Nox
+    10780: "plant",  # Stardrop Plant
+    10777: "plant",  # Desert Sword
+    10788: "fungus",  # Mottled Tar Spot Fungus
+    10789: "fungus",  # Clustered Tongue Fungus
+    10790: "fungus",  # Branch Funnel
+    10792: "fungus",  # Weeping Waxcap
+    10793: "fungus",  # Glow Cap
+    10791: "fungus",  # Tinted-Burst
+}
+
 API_PROTOCOL = env("API_PROTOCOL", default="http")
 
 STEAM_USERNAME = env("STEAM_USERNAME", default=None)

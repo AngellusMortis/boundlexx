@@ -1,6 +1,6 @@
 World Colors:
-{% for color_group in colors %}
-```{% for color in color_group %}
-{{ color.item.english|stringformat:"25s" }}: {{ color.color.default_name }} ({{ color.color.game_id }}){% if color.is_new_color %} NEW{% else %}{% if color.exist_via_transform %} TRANSFORM{% endif %}{% if color.days_since_last %} Days: {{ color.days_since_last }}{% endif %}{% endif %}{% endfor %}
-```{% if not forloop.last %}%SPLIT_MESSAGE%{% endif %}
-{% endfor %}
+```
+{% for group_name, color_group in color_groups.items %}{% if group_name %}{{ group_name|title|stringformat:"25s" }}
+{% endif %}{% for color in color_group %}{% include 'boundlexx/notifications/exoworld_color.md' %}{% endfor %}{% if group_name == "grass" %}```%SPLIT_MESSAGE%```{% else %}
+{% endif %}{% endfor %}
+```

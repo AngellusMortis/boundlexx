@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-from typing import List
+from typing import Dict, List, Tuple
 
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.db import models
 from django.db.models.signals import post_save
@@ -136,12 +137,35 @@ class ExoworldNotification(NotificationBase):
         if colors.count() == 0:
             colors = None
 
+        color_groups: Dict[str, list] = {}
         if colors is not None:
-            colors = list(colors)
-            if len(colors) > 30:
-                colors = [colors[:30], colors[30:]]
-            else:
-                colors = [colors]
+            for group_name in settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER:
+                color_groups[group_name] = []
+
+            for color in colors:
+                item_id = color.item.game_id
+                group_name = settings.BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS[
+                    item_id
+                ]
+
+                order_index = list(
+                    settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER[group_name]
+                ).index(item_id)
+                color_group: List[Tuple[int, str]] = color_groups[group_name]
+                color_group.append((order_index, color))
+                color_groups[group_name] = color_group
+
+            for group_name in color_groups:
+                if len(color_groups[group_name]) == 0:
+                    del color_groups[group_name]
+                    continue
+
+                color_groups[group_name] = [
+                    c[1]
+                    for c in sorted(
+                        color_groups[group_name], key=lambda g: g[0]
+                    )
+                ]
 
         if resources is not None:
             embedded_resources = []
@@ -157,7 +181,7 @@ class ExoworldNotification(NotificationBase):
         if resources is None:
             message = render_to_string(
                 "boundlexx/notifications/exoworld_update.md",
-                {"world": world, "colors": colors},
+                {"world": world, "color_groups": color_groups},
             )
         else:
             message = render_to_string(
@@ -166,7 +190,7 @@ class ExoworldNotification(NotificationBase):
                     "world": world,
                     "embedded_resources": embedded_resources,
                     "surface_resources": surface_resources,
-                    "colors": colors,
+                    "color_groups": color_groups,
                 },
             )
 
