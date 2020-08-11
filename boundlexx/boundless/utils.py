@@ -101,13 +101,13 @@ def purge_cache():
         )
 
         identifier = r[0]["id"]
-        cache.set(CLOUDFLARE_CACHE_KEY, identifier)
+        cache.set(CLOUDFLARE_CACHE_KEY, identifier, timeout=3600)
 
     cf.zones.purge_cache.post(  # pylint: disable=no-member
         identifier, data={"purge_everything": True}
     )
 
     next_purge = timezone.now() + timedelta(minutes=1)
-    cache.set(CLOUDFLARE_PURGE_KEY, next_purge)
+    cache.set(CLOUDFLARE_PURGE_KEY, next_purge, timeout=60)
 
     return True

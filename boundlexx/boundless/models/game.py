@@ -47,7 +47,7 @@ class GameObj(PolymorphicModel):
 
         if localized_name is None:
             localized_name = self.localized_names.get("english")
-            cache.set(self.localization_cache_key, localized_name)
+            cache.set(self.localization_cache_key, localized_name, timeout=300)
         return localized_name
 
 

@@ -31,4 +31,4 @@ def send_discord_webhook(webhook_url, data_list):
             response.raise_for_status()
 
             last_call = time.monotonic()
-            cache.set(cache_key, last_call)
+            cache.set(cache_key, last_call, timeout=1)

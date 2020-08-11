@@ -323,7 +323,7 @@ def ingest_exo_world_data():
 
         parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
         parse_cache.append(topic)
-        cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache)
+        cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
 
         logger.info(
             "Topic %s: Imported %s block color details for world %s",
