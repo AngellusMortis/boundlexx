@@ -229,10 +229,17 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
 
         lookup_field = self.lookup_url_kwarg or self.lookup_field
         world_id = self.kwargs[lookup_field]
+        source_world_id = self.kwargs.get("world_source__id", None)
 
-        obj = get_object_or_404(
-            queryset, Q(world_source__id=world_id) | Q(world_dest__id=world_id)
-        )
+        if world_id == source_world_id:
+            obj = get_object_or_404(
+                queryset, world_source__id=world_id, world_dest__id=world_id
+            )
+        else:
+            obj = get_object_or_404(
+                queryset,
+                Q(world_source__id=world_id) | Q(world_dest__id=world_id),
+            )
 
         # May raise a permission denied
         self.check_object_permissions(self.request, obj)
