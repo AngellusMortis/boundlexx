@@ -13,7 +13,7 @@ Server Region: {{ world.get_region_display }}
 Tier: {{ world.get_tier_display }}
 World Type: {{ world.get_world_type_display }}
 Protection: {{ world.protection }}
-Closest Planet: {{ world.assignment }} @{{ world.assignment_distance }} blinksecs
+Closest Planet: {{ world.assignment }}{% if world.assignment_distance %} @{{ world.assignment_distance }} blinksecs ({{ world.assignment_cost }}c){% endif %}
 
 World Size (16-block chunks): {{ world.size }}
 Number of Regions: {{ world.number_of_regions }}

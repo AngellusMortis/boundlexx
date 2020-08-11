@@ -197,13 +197,17 @@ def calculate_distances(world_ids=None):
     for world in worlds:
         world_distances = WorldDistance.objects.filter(
             Q(world_source=world) | Q(world_dest=world)
-        )
+        ).select_related("world_source", "world_dest")
 
         world_distance_ids = set()
-        world_distance_ids.add(world.id)
         for world_distance in world_distances:
-            world_distance_ids.add(world_distance.world_source.id)
-            world_distance_ids.add(world_distance.world_dest.id)
+            if world_distance.world_source.id == world_distance.world_dest.id:
+                world_distance_ids.add(world.id)
+            else:
+                if world_distance.world_source.id != world.id:
+                    world_distance_ids.add(world_distance.world_source.id)
+                if world_distance.world_dest.id != world.id:
+                    world_distance_ids.add(world_distance.world_dest.id)
 
         missing_distance_ids = world_ids.difference(world_distance_ids)
 

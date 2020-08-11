@@ -388,6 +388,7 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
 class WorldDistanceSerializer(serializers.ModelSerializer):
     world_source = SimpleWorldSerializer()
     world_dest = SimpleWorldSerializer()
+    cost = serializers.IntegerField()
 
     class Meta:
         model = WorldDistance
@@ -395,6 +396,7 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
             "world_source",
             "world_dest",
             "distance",
+            "cost",
         ]
 
 

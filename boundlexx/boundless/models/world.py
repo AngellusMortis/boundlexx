@@ -390,20 +390,35 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
             key = self.world_type
         return settings.BOUNDLESS_WORLD_LIQUIDS[key][1]
 
-    def get_distance_to_world(self, world, client=None):
+    def _get_distance_to_world(self, world, client=None):
         distance_obj = WorldDistance.objects.filter(
             models.Q(world_source=self, world_dest=world)
             | models.Q(world_source=world, world_dest=self)
         ).first()
 
+        distance = 0.0
         if distance_obj is None:
-            if client is None:
-                client = BoundlessClient()
+            if world.id != self.id:
+                if client is None:
+                    client = BoundlessClient()
 
-            distance = client.get_world_distance(self.id, world.id)
+                distance = client.get_world_distance(self.id, world.id)
+                # value is returned as a float, no idea how cost formula works
+                # with non-whole numbers
+                if distance is not None and not distance.is_integer():
+                    raise ValueError(
+                        "Unexpected distance number: "
+                        f"{self.id} to {world.id} = {distance}"
+                    )
+
             distance_obj = WorldDistance.objects.create(
                 world_source=self, world_dest=world, distance=int(distance)
             )
+
+        return distance_obj
+
+    def get_distance_to_world(self, world, client=None):
+        distance_obj = self._get_distance_to_world(world, client=client)
 
         return distance_obj.distance
 
@@ -411,7 +426,24 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     def assignment_distance(self):
         if self.assignment is None:
             return None
-        return self.get_distance_to_world(self.assignment)
+
+        # if distance is partial, lets not blow up the exo world task
+        try:
+            return self.get_distance_to_world(self.assignment)
+        except ValueError:
+            return None
+
+    @cached_property
+    def assignment_cost(self):
+        if self.assignment is None:
+            return None
+
+        # if distance is partial, lets not blow up the exo world task
+        try:
+            distance_obj = self._get_distance_to_world(self.assignment)
+        except ValueError:
+            return None
+        return distance_obj.cost
 
 
 class WorldDistance(
@@ -426,6 +458,18 @@ class WorldDistance(
     distance = models.PositiveSmallIntegerField(
         _("Distance to work in blinksecs")
     )
+
+    @cached_property
+    def cost(self):
+        if self.distance < 13:  # pylint: disable=no-else-return
+            return 100 + max(self.distance - 2, 0) * 80
+        elif self.distance == 13:
+            return 1100
+
+        remaining = self.distance - 14
+        multiplier = remaining // 5
+        extra = remaining % 5
+        return 1100 + multiplier * 400 + extra * 100
 
 
 class WorldBlockColor(
