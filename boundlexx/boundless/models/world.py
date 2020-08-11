@@ -461,12 +461,10 @@ class WorldDistance(
 
     @cached_property
     def cost(self):
-        if self.distance < 13:  # pylint: disable=no-else-return
-            return 100 + max(self.distance - 2, 0) * 80
-        elif self.distance == 13:
-            return 1100
+        if self.distance < 13:
+            return 100 + max(self.distance - 1, 0) * 80
 
-        remaining = self.distance - 14
+        remaining = max(self.distance - 14, 0)
         multiplier = remaining // 5
         extra = remaining % 5
         return 1100 + multiplier * 400 + extra * 100
