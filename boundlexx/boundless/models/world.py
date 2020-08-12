@@ -684,6 +684,9 @@ class WorldPollManager(models.Manager):
 
         world_poll.refresh_from_db()
 
+        new_world = (
+            new_world or self.filter(world_id=world_poll.world_id).count() == 1
+        )
         if new_world and world.is_exo:
             ExoworldNotification.objects.send_new_notification(world_poll)
 
