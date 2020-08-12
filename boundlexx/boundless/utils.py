@@ -5,6 +5,7 @@ from CloudFlare import CloudFlare
 from django.conf import settings
 from django.core.cache import cache
 from django.utils import timezone
+from requests import HTTPError
 
 CLOUDFLARE_CACHE_KEY = "boundless:cloudflare_identifier"
 CLOUDFLARE_PURGE_KEY = "boundless:cloudflare_last_purge"
@@ -103,9 +104,12 @@ def purge_cache():
         identifier = r[0]["id"]
         cache.set(CLOUDFLARE_CACHE_KEY, identifier, timeout=3600)
 
-    cf.zones.purge_cache.post(  # pylint: disable=no-member
-        identifier, data={"purge_everything": True}
-    )
+    try:
+        cf.zones.purge_cache.post(  # pylint: disable=no-member
+            identifier, data={"purge_everything": True}
+        )
+    except HTTPError:
+        pass
 
     next_purge = timezone.now() + timedelta(minutes=1)
     cache.set(CLOUDFLARE_PURGE_KEY, next_purge, timeout=60)
