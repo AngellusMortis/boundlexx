@@ -21,8 +21,11 @@ def update_perm_worlds():
 
     worlds_created = 0
     for world_dict in worlds:
-        logger.debug(world_dict)
-        _, created = World.objects.get_or_create_from_game_dict(world_dict)
+        try:
+            _, created = World.objects.get_or_create_from_game_dict(world_dict)
+        except Exception:
+            logger.warning(world_dict)
+            raise
 
         if created:
             worlds_created += 1
@@ -103,10 +106,13 @@ def _scan_worlds(lower, upper):
     worlds_found = 0
     world_objs = []
     for world_dict in worlds:
-        logger.debug(world_dict)
-        world, created = World.objects.get_or_create_from_game_dict(
-            world_dict["worldData"]
-        )
+        try:
+            world, created = World.objects.get_or_create_from_game_dict(
+                world_dict["worldData"]
+            )
+        except Exception:
+            logger.warning(world_dict)
+            raise
 
         if created:
             worlds_found += 1
@@ -155,8 +161,6 @@ def poll_worlds(world_ids=None):
 
         logger.info("Polling world %s", world.display_name)
         world_data, poll_data = client.get_world_poll_by_id(world.id)
-        logger.debug(world_data)
-        logger.debug(poll_data)
 
         if world_data is None:
             logger.info(
@@ -166,8 +170,11 @@ def poll_worlds(world_ids=None):
             world.save()
             continue
 
-        logger.debug(world_data)
-        world, _ = World.objects.get_or_create_from_game_dict(world_data)
+        try:
+            world, _ = World.objects.get_or_create_from_game_dict(world_data)
+        except Exception:
+            logger.warning(world_data)
+            raise
 
         if world.is_locked or (
             world.end is not None and timezone.now() > world.end
@@ -176,9 +183,13 @@ def poll_worlds(world_ids=None):
             continue
 
         if poll_data is not None:
-            WorldPoll.objects.create_from_game_dict(
-                world_data, poll_data, world=world
-            )
+            try:
+                WorldPoll.objects.create_from_game_dict(
+                    world_data, poll_data, world=world
+                )
+            except Exception:
+                logger.warning(poll_data)
+                raise
 
 
 @app.task
