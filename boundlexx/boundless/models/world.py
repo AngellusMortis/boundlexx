@@ -663,7 +663,7 @@ class WorldPollManager(models.Manager):
             player_count=world_dict["info"]["players"],
             beacon_count=poll_dict["beacons"],
             plot_count=poll_dict["plots"],
-            total_prestige=poll_dict["prestige"],
+            total_prestige=poll_dict.get("prestige"),
         )
 
         self._create_resource_counts(world_poll, poll_dict["resources"])
@@ -721,7 +721,9 @@ class WorldPollResult(
     player_count = models.PositiveSmallIntegerField(_("Player Count"))
     beacon_count = models.PositiveIntegerField(_("Beacon Count"))
     plot_count = models.PositiveIntegerField(_("Plot Count"))
-    total_prestige = models.PositiveIntegerField(_("Total Prestige"))
+    total_prestige = models.PositiveIntegerField(
+        _("Total Prestige"), blank=True, null=True
+    )
 
     class Meta:
         unique_together = (
