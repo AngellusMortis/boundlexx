@@ -16,6 +16,19 @@ from boundlexx.boundless.models import (
 )
 
 
+class AzureImageField(serializers.ImageField):
+    def to_representation(self, value):
+        if not value:
+            return None
+
+        try:
+            url = value.url
+        except AttributeError:
+            return None
+
+        return url
+
+
 class NullSerializer(serializers.Serializer):
     def create(self, validated_data):
         return
@@ -282,7 +295,7 @@ class WorldSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     assignment = SimpleWorldSerializer()
-    image_url = serializers.URLField(source="image", allow_null=True)
+    image_url = AzureImageField(source="image", allow_null=True)
     forum_url = serializers.URLField(allow_null=True)
 
     class Meta:

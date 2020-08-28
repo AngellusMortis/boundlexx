@@ -58,6 +58,7 @@ docutils==0.16            # via sphinx
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 factory-boy==3.0.1        # via -r /app/requirements/in/dev.in
 faker==4.1.2              # via factory-boy
+filetype==1.0.7           # via -r /app/requirements/in/base.in
 flake8-bugbear==20.1.4    # via -r /app/requirements/in/dev.in
 flake8-builtins==1.5.3    # via -r /app/requirements/in/dev.in
 flake8-commas==2.0.0      # via -r /app/requirements/in/dev.in
@@ -89,7 +90,7 @@ kombu==4.6.11             # via celery
 lazy-object-proxy==1.4.3  # via astroid
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8, pylint
-more-itertools==8.4.0     # via pytest
+more-itertools==8.5.0     # via pytest
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
 mypy-extensions==0.4.3    # via black, mypy
 mypy==0.770               # via -r /app/requirements/in/dev.in, django-stubs

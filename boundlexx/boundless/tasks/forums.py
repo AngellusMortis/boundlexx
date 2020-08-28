@@ -10,6 +10,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.base import ContentFile
+from filetype.filetype import get_type
 
 from boundlexx.boundless.models import (
     Color,
@@ -21,7 +22,7 @@ from config.celery_app import app
 
 logger = get_task_logger(__name__)
 
-FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_exo_topics"
+FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_topics"
 
 FORUM_EXO_WORLD_CATEGORY = "exoworlds/31"
 FORUM_PERM_WORLD_CATEGORY = "worlds/33"
@@ -193,7 +194,7 @@ def _parse_title(title):
     return world_info
 
 
-def _get_world_image(raw_html):
+def _get_world_image(raw_html, name):
     image = None
     images = raw_html.find_all("a", {"class": "lightbox"})
 
@@ -204,7 +205,13 @@ def _get_world_image(raw_html):
         response = requests.get(image_url)
         response.raise_for_status()
 
+        extension = "jpg"
+        file_type = get_type(response.headers.get("content-type", None))
+        if file_type is not None:
+            extension = file_type.extension
+
         image = ContentFile(response.content)
+        image.name = f"{name}.{extension}".lower().replace(" ", "_")
 
     return image
 
@@ -294,10 +301,6 @@ def _parse_forum_topic(topic: int, is_exo: bool):
     world_info.update(_parse_world_info(raw_html))
     world_info = _normalize_world_info(world_info)
 
-    image = _get_world_image(raw_html)
-    if image is not None:
-        world_info["image"] = image
-
     if world_info["name"] != title_name:
         logger.warning(
             "Different between world name in title and forum post: %s vs. %s",
@@ -305,6 +308,10 @@ def _parse_forum_topic(topic: int, is_exo: bool):
             world_info["name"],
         )
         world_info["name"] = title_name
+
+    image = _get_world_image(raw_html, world_info["name"])
+    if image is not None:
+        world_info["image"] = image
 
     if is_exo:
         expected_fields = 7

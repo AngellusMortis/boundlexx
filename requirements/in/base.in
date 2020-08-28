@@ -27,6 +27,7 @@ cloudflare
 colorama
 coloredlogs
 dateparser
+filetype
 gspread
 msgpack
 pillow
