@@ -9,6 +9,7 @@ from bs4 import BeautifulSoup
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 
 from boundlexx.boundless.models import (
     Color,
@@ -22,12 +23,15 @@ logger = get_task_logger(__name__)
 
 FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_exo_topics"
 
+FORUM_EXO_WORLD_CATEGORY = "exoworlds/31"
+FORUM_PERM_WORLD_CATEGORY = "worlds/33"
 
-def _get_topics():
+
+def _get_topics(category: str):
     topics_to_parse = []
     parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
 
-    next_url: Optional[str] = "/c/creations/exoworlds/31.json"
+    next_url: Optional[str] = f"/c/creations/{category}.json"
     while next_url is not None:
         response = requests.get(
             f"{settings.BOUNDLESS_FORUM_BASE_URL}{next_url}"
@@ -36,7 +40,9 @@ def _get_topics():
 
         topic_list = response.json()["topic_list"]
         if "more_topics_url" in topic_list:
-            next_url = topic_list["more_topics_url"].replace("31", "31.json")
+            next_url = topic_list["more_topics_url"].replace(
+                category, f"{category}.json"
+            )
         else:
             next_url = None
 
@@ -44,7 +50,7 @@ def _get_topics():
 
         for topic in topics:
             if (
-                topic["id"] in settings.BOUNDLESS_FORUM_EXO_BAD_TOPICS
+                topic["id"] in settings.BOUNDLESS_FORUM_BAD_TOPICS
                 or topic["id"] in parse_cache
             ):
                 continue
@@ -187,6 +193,22 @@ def _parse_title(title):
     return world_info
 
 
+def _get_world_image(raw_html):
+    image = None
+    images = raw_html.find_all("a", {"class": "lightbox"})
+
+    if len(images) > 0:
+        image_url = images[0].get("href")
+        logger.info("Downloading image for topic %s", image_url)
+
+        response = requests.get(image_url)
+        response.raise_for_status()
+
+        image = ContentFile(response.content)
+
+    return image
+
+
 def _parse_world_info(raw_html):
     lines = raw_html.get_text().split("\n")
 
@@ -255,7 +277,7 @@ def _normalize_world_info(world_info):
     return world_info
 
 
-def _parse_forum_topic(topic):
+def _parse_forum_topic(topic: int, is_exo: bool):
     response = requests.get(
         f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json"
     )
@@ -272,6 +294,10 @@ def _parse_forum_topic(topic):
     world_info.update(_parse_world_info(raw_html))
     world_info = _normalize_world_info(world_info)
 
+    image = _get_world_image(raw_html)
+    if image is not None:
+        world_info["image"] = image
+
     if world_info["name"] != title_name:
         logger.warning(
             "Different between world name in title and forum post: %s vs. %s",
@@ -280,7 +306,14 @@ def _parse_forum_topic(topic):
         )
         world_info["name"] = title_name
 
-    if len(world_info) < 6:
+    if is_exo:
+        expected_fields = 7
+    else:
+        expected_fields = 6
+        if "end" in world_info:
+            del world_info["end"]
+
+    if len(world_info) < expected_fields:
         logger.warning(
             "Could not parse all world data for topic %s\nFound %s\n%s",
             topic,
@@ -301,14 +334,45 @@ def _parse_forum_topic(topic):
 
 @app.task
 def ingest_exo_world_data():
-    topics = _get_topics()
+    topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
 
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:
-        (
-            world_info,
-            block_details,
-        ) = _parse_forum_topic(topic)
+        world_info, block_details = _parse_forum_topic(topic, is_exo=True)
+
+        block_colors = _parse_block_details(block_details)
+        world, _ = World.objects.get_or_create_forum_world(topic, world_info)
+
+        number_created = 0
+        for block_color in block_colors:
+            _, created = WorldBlockColor.objects.get_or_create(
+                world=world,
+                item=block_color[0],
+                defaults={"color": block_color[1]},
+            )
+
+            if created:
+                number_created += 1
+
+        parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
+        parse_cache.append(topic)
+        cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
+
+        logger.info(
+            "Topic %s: Imported %s block color details for world %s",
+            topic,
+            number_created,
+            world,
+        )
+
+
+@app.task
+def ingest_perm_world_data():
+    topics = _get_topics(FORUM_PERM_WORLD_CATEGORY)
+
+    logger.info("Found %s topic(s) to parse", len(topics))
+    for topic in topics:
+        world_info, block_details = _parse_forum_topic(topic, is_exo=False)
 
         block_colors = _parse_block_details(block_details)
         world, _ = World.objects.get_or_create_forum_world(topic, world_info)
