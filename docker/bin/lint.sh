@@ -20,7 +20,7 @@ exit_code=$?
 echo
 
 echo "Running isort..."
-isort -c
+isort --check --diff /app/
 test $? -eq 0 -a $exit_code -eq 0
 exit_code=$?
 echo

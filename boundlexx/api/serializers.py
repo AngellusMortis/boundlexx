@@ -140,7 +140,9 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
 
 class ColorSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="color-detail", lookup_field="game_id", read_only=True,
+        view_name="color-detail",
+        lookup_field="game_id",
+        read_only=True,
     )
     blocks_url = serializers.HyperlinkedIdentityField(
         view_name="color-blocks-list",
@@ -149,7 +151,8 @@ class ColorSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     localization = LocalizedNameSerializer(
-        source="localizedname_set", many=True,
+        source="localizedname_set",
+        many=True,
     )
 
     class Meta:
@@ -166,7 +169,8 @@ class ColorSerializer(serializers.ModelSerializer):
 
 class SubtitleSerializer(serializers.ModelSerializer):
     localization = LocalizedNameSerializer(
-        source="localizedname_set", many=True,
+        source="localizedname_set",
+        many=True,
     )
 
     class Meta:
@@ -176,12 +180,15 @@ class SubtitleSerializer(serializers.ModelSerializer):
 
 class ItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="item-detail", lookup_field="game_id", read_only=True,
+        view_name="item-detail",
+        lookup_field="game_id",
+        read_only=True,
     )
     resource_counts_url = ResourceCountLinkField()
     colors_url = ItemColorsLinkField()
     localization = LocalizedNameSerializer(
-        source="localizedname_set", many=True,
+        source="localizedname_set",
+        many=True,
     )
     item_subtitle = SubtitleSerializer()
 
@@ -200,7 +207,9 @@ class ItemSerializer(serializers.ModelSerializer):
 
 class SimpleWorldSerializer(serializers.ModelSerializer):
     url = ActiveWorldUrlHyperlinkField(
-        view_name="world-detail", lookup_field="id", read_only=True,
+        view_name="world-detail",
+        lookup_field="id",
+        read_only=True,
     )
 
     class Meta:
@@ -251,7 +260,9 @@ class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
 
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="world-detail", lookup_field="id", read_only=True,
+        view_name="world-detail",
+        lookup_field="id",
+        read_only=True,
     )
     polls_url = NestedHyperlinkedIdentityField(
         view_name="world-poll-list",
@@ -260,7 +271,9 @@ class WorldSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     block_colors_url = serializers.HyperlinkedIdentityField(
-        view_name="world-block-colors", lookup_field="id", read_only=True,
+        view_name="world-block-colors",
+        lookup_field="id",
+        read_only=True,
     )
     distances_url = NestedHyperlinkedIdentityField(
         view_name="world-distance-list",
@@ -280,6 +293,8 @@ class WorldSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "display_name",
+            "image",
+            "forum_url",
             "assignment",
             "region",
             "tier",
@@ -311,7 +326,9 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 
 class SimpleItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="item-detail", lookup_field="game_id", read_only=True,
+        view_name="item-detail",
+        lookup_field="game_id",
+        read_only=True,
     )
 
     class Meta:
@@ -325,7 +342,9 @@ class SimpleItemSerializer(serializers.ModelSerializer):
 
 class SimpleColorSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
-        view_name="color-detail", lookup_field="game_id", read_only=True,
+        view_name="color-detail",
+        lookup_field="game_id",
+        read_only=True,
     )
 
     class Meta:
@@ -438,7 +457,9 @@ class ItemColorSerializer(serializers.ModelSerializer):
 
 class WorldBlockColorsViewSerializer(serializers.ModelSerializer):
     world_url = serializers.HyperlinkedIdentityField(
-        view_name="world-detail", lookup_field="id", read_only=True,
+        view_name="world-detail",
+        lookup_field="id",
+        read_only=True,
     )
     block_colors = WorldBlockColorSerializer(
         many=True, read_only=True, source="worldblockcolor_set"
@@ -471,13 +492,16 @@ class WorldPollSerializer(serializers.ModelSerializer):
     world = SimpleWorldSerializer()
 
     player_count = serializers.IntegerField(
-        source="result.player_count", read_only=True,
+        source="result.player_count",
+        read_only=True,
     )
     beacon_count = serializers.IntegerField(
-        source="result.beacon_count", read_only=True,
+        source="result.beacon_count",
+        read_only=True,
     )
     plot_count = serializers.IntegerField(
-        source="result.plot_count", read_only=True,
+        source="result.plot_count",
+        read_only=True,
     )
     total_prestige = serializers.IntegerField(
         source="result.total_prestige", read_only=True

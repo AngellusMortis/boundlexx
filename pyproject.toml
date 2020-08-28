@@ -44,7 +44,7 @@ sections = [
   "FIRSTPARTY",
   "LOCALFOLDER",
 ]
-skip = [
+skip_glob = [
   ".tox",
   ".git",
   "*/migrations/*",
@@ -52,6 +52,7 @@ skip = [
   "docs",
   "node_modules",
   "manage.py",
+  "boundlexx/utils/backends.py",
 ]
 
 [tool.pylint.master]

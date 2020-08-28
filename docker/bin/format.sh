@@ -7,5 +7,5 @@ black --config /app/pyproject.toml /app/
 echo
 
 echo "Running isort..."
-isort -y
+isort /app/
 echo

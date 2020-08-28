@@ -98,7 +98,8 @@ ITEM_RESOURCE_TIMESERIES_EXAMPLE = {
 
 
 class ItemViewSet(
-    DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet,
+    DescriptiveAutoSchemaMixin,
+    viewsets.ReadOnlyModelViewSet,
 ):
     queryset = (
         Item.objects.filter(active=True)
@@ -133,7 +134,10 @@ class ItemViewSet(
     list.example = {"list": {"value": get_list_example(ITEM_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves a items with a given ID.
@@ -180,7 +184,10 @@ class ItemResourceTimeseriesViewSet(
     list.operation_id = "list-item-resource-timeseries"  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves a specific resource counts for a give item/world combination
@@ -227,7 +234,8 @@ class ItemResourceWorldListViewSet(
 
 
 class ItemResourceCountViewSet(
-    NestedViewSetMixin, viewsets.ReadOnlyModelViewSet,
+    NestedViewSetMixin,
+    viewsets.ReadOnlyModelViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = ResourceCount.objects.filter(
@@ -263,7 +271,10 @@ class ItemResourceCountViewSet(
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_COUNT_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves the counts of the resource on a given world.
@@ -305,11 +316,14 @@ class ItemResourceCountViewSet(
 
 
 class ItemColorsViewSet(
-    NestedViewSetMixin, viewsets.ReadOnlyModelViewSet,
+    NestedViewSetMixin,
+    viewsets.ReadOnlyModelViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Item"])
     queryset = WorldBlockColor.objects.select_related(
-        "color", "world", "item",
+        "color",
+        "world",
+        "item",
     ).prefetch_related("color__localizedname_set")
     serializer_class = ItemColorSerializer
     lookup_field = "color__game_id"
@@ -340,7 +354,10 @@ class ItemColorsViewSet(
     list.operation_id = "item-colors"  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves the list worlds for specific color/item combination

@@ -71,7 +71,10 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     list.example = {"list": {"value": get_list_example(COLOR_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves a color with a given ID
@@ -84,13 +87,17 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class BlockColorViewSet(
-    NestedViewSetMixin, viewsets.ReadOnlyModelViewSet,
+    NestedViewSetMixin,
+    viewsets.ReadOnlyModelViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Color"])
     queryset = WorldBlockColor.objects.select_related(
-        "item", "world", "item__item_subtitle",
+        "item",
+        "world",
+        "item__item_subtitle",
     ).prefetch_related(
-        "item__localizedname_set", "item__item_subtitle__localizedname_set",
+        "item__localizedname_set",
+        "item__item_subtitle__localizedname_set",
     )
 
     serializer_class = BlockColorSerializer
@@ -124,7 +131,10 @@ class BlockColorViewSet(
     list.operation_id = "color-blocks"  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves the counts worlds for a given color/item combination

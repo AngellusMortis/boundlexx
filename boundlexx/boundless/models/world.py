@@ -69,7 +69,8 @@ class WorldManager(models.Manager):
 
         if world is None:
             world = World.objects.create(
-                id=world_dict["id"], display_name=world_dict["displayName"],
+                id=world_dict["id"],
+                display_name=world_dict["displayName"],
             )
             created = True
 
@@ -155,6 +156,10 @@ class WorldManager(models.Manager):
             world.end = world_info["end"]
         if "server" in world_info and world.region is None:
             world.region = world_info["server"]
+        if "image" in world_info and (
+            world.image is None or not world.image.name
+        ):
+            world.image = world_info["image"]
         if world.forum_id is None:
             world.forum_id = forum_id
 
@@ -294,6 +299,8 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     start = models.DateTimeField(blank=True, null=True, db_index=True)
     end = models.DateTimeField(blank=True, null=True, db_index=True)
 
+    image = models.ImageField(blank=True, null=True)
+
     def __str__(self):
         return self.display_name
 
@@ -336,7 +343,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
             return None
 
         return convert_linear_rgb_to_hex(
-            self.water_color_r, self.water_color_g, self.water_color_g,
+            self.water_color_r,
+            self.water_color_g,
+            self.water_color_g,
         )
 
     @property
@@ -446,6 +455,12 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         except ValueError:
             return None
         return distance_obj.cost
+
+    def forum_url(self):
+        if self.forum_id is None:
+            return None
+
+        return f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{self.forum_id}"
 
 
 class WorldDistance(

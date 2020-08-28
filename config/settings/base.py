@@ -61,6 +61,13 @@ if ENABLE_PROMETHEUS:
     DATABASES["default"]["ENGINE"] = "django_prometheus.db.backends.postgresql"
     CACHES["default"]["BACKEND"] = "boundlexx.utils.backends.RedisCache"
 
+AZURE_ACCOUNT_NAME = env("AZURE_ACCOUNT_NAME", default=None)
+AZURE_ACCOUNT_KEY = env("AZURE_ACCOUNT_KEY", default=None)
+AZURE_CONTAINER = env("AZURE_CONTAINER", default=None)
+AZURE_CUSTOM_DOMAIN = env("AZURE_CUSTOM_DOMAIN", default=None)
+
+if AZURE_ACCOUNT_NAME and AZURE_ACCOUNT_KEY and AZURE_CONTAINER:
+    DEFAULT_FILE_STORAGE = "storages.backends.azure_storage.AzureStorage"
 
 # URLS
 # ------------------------------------------------------------------------------
@@ -400,7 +407,7 @@ BOUNDLESS_EXO_SEARCH_RADIUS = 10
 BOUNDLESS_MAX_WORLD_ID = 1000
 BOUNDLESS_MAX_SCAN_CHUNK = 50
 BOUNDLESS_EXO_EXPIRED_BASE_ID = 2000000000
-BOUNDLESS_FORUM_EXO_BAD_TOPICS = [28861, 28592, 28593, 38617]
+BOUNDLESS_FORUM_EXO_BAD_TOPICS = [28861, 28592, 28593, 38617, 50102, 42678]
 BOUNDLESS_TESTING_FEATURES = env.bool(
     "BOUNDLESS_TESTING_FEATURES", default=False
 )

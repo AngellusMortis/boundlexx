@@ -305,7 +305,10 @@ def ingest_exo_world_data():
 
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:
-        world_info, block_details, = _parse_forum_topic(topic)
+        (
+            world_info,
+            block_details,
+        ) = _parse_forum_topic(topic)
 
         block_colors = _parse_block_details(block_details)
         world, _ = World.objects.get_or_create_forum_world(topic, world_info)

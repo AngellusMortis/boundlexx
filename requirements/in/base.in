@@ -11,6 +11,7 @@ django-polymorphic
 django-prometheus
 django-redis
 django-rest-fuzzysearch
+django-storages[azure]
 django<3.1
 djangorestframework
 drf-extensions

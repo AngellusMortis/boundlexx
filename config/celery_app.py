@@ -36,8 +36,9 @@ def setup_loggers(logger: logging.Logger, *args, **kwargs):
 def after_task(task_id: str, task: Task, *args, **kwargs):
     # Django not loaded until here
     # pylint: disable=import-outside-toplevel
-    from boundlexx.celery.models import TaskOutput
     from django_celery_results.models import TaskResult
+
+    from boundlexx.celery.models import TaskOutput
 
     if not task.name.startswith("boundlexx"):
         return

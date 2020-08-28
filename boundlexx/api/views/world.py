@@ -64,7 +64,10 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     list.example = {"list": {"value": get_list_example(examples.WORLD_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves a worlds with a given id
@@ -135,7 +138,10 @@ class WorldPollViewSet(
     list.example = {"list": {"value": get_list_example(examples.WORLD_POLL_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves a specific poll for a given world
@@ -255,8 +261,8 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
                 return queryset.filter(
                     Q(world_source__id=world_id) | Q(world_dest__id=world_id)
                 )
-            except ValueError:
-                raise Http404
+            except ValueError as ex:
+                raise Http404 from ex
         else:
             return queryset
 
@@ -272,7 +278,10 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     list.example = {"list": {"value": get_list_example(examples.WORLD_DISTANCES_EXAMPLE)}}  # type: ignore # noqa E501
 
     def retrieve(
-        self, request, *args, **kwargs,
+        self,
+        request,
+        *args,
+        **kwargs,
     ):  # pylint: disable=arguments-differ
         """
         Retrieves the distance to a specific world

@@ -190,7 +190,12 @@ def decode_index_data(binary):
 
 
 def decode_language(
-    binary, num_metals, num_subtitles, num_colors, item_types, language,
+    binary,
+    num_metals,
+    num_subtitles,
+    num_colors,
+    item_types,
+    language,
 ):
     offset = language.start_index
 
@@ -208,7 +213,10 @@ def decode_language(
         binary, color_strings_pointer, num_colors, metal_strings_pointer
     )
     metal_names = decode_encodings(
-        binary, metal_strings_pointer, num_metals, item_strings_pointer,
+        binary,
+        metal_strings_pointer,
+        num_metals,
+        item_strings_pointer,
     )
     item_names = decode_encodings(
         binary, item_strings_pointer, len(item_types), language.end_index
@@ -455,7 +463,8 @@ def command(
                     localizations_created += 1
 
                 l, was_created = LocalizedName.objects.get_or_create(
-                    game_obj=item.item_subtitle, lang=language.name,
+                    game_obj=item.item_subtitle,
+                    lang=language.name,
                 )
                 l.name = game_item.subtitle
                 l.save()

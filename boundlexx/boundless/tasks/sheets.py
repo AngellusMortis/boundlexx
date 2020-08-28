@@ -22,11 +22,13 @@ def _get_lifetimes(raw_lifetime):
     end = int(parts[1])
 
     if end == 0:
-        return None, None
+        end_time = None
+    else:
+        end_time = datetime.utcfromtimestamp(end).replace(tzinfo=pytz.utc)
 
     return (
         datetime.utcfromtimestamp(start).replace(tzinfo=pytz.utc),
-        datetime.utcfromtimestamp(end).replace(tzinfo=pytz.utc),
+        end_time,
     )
 
 

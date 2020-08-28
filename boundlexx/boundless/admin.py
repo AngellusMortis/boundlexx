@@ -354,6 +354,8 @@ class WorldAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "display_name",
+        "image",
+        "forum_url",
         "region",
         "tier",
         "world_type",
