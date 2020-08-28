@@ -282,6 +282,8 @@ class WorldSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     assignment = SimpleWorldSerializer()
+    image_url = serializers.URLField(source="image", allow_null=True)
+    forum_url = serializers.URLField(allow_null=True)
 
     class Meta:
         model = World
@@ -293,7 +295,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "display_name",
-            "image",
+            "image_url",
             "forum_url",
             "assignment",
             "region",
