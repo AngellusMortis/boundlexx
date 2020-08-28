@@ -389,6 +389,9 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
     world_source = SimpleWorldSerializer()
     world_dest = SimpleWorldSerializer()
     cost = serializers.IntegerField()
+    min_portal_cost = serializers.IntegerField(allow_null=True)
+    min_portal_open_cost = serializers.IntegerField(allow_null=True)
+    min_conduits = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = WorldDistance
@@ -397,6 +400,9 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
             "world_dest",
             "distance",
             "cost",
+            "min_portal_cost",
+            "min_portal_open_cost",
+            "min_conduits",
         ]
 
 

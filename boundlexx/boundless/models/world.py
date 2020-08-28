@@ -15,6 +15,8 @@ from boundlexx.boundless.models.game import Color, Item
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex
 from boundlexx.notifications.models import ExoworldNotification
 
+PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
+
 
 class WorldManager(models.Manager):
     def get_and_replace_expired_exo(self, world_id, display_name, end):
@@ -468,6 +470,32 @@ class WorldDistance(
         multiplier = remaining // 5
         extra = remaining % 5
         return 1100 + multiplier * 400 + extra * 100
+
+    @cached_property
+    def min_portal_cost(self):
+        if self.world_source.is_exo or self.world_dest.is_exo:
+            return None
+
+        if self.distance < 3:
+            return 1
+        if self.distance < 5:
+            return 2
+
+        return min((self.distance - 5) // 3 + 3, 9)
+
+    @cached_property
+    def min_portal_open_cost(self):
+        if self.world_source.is_exo or self.world_dest.is_exo:
+            return None
+
+        return self.min_portal_cost * 50
+
+    @cached_property
+    def min_conduits(self):
+        if self.world_source.is_exo or self.world_dest.is_exo:
+            return None
+
+        return PORTAL_CONDUITS[self.min_portal_cost - 1]
 
 
 class WorldBlockColor(
