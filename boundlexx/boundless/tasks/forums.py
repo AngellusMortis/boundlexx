@@ -197,10 +197,16 @@ def _parse_title(title):
 
 def _get_world_image(raw_html, name):
     image = None
-    images = raw_html.find_all("a", {"class": "lightbox"})
+
+    if "lightbox" in str(raw_html)[:100]:
+        images = raw_html.find_all("a", {"class": "lightbox"})
+        attribute = "href"
+    else:
+        images = raw_html.find_all("img")
+        attribute = "src"
 
     if len(images) > 0:
-        image_url = images[0].get("href")
+        image_url = images[0].get(attribute)
         logger.info("Downloading image for topic %s", image_url)
 
         response = requests.get(image_url)
