@@ -502,7 +502,11 @@ class WorldDistance(
 
     @cached_property
     def min_portal_cost(self):
-        if self.world_source.is_exo or self.world_dest.is_exo:
+        if (
+            self.world_source.is_exo
+            or self.world_dest.is_exo
+            or self.distance > 25
+        ):
             return None
 
         if self.distance < 3:
@@ -514,14 +518,14 @@ class WorldDistance(
 
     @cached_property
     def min_portal_open_cost(self):
-        if self.world_source.is_exo or self.world_dest.is_exo:
+        if self.min_portal_cost is None:
             return None
 
         return self.min_portal_cost * 50
 
     @cached_property
     def min_conduits(self):
-        if self.world_source.is_exo or self.world_dest.is_exo:
+        if self.min_portal_cost is None:
             return None
 
         return PORTAL_CONDUITS[self.min_portal_cost - 1]
