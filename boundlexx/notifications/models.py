@@ -1,13 +1,16 @@
 from __future__ import annotations
 
-from typing import Dict, List, Tuple
+from datetime import timedelta
+from typing import Dict, List, Optional, Tuple
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
+from django.contrib.humanize.templatetags.humanize import intcomma, naturaltime
 from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
+from django.utils import timezone
 from django_celery_results.models import TaskResult
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
@@ -24,7 +27,7 @@ class SubscriptionBase(PolymorphicModel):
     )
     name = models.CharField(max_length=32, blank=True, null=True)
 
-    def send(self, message):
+    def send(self, **kwargs):
         raise NotImplementedError()
 
 
@@ -59,25 +62,41 @@ class DiscordWebhookSubscription(SubscriptionBase):
 
         return data
 
-    def send(self, message):
-        messages = message.split("%SPLIT_MESSAGE%")
+    def send(
+        self, embed=None, files=None, markdown=None
+    ):  # pylint: disable=arguments-differ
+        if embed is None and markdown is None:
+            raise ValueError("embed or markdown required")
 
-        send_meantions = False
         data_list = []
-        for m in messages:
-            if len(m.strip()) == 0:
-                continue
-
-            data = {"content": m}
-
-            if not send_meantions:
-                data = self._add_meantions_to_data(data, "roles", self.roles)
-                data = self._add_meantions_to_data(data, "users", self.users)
-                send_meantions = True
+        if embed is not None:
+            data = {"embeds": embed, "content": ""}
+            data = self._add_meantions_to_data(data, "roles", self.roles)
+            data = self._add_meantions_to_data(data, "users", self.users)
 
             data_list.append(data)
+        else:
+            messages = markdown.split("%SPLIT_MESSAGE%")
+            send_meantions = False
+            data_list = []
+            for m in messages:
+                if len(m.strip()) == 0:
+                    continue
 
-        send_discord_webhook.delay(self.webhook_url, data_list)
+                data = {"content": m}
+
+                if not send_meantions:
+                    data = self._add_meantions_to_data(
+                        data, "roles", self.roles
+                    )
+                    data = self._add_meantions_to_data(
+                        data, "users", self.users
+                    )
+                    send_meantions = True
+
+                data_list.append(data)
+
+        send_discord_webhook.delay(self.webhook_url, data_list, files)
 
 
 class NotificationBase(PolymorphicModel):
@@ -87,7 +106,10 @@ class NotificationBase(PolymorphicModel):
     active = models.BooleanField(default=True)
 
     def markdown(self, **kwargs):
-        raise NotImplementedError()
+        return None
+
+    def embed(self, **kwargs):
+        return None, None
 
     def _markdown_replace(self, message):
         return (
@@ -108,30 +130,60 @@ class BaseNotificationManager(PolymorphicManager):
             notification.subscription.send(message)
 
 
-class MarkdownNotificationManager(PolymorphicManager):
+class PolymorphicNotificationManager(PolymorphicManager):
     def send_notification(self, *args):
         notifications = self.filter(active=True)
 
         for notification in notifications:
-            message = notification.markdown(*args)
+            embed, files = notification.embed(*args)
+            markdown = notification.markdown(*args)
 
-            notification.subscription.send(message)
+            notification.subscription.send(
+                embed=embed, files=files, markdown=markdown
+            )
 
 
-class ExoworldNotificationManager(MarkdownNotificationManager):
+class ExoworldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
-        super().send_notification(world_poll.world, world_poll.resources)
+        world = world_poll.world
+        super().send_notification(world, world_poll.resources)
+
+        if (
+            world.image.name
+            and world.forum_id
+            and world.worldblockcolor_set.count() > 0
+        ):
+            world.exo_notification_sent = True
+        else:
+            world.exo_notification_sent = False
+
+            world.save()
 
     def send_update_notification(self, world):
-        super().send_notification(world)
+        send_update = (
+            world.address is not None
+            and world.is_exo
+            and world.exo_notification_sent is False
+            and (
+                (world.forum_id and world.image.name)
+                or timezone.now() > world.start + timedelta(days=1)
+            )
+        )
+
+        if send_update:
+            super().send_notification(world)
+            world.exo_notification_sent = True
+            world.save()
 
 
 class ExoworldNotification(NotificationBase):
     objects = ExoworldNotificationManager()
 
-    def markdown(
-        self, world, resources=None
-    ):  # pylint: disable=arguments-differ
+    _context = None
+
+    def _get_context(self, world, resources=None):
+        if self._context is not None:
+            return self._context
 
         colors = world.worldblockcolor_set.all().order_by("item__game_id")
         if colors.count() == 0:
@@ -155,7 +207,7 @@ class ExoworldNotification(NotificationBase):
                 color_group.append((order_index, color))
                 color_groups[group_name] = color_group
 
-            for group_name in color_groups:
+            for group_name in list(color_groups.keys()):
                 if len(color_groups[group_name]) == 0:
                     del color_groups[group_name]
                     continue
@@ -167,6 +219,7 @@ class ExoworldNotification(NotificationBase):
                     )
                 ]
 
+        context = {"world": world, "color_groups": color_groups}
         if resources is not None:
             embedded_resources = []
             surface_resources = []
@@ -177,28 +230,233 @@ class ExoworldNotification(NotificationBase):
                 else:
                     surface_resources.append(resource)
 
+            context["embedded_resources"] = embedded_resources
+            context["surface_resources"] = surface_resources
+
+        self._context = context
+        return self._context
+
+    def markdown(
+        self, world, resources=None
+    ):  # pylint: disable=arguments-differ
+        context = self._get_context(world, resources)
+
         message = ""
         if resources is None:
             message = render_to_string(
                 "boundlexx/notifications/exoworld_update.md",
-                {"world": world, "color_groups": color_groups},
+                context,
             )
         else:
             message = render_to_string(
                 "boundlexx/notifications/exoworld.md",
-                {
-                    "world": world,
-                    "embedded_resources": embedded_resources,
-                    "surface_resources": surface_resources,
-                    "color_groups": color_groups,
-                },
+                context,
             )
 
         return self._markdown_replace(message)
 
+    def _main_embed(self, world, is_update=False):
+        files: Optional[Dict[str, str]] = None
+
+        main_embed = {}
+        main_embed["title"] = world.display_name
+
+        if is_update:
+            main_embed[
+                "description"
+            ] = "New information is avaiable for the new exoworld!"
+        else:
+            main_embed["description"] = "A new exoworld world as appeared!"
+
+        if world.forum_url:
+            main_embed["url"] = world.forum_url
+
+        if world.image.name:
+            main_embed["thumbnail"] = {
+                "url": f"attachment://{world.image.name}"
+            }
+
+            files = {world.image.name: world.image.url}
+
+        main_embed["fields"] = [
+            {
+                "name": "ID",
+                "value": f"{world.name} ({world.id})",
+                "inline": True,
+            },
+            {
+                "name": "Server",
+                "value": f"{world.address}",
+                "inline": True,
+            },
+            {
+                "name": "Start",
+                "value": (
+                    f"{naturaltime(world.start)}\n"
+                    f"{world.start.isoformat()}"
+                ),
+                "inline": True,
+            },
+            {
+                "name": "End",
+                "value": f"{naturaltime(world.end)}\n{world.end.isoformat()}",
+                "inline": True,
+            },
+            {
+                "name": "Server Region",
+                "value": f"{world.get_region_display()}",
+                "inline": True,
+            },
+            {
+                "name": "Tier",
+                "value": f"{world.get_tier_display()}",
+                "inline": True,
+            },
+            {
+                "name": "World Type",
+                "value": f"{world.get_world_type_display()}",
+                "inline": True,
+            },
+            {
+                "name": "Protection",
+                "value": f"{world.protection}",
+                "inline": True,
+            },
+            {
+                "name": "World Size (16-block chunks)",
+                "value": f"{world.size}",
+                "inline": True,
+            },
+            {
+                "name": "Number of Regions",
+                "value": f"{world.number_of_regions}",
+                "inline": True,
+            },
+            {
+                "name": "Surface Liquid",
+                "value": f"{world.surface_liquid}",
+                "inline": True,
+            },
+            {
+                "name": "Core Liquid",
+                "value": f"{world.core_liquid}",
+                "inline": True,
+            },
+        ]
+
+        if world.assignment is not None:
+            value = f"{world.assignment}"
+            if world.assignment_distance is not None:
+                value += (
+                    f" @{world.assignment_distance} blinksecs"
+                    f" ({world.assignment_cost}c)"
+                )
+
+            main_embed["fields"].append(
+                {
+                    "name": "Closest Planet",
+                    "value": value,
+                }
+            )
+
+        return main_embed, files
+
+    def _resource_embed(self, embedded_resources, surface_resources):
+        resource_embed: dict = {"title": "World Resources"}
+        fields: List[Dict[str, str]] = []
+
+        resource_groups = (
+            (embedded_resources, "Embedded Resources"),
+            (surface_resources, "Surface Resources"),
+        )
+        for resources, title in resource_groups:
+            values = [""]
+            for index, resource in enumerate(resources):
+                rank = index + 1
+                value = values[-1]
+
+                new_value = (
+                    f"\n#{rank} **{resource.item.english}**: "
+                    f"_{resource.percentage}% ({intcomma(resource.count)})_"
+                )
+
+                value += new_value
+                if len(value) > 1024:
+                    values.append(new_value)
+                else:
+                    values[-1] = value
+
+            if len(values[0]) > 0:
+                for index, value in enumerate(values):
+                    if index > 0:
+                        title += " (cont.)"
+                    fields.append(
+                        {
+                            "name": title,
+                            "value": value,
+                        }
+                    )
+
+        if len(fields) == 0:
+            return None
+
+        resource_embed["fields"] = fields
+        return resource_embed
+
+    def _color_embed(self, color_groups):
+        color_embed: dict = {"title": "Block Colors"}
+        fields: List[Dict[str, str]] = []
+        for group_name, color_group in color_groups.items():
+            value = ""
+            for color in color_group:
+                value += (
+                    f"\n* **{color.item.english:25s}**: "
+                    f"_{color.color.default_name} ({color.color.game_id})_"
+                )
+
+                extra = []
+                if color.is_new_color:
+                    extra.append("**NEW**")
+                if color.exist_via_transform:
+                    extra.append("**TRANSFORM**")
+                if color.exist_via_transform:
+                    extra.append(f"**Days: {color.days_since_last}**")
+
+                value += f" {' | '.join(extra)}"
+
+            fields.append(
+                {"name": group_name.title() or "Gleam", "value": value.strip()}
+            )
+
+        if len(fields) == 0:
+            return None
+
+        color_embed["fields"] = fields
+        return color_embed
+
+    def embed(self, world, resources=None):  # pylint: disable=arguments-differ
+        context = self._get_context(world, resources)
+
+        embeds = []
+        main_embed, files = self._main_embed(world, resources is None)
+        embeds.append(main_embed)
+
+        if resources is not None:
+            resource_embed = self._resource_embed(
+                context["embedded_resources"], context["surface_resources"]
+            )
+            if resource_embed is not None:
+                embeds.append(resource_embed)
+
+        color_embed = self._color_embed(context["color_groups"])
+        if color_embed is not None:
+            embeds.append(color_embed)
+
+        return embeds, files
+
 
 class FailedTaskNotification(NotificationBase):
-    objects = MarkdownNotificationManager()
+    objects = PolymorphicNotificationManager()
 
     def markdown(self, task):  # pylint: disable=arguments-differ
         output = get_output_for_task(task)

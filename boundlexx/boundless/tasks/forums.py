@@ -1,6 +1,6 @@
 import re
 import time
-from datetime import timezone
+from datetime import timedelta, timezone
 from typing import Optional
 
 import dateparser
@@ -10,6 +10,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core.cache import cache
 from django.core.files.base import ContentFile
+from django.utils import timezone as dj_timezone
 from filetype.filetype import get_type
 
 from boundlexx.boundless.models import (
@@ -361,9 +362,14 @@ def ingest_exo_world_data():
             if created:
                 number_created += 1
 
-        parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
-        parse_cache.append(topic)
-        cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
+        # only add world as parsed if the data is "complete" and has image
+        cutoff = dj_timezone.now() - timedelta(days=7)
+        if "image" in world_info or world.start < cutoff:
+            parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
+            parse_cache.append(topic)
+            cache.set(
+                FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000
+            )
 
         logger.info(
             "Topic %s: Imported %s block color details for world %s",

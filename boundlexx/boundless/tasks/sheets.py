@@ -81,7 +81,7 @@ def _create_block_colors(world, block_colors, item_names):
 
         block_color.save()
 
-    if block_colors_created > 0 and world.address is not None and world.is_exo:
+    if block_colors_created > 0:
         ExoworldNotification.objects.send_update_notification(world)
 
     logger.info("%s: created %s color(s)", world, block_colors_created)

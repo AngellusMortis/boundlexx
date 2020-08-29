@@ -156,12 +156,19 @@ class WorldManager(models.Manager):
             world.end = world_info["end"]
         if "server" in world_info and world.region is None:
             world.region = world_info["server"]
+
+        new_data = False
         if "image" in world_info and (
             world.image is None or not world.image.name
         ):
             world.image = world_info["image"]
+            new_data = True
         if world.forum_id is None:
             world.forum_id = forum_id
+            new_data = True
+
+        if new_data:
+            ExoworldNotification.objects.send_update_notification(world)
 
         world.save()
 
@@ -300,6 +307,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     end = models.DateTimeField(blank=True, null=True, db_index=True)
 
     image = models.ImageField(blank=True, null=True)
+    exo_notification_sent = models.NullBooleanField()
 
     def __str__(self):
         return self.display_name
@@ -353,15 +361,20 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         if self.tier is None or self.tier < World.Tier.TIER_4:
             return None
 
-        amount = 5
+        points = "5 points + Pie"
+        amount = 10
         if self.tier == World.Tier.TIER_4:
             amount = 1
+            points = "1 points"
         elif self.tier == World.Tier.TIER_5:
             amount = 3
+            points = "3 points"
         elif self.tier == World.Tier.TIER_6:
-            amount = 4
-        elif self.tier == World.Tier.TIER_7:
             amount = 5
+            points = "4 points"
+        elif self.tier == World.Tier.TIER_7:
+            amount = 7
+            points = "5 points"
 
         protection_type = "Volatile"
         if self.world_type in (
@@ -379,7 +392,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         ):
             protection_type = "Potent"
 
-        return f"Lvl {amount} {protection_type}"
+        return f"Lvl {amount} {protection_type} ({points})"
 
     @property
     def surface_liquid(self):
@@ -456,6 +469,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
             return None
         return distance_obj.cost
 
+    @property
     def forum_url(self):
         if self.forum_id is None:
             return None

@@ -126,11 +126,7 @@ class WorldWSDataView(views.APIView):
             world, data[2], data[3]
         )
 
-        if (
-            block_colors_created > 0
-            and world.address is not None
-            and world.is_exo
-        ):
+        if block_colors_created > 0:
             ExoworldNotification.objects.send_update_notification(world)
 
         return Response(
