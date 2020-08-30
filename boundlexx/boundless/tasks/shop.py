@@ -1,6 +1,6 @@
 import hashlib
 from collections import namedtuple
-from typing import Dict
+from typing import Dict, List, Tuple
 
 from celery.utils.log import get_task_logger
 from django.core.cache import cache
@@ -47,6 +47,7 @@ def try_update_prices():
 
 def _get_ranks(item, rank_klass, all_worlds):
     ranks: Dict[str, ItemRank] = {}
+    worlds: List[Tuple[str]] = []
 
     now = timezone.now()
 
@@ -55,7 +56,9 @@ def _get_ranks(item, rank_klass, all_worlds):
         if rank.next_update < now:
             ranks[world.name] = rank
 
-    return ranks
+        worlds.append((world.name, world.api_url))
+
+    return ranks, worlds
 
 
 def _update_item_prices(
@@ -109,8 +112,16 @@ def _update_prices():
     logger.info("Updating the prices for %s items", len(items))
 
     all_worlds = list(
-        World.objects.filter(active=True, is_creative=False).filter(
-            Q(owner__isnull=False) | Q(end__isnull=True)
+        World.objects.filter(
+            active=True, is_creative=False, api_url__isnull=False
+        ).filter(
+            Q(end__isnull=True)
+            | Q(
+                is_locked=False,
+                end__isnull=False,
+                end__gt=timezone.now(),
+                owner__isnull=False,
+            )
         )
     )
     for item in items:
