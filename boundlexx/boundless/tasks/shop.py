@@ -56,8 +56,7 @@ def _get_ranks(item, rank_klass, all_worlds):
         rank, _ = rank_klass.objects.get_or_create(item=item, world=world)
         if rank.next_update < now:
             ranks[world.name] = rank
-
-        worlds.append(SimpleWorld(world.name, world.api_url))
+            worlds.append(SimpleWorld(world.name, world.api_url))
 
     return ranks, worlds
 
