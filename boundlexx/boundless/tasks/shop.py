@@ -66,14 +66,14 @@ def _update_item_prices(
 ):
 
     client = BoundlessClient()
-    ranks = _get_ranks(item, rank_klass, all_worlds)
+    ranks, worlds = _get_ranks(item, rank_klass, all_worlds)
 
     if len(ranks) == 0:
         return -1
 
     total = 0
     shops = getattr(client, client_method)(
-        item.game_id, worlds=list(ranks.keys())
+        item.game_id, worlds=worlds)
     )
 
     # set all existing price records to inactive
