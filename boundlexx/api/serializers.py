@@ -653,7 +653,7 @@ class WorldPollTBSerializer(NullSerializer):
 
 
 class SimpleWorldShopPriceSerializer(serializers.ModelSerializer):
-    # item = SimpleItemSerializer()
+    item = SimpleItemSerializer()
     location = LocationSerializer()
 
 
@@ -663,7 +663,7 @@ class SimpleWorldShopStandPriceSerializer(SimpleWorldShopPriceSerializer):
         fields = [
             "time",
             "location",
-            # "item",
+            "item",
             "item_count",
             "price",
             "beacon_name",
@@ -679,6 +679,41 @@ class SimpleWorldRequestBasketPriceSerializer(SimpleWorldShopPriceSerializer):
             "time",
             "location",
             "item",
+            "item_count",
+            "price",
+            "beacon_name",
+            "guild_tag",
+            "shop_activity",
+        ]
+
+
+class SimpleItemShopPriceSerializer(serializers.ModelSerializer):
+    world = SimpleWorldSerializer()
+    location = LocationSerializer()
+
+
+class SimpleItemShopStandPriceSerializer(SimpleItemShopPriceSerializer):
+    class Meta:
+        model = ItemShopStandPrice
+        fields = [
+            "time",
+            "location",
+            "world",
+            "item_count",
+            "price",
+            "beacon_name",
+            "guild_tag",
+            "shop_activity",
+        ]
+
+
+class SimpleItemRequestBasketPriceSerializer(SimpleItemShopPriceSerializer):
+    class Meta:
+        model = ItemRequestBasketPrice
+        fields = [
+            "time",
+            "location",
+            "world",
             "item_count",
             "price",
             "beacon_name",

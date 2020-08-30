@@ -5,6 +5,8 @@ from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
@@ -15,6 +17,8 @@ from boundlexx.api.serializers import (
     ItemResourceCountTimeSeriesSerializer,
     ItemResourceCountTimeSeriesTBSerializer,
     ItemSerializer,
+    SimpleItemRequestBasketPriceSerializer,
+    SimpleItemShopStandPriceSerializer,
     SimpleWorldSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
@@ -29,6 +33,8 @@ from boundlexx.api.views.mixins import (
 )
 from boundlexx.boundless.models import (
     Item,
+    ItemRequestBasketPrice,
+    ItemShopStandPrice,
     ResourceCount,
     World,
     WorldBlockColor,
@@ -151,6 +157,66 @@ class ItemViewSet(
         )
 
     retrieve.example = {"retrieve": {"value": ITEM_EXAMPLE}}  # type: ignore # noqa E501
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=SimpleItemShopStandPriceSerializer,
+        url_path="shop-stands",
+    )
+    def shop_stands(
+        self,
+        request,
+        game_id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Shop Stands for given world
+        """
+
+        item = self.get_object()
+
+        queryset = ItemShopStandPrice.objects.filter(
+            item=item, active=True
+        ).order_by("world_id")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=SimpleItemRequestBasketPriceSerializer,
+        url_path="request-baskets",
+    )
+    def request_baskets(
+        self,
+        request,
+        game_id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Request Baskets for given world
+        """
+
+        item = self.get_object()
+
+        queryset = ItemRequestBasketPrice.objects.filter(
+            item=item, active=True
+        ).order_by("world_id")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
 
 
 class ItemResourceTimeseriesViewSet(
