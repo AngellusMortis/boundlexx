@@ -82,7 +82,10 @@ def _update_item_prices(
     for world, shops in shops.items():
         state_hash = hashlib.sha512()
 
-        shops = sorted(shops, key=lambda s: s.location)
+        shops = sorted(
+            shops,
+            key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
+        )
         for shop in shops:
             item_price = price_klass.objects.create_from_shop_item(
                 world.name, item, shop
