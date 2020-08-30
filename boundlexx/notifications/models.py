@@ -108,7 +108,7 @@ class NotificationBase(PolymorphicModel):
     def markdown(self, **kwargs):
         return None
 
-    def embed(self, **kwargs):
+    def embed(self, *args, **kwargs):
         return None, None
 
     def _markdown_replace(self, message):
