@@ -62,7 +62,7 @@ def _get_ranks(item, rank_klass, all_worlds):
     return ranks, worlds
 
 
-def _create_item_prices(shops, price_klass, world, item):
+def _create_item_prices(shops, price_klass, world_name, item):
     shops = sorted(
         shops,
         key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
@@ -72,7 +72,7 @@ def _create_item_prices(shops, price_klass, world, item):
     state_hash = hashlib.sha512()
     for shop in shops:
         item_price = price_klass.objects.create_from_shop_item(
-            world.name, item, shop
+            world_name, item, shop
         )
 
         state_hash.update(item_price.state_hash)
@@ -99,14 +99,9 @@ def _update_item_prices(
         item=item, active=True, world__name__in=list(ranks.keys())
     ).update(active=False)
 
-    for world, shops in shops.items():
-        if isinstance(world, SimpleWorld):
-            world_name = world.name
-        else:
-            world_name = world
-
+    for world_name, shops in shops.items():
         item_total, state_hash = _create_item_prices(
-            shops, price_klass, world, item
+            shops, price_klass, world_name, item
         )
         total += item_total
 
