@@ -1,13 +1,14 @@
 import hashlib
 from collections import namedtuple
-from typing import Dict, List, Tuple
+from typing import Dict, List
 
 from celery.utils.log import get_task_logger
 from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 
-from boundlexx.boundless.client import BoundlessClient, World as SimpleWorld
+from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models import (
     Item,
     ItemBuyRank,
@@ -47,7 +48,7 @@ def try_update_prices():
 
 def _get_ranks(item, rank_klass, all_worlds):
     ranks: Dict[str, ItemRank] = {}
-    worlds: List[Tuple[str]] = []
+    worlds: List[SimpleWorld] = []
 
     now = timezone.now()
 
@@ -59,6 +60,25 @@ def _get_ranks(item, rank_klass, all_worlds):
         worlds.append(SimpleWorld(world.name, world.api_url))
 
     return ranks, worlds
+
+
+def _create_item_prices(shops, price_klass, world, item):
+    shops = sorted(
+        shops,
+        key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
+    )
+
+    total = 0
+    state_hash = hashlib.sha512()
+    for shop in shops:
+        item_price = price_klass.objects.create_from_shop_item(
+            world.name, item, shop
+        )
+
+        state_hash.update(item_price.state_hash)
+        total += 1
+
+    return total, state_hash
 
 
 def _update_item_prices(
@@ -80,19 +100,10 @@ def _update_item_prices(
     ).update(active=False)
 
     for world, shops in shops.items():
-        state_hash = hashlib.sha512()
-
-        shops = sorted(
-            shops,
-            key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
+        item_total, state_hash = _create_item_prices(
+            shops, price_klass, world, item
         )
-        for shop in shops:
-            item_price = price_klass.objects.create_from_shop_item(
-                world.name, item, shop
-            )
-
-            state_hash.update(item_price.state_hash)
-            total += 1
+        total += item_total
 
         digest = str(state_hash.hexdigest())
         rank = ranks[world.name]

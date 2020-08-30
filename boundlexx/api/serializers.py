@@ -5,6 +5,8 @@ from rest_framework.reverse import reverse
 from boundlexx.boundless.models import (
     Color,
     Item,
+    ItemRequestBasketPrice,
+    ItemShopStandPrice,
     LeaderboardRecord,
     LocalizedName,
     ResourceCount,
@@ -27,6 +29,15 @@ class AzureImageField(serializers.ImageField):
             return None
 
         return url
+
+
+class LocationSerializer(serializers.DictField):
+    def to_representation(self, value):
+        return {
+            "x": value.x,
+            "y": value.y,
+            "z": value.z,
+        }
 
 
 class NullSerializer(serializers.Serializer):
@@ -639,3 +650,38 @@ class WorldPollTBSerializer(NullSerializer):
     total_prestige_variance = serializers.FloatField(
         source="worldpollresult__total_prestige_variance",
     )
+
+
+class SimpleWorldShopPriceSerializer(serializers.ModelSerializer):
+    # item = SimpleItemSerializer()
+    location = LocationSerializer()
+
+
+class SimpleWorldShopStandPriceSerializer(SimpleWorldShopPriceSerializer):
+    class Meta:
+        model = ItemShopStandPrice
+        fields = [
+            "time",
+            "location",
+            # "item",
+            "item_count",
+            "price",
+            "beacon_name",
+            "guild_tag",
+            "shop_activity",
+        ]
+
+
+class SimpleWorldRequestBasketPriceSerializer(SimpleWorldShopPriceSerializer):
+    class Meta:
+        model = ItemRequestBasketPrice
+        fields = [
+            "time",
+            "location",
+            "item",
+            "item_count",
+            "price",
+            "beacon_name",
+            "guild_tag",
+            "shop_activity",
+        ]

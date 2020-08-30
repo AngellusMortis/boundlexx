@@ -14,6 +14,8 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
+    SimpleWorldRequestBasketPriceSerializer,
+    SimpleWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
     WorldDistanceSerializer,
     WorldPollLeaderboardSerializer,
@@ -28,7 +30,13 @@ from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
     TimeseriesMixin,
 )
-from boundlexx.boundless.models import World, WorldDistance, WorldPoll
+from boundlexx.boundless.models import (
+    ItemRequestBasketPrice,
+    ItemShopStandPrice,
+    World,
+    WorldDistance,
+    WorldPoll,
+)
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
@@ -104,6 +112,66 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     block_colors.example = {
         "block_colors": {"value": examples.WORLD_COLORS_EXAMPLE}
     }
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=SimpleWorldShopStandPriceSerializer,
+        url_path="shop-stands",
+    )
+    def shop_stands(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Shop Stands for given world
+        """
+
+        world = self.get_object()
+
+        queryset = ItemShopStandPrice.objects.filter(
+            world=world, active=True
+        ).order_by("item_id")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=SimpleWorldRequestBasketPriceSerializer,
+        url_path="request-baskets",
+    )
+    def request_baskets(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Request Baskets for given world
+        """
+
+        world = self.get_object()
+
+        queryset = ItemRequestBasketPrice.objects.filter(
+            world=world, active=True
+        ).order_by("item_id")
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
 
 
 class WorldPollViewSet(
