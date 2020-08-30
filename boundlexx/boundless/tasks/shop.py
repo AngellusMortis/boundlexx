@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import BoundlessClient, World as SimpleWorld
 from boundlexx.boundless.models import (
     Item,
     ItemBuyRank,
@@ -56,7 +56,7 @@ def _get_ranks(item, rank_klass, all_worlds):
         if rank.next_update < now:
             ranks[world.name] = rank
 
-        worlds.append((world.name, world.api_url))
+        worlds.append(SimpleWorld(world.name, world.api_url))
 
     return ranks, worlds
 
@@ -79,20 +79,20 @@ def _update_item_prices(
         item=item, active=True, world__name__in=list(ranks.keys())
     ).update(active=False)
 
-    for world_name, shops in shops.items():
+    for world, shops in shops.items():
         state_hash = hashlib.sha512()
 
         shops = sorted(shops, key=lambda s: s.location)
         for shop in shops:
             item_price = price_klass.objects.create_from_shop_item(
-                world_name, item, shop
+                world.name, item, shop
             )
 
             state_hash.update(item_price.state_hash)
             total += 1
 
         digest = str(state_hash.hexdigest())
-        rank = ranks[world_name]
+        rank = ranks[world.name]
         if rank.state_hash == digest:
             rank.decrease_rank()
         else:
