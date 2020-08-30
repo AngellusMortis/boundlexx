@@ -72,9 +72,7 @@ def _update_item_prices(
         return -1
 
     total = 0
-    shops = getattr(client, client_method)(
-        item.game_id, worlds=worlds)
-    )
+    shops = getattr(client, client_method)(item.game_id, worlds=worlds)
 
     # set all existing price records to inactive
     price_klass.objects.filter(
