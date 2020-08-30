@@ -64,6 +64,36 @@ ITEM_EXAMPLE = {
     },
 }
 
+ITEM_REQUEST_BASKETS_EXAMPLE = {
+    "time": "2020-08-30T15:30:27.593310-04:00",
+    "location": {"x": 1358, "y": 67, "z": 1320},
+    "world": {
+        "url": f"{get_base_url()}/api/v1/worlds/23/",
+        "id": 23,
+        "display_name": "Dand",
+    },
+    "item_count": 14400,
+    "price": "0.00",
+    "beacon_name": "",
+    "guild_tag": "",
+    "shop_activity": 0,
+}
+
+ITEM_SHOP_STAND_EXAMPLE = {
+    "time": "2020-08-30T15:30:30.037943-04:00",
+    "location": {"x": 1493, "y": 73, "z": 644},
+    "world": {
+        "url": f"{get_base_url()}/api/v1/worlds/23/",
+        "id": 23,
+        "display_name": "Dand",
+    },
+    "item_count": 89,
+    "price": "100.00",
+    "beacon_name": "",
+    "guild_tag": "",
+    "shop_activity": 0,
+}
+
 ITEM_RESOURCE_COUNT_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/items/10787/resource-counts/10/",
     "item_url": f"{get_base_url()}/api/v1/items/10787/",
@@ -188,6 +218,10 @@ class ItemViewSet(
 
         return Response(serializer.data)
 
+    shop_stands.example = {
+        "shop_stands": {"value": get_list_example(ITEM_SHOP_STAND_EXAMPLE)}
+    }
+
     @action(
         detail=True,
         methods=["get"],
@@ -217,6 +251,12 @@ class ItemViewSet(
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    request_baskets.example = {
+        "request_baskets": {
+            "value": get_list_example(ITEM_REQUEST_BASKETS_EXAMPLE)
+        }
+    }
 
 
 class ItemResourceTimeseriesViewSet(

@@ -48,6 +48,36 @@ WORLD_COLORS_EXAMPLE = {
     ],
 }
 
+WORLD_REQUEST_BASKETS_EXAMPLE = {
+    "time": "2020-08-30T15:30:22.721229-04:00",
+    "location": {"x": 1358, "y": 67, "z": 1320},
+    "item": {
+        "url": f"{get_base_url()}/api/v1/items/9829/",
+        "game_id": 9829,
+        "string_id": "ITEM_TYPE_SHOP_PLINTH_BUYING",
+    },
+    "item_count": 14400,
+    "price": "0.00",
+    "beacon_name": "",
+    "guild_tag": "",
+    "shop_activity": 0,
+}
+
+WORLD_SHOP_STANDS_EXAMPLE = {
+    "time": "2020-08-30T15:30:30.037943-04:00",
+    "location": {"x": 1493, "y": 73, "z": 644},
+    "item": {
+        "url": f"{get_base_url()}/api/v1/items/9830/",
+        "game_id": 9830,
+        "string_id": "ITEM_TYPE_SHOP_PLINTH_SELLING",
+    },
+    "item_count": 89,
+    "price": "100.00",
+    "beacon_name": "",
+    "guild_tag": "",
+    "shop_activity": 0,
+}
+
 WORLD_POLL_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/10/polls/3/",
     "id": 3,

@@ -143,6 +143,12 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         return Response(serializer.data)
 
+    shop_stands.example = {
+        "shop_stands": {
+            "value": get_list_example(examples.WORLD_SHOP_STANDS_EXAMPLE)
+        }
+    }
+
     @action(
         detail=True,
         methods=["get"],
@@ -172,6 +178,12 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         serializer = self.get_serializer(queryset, many=True)
 
         return Response(serializer.data)
+
+    request_baskets.example = {
+        "request_baskets": {
+            "value": get_list_example(examples.WORLD_REQUEST_BASKETS_EXAMPLE)
+        }
+    }
 
 
 class WorldPollViewSet(
