@@ -100,13 +100,18 @@ def _update_item_prices(
     ).update(active=False)
 
     for world, shops in shops.items():
+        if isinstance(world, SimpleWorld):
+            world_name = world.name
+        else:
+            world_name = world
+
         item_total, state_hash = _create_item_prices(
             shops, price_klass, world, item
         )
         total += item_total
 
         digest = str(state_hash.hexdigest())
-        rank = ranks[world.name]
+        rank = ranks[world_name]
         if rank.state_hash == digest:
             rank.decrease_rank()
         else:
