@@ -9,6 +9,7 @@ from requests import HTTPError
 
 CLOUDFLARE_CACHE_KEY = "boundless:cloudflare_identifier"
 CLOUDFLARE_PURGE_KEY = "boundless:cloudflare_last_purge"
+ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
 
 
 def convert_linear_to_s(linear):
@@ -128,3 +129,23 @@ def get_next_rank_update(ranks):
         next_update += timedelta(minutes=5)
 
     return next_update
+
+
+def get_block_color_item_ids():
+    item_ids = cache.get(ITEM_COLOR_IDS_KEYS)
+
+    if item_ids is None:
+        from boundlexx.boundless.models import (  # noqa: E501 # pylint: disable=import-outside-toplevel,cyclic-import
+            WorldBlockColor,
+        )
+
+        block_colors = (
+            WorldBlockColor.objects.all()
+            .distinct("item_id")
+            .prefetch_related("item")
+        )
+        item_ids = [bc.item.game_id for bc in block_colors]
+
+        cache.set(ITEM_COLOR_IDS_KEYS, item_ids, timeout=86400)
+
+    return item_ids

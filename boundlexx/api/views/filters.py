@@ -3,16 +3,65 @@ from django.db.models import F, Func, Value
 from django.utils.translation import ugettext as _
 from django_filters.rest_framework import FilterSet, filters
 
-from boundlexx.boundless.models import ResourceCount, World, WorldBlockColor
+from boundlexx.boundless.models import (
+    Item,
+    ResourceCount,
+    World,
+    WorldBlockColor,
+)
+from boundlexx.boundless.utils import get_block_color_item_ids
+
+
+class LangFilter(filters.ChoiceFilter):
+    def __init__(self, *args, **kwargs):
+        kwargs["label"] = _("Filters the list of localized named returned.")
+        kwargs["choices"] = settings.BOUNDLESS_LANGUAGES
+
+        super().__init__(*args, **kwargs)
+
+    def filter(self, qs, value):  # noqa: A003
+        return qs
 
 
 class LocalizationFilterSet(FilterSet):
-    lang = filters.ChoiceFilter(
-        label=_("Filters the list of localized named returned."),
-        choices=settings.BOUNDLESS_LANGUAGES,
+    lang = LangFilter()
+
+
+class ItemFilterSet(LocalizationFilterSet):
+    has_colors = filters.BooleanFilter(
+        label=_("Filters out items with/without colors"),
+        method="filter_colors",
     )
 
-    def filter_queryset(self, queryset):
+    is_resource = filters.BooleanFilter(
+        label=_("Filters out items that are/are not resources"),
+        method="filter_resources",
+    )
+
+    class Meta:
+        model = Item
+        fields = [
+            "string_id",
+        ]
+
+    def filter_resources(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(
+                game_id__in=settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
+            )
+        elif value is False:
+            queryset = queryset.exclude(
+                game_id__in=settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
+            )
+
+        return queryset
+
+    def filter_colors(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(game_id__in=get_block_color_item_ids())
+        elif value is False:
+            queryset = queryset.exclude(game_id__in=get_block_color_item_ids())
+
         return queryset
 
 

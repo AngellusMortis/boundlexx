@@ -24,8 +24,8 @@ from boundlexx.api.serializers import (
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import (
     ItemColorFilterSet,
+    ItemFilterSet,
     ItemResourceCountFilterSet,
-    LocalizationFilterSet,
 )
 from boundlexx.api.views.mixins import (
     DescriptiveAutoSchemaMixin,
@@ -155,7 +155,7 @@ class ItemViewSet(
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
     ]
-    filterset_class = LocalizationFilterSet
+    filterset_class = ItemFilterSet
     search_fields = ["string_id", "localizedname__name"]
     ordering = ["-rank", "game_id"]
     ordering_fields: List[str] = []
