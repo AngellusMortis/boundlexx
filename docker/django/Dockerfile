@@ -29,15 +29,15 @@ FROM base as dev
 
 ENV PYTHONDONTWRITEBYTECODE 1
 
-# Requirements are installed here to ensure they will be cached.
-COPY ./requirements /requirements
-RUN pip install -r /requirements/dev.txt
-
 RUN apt-get update \
   && apt-get install -y git \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
   && rm -rf /var/lib/apt/lists/*
+
+# Requirements are installed here to ensure they will be cached.
+COPY ./requirements /requirements
+RUN pip install -r /requirements/dev.txt
 
 COPY --chown=django:django ./docker/django/entrypoint /entrypoint
 RUN chmod +x /entrypoint
