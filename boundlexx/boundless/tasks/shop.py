@@ -127,10 +127,9 @@ def _update_item_prices(
         )
         total += item_total
 
+        digest = str(state_hash.hexdigest())
         rank = ranks[world_name]
         if rank.state_hash != "":
-            digest = str(state_hash.hexdigest())
-
             if rank.state_hash == digest:
                 rank.decrease_rank()
             else:
