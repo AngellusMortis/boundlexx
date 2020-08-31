@@ -5,5 +5,5 @@ from boundlexx.boundless.models import ItemBuyRank, ItemSellRank
 
 @click.command()
 def command():
-    ItemBuyRank.objects.delete()
-    ItemSellRank.objects.delete()
+    ItemBuyRank.objects.all().delete()
+    ItemSellRank.objects.all().delete()
