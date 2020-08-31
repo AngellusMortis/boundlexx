@@ -5,6 +5,7 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
 from django.utils import timezone
+from django.utils.formats import localize
 
 from boundlexx.boundless.models import (
     Color,
@@ -73,6 +74,9 @@ class ItemRankInline(admin.TabularInline):
     ]
     can_delete = False
     max_num = 0
+
+    def next_update(self, obj):
+        return localize(obj.next_update)
 
 
 class ItemBuyRankInline(ItemRankInline):
