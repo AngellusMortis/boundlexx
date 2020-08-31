@@ -15,7 +15,6 @@ from django_celery_results.models import TaskResult
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.api.utils import get_base_url
-from boundlexx.celery.utils import get_output_for_task
 from boundlexx.notifications.tasks import send_discord_webhook
 
 User = get_user_model()

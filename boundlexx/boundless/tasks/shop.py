@@ -29,15 +29,27 @@ UpdateOption = namedtuple(
 
 
 UPDATE_PRICES_LOCK = "boundless:update_prices"
+LAST_UPDATE_PRICES = "boundless:update_prices_last"
 
 
 @app.task
 def try_update_prices():
     lock = cache.lock(UPDATE_PRICES_LOCK)
 
+    do_run = True
     if lock.locked():
-        logger.warning("Could not update prices, task already running")
-    else:
+        last_run = cache.get(LAST_UPDATE_PRICES)
+        if last_run is None:
+            logger.warning(
+                "update_prices task has not ran recently, breaking lock"
+            )
+            lock.reset()
+        else:
+            do_run = False
+            logger.warning("Could not update prices, task already running")
+
+    if do_run:
+        logger.info("Starting update_prices task")
         update_prices.delay()
 
 
@@ -48,6 +60,7 @@ def update_prices():
     acquired = lock.acquire(blocking=True, timeout=1)
 
     if acquired:
+        cache.set(LAST_UPDATE_PRICES, timezone.now(), timeout=28800)
         try:
             _update_prices()
         finally:
