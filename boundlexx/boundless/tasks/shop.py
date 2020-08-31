@@ -35,6 +35,16 @@ UPDATE_PRICES_LOCK = "boundless:update_prices"
 def try_update_prices():
     lock = cache.lock(UPDATE_PRICES_LOCK)
 
+    if lock.locked():
+        logger.warning("Could not update prices, task already running")
+    else:
+        update_prices.delay()
+
+
+@app.task
+def update_prices():
+    lock = cache.lock(UPDATE_PRICES_LOCK)
+
     acquired = lock.acquire(blocking=True, timeout=1)
 
     if acquired:
@@ -43,7 +53,7 @@ def try_update_prices():
         finally:
             lock.release()
     else:
-        logger.warning("Could not update prices, task already running")
+        raise Exception("Could not update prices, task already running")
 
 
 def _get_ranks(item, rank_klass, all_worlds):
