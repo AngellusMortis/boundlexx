@@ -5,7 +5,7 @@ from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.models import World, WorldDistance, WorldPoll
 from config.celery_app import app
 
@@ -155,12 +155,24 @@ def poll_worlds(world_ids=None):
         worlds = World.objects.filter(id__in=world_ids)
 
     client = BoundlessClient()
+    errors_total = 0
 
     for world in worlds:
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
 
         logger.info("Polling world %s", world.display_name)
-        world_data, poll_data = client.get_world_poll_by_id(world.id)
+
+        try:
+            world_data, poll_data = client.get_world_poll_by_id(world.id)
+        except HTTP_ERRORS as ex:
+            errors_total += 1
+            logger.error("%s while polling world %s", ex, world)
+
+            if errors_total > 5:
+                raise Exception(  # pylint: disable=raise-missing-from
+                    "Aborting due to large number of HTTP errors"
+                )
+            continue
 
         if world_data is None:
             logger.info(

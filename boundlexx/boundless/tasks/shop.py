@@ -7,7 +7,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models import (
     Item,
@@ -158,13 +158,31 @@ def _update_prices():
             )
         )
     )
+
+    errors_total = 0
+
     for item in items:
-        buy_updated = _update_item_prices(
-            item, ItemBuyRank, "shop_buy", ItemRequestBasketPrice, all_worlds
-        )
-        sell_updated = _update_item_prices(
-            item, ItemSellRank, "shop_sell", ItemShopStandPrice, all_worlds
-        )
+        try:
+            buy_updated = _update_item_prices(
+                item,
+                ItemBuyRank,
+                "shop_buy",
+                ItemRequestBasketPrice,
+                all_worlds,
+            )
+        except HTTP_ERRORS as ex:
+            errors_total += 1
+            buy_updated = -1
+            logger.error("%s while uploading buy prices of %s", ex, item)
+
+        try:
+            sell_updated = _update_item_prices(
+                item, ItemSellRank, "shop_sell", ItemShopStandPrice, all_worlds
+            )
+        except HTTP_ERRORS as ex:
+            errors_total += 1
+            sell_updated = -1
+            logger.error("%s while uploading sell prices of %s", ex, item)
 
         if buy_updated >= 0 or sell_updated >= 0:
             logger.info(
@@ -173,5 +191,8 @@ def _update_prices():
                 buy_updated,
                 sell_updated,
             )
-        else:
+        elif buy_updated == 0 and sell_updated == 0:
             logger.info("Skipped %s", item)
+
+        if errors_total > 10:
+            raise Exception("Aborting due to large number of HTTP errors")
