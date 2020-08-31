@@ -12,7 +12,10 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Color, Item
-from boundlexx.boundless.utils import convert_linear_rgb_to_hex
+from boundlexx.boundless.utils import (
+    convert_linear_rgb_to_hex,
+    get_next_rank_update,
+)
 from boundlexx.notifications.models import ExoworldNotification
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
@@ -475,6 +478,14 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
             return None
 
         return f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{self.forum_id}"
+
+    @property
+    def next_shop_stand_update(self):
+        return get_next_rank_update(self.itemsellrank_set.all())
+
+    @property
+    def next_request_basket_update(self):
+        return get_next_rank_update(self.itembuyrank_set.all())
 
 
 class WorldDistance(

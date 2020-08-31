@@ -11,6 +11,8 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
+from boundlexx.boundless.utils import get_next_rank_update
+
 
 class GameObjManager(PolymorphicManager):
     def get_queryset(self):
@@ -192,3 +194,11 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     @property
     def has_colors(self):
         return self.worldblockcolor_set.count() > 0
+
+    @property
+    def next_shop_stand_update(self):
+        return get_next_rank_update(self.itemsellrank_set.all())
+
+    @property
+    def next_request_basket_update(self):
+        return get_next_rank_update(self.itembuyrank_set.all())

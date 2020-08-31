@@ -209,12 +209,25 @@ class ItemSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     resource_counts_url = ResourceCountLinkField()
+    request_baskets_url = serializers.HyperlinkedIdentityField(
+        view_name="item-shop-stands",
+        lookup_field="game_id",
+        read_only=True,
+    )
+    shop_stands_url = serializers.HyperlinkedIdentityField(
+        view_name="item-request-baskets",
+        lookup_field="game_id",
+        read_only=True,
+    )
     colors_url = ItemColorsLinkField()
     localization = LocalizedNameSerializer(
         source="localizedname_set",
         many=True,
     )
     item_subtitle = SubtitleSerializer()
+
+    next_shop_stand_update = serializers.DateTimeField(allow_null=True)
+    next_request_basket_update = serializers.DateTimeField(allow_null=True)
 
     class Meta:
         model = Item
@@ -224,6 +237,10 @@ class ItemSerializer(serializers.ModelSerializer):
             "game_id",
             "string_id",
             "resource_counts_url",
+            "request_baskets_url",
+            "next_request_basket_update",
+            "shop_stands_url",
+            "next_shop_stand_update",
             "localization",
             "item_subtitle",
         ]
@@ -305,9 +322,22 @@ class WorldSerializer(serializers.ModelSerializer):
         lookup_url_kwarg=["world_source__id"],
         read_only=True,
     )
+    request_baskets_url = serializers.HyperlinkedIdentityField(
+        view_name="world-shop-stands",
+        lookup_field="id",
+        read_only=True,
+    )
+    shop_stands_url = serializers.HyperlinkedIdentityField(
+        view_name="world-request-baskets",
+        lookup_field="id",
+        read_only=True,
+    )
     assignment = SimpleWorldSerializer()
     image_url = AzureImageField(source="image", allow_null=True)
     forum_url = serializers.URLField(allow_null=True)
+
+    next_shop_stand_update = serializers.DateTimeField(allow_null=True)
+    next_request_basket_update = serializers.DateTimeField(allow_null=True)
 
     class Meta:
         model = World
@@ -316,6 +346,10 @@ class WorldSerializer(serializers.ModelSerializer):
             "polls_url",
             "block_colors_url",
             "distances_url",
+            "request_baskets_url",
+            "next_request_basket_update",
+            "shop_stands_url",
+            "next_shop_stand_update",
             "id",
             "name",
             "display_name",

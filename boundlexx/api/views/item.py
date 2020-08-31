@@ -144,6 +144,8 @@ class ItemViewSet(
             "localizedname_set",
             "item_subtitle__localizedname_set",
             "worldblockcolor_set",
+            "itembuyrank_set",
+            "itemsellrank_set",
         )
     )
     serializer_class = ItemSerializer

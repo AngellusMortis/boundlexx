@@ -115,3 +115,16 @@ def purge_cache():
     cache.set(CLOUDFLARE_PURGE_KEY, next_purge, timeout=60)
 
     return True
+
+
+def get_next_rank_update(ranks):
+    next_update = None
+
+    for item_rank in ranks:
+        if next_update is None or item_rank.next_update < next_update:
+            next_update = item_rank.next_update
+
+    if next_update is not None:
+        next_update += timedelta(minutes=5)
+
+    return next_update
