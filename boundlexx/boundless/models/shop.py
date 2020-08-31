@@ -98,7 +98,7 @@ class ItemRequestBasketPrice(
 class ItemRank(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     world = models.ForeignKey(World, on_delete=models.CASCADE)
-    rank = models.PositiveSmallIntegerField(default=5)
+    rank = models.PositiveSmallIntegerField(default=20)
     last_update = models.DateTimeField(blank=True, null=True)
     state_hash = models.CharField(max_length=128, default="")
 
