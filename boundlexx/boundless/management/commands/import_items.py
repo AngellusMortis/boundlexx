@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 from collections import namedtuple
 from struct import unpack_from
 from typing import Dict, List
