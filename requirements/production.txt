@@ -36,9 +36,9 @@ django-polymorphic==3.0.0  # via -r /app/requirements/in/base.in
 django-prometheus==2.1.0  # via -r /app/requirements/in/base.in
 django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lock
 django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
-django-storages[azure]==1.9.1  # via -r /app/requirements/in/base.in
+django-storages[azure]==1.10  # via -r /app/requirements/in/base.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-timezone-field, djangorestframework
+django==3.1               # via -r /app/requirements/in/base.in, django-celery-beat, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-timezone-field, djangorestframework
 djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, drf-extensions
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 filetype==1.0.7           # via -r /app/requirements/in/base.in
