@@ -187,16 +187,17 @@ def _update_prices():
         if buy_updated >= -1 or sell_updated >= -1:
             if buy_updated == -1 and sell_updated == -1:
                 logger.info("Skipped %s", item)
+            else:
 
-            def status(v):
-                return v if v >= 0 else "skipped" if v == -1 else "error"
+                def status(v):
+                    return v if v >= 0 else "skipped" if v == -1 else "error"
 
-            logger.info(
-                "Updated %s (Baskets: %s, Stands: %s)",
-                item,
-                status(buy_updated),
-                status(sell_updated),
-            )
+                logger.info(
+                    "Updated %s (Baskets: %s, Stands: %s)",
+                    item,
+                    status(buy_updated),
+                    status(sell_updated),
+                )
 
         if errors_total > 10:
             raise Exception("Aborting due to large number of HTTP errors")
