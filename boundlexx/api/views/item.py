@@ -20,6 +20,7 @@ from boundlexx.api.serializers import (
     SimpleItemRequestBasketPriceSerializer,
     SimpleItemShopStandPriceSerializer,
     SimpleWorldSerializer,
+    WorldColorSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import (
@@ -433,7 +434,6 @@ class ItemColorsViewSet(
         "world",
         "item",
     ).prefetch_related("color__localizedname_set")
-    serializer_class = ItemColorSerializer
     lookup_field = "color__game_id"
     filter_backends = [
         DjangoFilterBackend,
@@ -443,11 +443,26 @@ class ItemColorsViewSet(
     filterset_class = ItemColorFilterSet
     search_fields = [
         "color__localizedname__name",
-        "world__display_name",
-        "world__name",
     ]
-    ordering = ["-rank", "color__game_id"]
+    ordering = ["-rank", "color__game_id", "world_id"]
     ordering_fields: List[str] = []
+
+    serializer_class = ItemColorSerializer
+    detail_serializer_class = WorldColorSerializer
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if self.action == "list":
+            queryset = queryset.distinct("rank", "color__game_id")
+
+        return queryset
+
+    def get_serializer_class(self):
+        if self.action == "retrieve":
+            return self.detail_serializer_class
+
+        return super().get_serializer_class()
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

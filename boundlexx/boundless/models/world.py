@@ -115,6 +115,8 @@ class WorldManager(models.Manager):
 
         if start is not None:
             world.start = start
+
+        if end is not None:
             world.end = end
 
         world.save()
@@ -552,6 +554,7 @@ class WorldBlockColor(
     _new_color = models.NullBooleanField()
     _exist_on_perm = models.NullBooleanField()
     _exist_via_transform = models.NullBooleanField()
+    _days_since_last = models.IntegerField(null=True, blank=True)
 
     class Meta:
         unique_together = ("world", "item")
@@ -559,14 +562,14 @@ class WorldBlockColor(
     @property
     def exist_on_perm(self):
         if self._exist_on_perm is None:
-            if self.world.start is None:
+            if self.world.end is None:
                 exist_on_perm = True
             else:
                 exist_on_perm = (
                     WorldBlockColor.objects.filter(
                         item=self.item,
                         color=self.color,
-                        world__start__isnull=True,
+                        world__end__isnull=True,
                     ).count()
                     > 0
                 )
@@ -579,7 +582,7 @@ class WorldBlockColor(
         if self._new_color is None:
             if self.exist_on_perm:
                 new_color = False
-            elif self.world.start is None:
+            elif self.world.end is None:
                 new_color = True
             else:
                 new_color = (
@@ -610,7 +613,7 @@ class WorldBlockColor(
                 WorldBlockColor.objects.filter(
                     item=self.item,
                     color=self.color,
-                    world__start__isnull=True,
+                    world__end__isnull=True,
                 ).count()
                 > 0
             ):
@@ -620,7 +623,7 @@ class WorldBlockColor(
                 WorldBlockColor.objects.filter(
                     item__game_id__in=self.transform_group,
                     color=self.color,
-                    world__start__isnull=True,
+                    world__end__isnull=True,
                 ).count()
                 > 0
             )
@@ -629,8 +632,11 @@ class WorldBlockColor(
             self.save()
         return self._exist_via_transform
 
-    @cached_property
+    @property
     def days_since_last(self):
+        if self._days_since_last is not None:
+            return self._days_since_last
+
         if self._new_color:
             return None
 
@@ -647,6 +653,8 @@ class WorldBlockColor(
             WorldBlockColor.objects.filter(
                 item=self.item,
                 color=self.color,
+                world__owner__isnull=True,
+                world__is_creative=False,
                 world__end__isnull=False,
                 world__end__lt=self.world.start,
             )
@@ -657,7 +665,12 @@ class WorldBlockColor(
         if last is None:
             return None
 
-        return (self.world.start - last.world.end).days  # type: ignore
+        self._days_since_last = (
+            self.world.start - last.world.end  # type: ignore
+        ).days
+        self.save()
+
+        return self._days_since_last
 
 
 class WorldCreatureColor(

@@ -502,6 +502,16 @@ class BlockColorSerializer(serializers.ModelSerializer):
 
 class ItemColorSerializer(serializers.ModelSerializer):
     color = SimpleColorSerializer()
+
+    class Meta:
+        model = WorldBlockColor
+        fields = [
+            "color",
+            "exist_on_perm",
+        ]
+
+
+class WorldColorSerializer(serializers.ModelSerializer):
     world = SimpleWorldSerializer()
 
     class Meta:

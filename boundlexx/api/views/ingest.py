@@ -77,6 +77,9 @@ class WorldWSDataView(views.APIView):
                     owner__isnull=True,
                 ).get()
 
+        if world is not None and world.is_creative:
+            world = None
+
         return world
 
     def _create_colors(self, world, block_colors, creature_colors):
