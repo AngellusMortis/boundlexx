@@ -52,7 +52,7 @@ django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-storages[azure]==1.10  # via -r /app/requirements/in/base.in
 django-stubs==1.5.0       # via -r /app/requirements/in/dev.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.1               # via -r /app/requirements/in/base.in, django-celery-beat, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-stubs, django-timezone-field, djangorestframework
+django==3.0.9             # via -r /app/requirements/in/base.in, django-celery-beat, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-stubs, django-timezone-field, djangorestframework
 djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, drf-extensions
 docutils==0.16            # via sphinx
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
