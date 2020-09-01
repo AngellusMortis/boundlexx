@@ -40,7 +40,7 @@ from boundlexx.boundless.models import (
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = World.objects.filter(active=True).prefetch_related(
+    queryset = World.objects.all().prefetch_related(
         "worldblockcolor_set",
         "worldblockcolor_set__item",
         "worldblockcolor_set__color",
@@ -192,7 +192,7 @@ class WorldPollViewSet(
     TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
 ):
     schema = DescriptiveAutoSchema(tags=["World"])
-    queryset = WorldPoll.objects.filter(world__active=True).prefetch_related(
+    queryset = WorldPoll.objects.all().prefetch_related(
         "worldpollresult_set",
         "leaderboardrecord_set",
         "resourcecount_set",

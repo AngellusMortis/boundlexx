@@ -73,6 +73,10 @@ class WorldFilterSet(FilterSet):
         label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
     )
+    show_inactive = filters.BooleanFilter(
+        label=_("Include inactive worlds (no longer in game API)"),
+        method="filter_inactive",
+    )
 
     class Meta:
         model = World
@@ -103,6 +107,18 @@ class WorldFilterSet(FilterSet):
             queryset = queryset.filter(owner__isnull=False)
         elif value is False:
             queryset = queryset.filter(owner__isnull=True)
+        return queryset
+
+    def filter_inactive(self, queryset, name, value):
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+
+        if "id" not in self.request.parser_context["kwargs"]:
+            if self.form.cleaned_data["show_inactive"] is not True:
+                queryset = queryset.filter(active=True)
+
         return queryset
 
 
