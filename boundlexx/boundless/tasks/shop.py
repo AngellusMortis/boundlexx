@@ -142,6 +142,14 @@ def _update_item_prices(
     return total
 
 
+def _log_worlds(all_worlds):
+    worlds = []
+    for world in all_worlds:
+        worlds.append((world.name, world.api_url))
+
+    logger.info("All worlds: %s", worlds)
+
+
 def _update_prices():
     items = Item.objects.filter(active=True)
     logger.info("Updating the prices for %s items", len(items))
@@ -149,7 +157,8 @@ def _update_prices():
     all_worlds = list(
         World.objects.filter(
             active=True, is_creative=False, api_url__isnull=False
-        ).filter(
+        )
+        .filter(
             Q(end__isnull=True)
             | Q(
                 is_locked=False,
@@ -158,7 +167,9 @@ def _update_prices():
                 owner__isnull=False,
             )
         )
+        .exclude(api_url="")
     )
+    _log_worlds(all_worlds)
 
     errors_total = 0
 
