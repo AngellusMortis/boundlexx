@@ -143,14 +143,18 @@ class LangFilterListSerializer(
 ):  # pylint: disable=abstract-method
     def to_representation(self, data):
         data = super().to_representation(data)
+        lang = self.context["request"].query_params.get("lang", "all")
 
-        if "lang" in self.context["request"].query_params:
-            lang = self.context["request"].query_params["lang"]
-            new_data = []
-            for item in data:
-                if item["lang"] == lang:
-                    new_data.append(item)
-            data = new_data
+        if lang == "all":
+            return data
+        if lang == "none":
+            return []
+
+        new_data = []
+        for item in data:
+            if item["lang"] == lang:
+                new_data.append(item)
+        data = new_data
 
         return data
 

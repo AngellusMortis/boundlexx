@@ -15,7 +15,10 @@ from boundlexx.boundless.utils import get_block_color_item_ids
 class LangFilter(filters.ChoiceFilter):
     def __init__(self, *args, **kwargs):
         kwargs["label"] = _("Filters the list of localized named returned.")
-        kwargs["choices"] = settings.BOUNDLESS_LANGUAGES
+        kwargs["choices"] = settings.BOUNDLESS_LANGUAGES + [
+            ("none", "None"),
+            ("all", "All"),
+        ]
 
         super().__init__(*args, **kwargs)
 
