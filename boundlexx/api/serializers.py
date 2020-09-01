@@ -358,7 +358,6 @@ class WorldSerializer(serializers.ModelSerializer):
             "assignment",
             "region",
             "tier",
-            "description",
             "size",
             "world_type",
             "time_offset",
