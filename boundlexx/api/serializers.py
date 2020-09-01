@@ -464,6 +464,7 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
             "is_new_color",
             "exist_on_perm",
             "exist_via_transform",
+            "days_since_last",
         ]
 
 
@@ -500,6 +501,7 @@ class BlockColorSerializer(serializers.ModelSerializer):
             "is_new_color",
             "exist_on_perm",
             "exist_via_transform",
+            "days_since_last",
         ]
 
 
@@ -525,6 +527,7 @@ class WorldColorSerializer(serializers.ModelSerializer):
             "is_new_color",
             "exist_on_perm",
             "exist_via_transform",
+            "days_since_last",
         ]
 
 
