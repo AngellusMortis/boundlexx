@@ -138,7 +138,7 @@ class WorldBlockColorFilterSet(FilterSet):
         method="filter_sovereign",
     )
     show_inactive_colors = filters.BooleanFilter(
-        label=_("Include previous avaible Sovereign colors"),
+        label=_("Include previous avaiable Sovereign colors"),
         method="filter_null",
     )
 
@@ -234,7 +234,7 @@ class ItemResourceCountFilterSet(FilterSet):
 
 class ItemColorFilterSet(WorldBlockColorFilterSet):
     show_inactive_colors = filters.BooleanFilter(
-        label=_("Include previous avaible Sovereign colors"),
+        label=_("Include previous avaiable Sovereign colors"),
         method="filter_null",
     )
 
