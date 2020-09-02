@@ -91,13 +91,17 @@ class BlockColorViewSet(
     viewsets.ReadOnlyModelViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Color"])
-    queryset = WorldBlockColor.objects.select_related(
-        "item",
-        "world",
-        "item__item_subtitle",
-    ).prefetch_related(
-        "item__localizedname_set",
-        "item__item_subtitle__localizedname_set",
+    queryset = (
+        WorldBlockColor.objects.filter(world__is_creative=False)
+        .select_related(
+            "item",
+            "world",
+            "item__item_subtitle",
+        )
+        .prefetch_related(
+            "item__localizedname_set",
+            "item__item_subtitle__localizedname_set",
+        )
     )
 
     serializer_class = BlockColorSerializer

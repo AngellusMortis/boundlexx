@@ -77,7 +77,7 @@ class WorldWSDataView(views.APIView):
                     owner__isnull=True,
                 ).get()
 
-        if world is not None and world.is_creative:
+        if world is not None:
             world = None
 
         return world
@@ -94,8 +94,8 @@ class WorldWSDataView(views.APIView):
             if item is not None:
                 color = Color.objects.get(game_id=block_color[1])
 
-                _, created = WorldBlockColor.objects.get_or_create(
-                    world=world, item=item, defaults={"color": color}
+                _, created = WorldBlockColor.objects.get_or_create_color(
+                    world=world, item=item, color=color
                 )
 
                 if created:

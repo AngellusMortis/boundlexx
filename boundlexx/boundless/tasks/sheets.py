@@ -72,7 +72,7 @@ def _create_block_colors(world, block_colors, item_names):
             continue
 
         color = Color.objects.get(game_id=int(raw_block_color[0].strip()))
-        block_color, created = WorldBlockColor.objects.get_or_create(
+        block_color, created = WorldBlockColor.objects.get_or_create_color(
             world=world, item=item, color=color
         )
 

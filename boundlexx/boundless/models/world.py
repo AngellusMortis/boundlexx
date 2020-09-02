@@ -544,20 +544,46 @@ class WorldDistance(
         return PORTAL_CONDUITS[self.min_portal_cost - 1]
 
 
+class WorldBlockColorManager(models.Manager):
+    def get_or_create_color(self, world, item, color):
+        created = False
+        block_color = self.filter(world=world, item=item, active=True).first()
+
+        if block_color is None or (
+            world.owner is not None and block_color.color != color
+        ):
+            if world.owner is not None:
+                self.filter(world=world, item=item, active=True).update(
+                    active=False
+                )
+
+            created = True
+            block_color = self.create(
+                world=world, item=item, color=color, active=True
+            )
+        elif block_color.color != color:
+            block_color.color = color
+            block_color.save()
+
+        return block_color, created
+
+
 class WorldBlockColor(
     ExportModelOperationsMixin("world_block_color"), models.Model  # type: ignore # noqa E501
 ):
+    objects = WorldBlockColorManager()
+
     world = models.ForeignKey(World, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
+
+    time = models.DateTimeField(auto_now_add=True)
+    active = models.BooleanField(default=True)
 
     _new_color = models.NullBooleanField()
     _exist_on_perm = models.NullBooleanField()
     _exist_via_transform = models.NullBooleanField()
     _days_since_last = models.IntegerField(null=True, blank=True)
-
-    class Meta:
-        unique_together = ("world", "item")
 
     @property
     def exist_on_perm(self):
@@ -634,42 +660,43 @@ class WorldBlockColor(
 
     @property
     def days_since_last(self):
+        if self._days_since_last == -1:
+            return None
         if self._days_since_last is not None:
             return self._days_since_last
 
         if self._new_color:
             return None
 
+        self._days_since_last = -1
+
         # color exists on perm world
         if (
             WorldBlockColor.objects.filter(
                 item=self.item, color=self.color, world__end__isnull=True
             ).count()
-            > 0
+            == 0
         ):
-            return None
-
-        last = (
-            WorldBlockColor.objects.filter(
-                item=self.item,
-                color=self.color,
-                world__owner__isnull=True,
-                world__is_creative=False,
-                world__end__isnull=False,
-                world__end__lt=self.world.start,
+            last = (
+                WorldBlockColor.objects.filter(
+                    item=self.item,
+                    color=self.color,
+                    world__owner__isnull=True,
+                    world__is_creative=False,
+                    world__end__isnull=False,
+                    world__end__lt=self.world.start,
+                )
+                .order_by("-world__end")
+                .first()
             )
-            .order_by("-world__end")
-            .first()
-        )
 
-        if last is None:
-            return None
-
-        self._days_since_last = (
-            self.world.start - last.world.end  # type: ignore
-        ).days
+            self._days_since_last = (
+                self.world.start - last.world.end  # type: ignore
+            ).days
         self.save()
 
+        if self._days_since_last == -1:
+            return None
         return self._days_since_last
 
 

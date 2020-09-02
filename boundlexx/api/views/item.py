@@ -429,11 +429,15 @@ class ItemColorsViewSet(
     viewsets.ReadOnlyModelViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Item"])
-    queryset = WorldBlockColor.objects.select_related(
-        "color",
-        "world",
-        "item",
-    ).prefetch_related("color__localizedname_set")
+    queryset = (
+        WorldBlockColor.objects.filter(world__is_creative=False)
+        .select_related(
+            "color",
+            "world",
+            "item",
+        )
+        .prefetch_related("color__localizedname_set")
+    )
     lookup_field = "color__game_id"
     filter_backends = [
         DjangoFilterBackend,

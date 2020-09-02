@@ -1,3 +1,4 @@
+from collections import namedtuple
 from typing import List
 
 from django.db.models import Q
@@ -37,6 +38,8 @@ from boundlexx.boundless.models import (
     WorldDistance,
     WorldPoll,
 )
+
+BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
@@ -105,8 +108,21 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         world = self.get_object()
 
+        show_inactive_colors = request.query_params.get(
+            "show_inactive_colors", False
+        )
+
+        all_block_colors = list(world.worldblockcolor_set.all())
+
+        block_colors = []
+        for bc in all_block_colors:
+            if show_inactive_colors or bc.active:
+                block_colors.append(bc)
+
+        response = BlockColorResponse(world.id, block_colors)
+
         serializer = self.get_serializer_class()(
-            world, context={"request": request}
+            response, context={"request": request}
         )
 
         return Response(serializer.data)

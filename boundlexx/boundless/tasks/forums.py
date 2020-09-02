@@ -359,10 +359,8 @@ def ingest_exo_world_data():
 
         number_created = 0
         for block_color in block_colors:
-            _, created = WorldBlockColor.objects.get_or_create(
-                world=world,
-                item=block_color[0],
-                defaults={"color": block_color[1]},
+            _, created = WorldBlockColor.objects.get_or_create_color(
+                world=world, item=block_color[0], color=block_color[1]
             )
 
             if created:
@@ -398,10 +396,8 @@ def ingest_perm_world_data():
 
         number_created = 0
         for block_color in block_colors:
-            _, created = WorldBlockColor.objects.get_or_create(
-                world=world,
-                item=block_color[0],
-                defaults={"color": block_color[1]},
+            _, created = WorldBlockColor.objects.get_or_create_color(
+                world=world, item=block_color[0], color=block_color[1]
             )
 
             if created:

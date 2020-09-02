@@ -78,7 +78,11 @@ class WorldFilterSet(FilterSet):
     )
     show_inactive = filters.BooleanFilter(
         label=_("Include inactive worlds (no longer in game API)"),
-        method="filter_inactive",
+        method="filter_null",
+    )
+    show_inactive_colors = filters.BooleanFilter(
+        label=_("Include previous colors for world (Sovereign only)"),
+        method="filter_null",
     )
 
     class Meta:
@@ -112,7 +116,7 @@ class WorldFilterSet(FilterSet):
             queryset = queryset.filter(owner__isnull=True)
         return queryset
 
-    def filter_inactive(self, queryset, name, value):
+    def filter_null(self, queryset, name, value):
         return queryset
 
     def filter_queryset(self, queryset):
@@ -132,6 +136,10 @@ class WorldBlockColorFilterSet(FilterSet):
     is_sovereign = filters.BooleanFilter(
         label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
+    )
+    show_inactive_colors = filters.BooleanFilter(
+        label=_("Include previous avaible Sovereign colors"),
+        method="filter_null",
     )
 
     class Meta:
@@ -167,6 +175,17 @@ class WorldBlockColorFilterSet(FilterSet):
             queryset = queryset.filter(world__owner__isnull=False)
         elif value is False:
             queryset = queryset.filter(world__owner__isnull=True)
+        return queryset
+
+    def filter_null(self, queryset, name, value):
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+
+        if self.form.cleaned_data["show_inactive_colors"] is not True:
+            queryset = queryset.filter(active=True)
+
         return queryset
 
 
@@ -214,6 +233,11 @@ class ItemResourceCountFilterSet(FilterSet):
 
 
 class ItemColorFilterSet(WorldBlockColorFilterSet):
+    show_inactive_colors = filters.BooleanFilter(
+        label=_("Include previous avaible Sovereign colors"),
+        method="filter_null",
+    )
+
     class Meta:
         model = WorldBlockColor
         fields = [
@@ -224,6 +248,17 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
             "world__name",
             "world__display_name",
         ]
+
+    def filter_null(self, queryset, name, value):
+        return queryset
+
+    def filter_queryset(self, queryset):
+        queryset = super().filter_queryset(queryset)
+
+        if self.form.cleaned_data["show_inactive_colors"] is not True:
+            queryset = queryset.filter(active=True)
+
+        return queryset
 
 
 class TimeseriesFilterSet(FilterSet):

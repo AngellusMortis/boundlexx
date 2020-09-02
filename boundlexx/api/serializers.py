@@ -531,19 +531,13 @@ class WorldColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorldBlockColorsViewSerializer(serializers.ModelSerializer):
+class WorldBlockColorsViewSerializer(serializers.Serializer):
     world_url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
         read_only=True,
     )
-    block_colors = WorldBlockColorSerializer(
-        many=True, read_only=True, source="worldblockcolor_set"
-    )
-
-    class Meta:
-        model = World
-        fields = ["world_url", "block_colors"]
+    block_colors = WorldBlockColorSerializer(many=True, read_only=True)
 
 
 class WorldPollSerializer(serializers.ModelSerializer):
