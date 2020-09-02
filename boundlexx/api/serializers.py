@@ -531,7 +531,9 @@ class WorldColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorldBlockColorsViewSerializer(serializers.Serializer):
+class WorldBlockColorsViewSerializer(
+    serializers.Serializer
+):  # pylint: disable=abstract-method
     world_url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
