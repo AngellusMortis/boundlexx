@@ -118,6 +118,43 @@ class ResourceCountLinkField(serializers.ModelField):
         return None
 
 
+class ShopURL(serializers.ModelField):
+    def __init__(self, *args, **kwargs):
+        kwargs["read_only"] = True
+        kwargs["model_field"] = None
+        kwargs["allow_null"] = True
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, value):  # pylint: disable=arguments-differ
+        return Hyperlink(value, None)
+
+    def get_url(self, obj):
+        return None
+
+    def get_attribute(self, obj):
+        if not obj.is_creative:
+            return self.get_url(obj)
+        return None
+
+
+class RequestBasketsURL(ShopURL):
+    def get_url(self, obj):
+        return reverse(
+            "world-request-baskets",
+            kwargs={"id": obj.id},
+            request=self.context["request"],
+        )
+
+
+class ShopStandsURL(ShopURL):
+    def get_url(self, obj):
+        return reverse(
+            "world-shop-stands",
+            args={"id": obj.id},
+            request=self.context["request"],
+        )
+
+
 class ItemColorsLinkField(serializers.ModelField):
     def __init__(self, *args, **kwargs):
         kwargs["read_only"] = True
@@ -326,16 +363,8 @@ class WorldSerializer(serializers.ModelSerializer):
         lookup_url_kwarg=["world_source__id"],
         read_only=True,
     )
-    request_baskets_url = serializers.HyperlinkedIdentityField(
-        view_name="world-shop-stands",
-        lookup_field="id",
-        read_only=True,
-    )
-    shop_stands_url = serializers.HyperlinkedIdentityField(
-        view_name="world-request-baskets",
-        lookup_field="id",
-        read_only=True,
-    )
+    request_baskets_url = RequestBasketsURL()
+    shop_stands_url = ShopStandsURL()
     assignment = SimpleWorldSerializer()
     image_url = AzureImageField(source="image", allow_null=True)
     forum_url = serializers.URLField(allow_null=True)
