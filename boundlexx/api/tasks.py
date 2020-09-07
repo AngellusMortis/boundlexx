@@ -50,18 +50,20 @@ def purge_cache(all_paths=False):
         logger.warning("Azure settings not configured")
         return
 
-    credentials = ServicePrincipalCredentials(
-        settings.AZURE_CLIENT_ID,
-        settings.AZURE_CLIENT_SECRET,
-        tenant=settings.AZURE_TENANT_ID,
-    )
+    try:
+        credentials = ServicePrincipalCredentials(
+            settings.AZURE_CLIENT_ID,
+            settings.AZURE_CLIENT_SECRET,
+            tenant=settings.AZURE_TENANT_ID,
+        )
 
-    client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
+        client = CdnManagementClient(
+            credentials, settings.AZURE_SUBSCRIPTION_ID
+        )
 
-    for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
-        logger.info("Purging paths: %s", paths_group)
+        for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
+            logger.info("Purging paths: %s", paths_group)
 
-        try:
             poller = client.endpoints.purge_content(
                 settings.AZURE_CDN_RESOURCE_GROUP,
                 settings.AZURE_CDN_PROFILE_NAME,
@@ -69,9 +71,9 @@ def purge_cache(all_paths=False):
                 paths_group,
             )
             poller.result()
-        except (Exception, socket.gaierror) as ex:
-            logger.info("Rescheduling paths: %s", paths)
-            queue_purge_paths(paths)
+    except (Exception, socket.gaierror) as ex:
+        logger.info("Rescheduling paths: %s", paths)
+        queue_purge_paths(paths)
 
-            if "No address associated with hostname" not in str(ex):
-                raise
+        if "No address associated with hostname" not in str(ex):
+            raise
