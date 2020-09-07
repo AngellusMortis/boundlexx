@@ -246,8 +246,9 @@ def _add_to_count(count):
                 )
                 cache.set(PURGE_CACHE_COUNT, in_progress_count, timeout=600)
                 success = True
-            else:
-                time.sleep(1)
+        # do not sleep with lock
+        if not success:
+            time.sleep(1)
 
 
 def _remove_from_count(count):
