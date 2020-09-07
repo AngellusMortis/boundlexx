@@ -69,7 +69,10 @@ def purge_cache(all_paths=False):
                 paths_group,
             )
             poller.result()
-        except (Exception, socket.gaierror):
+        except socket.gaierror:
+            logger.info("Rescheduling paths: %s", paths)
+            queue_purge_paths(paths)
+        except Exception:
             logger.info("Rescheduling paths: %s", paths)
             queue_purge_paths(paths)
             raise
