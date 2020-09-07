@@ -1,3 +1,4 @@
+import time
 from datetime import timedelta
 from typing import Any, Optional
 
@@ -13,7 +14,8 @@ from config.celery_app import app
 MAX_SINGLE_PURGE = 50
 CDN_PURGE_KEY = "boundless:cdn_last_purge"
 ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
-PURGE_CACHE_LOCK = "boundless:purge_cache_lock"
+PURGE_CACHE_COUNT = "boundless:purge_cache_count"
+PURGE_COUNT_LOCK = "boundless:purge_cache_count_lock"
 
 logger = get_task_logger(__name__)
 
@@ -214,6 +216,53 @@ def _path_chunks(iterable, chunk_size):
     yield iterable
 
 
+def _purge_paths(client, paths):
+    _add_to_count(len(paths))
+
+    try:
+        logger.info("Purging paths: %s", paths)
+        poller = client.endpoints.purge_content(
+            settings.AZURE_CDN_RESOURCE_GROUP,
+            settings.AZURE_CDN_PROFILE_NAME,
+            settings.AZURE_CDN_ENDPOINT_NAME,
+            paths,
+        )
+        poller.result()
+    finally:
+        _remove_from_count(len(paths))
+
+
+def _add_to_count(count):
+    success = False
+
+    while not success:
+        with cache.lock(PURGE_COUNT_LOCK, expire=10, auto_renewal=False):
+            in_progress_count = cache.get(PURGE_CACHE_COUNT, 0)
+            in_progress_count += count
+
+            if in_progress_count <= MAX_SINGLE_PURGE:
+                logger.info(
+                    "Incrementing in progress count: %s", in_progress_count
+                )
+                cache.set(PURGE_CACHE_COUNT, in_progress_count, timeout=600)
+                success = True
+            else:
+                time.sleep(1)
+
+
+def _remove_from_count(count):
+    with cache.lock(PURGE_COUNT_LOCK, expire=10, auto_renewal=False):
+        in_progress_count = cache.get(PURGE_CACHE_COUNT, 0)
+        in_progress_count -= count
+
+        if in_progress_count < 0:
+            logger.error("In progress count is less than 0")
+            in_progress_count = 0
+
+        logger.info("Decrementing in progress count: %s", in_progress_count)
+        cache.set(PURGE_CACHE_COUNT, in_progress_count, timeout=600)
+
+
 @app.task
 def purge_cache(model_name: Optional[str] = None, pk: Optional[Any] = None):
     logger.info("Purging cache for %s (%s)", model_name, pk)
@@ -243,22 +292,10 @@ def purge_cache(model_name: Optional[str] = None, pk: Optional[Any] = None):
         tenant=settings.AZURE_TENANT_ID,
     )
 
-    cdn_client = CdnManagementClient(
-        credentials, settings.AZURE_SUBSCRIPTION_ID
-    )
+    client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
 
     for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
-        logger.info("Acquiring purge_cache lock...")
-
-        with cache.lock(PURGE_CACHE_LOCK, expire=60, auto_renewal=False):
-            logger.info("Purging paths: %s", paths_group)
-            poller = cdn_client.endpoints.purge_content(
-                settings.AZURE_CDN_RESOURCE_GROUP,
-                settings.AZURE_CDN_PROFILE_NAME,
-                settings.AZURE_CDN_ENDPOINT_NAME,
-                paths_group,
-            )
-            poller.result()
+        _purge_paths(client, paths_group)
 
     next_purge = timezone.now() + timedelta(minutes=1)
     cache.set(cache_key, next_purge, timeout=60)
