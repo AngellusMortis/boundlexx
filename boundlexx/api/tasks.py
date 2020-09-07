@@ -8,6 +8,7 @@ from boundlexx.api.utils import (
     PURGE_CACHE_LOCK,
     PURGE_CACHE_PATHS,
     PURGE_GROUPS,
+    queue_purge_paths,
 )
 from config.celery_app import app
 
@@ -57,10 +58,15 @@ def purge_cache(all_paths=False):
 
     for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
         logger.info("Purging paths: %s", paths_group)
-        poller = client.endpoints.purge_content(
-            settings.AZURE_CDN_RESOURCE_GROUP,
-            settings.AZURE_CDN_PROFILE_NAME,
-            settings.AZURE_CDN_ENDPOINT_NAME,
-            paths_group,
-        )
-        poller.result()
+
+        try:
+            poller = client.endpoints.purge_content(
+                settings.AZURE_CDN_RESOURCE_GROUP,
+                settings.AZURE_CDN_PROFILE_NAME,
+                settings.AZURE_CDN_ENDPOINT_NAME,
+                paths_group,
+            )
+            poller.result()
+        except Exception:
+            queue_purge_paths(paths)
+            raise
