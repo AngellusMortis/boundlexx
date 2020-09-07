@@ -22,8 +22,8 @@ celery<5
 django-celery-beat
 flower
 
+azure-mgmt-cdn
 beautifulsoup4
-cloudflare
 colorama
 coloredlogs
 dateparser

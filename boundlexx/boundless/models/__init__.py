@@ -30,7 +30,6 @@ from boundlexx.boundless.models.world import (
     WorldPoll,
     WorldPollResult,
 )
-from boundlexx.boundless.utils import purge_cache
 
 __all__ = [
     "GameObj",
@@ -58,7 +57,12 @@ __all__ = [
 
 
 @receiver(post_save)
-def check_purge_cache(sender, **kwargs):
+def check_purge_cache(sender, instance=None, **kwargs):
+    from boundlexx.api.tasks import (  # pylint: disable=cyclic-import
+        purge_cache,
+    )
+
     # only purge for Boundless related models
-    if "boundlexx.boundless.models" in repr(sender):
-        purge_cache()
+    module_path = sender.__module__
+    if "boundlexx.boundless.models" in module_path and instance is not None:
+        purge_cache.delay(sender.__name__, instance.pk)

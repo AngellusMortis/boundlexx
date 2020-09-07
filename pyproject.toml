@@ -75,6 +75,7 @@ disable = [
   'unused-argument',
   'useless-super-delegation',
   'duplicate-code',
+  'import-outside-toplevel',
 ]
 
 [tool.pylint.design]

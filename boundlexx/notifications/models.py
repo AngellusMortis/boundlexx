@@ -409,7 +409,7 @@ class ExoworldNotification(NotificationBase):
             value = ""
             for color in color_group:
                 value += (
-                    f"\n* **{color.item.english:25s}**: "
+                    f"\n* **{color.item.english}**: "
                     f"_{color.color.default_name} ({color.color.game_id})_"
                 )
 

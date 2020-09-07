@@ -1,6 +1,6 @@
 import djclick as click
 
-from boundlexx.boundless.utils import purge_cache
+from boundlexx.api.tasks import purge_cache
 
 
 @click.command()
