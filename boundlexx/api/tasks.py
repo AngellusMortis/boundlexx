@@ -1,3 +1,5 @@
+import socket
+
 from azure.mgmt.cdn import CdnManagementClient
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -67,6 +69,7 @@ def purge_cache(all_paths=False):
                 paths_group,
             )
             poller.result()
-        except Exception:
+        except (Exception, socket.gaierror):
+            logger.info("Rescheduling paths: %s", paths)
             queue_purge_paths(paths)
             raise
