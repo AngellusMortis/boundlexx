@@ -69,10 +69,9 @@ def purge_cache(all_paths=False):
                 paths_group,
             )
             poller.result()
-        except socket.gaierror:
+        except (Exception, socket.gaierror) as ex:
             logger.info("Rescheduling paths: %s", paths)
             queue_purge_paths(paths)
-        except Exception:
-            logger.info("Rescheduling paths: %s", paths)
-            queue_purge_paths(paths)
-            raise
+
+            if "No address associated with hostname" not in str(ex):
+                raise
