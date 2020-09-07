@@ -71,7 +71,7 @@ def purge_cache(all_paths=False):
                 paths_group,
             )
             poller.result()
-    except (Exception, socket.gaierror) as ex:
+    except (Exception, socket.gaierror) as ex:  # pylint: disable=broad-except
         logger.info("Rescheduling paths: %s", paths)
         queue_purge_paths(paths)
 
