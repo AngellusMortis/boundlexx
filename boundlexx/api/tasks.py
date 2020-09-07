@@ -216,6 +216,8 @@ def _path_chunks(iterable, chunk_size):
 
 @app.task
 def purge_cache(model_name: Optional[str] = None, pk: Optional[Any] = None):
+    logger.info("Purging cache for %s (%s)", model_name, pk)
+
     if (
         settings.AZURE_CDN_ENDPOINT_NAME is None
         or len(settings.AZURE_CDN_ENDPOINT_NAME) == 0
