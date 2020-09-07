@@ -18,26 +18,26 @@ PURGE_CACHE_LOCK = "boundless:purge_cache_lock"
 logger = get_task_logger(__name__)
 
 PURGE_GROUPS = {
-    "all": ["/api/v1/*"],
-    "worlds": ["/api/v1/worlds/", "/api/v1/worlds/{world_id}/*"],
-    "colors": ["/api/v1/colors/", "/api/v1/colors/{color_id}/*"],
-    "items": ["/api/v1/items/", "/api/v1/items/{item_id}/*"],
-    "request-baskets": [
+    "__all__": ["/api/v1/*"],
+    "World": ["/api/v1/worlds/", "/api/v1/worlds/{world_id}/*"],
+    "Color": ["/api/v1/colors/", "/api/v1/colors/{color_id}/*"],
+    "Item": ["/api/v1/items/", "/api/v1/items/{item_id}/*"],
+    "ItemRequestBasketPrice": [
         "/api/v1/items/{item_id}/request-baskets/*",
         "/api/v1/worlds/{world_id}/request-baskets/*",
     ],
-    "shop-stands": [
+    "ItemShopStandPrice": [
         "/api/v1/items/{item_id}/shop-stands/*",
         "/api/v1/worlds/{world_id}/shop-stands/*",
     ],
-    "world-polls": [
+    "WorldPoll": [
         "/api/v1/worlds/{world_id}/polls/*",
     ],
-    "resource-counts": [
+    "ResourceCount": [
         "/api/v1/items/{item_id}/resource-counts/*",
         "/api/v1/items/{item_id}/resource-timeseries/*",
     ],
-    "block-colors": [
+    "WorldBlockColor": [
         "/api/v1/colors/{color_id}/blocks/*",
         "/api/v1/items/{item_id}/colors/*",
         "/api/v1/worlds/{world_id}/block-colors/*",
@@ -49,7 +49,7 @@ def _get_paths_world(pk):
     from boundlexx.boundless.models import World
 
     world = World.objects.get(pk=pk)
-    paths = PURGE_GROUPS["worlds"]
+    paths = PURGE_GROUPS["World"]
 
     for index, path in enumerate(paths):
         paths[index] = path.replace("{world_id}", str(world.id))
@@ -61,7 +61,7 @@ def _get_paths_color(pk):
     from boundlexx.boundless.models import Color
 
     color = Color.objects.get(pk=pk)
-    paths = PURGE_GROUPS["colors"]
+    paths = PURGE_GROUPS["Color"]
 
     for index, path in enumerate(paths):
         paths[index] = path.replace("{color_id}", str(color.game_id))
@@ -73,7 +73,7 @@ def _get_paths_item(pk):
     from boundlexx.boundless.models import Item
 
     item = Item.objects.get(pk=pk)
-    paths = PURGE_GROUPS["items"]
+    paths = PURGE_GROUPS["Item"]
 
     for index, path in enumerate(paths):
         paths[index] = path.replace("{item_id}", str(item.game_id))
@@ -87,7 +87,7 @@ def _get_paths_shop_stand(pk):
     shop = ItemShopStandPrice.objects.select_related("item", "world").get(
         pk=pk
     )
-    paths = PURGE_GROUPS["shop-stands"]
+    paths = PURGE_GROUPS["ItemShopStandPrice"]
 
     for index, path in enumerate(paths):
         path = path.replace("{item_id}", str(shop.item.game_id))
@@ -108,7 +108,7 @@ def _get_paths_request_basket(pk):
     shop = ItemRequestBasketPrice.objects.select_related("item", "world").get(
         pk=pk
     )
-    paths = PURGE_GROUPS["request-baskets"]
+    paths = PURGE_GROUPS["ItemRequestBasketPrice"]
 
     for index, path in enumerate(paths):
         path = path.replace("{item_id}", str(shop.item.game_id))
@@ -127,7 +127,7 @@ def _get_paths_world_poll(pk):
     from boundlexx.boundless.models import WorldPoll
 
     poll = WorldPoll.objects.select_related("world").get(pk=pk)
-    paths = PURGE_GROUPS["world-polls"]
+    paths = PURGE_GROUPS["WorldPoll"]
 
     for index, path in enumerate(paths):
         paths[index] = path.replace("{world_id}", str(poll.world.id))
@@ -139,7 +139,7 @@ def _get_paths_resouce_count(pk):
     from boundlexx.boundless.models import ResourceCount
 
     count = ResourceCount.objects.select_related("item").get(pk=pk)
-    paths = PURGE_GROUPS["resource-counts"]
+    paths = PURGE_GROUPS["ResourceCount"]
 
     for index, path in enumerate(paths):
         paths[index] = path.replace("{item_id}", str(count.item.game_id))
@@ -153,7 +153,7 @@ def _get_paths_block_color(pk):
     block_color = WorldBlockColor.objects.select_related(
         "item", "world", "color"
     ).get(pk=pk)
-    paths = PURGE_GROUPS["block-colors"]
+    paths = PURGE_GROUPS["WorldBlockColor"]
 
     for index, path in enumerate(paths):
         path = path.replace("{item_id}", str(block_color.item.game_id))
@@ -177,7 +177,7 @@ def _get_paths(model_name: Optional[str] = None, pk: Optional[Any] = None):
     cache_key = None
 
     if model_name is None:
-        paths = PURGE_GROUPS["all"]
+        paths = PURGE_GROUPS["__all__"]
         cache_key = f"{CDN_PURGE_KEY}:all"
 
     if model_name == "World":

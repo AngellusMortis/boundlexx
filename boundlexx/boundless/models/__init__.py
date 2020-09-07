@@ -59,10 +59,17 @@ __all__ = [
 @receiver(post_save)
 def check_purge_cache(sender, instance=None, **kwargs):
     from boundlexx.api.tasks import (  # pylint: disable=cyclic-import
+        PURGE_GROUPS,
         purge_cache,
     )
 
     # only purge for Boundless related models
     module_path = sender.__module__
-    if "boundlexx.boundless.models" in module_path and instance is not None:
-        purge_cache.delay(sender.__name__, instance.pk)
+    model_name = sender.__name__
+
+    if (
+        "boundlexx.boundless.models" in module_path
+        and instance is not None
+        and model_name in PURGE_GROUPS
+    ):
+        purge_cache.delay(model_name, instance.pk)
