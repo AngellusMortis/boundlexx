@@ -228,6 +228,7 @@ def purge_cache(model_name: Optional[str] = None, pk: Optional[Any] = None):
     paths, cache_key = _get_paths(model_name, pk)
     if len(paths) == 0:
         logger.warning("No paths to purge")
+        return
 
     next_purge = cache.get(cache_key)
     now = timezone.now()
