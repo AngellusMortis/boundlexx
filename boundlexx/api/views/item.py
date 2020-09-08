@@ -3,6 +3,8 @@ from typing import List
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
@@ -161,6 +163,7 @@ class ItemViewSet(
     ordering = ["-rank", "game_id"]
     ordering_fields: List[str] = []
 
+    @method_decorator(cache_page(settings.CACHE_DURATION))
     def list(self, request, *args, **kwargs):  # noqa A003
         """
         Retrieves the list of items avaiable in Boundless
