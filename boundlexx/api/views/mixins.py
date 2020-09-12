@@ -77,9 +77,7 @@ class TimeseriesMixin:
                     values_list.append(stat_field)
 
             if is_bucket:
-                queryset = queryset.values("time_bucket").annotate(
-                    **aggregate_args
-                )
+                queryset = queryset.values("time_bucket").annotate(**aggregate_args)
             else:
                 queryset = [queryset.aggregate(**aggregate_args)]
 

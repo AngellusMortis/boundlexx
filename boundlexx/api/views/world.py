@@ -27,10 +27,7 @@ from boundlexx.api.serializers import (
 )
 from boundlexx.api.utils import get_list_example
 from boundlexx.api.views.filters import WorldFilterSet
-from boundlexx.api.views.mixins import (
-    DescriptiveAutoSchemaMixin,
-    TimeseriesMixin,
-)
+from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
 from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemShopStandPrice,
@@ -70,9 +67,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         Retrieves the list of worlds avaiable in Boundless
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(examples.WORLD_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -85,9 +80,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         """
         Retrieves a worlds with a given id
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": examples.WORLD_EXAMPLE}}  # type: ignore # noqa E501
 
@@ -108,9 +101,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         world = self.get_object()
 
-        show_inactive_colors = request.query_params.get(
-            "show_inactive_colors", False
-        )
+        show_inactive_colors = request.query_params.get("show_inactive_colors", False)
 
         all_block_colors = list(world.worldblockcolor_set.all())
 
@@ -121,15 +112,11 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         response = BlockColorResponse(world.id, block_colors)
 
-        serializer = self.get_serializer_class()(
-            response, context={"request": request}
-        )
+        serializer = self.get_serializer_class()(response, context={"request": request})
 
         return Response(serializer.data)
 
-    block_colors.example = {
-        "block_colors": {"value": examples.WORLD_COLORS_EXAMPLE}
-    }
+    block_colors.example = {"block_colors": {"value": examples.WORLD_COLORS_EXAMPLE}}
 
     @action(
         detail=True,
@@ -148,9 +135,9 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         world = self.get_object()
 
-        queryset = ItemShopStandPrice.objects.filter(
-            world=world, active=True
-        ).order_by("item_id")
+        queryset = ItemShopStandPrice.objects.filter(world=world, active=True).order_by(
+            "item_id"
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -162,9 +149,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
     shop_stands.example = {
-        "shop_stands": {
-            "value": get_list_example(examples.WORLD_SHOP_STANDS_EXAMPLE)
-        }
+        "shop_stands": {"value": get_list_example(examples.WORLD_SHOP_STANDS_EXAMPLE)}
     }
 
     @action(
@@ -229,9 +214,7 @@ class WorldPollViewSet(
         Retrieves the list polls avaiable for give World
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(examples.WORLD_POLL_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -246,9 +229,7 @@ class WorldPollViewSet(
 
         Can pass `latest` in place of `id` to retrieve the newsest one
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": examples.WORLD_POLL_EXAMPLE}}  # type: ignore # noqa E501
 
@@ -318,9 +299,7 @@ class WorldPollViewSet(
 
 class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
     queryset = (
-        WorldDistance.objects.filter(
-            world_source__active=True, world_dest__active=True
-        )
+        WorldDistance.objects.filter(world_source__active=True, world_dest__active=True)
         .select_related("world_source", "world_dest")
         .order_by("distance")
     )
@@ -369,9 +348,7 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
         Retrieves the list of distances to know worlds
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(examples.WORLD_DISTANCES_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -384,8 +361,6 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
         """
         Retrieves the distance to a specific world
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": examples.WORLD_DISTANCES_EXAMPLE}}  # type: ignore # noqa E501

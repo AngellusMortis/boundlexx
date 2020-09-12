@@ -21,9 +21,7 @@ from boundlexx.boundless.models import (
 # https://gist.github.com/mayumi7/ca9e58a21459ccc76ee09873cff5000f
 # https://forum.playboundless.com/t/documentation-of-itemcolorstrings-dat-structure/45708
 
-LanguagePointer = namedtuple(
-    "LanguagePointer", ("name", "start_index", "end_index")
-)
+LanguagePointer = namedtuple("LanguagePointer", ("name", "start_index", "end_index"))
 ItemType = namedtuple("ItemType", ("item_id", "subtitle_id"))
 GameItem = namedtuple("GameItem", ("name", "subtitle"))
 
@@ -76,13 +74,10 @@ def decode_encodings(binary, pointer, index_count, final_index):
 
         while word_count > 0:
             word_offset = 1
-            word_pointer = (
-                encoding_pointer + (word_offset + encoding_offset) // 8
-            )
+            word_pointer = encoding_pointer + (word_offset + encoding_offset) // 8
 
             word_length = (
-                unpack_from("<I", binary, word_pointer)[0]
-                >> (encoding_offset % 8)
+                unpack_from("<I", binary, word_pointer)[0] >> (encoding_offset % 8)
             ) % 4
 
             word_length = length_lookup[word_length]
@@ -106,9 +101,7 @@ def decode_encodings(binary, pointer, index_count, final_index):
 
     words_max_index += 1
 
-    words_index_bits_per_value = unpack_from("B", binary, words_index_pointer)[
-        0
-    ]
+    words_index_bits_per_value = unpack_from("B", binary, words_index_pointer)[0]
     words_index = unpack_bits(
         binary,
         words_index_pointer + 1,
@@ -127,9 +120,7 @@ def decode_encodings(binary, pointer, index_count, final_index):
             letters = final_index - start_index
 
         words.append(
-            unpack_from(f"<{letters}s", binary, start_index)[0].decode(
-                "latin1"
-            )
+            unpack_from(f"<{letters}s", binary, start_index)[0].decode("latin1")
         )
 
     final_strings = []
@@ -180,9 +171,7 @@ def decode_index_data(binary):
                 languages[-1].start_index,
                 language_address,
             )
-        languages.append(
-            LanguagePointer(language_name, language_address, None)
-        )
+        languages.append(LanguagePointer(language_name, language_address, None))
 
     languages[-1] = LanguagePointer(
         languages[-1].name, languages[-1].start_index, len(binary)
@@ -256,9 +245,7 @@ def construct_item_list(compileditems_binary):
 
 
 def construct_color_list(compiledcolorpaletteslists_binary):
-    data = msgpack.unpackb(
-        compiledcolorpaletteslists_binary, strict_map_key=False
-    )
+    data = msgpack.unpackb(compiledcolorpaletteslists_binary, strict_map_key=False)
 
     colors_palettes = {}
     for color in data[0]:
@@ -299,9 +286,7 @@ def command(
         )
 
     compiled_items = construct_item_list(compileditems_file.read())
-    color_palettes = construct_color_list(
-        compiledcolorpaletteslists_file.read()
-    )
+    color_palettes = construct_color_list(compiledcolorpaletteslists_file.read())
     binary_data = itemcolorstrings_file.read()
 
     (
@@ -338,9 +323,7 @@ def command(
     subtitles = {}
     with click.progressbar(range(subtitles_max_index + 1)) as bar:
         for index in bar:
-            subtitle, was_created = Subtitle.objects.get_or_create(
-                game_id=index
-            )
+            subtitle, was_created = Subtitle.objects.get_or_create(game_id=index)
 
             subtitles[subtitle.game_id] = subtitle
 
@@ -356,9 +339,9 @@ def command(
         for item in bar:
             # do not add items that cannot be normally dropped
             if not compiled_items[item.item_id]["canDrop"]:
-                items_disabled += Item.objects.filter(
-                    game_id=item.item_id
-                ).update(active=False)
+                items_disabled += Item.objects.filter(game_id=item.item_id).update(
+                    active=False
+                )
                 continue
 
             item_obj, was_created = Item.objects.get_or_create(

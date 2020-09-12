@@ -3,12 +3,7 @@ from django.db.models import F, Func, Value
 from django.utils.translation import ugettext as _
 from django_filters.rest_framework import FilterSet, filters
 
-from boundlexx.boundless.models import (
-    Item,
-    ResourceCount,
-    World,
-    WorldBlockColor,
-)
+from boundlexx.boundless.models import Item, ResourceCount, World, WorldBlockColor
 from boundlexx.boundless.utils import get_block_color_item_ids
 
 

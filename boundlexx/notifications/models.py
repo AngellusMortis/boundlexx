@@ -21,9 +21,7 @@ User = get_user_model()
 
 
 class SubscriptionBase(PolymorphicModel):
-    owner = models.ForeignKey(
-        User, on_delete=models.CASCADE, blank=True, null=True
-    )
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     name = models.CharField(max_length=32, blank=True, null=True)
 
     def send(self, **kwargs):
@@ -55,9 +53,7 @@ class DiscordWebhookSubscription(SubscriptionBase):
                     else:
                         meantions_prefix = f"<@{meantion}> {meantions_prefix}"
 
-                data[
-                    "content"
-                ] = f'{meantions_prefix.strip()}\n{data["content"]}'
+                data["content"] = f'{meantions_prefix.strip()}\n{data["content"]}'
 
         return data
 
@@ -85,12 +81,8 @@ class DiscordWebhookSubscription(SubscriptionBase):
                 data = {"content": m}
 
                 if not send_meantions:
-                    data = self._add_meantions_to_data(
-                        data, "roles", self.roles
-                    )
-                    data = self._add_meantions_to_data(
-                        data, "users", self.users
-                    )
+                    data = self._add_meantions_to_data(data, "roles", self.roles)
+                    data = self._add_meantions_to_data(data, "users", self.users)
                     send_meantions = True
 
                 data_list.append(data)
@@ -99,9 +91,7 @@ class DiscordWebhookSubscription(SubscriptionBase):
 
 
 class NotificationBase(PolymorphicModel):
-    subscription = models.ForeignKey(
-        SubscriptionBase, on_delete=models.CASCADE
-    )
+    subscription = models.ForeignKey(SubscriptionBase, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
 
     def markdown(self, **kwargs):
@@ -137,9 +127,7 @@ class PolymorphicNotificationManager(PolymorphicManager):
             embed, files = notification.embed(*args)
             markdown = notification.markdown(*args)
 
-            notification.subscription.send(
-                embed=embed, files=files, markdown=markdown
-            )
+            notification.subscription.send(embed=embed, files=files, markdown=markdown)
 
 
 class ExoworldNotificationManager(PolymorphicNotificationManager):
@@ -195,9 +183,7 @@ class ExoworldNotification(NotificationBase):
 
             for color in colors:
                 item_id = color.item.game_id
-                group_name = settings.BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS[
-                    item_id
-                ]
+                group_name = settings.BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS[item_id]
 
                 order_index = list(
                     settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER[group_name]
@@ -212,10 +198,7 @@ class ExoworldNotification(NotificationBase):
                     continue
 
                 color_groups[group_name] = [
-                    c[1]
-                    for c in sorted(
-                        color_groups[group_name], key=lambda g: g[0]
-                    )
+                    c[1] for c in sorted(color_groups[group_name], key=lambda g: g[0])
                 ]
 
         context = {"world": world, "color_groups": color_groups}
@@ -235,9 +218,7 @@ class ExoworldNotification(NotificationBase):
         self._context = context
         return self._context
 
-    def markdown(
-        self, world, resources=None
-    ):  # pylint: disable=arguments-differ
+    def markdown(self, world, resources=None):  # pylint: disable=arguments-differ
         context = self._get_context(world, resources)
 
         message = ""
@@ -271,9 +252,7 @@ class ExoworldNotification(NotificationBase):
             main_embed["url"] = world.forum_url
 
         if world.image.name:
-            main_embed["thumbnail"] = {
-                "url": f"attachment://{world.image.name}"
-            }
+            main_embed["thumbnail"] = {"url": f"attachment://{world.image.name}"}
 
             files = {world.image.name: world.image.url}
 
@@ -290,10 +269,7 @@ class ExoworldNotification(NotificationBase):
             },
             {
                 "name": "Start",
-                "value": (
-                    f"{naturaltime(world.start)}\n"
-                    f"{world.start.isoformat()}"
-                ),
+                "value": (f"{naturaltime(world.start)}\n" f"{world.start.isoformat()}"),
                 "inline": True,
             },
             {
@@ -485,7 +461,6 @@ class FailedTaskNotification(NotificationBase):
 def task_failure_handler(sender, instance, **kwargs):
     if (
         instance.status == "FAILURE"
-        and instance.task_name
-        != "boundlexx.notifications.tasks.send_discord_webhook"
+        and instance.task_name != "boundlexx.notifications.tasks.send_discord_webhook"
     ):
         FailedTaskNotification.objects.send_notification(instance)

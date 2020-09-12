@@ -57,9 +57,7 @@ def purge_cache(all_paths=False):
             tenant=settings.AZURE_TENANT_ID,
         )
 
-        client = CdnManagementClient(
-            credentials, settings.AZURE_SUBSCRIPTION_ID
-        )
+        client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
 
         for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
             logger.info("Purging paths: %s", paths_group)

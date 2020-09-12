@@ -42,9 +42,7 @@ class DescriptiveAutoSchema(AutoSchema):
                 if lookup_field == "pk":
                     lookup_field = "id"
                 if param["name"] == lookup_field:
-                    param[
-                        "description"
-                    ] += " Pass `latest` to get newest item."
+                    param["description"] += " Pass `latest` to get newest item."
                     param["schema"] = {
                         "type": "string",
                         "pattern": r"^(\d+|latest)$",

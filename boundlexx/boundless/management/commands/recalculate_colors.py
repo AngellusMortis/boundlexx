@@ -12,9 +12,7 @@ def command():
         _days_since_last=None,
     )
 
-    with click.progressbar(
-        WorldBlockColor.objects.order_by("world_id")
-    ) as pbar:
+    with click.progressbar(WorldBlockColor.objects.order_by("world_id")) as pbar:
         for block_color in pbar:
             block_color.exist_on_perm  # pylint: disable=pointless-statement
             block_color.is_new_color  # pylint: disable=pointless-statement

@@ -45,17 +45,13 @@ def search_exo_worlds():
         logger.warning("No worlds found to use as a start")
         return
 
-    worlds_lower = max(
-        most_recent_world.id - settings.BOUNDLESS_EXO_SEARCH_RADIUS, 1
-    )
+    worlds_lower = max(most_recent_world.id - settings.BOUNDLESS_EXO_SEARCH_RADIUS, 1)
     worlds_upper = most_recent_world.id + settings.BOUNDLESS_EXO_SEARCH_RADIUS
 
     if worlds_lower == most_recent_world:
         worlds_lower += 1
 
-    logger.info(
-        "Starting scan for exo worlds (%s, %s)", worlds_lower, worlds_upper
-    )
+    logger.info("Starting scan for exo worlds (%s, %s)", worlds_lower, worlds_upper)
 
     _, worlds = _scan_worlds(worlds_lower, worlds_upper)
 
@@ -65,8 +61,6 @@ def search_exo_worlds():
             worlds_found += 1
 
     logger.info("Found %s exo world(s)", worlds_found)
-    if len(worlds) > 0:
-        calculate_distances.delay([w.id for w in worlds])
 
 
 @app.task
@@ -95,8 +89,6 @@ def discover_all_worlds(start_id=None):
         new_worlds += worlds
 
     logger.info("Scan Complete. Found %s world(s)", worlds_found)
-    if len(new_worlds) > 0:
-        calculate_distances.delay([w.id for w in new_worlds])
 
 
 def _scan_worlds(lower, upper):
@@ -175,9 +167,7 @@ def poll_worlds(world_ids=None):
             continue
 
         if world_data is None:
-            logger.info(
-                "World %s no longer in API, marking inactive...", world
-            )
+            logger.info("World %s no longer in API, marking inactive...", world)
             world.active = False
             world.save()
             continue
@@ -188,9 +178,7 @@ def poll_worlds(world_ids=None):
             logger.warning(world_data)
             raise
 
-        if world.is_locked or (
-            world.end is not None and timezone.now() > world.end
-        ):
+        if world.is_locked or (world.end is not None and timezone.now() > world.end):
             logger.info("World %s expired, not polling...", world)
             continue
 

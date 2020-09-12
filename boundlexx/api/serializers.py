@@ -76,9 +76,7 @@ class NestedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
 
             kwargs[self.lookup_url_kwarg[index]] = lookup_value
 
-        return self.reverse(
-            view_name, kwargs=kwargs, request=request, format=format
-        )
+        return self.reverse(view_name, kwargs=kwargs, request=request, format=format)
 
 
 class ActiveWorldUrlHyperlinkField(serializers.HyperlinkedIdentityField):
@@ -691,12 +689,8 @@ class WorldPollTBSerializer(NullSerializer):
     plot_count_median = serializers.IntegerField(
         source="worldpollresult__plot_count_median"
     )
-    plot_count_min = serializers.IntegerField(
-        source="worldpollresult__plot_count_min"
-    )
-    plot_count_max = serializers.IntegerField(
-        source="worldpollresult__plot_count_max"
-    )
+    plot_count_min = serializers.IntegerField(source="worldpollresult__plot_count_min")
+    plot_count_max = serializers.IntegerField(source="worldpollresult__plot_count_max")
     plot_count_stddev = serializers.FloatField(
         source="worldpollresult__plot_count_stddev",
     )

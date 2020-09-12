@@ -114,9 +114,7 @@ def ingest_world_data():
             )
 
         if world is None:
-            world = World.objects.create(
-                id=world_id, display_name=display_name
-            )
+            world = World.objects.create(id=world_id, display_name=display_name)
 
         world = _update_world(world, start, end, row)
         _create_block_colors(world, row[11:-5], header_columns[11:-5])

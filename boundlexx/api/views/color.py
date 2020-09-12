@@ -8,10 +8,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import BlockColorSerializer, ColorSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import (
-    LocalizationFilterSet,
-    WorldBlockColorFilterSet,
-)
+from boundlexx.api.views.filters import LocalizationFilterSet, WorldBlockColorFilterSet
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Color, WorldBlockColor
 
@@ -64,9 +61,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         Retrieves the list of colors avaiable in Boundless
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(COLOR_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -79,9 +74,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         """
         Retrieves a color with a given ID
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": COLOR_EXAMPLE}}  # type: ignore # noqa E501
 
@@ -127,9 +120,7 @@ class BlockColorViewSet(
         Retrieves the list of the items for a given color
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(COLOR_BLOCKS_EXAMPLE)}}  # type: ignore # noqa E501
     list.operation_id = "color-blocks"  # type: ignore # noqa E501
@@ -143,9 +134,7 @@ class BlockColorViewSet(
         """
         Retrieves the counts worlds for a given color/item combination
         """
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"list": {"value": get_list_example(COLOR_BLOCKS_EXAMPLE)}}  # type: ignore # noqa E501
     retrieve.operation_id = "color-blocks-item"  # type: ignore # noqa E501

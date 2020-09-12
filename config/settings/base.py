@@ -346,12 +346,8 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 # Your stuff...
 # ------------------------------------------------------------------------------
 ADMIN_TOOLS_MENU = "boundlexx.admin.menu.BoundlexxMenu"
-ADMIN_TOOLS_INDEX_DASHBOARD = (
-    "boundlexx.admin.dashboard.BoundlexxIndexDashboard"
-)
-ADMIN_TOOLS_APP_INDEX_DASHBOARD = (
-    "boundlexx.admin.dashboard.BoundlexxAppIndexDashboard"
-)
+ADMIN_TOOLS_INDEX_DASHBOARD = "boundlexx.admin.dashboard.BoundlexxIndexDashboard"
+ADMIN_TOOLS_APP_INDEX_DASHBOARD = "boundlexx.admin.dashboard.BoundlexxAppIndexDashboard"
 FLOWER_BASE_URL = env("FLOWER_BASE_URL")
 
 REST_FRAMEWORK = {
@@ -386,18 +382,14 @@ BOUNDLESS_API_URL_BASE = env(
 BOUNDLESS_ACCOUNTS_BASE_URL = "https://account.playboundless.com"
 BOUNDLESS_USERNAME = env("BOUNDLESS_USERNAME")
 BOUNDLESS_PASSWORD = env("BOUNDLESS_PASSWORD", default=None)
-BOUNDLESS_DS_REQUIRES_AUTH = env.bool(
-    "BOUNDLESS_DS_REQUIRES_AUTH", default=False
-)
+BOUNDLESS_DS_REQUIRES_AUTH = env.bool("BOUNDLESS_DS_REQUIRES_AUTH", default=False)
 
 # number of seconds between calls to each world
 BOUNDLESS_API_WORLD_DELAY = 1
 
 # path to Boundless itemcolorstrings.dat
 BOUNDLESS_ITEMS_FILE = "/boundless/assets/archetypes/itemcolorstrings.dat"
-BOUNDLESS_COMPILED_ITEMS_FILE = (
-    "/boundless/assets/archetypes/compileditems.msgpack"
-)
+BOUNDLESS_COMPILED_ITEMS_FILE = "/boundless/assets/archetypes/compileditems.msgpack"
 BOUNDLESS_COMPILED_COLOR_PALETTES_FILE = (
     "/boundless/assets/archetypes/compiledcolorpalettelists.msgpack"
 )
@@ -418,9 +410,7 @@ BOUNDLESS_MAX_WORLD_ID = 1000
 BOUNDLESS_MAX_SCAN_CHUNK = 50
 BOUNDLESS_EXO_EXPIRED_BASE_ID = 2000000000
 BOUNDLESS_FORUM_BAD_TOPICS = [28861, 28592, 28593, 38617, 50102, 42678]
-BOUNDLESS_TESTING_FEATURES = env.bool(
-    "BOUNDLESS_TESTING_FEATURES", default=False
-)
+BOUNDLESS_TESTING_FEATURES = env.bool("BOUNDLESS_TESTING_FEATURES", default=False)
 BOUNDLESS_FORUM_BASE_URL = "https://forum.playboundless.com"
 BOUNDLESS_FORUM_NAME_MAPPINGS = {
     "Ancient": "Ancient Wood Trunk",

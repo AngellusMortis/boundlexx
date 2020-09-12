@@ -12,10 +12,7 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Color, Item
-from boundlexx.boundless.utils import (
-    convert_linear_rgb_to_hex,
-    get_next_rank_update,
-)
+from boundlexx.boundless.utils import convert_linear_rgb_to_hex, get_next_rank_update
 from boundlexx.notifications.models import ExoworldNotification
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
@@ -42,9 +39,7 @@ class WorldManager(models.Manager):
             world.active = True
             world.save()
 
-            WorldBlockColor.objects.filter(world_id=old_id).update(
-                world_id=world.id
-            )
+            WorldBlockColor.objects.filter(world_id=old_id).update(world_id=world.id)
             World.objects.filter(id=old_id).delete()
 
             return world
@@ -58,9 +53,9 @@ class WorldManager(models.Manager):
         start = None
         end = None
         if "lifetime" in world_dict:
-            start = datetime.utcfromtimestamp(
-                world_dict["lifetime"][0]
-            ).replace(tzinfo=pytz.utc)
+            start = datetime.utcfromtimestamp(world_dict["lifetime"][0]).replace(
+                tzinfo=pytz.utc
+            )
             end = datetime.utcfromtimestamp(world_dict["lifetime"][1]).replace(
                 tzinfo=pytz.utc
             )
@@ -92,9 +87,9 @@ class WorldManager(models.Manager):
         else:
             world.world_type = world_dict["worldType"]
             world.description = world_dict["worldDescription"]
-        world.time_offset = datetime.utcfromtimestamp(
-            world_dict["timeOffset"]
-        ).replace(tzinfo=pytz.utc)
+        world.time_offset = datetime.utcfromtimestamp(world_dict["timeOffset"]).replace(
+            tzinfo=pytz.utc
+        )
         world.atmosphere_color_r = world_dict["atmosphereColor"][0]
         world.atmosphere_color_g = world_dict["atmosphereColor"][1]
         world.atmosphere_color_b = world_dict["atmosphereColor"][2]
@@ -163,9 +158,7 @@ class WorldManager(models.Manager):
             world.region = world_info["server"]
 
         new_data = False
-        if "image" in world_info and (
-            world.image is None or not world.image.name
-        ):
+        if "image" in world_info and (world.image is None or not world.image.name):
             world.image = world_info["image"]
             new_data = True
         if world.forum_id is None:
@@ -222,9 +215,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         ]
 
     name = models.CharField(_("Name"), max_length=64, null=True, db_index=True)
-    display_name = models.CharField(
-        _("Display Name"), max_length=64, db_index=True
-    )
+    display_name = models.CharField(_("Display Name"), max_length=64, db_index=True)
     region = models.CharField(
         _("Server Region"),
         max_length=16,
@@ -279,9 +270,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         default=False,
         db_index=True,
         null=True,
-        help_text=_(
-            "If this world is locked (only `true` for Soverign worlds)"
-        ),
+        help_text=_("If this world is locked (only `true` for Soverign worlds)"),
     )
     is_public = models.BooleanField(
         default=True,
@@ -291,15 +280,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     )
     number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
 
-    atmosphere_color_r = models.FloatField(
-        _("Atmosphere Linear R Color"), null=True
-    )
-    atmosphere_color_g = models.FloatField(
-        _("Atmosphere Linear G Color"), null=True
-    )
-    atmosphere_color_b = models.FloatField(
-        _("Atmosphere Linear B Color"), null=True
-    )
+    atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"), null=True)
+    atmosphere_color_g = models.FloatField(_("Atmosphere Linear G Color"), null=True)
+    atmosphere_color_b = models.FloatField(_("Atmosphere Linear B Color"), null=True)
     water_color_r = models.FloatField(_("Water Linear R Color"), null=True)
     water_color_g = models.FloatField(_("Water Linear G Color"), null=True)
     water_color_b = models.FloatField(_("Water Linear B Color"), null=True)
@@ -493,15 +476,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
 class WorldDistance(
     ExportModelOperationsMixin("world_distance"), models.Model  # type: ignore
 ):
-    world_source = models.ForeignKey(
-        World, on_delete=models.CASCADE, related_name="+"
-    )
-    world_dest = models.ForeignKey(
-        World, on_delete=models.CASCADE, related_name="+"
-    )
-    distance = models.PositiveSmallIntegerField(
-        _("Distance to work in blinksecs")
-    )
+    world_source = models.ForeignKey(World, on_delete=models.CASCADE, related_name="+")
+    world_dest = models.ForeignKey(World, on_delete=models.CASCADE, related_name="+")
+    distance = models.PositiveSmallIntegerField(_("Distance to work in blinksecs"))
 
     @cached_property
     def cost(self):
@@ -515,11 +492,7 @@ class WorldDistance(
 
     @cached_property
     def min_portal_cost(self):
-        if (
-            self.world_source.is_exo
-            or self.world_dest.is_exo
-            or self.distance > 25
-        ):
+        if self.world_source.is_exo or self.world_dest.is_exo or self.distance > 25:
             return None
 
         if self.distance < 3:
@@ -553,14 +526,10 @@ class WorldBlockColorManager(models.Manager):
             world.owner is not None and block_color.color != color
         ):
             if world.owner is not None:
-                self.filter(world=world, item=item, active=True).update(
-                    active=False
-                )
+                self.filter(world=world, item=item, active=True).update(active=False)
 
             created = True
-            block_color = self.create(
-                world=world, item=item, color=color, active=True
-            )
+            block_color = self.create(world=world, item=item, color=color, active=True)
         elif block_color.color != color:
             block_color.color = color
             block_color.save()
@@ -712,9 +681,7 @@ class WorldCreatureColor(
         WILDSTOCK = "WILDSTOCK", _("Wildstock")
 
     world = models.ForeignKey(World, on_delete=models.CASCADE)
-    creature_type = models.CharField(
-        max_length=16, choices=CreatureType.choices
-    )
+    creature_type = models.CharField(max_length=16, choices=CreatureType.choices)
     color_data = models.TextField()
 
     class Meta:
@@ -723,9 +690,7 @@ class WorldCreatureColor(
 
 class WorldPollManager(models.Manager):
     def _create_resource_counts(self, world_poll, resources_list):
-        resource_order = list(
-            settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING.keys()
-        )
+        resource_order = list(settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING.keys())
 
         resources = []
         embedded_total = 0
@@ -760,13 +725,9 @@ class WorldPollManager(models.Manager):
                 percentage=(amount / total) * 100,
             )
 
-    def create_from_game_dict(
-        self, world_dict, poll_dict, world=None, new_world=False
-    ):
+    def create_from_game_dict(self, world_dict, poll_dict, world=None, new_world=False):
         if world is None:
-            world, new_world = World.objects.get_or_create_from_game_dict(
-                world_dict
-            )
+            world, new_world = World.objects.get_or_create_from_game_dict(world_dict)
 
         world_poll = self.create(world=world)
 
@@ -796,11 +757,16 @@ class WorldPollManager(models.Manager):
 
         world_poll.refresh_from_db()
 
-        new_world = (
-            new_world or self.filter(world_id=world_poll.world_id).count() == 1
-        )
-        if new_world and world.is_exo:
-            ExoworldNotification.objects.send_new_notification(world_poll)
+        new_world = new_world or self.filter(world_id=world_poll.world_id).count() == 1
+        if new_world:
+            from boundlexx.boundless.tasks.worlds import (  # pylint: disable=cyclic-import  # noqa: E501
+                calculate_distances,
+            )
+
+            calculate_distances.delay([world.id])
+
+            if world.is_exo:
+                ExoworldNotification.objects.send_new_notification(world_poll)
 
         return world_poll
 
@@ -864,9 +830,7 @@ class ResourceCount(
 
     @cached_property
     def is_embedded(self):
-        return settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[
-            self.item.game_id
-        ]
+        return settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[self.item.game_id]
 
 
 class LeaderboardRecord(

@@ -60,9 +60,7 @@ class ItemPriceInline(admin.TabularInline):
 
     def get_queryset(self, request):
         cutoff = timezone.now() - timedelta(days=TIMESERIES_CUTOFF)
-        return (
-            super().get_queryset(request).filter(active=True, time__gt=cutoff)
-        )
+        return super().get_queryset(request).filter(active=True, time__gt=cutoff)
 
 
 class ItemRankInline(admin.TabularInline):
@@ -149,9 +147,7 @@ class GameObjAdmin(admin.ModelAdmin):
         return False
 
     def get_queryset(self, request):
-        return (
-            super().get_queryset(request).prefetch_related("localizedname_set")
-        )
+        return super().get_queryset(request).prefetch_related("localizedname_set")
 
 
 @admin.register(Subtitle)
@@ -290,12 +286,7 @@ class WorldPollInline(admin.TabularInline):
 
     def get_queryset(self, request):
         cutoff = timezone.now() - timedelta(days=TIMESERIES_CUTOFF)
-        return (
-            super()
-            .get_queryset(request)
-            .filter(time__gt=cutoff)
-            .order_by("-time")
-        )
+        return super().get_queryset(request).filter(time__gt=cutoff).order_by("-time")
 
 
 class WorldBlockColorInline(admin.TabularInline):

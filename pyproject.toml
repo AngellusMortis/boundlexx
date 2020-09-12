@@ -1,5 +1,5 @@
 [tool.black]
-line-length = 79
+line-length = 88
 include = '\.pyi?$'
 exclude = '''
 (
@@ -34,7 +34,7 @@ plugins = [
 
 
 [tool.isort]
-line_length = 79
+line_length = 88
 multi_line_output = 3
 include_trailing_comma = true
 sections = [
@@ -62,7 +62,7 @@ load-plugins = [
 ]
 
 [tool.pylint.format]
-max-line = 80
+max-line = 88
 
 [tool.pylint.messages_control]
 disable = [

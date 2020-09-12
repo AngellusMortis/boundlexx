@@ -65,9 +65,7 @@ class ItemShopPrice(models.Model):
     @property
     def location(self) -> Location:
         if self._location is None:
-            self._location = Location(
-                self.location_x, self.location_y, self.location_z
-            )
+            self._location = Location(self.location_x, self.location_y, self.location_z)
         return self._location
 
     def refresh_from_db(self, using=None, fields=None):
@@ -140,9 +138,7 @@ class ItemRank(models.Model):
         # dead (20-30) goes 150, 180, 210, 240, 270, 300, 330, 360 * 3
         else:
             delay = min(
-                delay
-                + offset * (self.rank - 11)
-                + offset * (self.rank - 20) * 2,
+                delay + offset * (self.rank - 11) + offset * (self.rank - 20) * 2,
                 settings.BOUNDLESS_MAX_ITEM_DELAY,
             )
 

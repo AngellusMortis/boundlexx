@@ -37,9 +37,7 @@ def unpack_auth_ticket(auth_ticket):
     gc_token_length = struct.unpack_from("<I", buffer, offset)[0]
     offset += 4
 
-    gc_token = bytes(
-        struct.unpack_from(f"<{gc_token_length}B", buffer, offset)
-    )
+    gc_token = bytes(struct.unpack_from(f"<{gc_token_length}B", buffer, offset))
     offset += gc_token_length
     (
         session_header_length,
@@ -96,9 +94,7 @@ def get_block_color_item_ids():
         )
 
         block_colors = (
-            WorldBlockColor.objects.all()
-            .distinct("item_id")
-            .prefetch_related("item")
+            WorldBlockColor.objects.all().distinct("item_id").prefetch_related("item")
         )
         item_ids = [bc.item.game_id for bc in block_colors]
 

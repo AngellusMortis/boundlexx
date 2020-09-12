@@ -36,18 +36,12 @@ class WorldWSDataView(views.APIView):
             elif "display_name" in request.data:
                 display_name = request.data["display_name"]
             else:
-                display_name = request.data.get("config", {}).get(
-                    "displayName"
-                )
+                display_name = request.data.get("config", {}).get("displayName")
 
-            for key, value in request.data["config"]["world"][
-                "blockColors"
-            ].items():
+            for key, value in request.data["config"]["world"]["blockColors"].items():
                 block_colors.append((key, value))
 
-            for key, value in request.data["config"]["world"][
-                "creatureColors"
-            ].items():
+            for key, value in request.data["config"]["world"]["creatureColors"].items():
                 creature_colors.append((key, value))
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
@@ -87,9 +81,7 @@ class WorldWSDataView(views.APIView):
         creature_colors_created = 0
 
         for block_color in block_colors:
-            item = Item.objects.filter(
-                string_id=f"ITEM_TYPE_{block_color[0]}"
-            ).first()
+            item = Item.objects.filter(string_id=f"ITEM_TYPE_{block_color[0]}").first()
 
             if item is not None:
                 color = Color.objects.get(game_id=block_color[1])

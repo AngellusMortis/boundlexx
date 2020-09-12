@@ -20,8 +20,6 @@ class RedisTaskLogger(logging.Handler):
             if output is None:
                 output = []
 
-            output.append(
-                f"[{record.asctime}: {record.levelname}] {record.message}"
-            )
+            output.append(f"[{record.asctime}: {record.levelname}] {record.message}")
 
             cache.set(cache_key, output, timeout=LOG_TIMEOUT)

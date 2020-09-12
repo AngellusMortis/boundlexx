@@ -13,12 +13,7 @@ from django.core.files.base import ContentFile
 from django.utils import timezone as dj_timezone
 from filetype.filetype import get_type
 
-from boundlexx.boundless.models import (
-    Color,
-    LocalizedName,
-    World,
-    WorldBlockColor,
-)
+from boundlexx.boundless.models import Color, LocalizedName, World, WorldBlockColor
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -35,9 +30,7 @@ def _get_topics(category: str):
 
     next_url: Optional[str] = f"/c/creations/{category}.json"
     while next_url is not None:
-        response = requests.get(
-            f"{settings.BOUNDLESS_FORUM_BASE_URL}{next_url}"
-        )
+        response = requests.get(f"{settings.BOUNDLESS_FORUM_BASE_URL}{next_url}")
         response.raise_for_status()
 
         topic_list = response.json()["topic_list"]
@@ -97,9 +90,7 @@ def _clean_line(line):
 def _get_item_and_color(colors, parts):
     item = None
     try:
-        item = LocalizedName.objects.get(
-            lang="english", name=parts[0]
-        ).game_obj
+        item = LocalizedName.objects.get(lang="english", name=parts[0]).game_obj
     except LocalizedName.DoesNotExist:
         pass
 
@@ -292,17 +283,13 @@ def _normalize_world_info(world_info):
 
 
 def _parse_forum_topic(topic: int, is_exo: bool):
-    response = requests.get(
-        f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json"
-    )
+    response = requests.get(f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json")
     response.raise_for_status()
 
     data = response.json()
 
     world_info = _parse_title(data["title"])
-    raw_html = BeautifulSoup(
-        data["post_stream"]["posts"][0]["cooked"], "html.parser"
-    )
+    raw_html = BeautifulSoup(data["post_stream"]["posts"][0]["cooked"], "html.parser")
 
     title_name = world_info["name"]
     world_info.update(_parse_world_info(raw_html))
@@ -371,9 +358,7 @@ def ingest_exo_world_data():
         if "image" in world_info or world.start < cutoff:
             parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
             parse_cache.append(topic)
-            cache.set(
-                FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000
-            )
+            cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
 
         logger.info(
             "Topic %s: Imported %s block color details for world %s",

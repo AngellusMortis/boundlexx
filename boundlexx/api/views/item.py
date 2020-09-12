@@ -28,10 +28,7 @@ from boundlexx.api.views.filters import (
     ItemFilterSet,
     ItemResourceCountFilterSet,
 )
-from boundlexx.api.views.mixins import (
-    DescriptiveAutoSchemaMixin,
-    TimeseriesMixin,
-)
+from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
 from boundlexx.boundless.models import (
     Item,
     ItemRequestBasketPrice,
@@ -166,9 +163,7 @@ class ItemViewSet(
         Retrieves the list of items avaiable in Boundless
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -185,9 +180,7 @@ class ItemViewSet(
         a "resource" in Boundless. `resource_counts_url` provide most
         resource counts of the item on all Boundless worlds.
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": ITEM_EXAMPLE}}  # type: ignore # noqa E501
 
@@ -208,9 +201,9 @@ class ItemViewSet(
 
         item = self.get_object()
 
-        queryset = ItemShopStandPrice.objects.filter(
-            item=item, active=True
-        ).order_by("world_id")
+        queryset = ItemShopStandPrice.objects.filter(item=item, active=True).order_by(
+            "world_id"
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -256,9 +249,7 @@ class ItemViewSet(
         return Response(serializer.data)
 
     request_baskets.example = {
-        "request_baskets": {
-            "value": get_list_example(ITEM_REQUEST_BASKETS_EXAMPLE)
-        }
+        "request_baskets": {"value": get_list_example(ITEM_REQUEST_BASKETS_EXAMPLE)}
     }
 
 
@@ -285,9 +276,7 @@ class ItemResourceTimeseriesViewSet(
         Retrieves the list resource counts for a give item/world combination
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_TIMESERIES_EXAMPLE)}}  # type: ignore # noqa E501
     list.operation_id = "list-item-resource-timeseries"  # type: ignore # noqa E501
@@ -301,9 +290,7 @@ class ItemResourceTimeseriesViewSet(
         """
         Retrieves a specific resource counts for a give item/world combination
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_TIMESERIES_EXAMPLE}}  # type: ignore # noqa E501
 
@@ -335,9 +322,7 @@ class ItemResourceWorldListViewSet(
         timeseries lookup
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCES_WORLD_LIST_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -373,9 +358,7 @@ class ItemResourceCountViewSet(
         This endpoint will only exist if the given item is a "resource"
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_COUNT_EXAMPLE)}}  # type: ignore # noqa E501
 
@@ -388,9 +371,7 @@ class ItemResourceCountViewSet(
         """
         Retrieves the counts of the resource on a given world.
         """
-        return super().retrieve(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_COUNT_EXAMPLE}}  # type: ignore # noqa E501
 
@@ -415,10 +396,7 @@ class ItemResourceCountViewSet(
             except ValueError:
                 pass
             else:
-                if (
-                    game_id
-                    not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
-                ):
+                if game_id not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
                     raise Http404()
 
         return kwargs
@@ -473,9 +451,7 @@ class ItemColorsViewSet(
         Retrieves the list of colors for a given item
         """
 
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
     list.operation_id = "item-colors"  # type: ignore # noqa E501
@@ -489,9 +465,7 @@ class ItemColorsViewSet(
         """
         Retrieves the list worlds for specific color/item combination
         """
-        return super().list(  # pylint: disable=no-member
-            request, *args, **kwargs
-        )
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
     retrieve.operation_id = "item-colors-color"  # type: ignore # noqa E501

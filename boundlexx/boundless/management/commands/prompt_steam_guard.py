@@ -13,9 +13,7 @@ def command():
     client.set_credential_location(settings.STEAM_SENTRY_DIR)
 
     click.echo("Logging into Steam...")
-    client.cli_login(
-        username=settings.STEAM_USERNAME, password=settings.STEAM_PASSWORD
-    )
+    client.cli_login(username=settings.STEAM_USERNAME, password=settings.STEAM_PASSWORD)
 
     time.sleep(5)
 

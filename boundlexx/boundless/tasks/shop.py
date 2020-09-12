@@ -40,9 +40,7 @@ def try_update_prices():
     if lock.locked():
         last_run = cache.get(LAST_UPDATE_PRICES)
         if last_run is None:
-            logger.warning(
-                "update_prices task has not ran recently, breaking lock"
-            )
+            logger.warning("update_prices task has not ran recently, breaking lock")
             lock.reset()
         else:
             do_run = False
@@ -93,9 +91,7 @@ def _create_item_prices(shops, price_klass, world_name, item):
     total = 0
     state_hash = hashlib.sha512()
     for shop in shops:
-        item_price = price_klass.objects.create_from_shop_item(
-            world_name, item, shop
-        )
+        item_price = price_klass.objects.create_from_shop_item(world_name, item, shop)
 
         state_hash.update(item_price.state_hash)
         total += 1
@@ -103,9 +99,7 @@ def _create_item_prices(shops, price_klass, world_name, item):
     return total, state_hash
 
 
-def _update_item_prices(
-    item, rank_klass, client_method, price_klass, all_worlds
-):
+def _update_item_prices(item, rank_klass, client_method, price_klass, all_worlds):
 
     client = BoundlessClient()
     ranks, worlds = _get_ranks(item, rank_klass, all_worlds)
@@ -155,9 +149,7 @@ def _update_prices():
     logger.info("Updating the prices for %s items", len(items))
 
     all_worlds = list(
-        World.objects.filter(
-            active=True, is_creative=False, api_url__isnull=False
-        )
+        World.objects.filter(active=True, is_creative=False, api_url__isnull=False)
         .filter(
             Q(end__isnull=True)
             | Q(
