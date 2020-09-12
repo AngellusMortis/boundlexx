@@ -3,13 +3,10 @@ from typing import List
 from django.conf import settings
 from django.http import Http404
 from django.shortcuts import get_object_or_404
-from django.utils.decorators import method_decorator
-from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework_extensions.etag.decorators import etag
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
@@ -164,8 +161,6 @@ class ItemViewSet(
     ordering = ["-rank", "game_id"]
     ordering_fields: List[str] = []
 
-    @etag()
-    @method_decorator(cache_page(settings.CACHE_DURATION))
     def list(self, request, *args, **kwargs):  # noqa A003
         """
         Retrieves the list of items avaiable in Boundless
