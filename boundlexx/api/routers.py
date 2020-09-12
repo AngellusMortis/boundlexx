@@ -21,8 +21,8 @@ will always be returned by default. If you actually want JSON for your code,
 you need to request it. You can add a `?format=` filter to any API URL to
 force a specific format.
 
-`format=api` - will force the browsable API
-`format=json` - will force a JSON response
+* `format=api` - will force the browsable API
+* `format=json` - will force a JSON response
 """
 
 
