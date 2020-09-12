@@ -15,14 +15,19 @@ to filter it down to just the information you need/want. As such every endpoint
 has various filters avaiable to make use of if too much data is coming back for
 you.
 
-The API is some what heavily cached by a CDN, so you must be explicit when
-you make requests for what format you want. Chances are, the browsable API
-will always be returned by default. If you actually want JSON for your code,
-you need to request it. You can add a `?format=` filter to any API URL to
-force a specific format.
+The API provides a nice "browsable API" view for each endpoint that allows you
+to interact with the endpoint. It will show you all of the avaiable filters,
+formats, etc. Because the API is kind of heavily cached by a CDN, this **format
+is _not_ the default**. If you would like to use it, simply add `?format=api`
+to the end of any endpoint to get it.
 
-* `format=api` - will force the browsable API
-* `format=json` - will force a JSON response
+The API is also designed to give you as much data as avaiable, so you might
+be getting more then you need. It is expected you use filters to trim down the
+response content to only what you want back. The browsable API has all the
+possible filters for each endpoint as does this OpenAPI spec. The OpenAPI spec
+may extra filters that do not work on specific endpoints as there is a bit of
+drift between the generation of the API vs. the generation of the docs that
+have not been resolved yet (Sorry!).
 """
 
 
