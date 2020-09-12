@@ -36,12 +36,34 @@
             ]
         },
         {
-            "name": "Boundlexx: Debug Import Items",
+            "name": "Boundlexx: Debug Ingest",
             "type": "python",
             "request": "launch",
             "module": "manage",
             "args": [
-                "import_items"
+                "ingest_game_data",
+                "246.6.0"
+            ]
+        },
+        {
+            "name": "Boundlexx: Debug Create",
+            "type": "python",
+            "request": "launch",
+            "module": "manage",
+            "args": [
+                "create_game_objects",
+            ]
+        },
+        {
+            "name": "Boundlexx: Debug Ingest File",
+            "type": "python",
+            "request": "launch",
+            "module": "manage",
+            "args": [
+                "ingest_game_data",
+                "246.6.0",
+                "-f",
+                "/boundless/assets/archetypes/itemcolorstrings.dat"
             ]
         },
         {

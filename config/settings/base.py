@@ -112,6 +112,7 @@ THIRD_PARTY_APPS = [
     "django_celery_results",
     "rest_framework",
     "rest_framework.authtoken",
+    "django_json_widget",
 ]
 
 LOCAL_APPS = [
@@ -120,6 +121,7 @@ LOCAL_APPS = [
     "boundlexx.boundless",
     "boundlexx.api",
     "boundlexx.notifications",
+    "boundlexx.ingest",
 ]
 # https://docs.djangoproject.com/en/dev/ref/settings/#installed-apps
 INSTALLED_APPS = ADMIN_APPS + DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
@@ -391,6 +393,8 @@ BOUNDLESS_DS_REQUIRES_AUTH = env.bool("BOUNDLESS_DS_REQUIRES_AUTH", default=Fals
 
 # number of seconds between calls to each world
 BOUNDLESS_API_WORLD_DELAY = 1
+BOUNDLESS_LOCATION = "/boundless/"
+
 
 # path to Boundless itemcolorstrings.dat
 BOUNDLESS_ITEMS_FILE = "/boundless/assets/archetypes/itemcolorstrings.dat"

@@ -6,6 +6,7 @@ django-celery-results
 django-click
 django-environ
 django-filter
+django-json-widget
 django-model-utils
 django-polymorphic
 django-prometheus
@@ -34,5 +35,6 @@ pillow
 psycopg2 --no-binary psycopg2
 python-slugify
 pyyaml
+semver
 steam[client]
 uritemplate

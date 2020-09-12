@@ -141,7 +141,7 @@ class ColorValue(ExportModelOperationsMixin("color_value"), models.Model):  # ty
         FIBER = "FIBER", _("FIBER")
 
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
-    color_type = models.CharField(max_length=16, choices=ColorType.choices)
+    color_type = models.CharField(max_length=64, choices=ColorType.choices)
     shade = models.IntegerField()
     base = models.IntegerField()
     hlight = models.IntegerField()

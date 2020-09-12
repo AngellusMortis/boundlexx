@@ -32,6 +32,7 @@ django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
+django-json-widget==1.0.1  # via -r /app/requirements/in/base.in
 django-model-utils==4.0.0  # via -r /app/requirements/in/base.in
 django-polymorphic==3.0.0  # via -r /app/requirements/in/base.in
 django-prometheus==2.1.0  # via -r /app/requirements/in/base.in
@@ -44,6 +45,7 @@ djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 filetype==1.0.7           # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
+future==0.18.2            # via django-json-widget
 gevent-eventemitter==2.1  # via steam
 gevent==20.6.2            # via gevent-eventemitter, steam
 google-auth-oauthlib==0.4.1  # via gspread
@@ -56,7 +58,7 @@ idna==2.10                # via requests
 isodate==0.6.0            # via msrest
 kombu==4.6.11             # via celery
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
-msrest==0.6.18            # via azure-mgmt-cdn, msrestazure
+msrest==0.6.19            # via azure-mgmt-cdn, msrestazure
 msrestazure==0.6.4        # via azure-mgmt-cdn
 oauthlib==3.1.0           # via requests-oauthlib
 pillow==7.2.0             # via -r /app/requirements/in/base.in
@@ -79,6 +81,7 @@ regex==2020.7.14          # via dateparser
 requests-oauthlib==1.3.0  # via google-auth-oauthlib, msrest
 requests==2.24.0          # via adal, azure-storage-common, gspread, msrest, requests-oauthlib, steam
 rsa==4.6                  # via google-auth
+semver==2.10.2            # via -r /app/requirements/in/base.in
 six==1.15.0               # via argon2-cffi, cryptography, google-auth, isodate, msrestazure, protobuf, python-dateutil, steam
 soupsieve==2.0.1          # via beautifulsoup4
 sqlparse==0.3.1           # via django
