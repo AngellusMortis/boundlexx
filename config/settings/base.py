@@ -363,6 +363,11 @@ REST_FRAMEWORK = {
         "django_filters.rest_framework.DjangoFilterBackend"
     ],  # noqa
     "PAGE_SIZE": 255,
+    "DEFAULT_RENDERER_CLASSES": [
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.BrowsableAPIRenderer",
+    ],
+    "DEFAULT_CONTENT_NEGOTIATION_CLASS": "boundlexx.api.negotiation.IgnoreClientContentNegotiation",  # noqa: E501
 }
 
 REST_FRAMEWORK_EXTENSIONS = {
