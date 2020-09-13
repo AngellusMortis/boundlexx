@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import re
 from typing import Dict
 
 from django.conf import settings
@@ -85,9 +86,13 @@ class LocalizedStringText(models.Model):
     lang = models.CharField(_("Language"), max_length=16)
     text = models.TextField()
 
+    @cached_property
+    def plain_text(self):
+        return re.sub(r"\$\[STYLE\([^]]*, ?([^[])\)\]", r"\g<1>", self.text)
+
     class Meta:
         indexes = [
-            GinIndex(fields=["string"]),
+            GinIndex(fields=["text"]),
         ]
 
 
@@ -252,6 +257,11 @@ class SkillGroup(models.Model):
     display_name = models.ForeignKey(LocalizedString, on_delete=models.CASCADE)
     unlock_level = models.PositiveIntegerField()
 
+    class Meta:
+        indexes = [
+            GinIndex(fields=["name"]),
+        ]
+
     def __str__(self):
         return self.name
 
@@ -279,6 +289,11 @@ class Skill(models.Model):
     )
     bundle_prefix = models.CharField(max_length=128)
     affected_by_other_skills = models.BooleanField()
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=["name"]),
+        ]
 
     def __str__(self):
         return self.name

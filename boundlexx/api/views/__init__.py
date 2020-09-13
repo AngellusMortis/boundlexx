@@ -7,6 +7,7 @@ from boundlexx.api.views.item import (
     ItemResourceWorldListViewSet,
     ItemViewSet,
 )
+from boundlexx.api.views.skill import SkillGroupViewSet, SkillViewSet
 from boundlexx.api.views.world import (
     WorldDistanceViewSet,
     WorldPollViewSet,
@@ -14,15 +15,17 @@ from boundlexx.api.views.world import (
 )
 
 __all__ = [
+    "BlockColorViewSet",
     "ColorViewSet",
-    "ItemViewSet",
     "ItemColorsViewSet",
     "ItemResourceCountViewSet",
     "ItemResourceTimeseriesViewSet",
-    "WorldViewSet",
-    "WorldPollViewSet",
-    "WorldWSDataView",
-    "BlockColorViewSet",
-    "WorldDistanceViewSet",
     "ItemResourceWorldListViewSet",
+    "ItemViewSet",
+    "SkillGroupViewSet",
+    "SkillViewSet",
+    "WorldDistanceViewSet",
+    "WorldPollViewSet",
+    "WorldViewSet",
+    "WorldWSDataView",
 ]

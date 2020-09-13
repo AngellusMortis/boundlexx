@@ -287,3 +287,10 @@ class TimeseriesFilterSet(FilterSet):
         return queryset.annotate(
             time_bucket=Func(Value(value), F("time"), function="time_bucket")
         )
+
+
+class SkillFilterSet(LocalizationFilterSet):
+    group = filters.CharFilter(method="filter_group")
+
+    def filter_group(self, queryset, name, value):
+        return queryset.filter(group__name=value)

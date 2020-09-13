@@ -52,6 +52,9 @@ world_viewset.register(
     parents_query_lookups=["world_source__id"],
 )
 
+router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
+router.register("skills", views.SkillViewSet, basename="skill")
+
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
 urlpatterns = [

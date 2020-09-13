@@ -1,3 +1,4 @@
+from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.relations import Hyperlink
 from rest_framework.reverse import reverse
@@ -9,7 +10,11 @@ from boundlexx.boundless.models import (
     ItemShopStandPrice,
     LeaderboardRecord,
     LocalizedName,
+    LocalizedString,
+    LocalizedStringText,
     ResourceCount,
+    Skill,
+    SkillGroup,
     Subtitle,
     World,
     WorldBlockColor,
@@ -194,6 +199,24 @@ class LangFilterListSerializer(
         return data
 
 
+class LocalizedStringTextSerializer(serializers.ModelSerializer):
+    plain_text = serializers.CharField()
+
+    class Meta:
+        model = LocalizedStringText
+        list_serializer_class = LangFilterListSerializer
+        fields = ["lang", "text", "plain_text"]
+
+
+class LocalizedStringSerializer(serializers.ModelSerializer):
+    strings = LocalizedStringTextSerializer(many=True)
+
+    class Meta:
+        model = LocalizedString
+        list_serializer_class = LangFilterListSerializer
+        fields = ["string_id", "strings"]
+
+
 class LocalizedNameSerializer(serializers.ModelSerializer):
     class Meta:
         model = LocalizedName
@@ -268,12 +291,16 @@ class ItemSerializer(serializers.ModelSerializer):
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
     next_request_basket_update = serializers.DateTimeField(allow_null=True)
 
+    list_type = LocalizedStringSerializer()
+    description = LocalizedStringSerializer()
+
     class Meta:
         model = Item
         fields = [
             "url",
             "colors_url",
             "game_id",
+            "name",
             "string_id",
             "resource_counts_url",
             "request_baskets_url",
@@ -282,6 +309,9 @@ class ItemSerializer(serializers.ModelSerializer):
             "next_shop_stand_update",
             "localization",
             "item_subtitle",
+            "mint_value",
+            "list_type",
+            "description",
         ]
 
 
@@ -338,6 +368,64 @@ class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
         ]
 
 
+class SimpleSkillGroupSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="skill-group-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+
+    class Meta:
+        model = SkillGroup
+        fields = [
+            "url",
+            "name",
+        ]
+
+
+class SkillSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="skill-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+    group = SimpleSkillGroupSerializer()
+    display_name = LocalizedStringSerializer()
+    description = LocalizedStringSerializer()
+
+    class Meta:
+        model = Skill
+        fields = [
+            "url",
+            "name",
+            "display_name",
+            "description",
+            "group",
+            "number_unlocks",
+            "cost",
+            "order",
+            "category",
+            "link_type",
+            "bundle_prefix",
+            "affected_by_other_skills",
+        ]
+
+
+class SimpleSkillSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="skill-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+
+    class Meta:
+        model = SkillGroup
+        fields = [
+            "url",
+            "name",
+        ]
+
+
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
@@ -370,6 +458,16 @@ class WorldSerializer(serializers.ModelSerializer):
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
     next_request_basket_update = serializers.DateTimeField(allow_null=True)
 
+    protection_points = serializers.IntegerField(
+        allow_null=True,
+        help_text=_(
+            "'points' are not equal to levels in skill. For more details see "
+            '<a href="https://forum.playboundless.com/t/28068/4">this forum '
+            "post</a>."
+        ),
+    )
+    protection_skill = SimpleSkillSerializer()
+
     class Meta:
         model = World
         fields = [
@@ -391,6 +489,8 @@ class WorldSerializer(serializers.ModelSerializer):
             "tier",
             "size",
             "world_type",
+            "protection_points",
+            "protection_skill",
             "time_offset",
             "is_sovereign",
             "is_perm",
@@ -788,4 +888,23 @@ class SimpleItemRequestBasketPriceSerializer(SimpleItemShopPriceSerializer):
             "beacon_name",
             "guild_tag",
             "shop_activity",
+        ]
+
+
+class SkillGroupSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="skill-group-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+    display_name = LocalizedStringSerializer()
+
+    class Meta:
+        model = SkillGroup
+        fields = [
+            "url",
+            "name",
+            "skill_type",
+            "display_name",
+            "unlock_level",
         ]
