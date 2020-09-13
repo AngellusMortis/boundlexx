@@ -421,6 +421,8 @@ def _get_levels(recipe_dict):
             recipe_level.inputs.set(linputs)
         levels.append(recipe_level)
 
+    return levels
+
 
 def _recipe_group():
     recipes = GameFile.objects.get(
@@ -500,6 +502,9 @@ def _recipe_group():
 def command(core, item, skill, recipe):
     if not any([core, item, skill, recipe]):
         core = True
+        item = True
+        skill = True
+        recipe = True
 
     if core:
         _core_group()
