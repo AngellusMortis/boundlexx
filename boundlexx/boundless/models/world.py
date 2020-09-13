@@ -5,17 +5,19 @@ from datetime import datetime, timedelta
 import pytz
 from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
+from django.core.cache import cache
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import BoundlessClient
-from boundlexx.boundless.models.game import Color, Item
+from boundlexx.boundless.models.game import Color, Item, Skill
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex, get_next_rank_update
 from boundlexx.notifications.models import ExoworldNotification
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
+PROTECTION_SKILLS_CACHE = "boundless:protection_skills"
 
 
 class WorldManager(models.Manager):
@@ -344,26 +346,25 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
             self.water_color_g,
         )
 
-    @property
-    def protection(self):
+    @cached_property
+    def protection_points(self):
         if self.tier is None or self.tier < World.Tier.TIER_4:
             return None
 
-        points = "5 points + Pie"
         amount = 10
         if self.tier == World.Tier.TIER_4:
             amount = 1
-            points = "1 points"
         elif self.tier == World.Tier.TIER_5:
             amount = 3
-            points = "3 points"
         elif self.tier == World.Tier.TIER_6:
             amount = 5
-            points = "4 points"
         elif self.tier == World.Tier.TIER_7:
             amount = 7
-            points = "5 points"
 
+        return amount
+
+    @cached_property
+    def protection_skill(self):
         protection_type = "Volatile"
         if self.world_type in (
             World.WorldType.TYPE_LUSH,
@@ -380,7 +381,36 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         ):
             protection_type = "Potent"
 
-        return f"Lvl {amount} {protection_type} ({points})"
+        skills = cache.get(PROTECTION_SKILLS_CACHE)
+        if skills is None:
+            skills = list(Skill.objects.filter(group__name="Exploration"))
+            cache.set(PROTECTION_SKILLS_CACHE, skills, timeout=86400)
+
+        protection_skill = None
+        for skill in skills:
+            if skill.name.startswith(protection_type):
+                protection_skill = skill
+                break
+        return protection_skill
+
+    @property
+    def protection(self):
+        if self.protection_points is None:
+            return None
+
+        points = "5 points + Pie"
+        if self.protection_points == 1:
+            points = "1 point"
+        elif self.protection_points == 3:
+            points = "3 points"
+        elif self.protection_points == 5:
+            points = "4 points"
+        elif self.protection_points == 7:
+            points = "5 points"
+
+        protection_type = self.protection_skill.name.split(" ")[0]
+
+        return f"Lvl {self.protection_points} {protection_type} ({points})"
 
     @property
     def surface_liquid(self):

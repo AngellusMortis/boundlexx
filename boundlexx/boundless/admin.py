@@ -5,8 +5,10 @@ from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
 from django.templatetags.tz import localtime
+from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import localize
+from django.utils.safestring import mark_safe
 
 from boundlexx.boundless.models import (
     Color,
@@ -19,7 +21,12 @@ from boundlexx.boundless.models import (
     LeaderboardRecord,
     LocalizedName,
     Metal,
+    Recipe,
+    RecipeGroup,
+    RecipeLevel,
     ResourceCount,
+    Skill,
+    SkillGroup,
     Subtitle,
     World,
     WorldBlockColor,
@@ -537,3 +544,156 @@ class WorldPollAdmin(admin.ModelAdmin):
                 "resourcecount_set__item",
             )
         )
+
+
+@admin.register(SkillGroup)
+class SkillGroupAdmin(admin.ModelAdmin):
+    list_display = ["name", "skill_type", "unlock_level"]
+
+
+@admin.register(Skill)
+class SkillAdmin(admin.ModelAdmin):
+    list_display = ["name", "group", "number_unlocks", "cost"]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).select_related("group")
+
+
+@admin.register(RecipeGroup)
+class RecipeGroupAdmin(admin.ModelAdmin):
+    list_display = ["name"]
+
+    readonly_fields = ["name", "display_name", "members"]
+
+
+class RecipeInputInline(admin.TabularInline):
+    model = RecipeLevel.inputs.through
+
+    def input_group(self, obj):
+        return obj.recipeinput.group or "-"
+
+    input_group.short_description = "group"  # type: ignore
+
+    def input_item(self, obj):
+        return obj.recipeinput.item or "-"
+
+    input_item.short_description = "item"  # type: ignore
+
+    def input_count(self, obj):
+        return obj.recipeinput.count
+
+    input_count.short_description = "count"  # type: ignore
+
+    fields = [
+        "input_group",
+        "input_item",
+        "input_count",
+    ]
+    readonly_fields = [
+        "input_group",
+        "input_item",
+        "input_count",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+@admin.register(RecipeLevel)
+class RecipeLevelAdmin(admin.ModelAdmin):
+    readonly_fields = [
+        "level",
+        "wear",
+        "spark",
+        "duration",
+        "output_quantity",
+    ]
+
+    exclude = ["inputs"]
+
+    inlines = [
+        RecipeInputInline,
+    ]
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related("inputs")
+
+
+class RecipeRequirementsInline(admin.TabularInline):
+    model = Recipe.requirements.through
+
+    def requirements_skill(self, obj):
+        return obj.reciperequirement.skill
+
+    requirements_skill.short_description = "skill"  # type: ignore
+
+    def requirements_level(self, obj):
+        return obj.reciperequirement.level
+
+    requirements_level.short_description = "level"  # type: ignore
+
+    fields = [
+        "requirements_skill",
+        "requirements_level",
+    ]
+    readonly_fields = [
+        "requirements_skill",
+        "requirements_level",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+class RecipeLevelInline(admin.TabularInline):
+    model = Recipe.levels.through
+
+    def level(self, obj):
+        return obj.recipelevel.get_level_display()
+
+    level.short_description = "level"  # type: ignore
+
+    def link(self, obj):
+        link = reverse("admin:boundless_recipelevel_change", args=(obj.recipelevel.id,))
+
+        return mark_safe(f'<a href="{link}">View</a>')  # nosec
+
+    link.short_description = "link"  # type: ignore
+
+    fields = [
+        "level",
+        "link",
+    ]
+    readonly_fields = [
+        "level",
+        "link",
+    ]
+    can_delete = False
+    max_num = 0
+
+
+@admin.register(Recipe)
+class RecipeAdmin(GameObjAdmin):
+    list_display = [
+        "output",
+        "group_name",
+        "machine",
+        "craft_xp",
+        "can_hand_craft",
+    ]
+
+    readonly_fields = [
+        "game_id",
+        "machine",
+        "heat",
+        "craft_xp",
+        "output",
+        "can_hand_craft",
+        "machine_level",
+        "power",
+        "group_name",
+        "knowledge_unlock_level",
+        "tints",
+    ]
+
+    exclude = ["requirements", "levels"]
+
+    inlines = [RecipeRequirementsInline, RecipeLevelInline]

@@ -70,6 +70,27 @@ class LocalizedName(
         return f"{self.lang}: {self.name}"
 
 
+class LocalizedString(models.Model):
+    string_id = models.CharField(max_length=128, unique=True)
+
+    def __str__(self):
+        return self.string_id
+
+
+class LocalizedStringText(models.Model):
+    string = models.ForeignKey(
+        LocalizedString, on_delete=models.CASCADE, related_name="strings"
+    )
+
+    lang = models.CharField(_("Language"), max_length=16)
+    text = models.TextField()
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=["string"]),
+        ]
+
+
 class Subtitle(ExportModelOperationsMixin("subtitle"), GameObj):  # type: ignore # noqa E501
     pass
 
@@ -165,6 +186,22 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )
     string_id = models.CharField(_("String ID"), max_length=64)
+    name = models.CharField(_("Name"), max_length=64)
+    mint_value = models.FloatField(_("Chrysominter Value"), null=True, blank=True)
+    list_type = models.ForeignKey(
+        LocalizedString,
+        on_delete=models.CASCADE,
+        related_name="+",
+        blank=True,
+        null=True,
+    )
+    description = models.ForeignKey(
+        LocalizedString,
+        on_delete=models.CASCADE,
+        related_name="+",
+        blank=True,
+        null=True,
+    )
 
     class Meta:
         indexes = [
@@ -202,3 +239,123 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     @property
     def next_request_basket_update(self):
         return get_next_rank_update(self.itembuyrank_set.all())
+
+
+class SkillGroup(models.Model):
+    class SkillType(models.TextChoices):
+        ATTRIBUTES = "Attributes", _("Attributes")
+        BASIC = "Basic", _("Basic")
+        EPIC = "Epic", _("Epic")
+
+    skill_type = models.CharField(max_length=16, choices=SkillType.choices)
+    name = models.CharField(max_length=16, unique=True)
+    display_name = models.ForeignKey(LocalizedString, on_delete=models.CASCADE)
+    unlock_level = models.PositiveIntegerField()
+
+    def __str__(self):
+        return self.name
+
+
+class Skill(models.Model):
+    class LinkType(models.TextChoices):
+        NONE = "None", _("None")
+        LEFT = "Left", _("Left")
+        RIGHT = "Right", _("Right")
+
+    group = models.ForeignKey(SkillGroup, on_delete=models.CASCADE)
+    number_unlocks = models.PositiveIntegerField(
+        help_text=_("How many times this skill can be unlocked")
+    )
+    cost = models.PositiveIntegerField()
+    name = models.CharField(max_length=64, unique=True)
+    order = models.PositiveIntegerField()
+    category = models.CharField(max_length=32)
+    link_type = models.CharField(max_length=8, choices=LinkType.choices)
+    description = models.ForeignKey(
+        LocalizedString, on_delete=models.CASCADE, related_name="+"
+    )
+    display_name = models.ForeignKey(
+        LocalizedString, on_delete=models.CASCADE, related_name="+"
+    )
+    bundle_prefix = models.CharField(max_length=128)
+    affected_by_other_skills = models.BooleanField()
+
+    def __str__(self):
+        return self.name
+
+
+class RecipeGroup(models.Model):
+    name = models.CharField(max_length=32)
+    display_name = models.ForeignKey(LocalizedString, on_delete=models.CASCADE)
+    members = models.ManyToManyField(Item)
+
+    def __str__(self):
+        return self.name
+
+
+class RecipeInput(models.Model):
+    group = models.ForeignKey(
+        RecipeGroup, on_delete=models.CASCADE, blank=True, null=True
+    )
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, blank=True, null=True)
+    count = models.PositiveSmallIntegerField()
+
+
+class RecipeLevel(models.Model):
+    class Level(models.IntegerChoices):
+        SINGLE = 0, _("Single")
+        BULK = 1, _("Bulk")
+        MASS = 2, _("Mass")
+
+    level = models.PositiveIntegerField(choices=Level.choices)
+
+    wear = models.PositiveIntegerField()
+    spark = models.PositiveIntegerField()
+    duration = models.PositiveIntegerField()
+    output_quantity = models.PositiveIntegerField()
+    inputs = models.ManyToManyField(RecipeInput)
+
+
+class RecipeRequirement(models.Model):
+    skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
+    level = models.PositiveSmallIntegerField()
+
+
+class Recipe(GameObj):
+    class MachineType(models.TextChoices):
+        COMPACTOR = "COMPACTOR", _("COMPACTOR")
+        CRAFTING_TABLE = "CRAFTING_TABLE", _("CRAFTING_TABLE")
+        DYE_MAKER = "DYE_MAKER", _("DYE_MAKER")
+        EXTRACTOR = "EXTRACTOR", _("EXTRACTOR")
+        FURNACE = "FURNACE", _("FURNACE")
+        MIXER = "MIXER", _("MIXER")
+        REFINERY = "REFINERY", _("REFINERY")
+        WORKBENCH = "WORKBENCH", _("WORKBENCH")
+
+    class MachineLevelType(models.TextChoices):
+        NONE = "", _("")
+        STANDARD = "Standard", _("Standard")
+        POWERED = "Powered", _("Powered")
+        OVERDRIVEN = "Overdriven", _("Overdriven")
+        SUPERCHARGED = "Supercharged", _("Supercharged")
+
+    class GroupType(models.TextChoices):
+        DECORATIVE_STONE = "Powered", _("Powered")
+        UNDEFINED = "Overdriven", _("Overdriven")
+        SUPERCHARGED = "Supercharged", _("Supercharged")
+
+    heat = models.PositiveSmallIntegerField()
+    craft_xp = models.PositiveSmallIntegerField()
+    machine = models.CharField(max_length=16, choices=MachineType.choices, null=True)
+    output = models.ForeignKey(Item, on_delete=models.CASCADE)
+    can_hand_craft = models.BooleanField()
+    machine_level = models.CharField(
+        max_length=16, choices=MachineLevelType.choices, blank=True
+    )
+    power = models.PositiveIntegerField()
+    group_name = models.CharField(max_length=32)
+    knowledge_unlock_level = models.PositiveIntegerField()
+
+    tints = models.ManyToManyField(Item, related_name="+")
+    requirements = models.ManyToManyField(RecipeRequirement)
+    levels = models.ManyToManyField(RecipeLevel)
