@@ -56,15 +56,12 @@
             ]
         },
         {
-            "name": "Boundlexx: Debug Ingest File",
+            "name": "Boundlexx: Debug Commnad",
             "type": "python",
             "request": "launch",
             "module": "manage",
             "args": [
-                "ingest_game_data",
-                "246.6.0",
-                "-f",
-                "/boundless/assets/archetypes/itemcolorstrings.dat"
+                "recalculate_plain_text",
             ]
         },
         {

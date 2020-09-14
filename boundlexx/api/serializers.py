@@ -21,6 +21,7 @@ from boundlexx.boundless.models import (
     WorldDistance,
     WorldPoll,
 )
+from boundlexx.ingest.models import GameFile
 
 
 class AzureImageField(serializers.ImageField):
@@ -907,4 +908,40 @@ class SkillGroupSerializer(serializers.ModelSerializer):
             "skill_type",
             "display_name",
             "unlock_level",
+        ]
+
+
+class SimpleGameFileSerializer(serializers.ModelSerializer):
+    file_type = serializers.ChoiceField(
+        source="get_file_type_display",
+        help_text=_("0 = JSON, 1 = MSGPACK, 2 = OTHER"),
+        choices=GameFile.Filetype.choices,
+    )
+    url = serializers.HyperlinkedIdentityField(
+        view_name="game-file-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+
+    class Meta:
+        model = GameFile
+        fields = [
+            "url",
+            "folder",
+            "filename",
+            "file_type",
+            "game_version",
+        ]
+
+
+class GameFileSerializer(SimpleGameFileSerializer):
+    class Meta:
+        model = GameFile
+        fields = [
+            "url",
+            "folder",
+            "filename",
+            "file_type",
+            "game_version",
+            "content",
         ]

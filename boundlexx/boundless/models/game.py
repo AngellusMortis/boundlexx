@@ -79,16 +79,32 @@ class LocalizedString(models.Model):
 
 
 class LocalizedStringText(models.Model):
+    STYLE_REGEX = r"\$\[STYLE\(([^]]*),[^[]*\)\]"
+    ATTRIBUTE_REGEX = r"\${(ATTRIBUTE|BUNDLE|ACTION)\(([^}]*)\)\}"
+    POST_REL_REGEX = r" \(an increase of \$\{ATTRIBUTE[^}]*\}\)"
+
     string = models.ForeignKey(
         LocalizedString, on_delete=models.CASCADE, related_name="strings"
     )
 
     lang = models.CharField(_("Language"), max_length=16)
     text = models.TextField()
+    _plain_text = models.TextField(blank=True, null=True)
 
-    @cached_property
+    @property
     def plain_text(self):
-        return re.sub(r"\$\[STYLE\([^]]*, ?([^[])\)\]", r"\g<1>", self.text)
+        if self._plain_text is None:
+            # strip styles
+            self._plain_text = re.sub(
+                LocalizedStringText.STYLE_REGEX, r"\g<1>", self.text
+            )
+
+            # attributes are expensive to caculate, do not do them here
+            # run recalculate_plain_text for this
+            matches = re.findall(LocalizedStringText.ATTRIBUTE_REGEX, self._plain_text)
+            if len(matches) == 0:
+                self.save()
+        return self._plain_text
 
     class Meta:
         indexes = [
@@ -281,9 +297,7 @@ class Skill(models.Model):
     order = models.PositiveIntegerField()
     category = models.CharField(max_length=32)
     link_type = models.CharField(max_length=8, choices=LinkType.choices)
-    description = models.ForeignKey(
-        LocalizedString, on_delete=models.CASCADE, related_name="+"
-    )
+    description = models.ForeignKey(LocalizedString, on_delete=models.CASCADE)
     display_name = models.ForeignKey(
         LocalizedString, on_delete=models.CASCADE, related_name="+"
     )

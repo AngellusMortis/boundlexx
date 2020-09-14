@@ -54,6 +54,7 @@ world_viewset.register(
 
 router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
 router.register("skills", views.SkillViewSet, basename="skill")
+router.register("game-files", views.GameFileViewSet, basename="game-file")
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.
