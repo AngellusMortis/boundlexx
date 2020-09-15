@@ -102,7 +102,10 @@ def _format_value(value, display_type, multi_level, is_percent):
 
     # int
     if display_type == 1:
-        value = int(value)
+        try:
+            value = int(value)
+        except ValueError:
+            pass
     # percentages
     if is_percent or display_type in (2, 12) and isinstance(value, (int, float)):
         value = int(value * 100)
@@ -115,10 +118,11 @@ def _format_value(value, display_type, multi_level, is_percent):
         format_string = "25 per {}s"
     # speed
     elif display_type == 4:
+        value = float(value)
         format_string = "{:.1}m/s"
     # distance
     elif display_type == 5:
-        format_string = "{:.1}m"
+        format_string = "{}m"
     elif display_type == 7:
         format_string = "{} secs"
     # per s
@@ -296,11 +300,12 @@ def _replace_lookups(localization, matches):
         elif match_type == "ACTION":
             value = name
 
-        if value is not None:
+        if value is not None and not isinstance(value, str):
             attribute = attributes["archetypes"]["Character"]["attributes"][
                 attribute_name
             ]
             if attribute_name is not None:
+
                 attr = _calc(
                     skill,
                     skill.number_unlocks + 1,
@@ -314,6 +319,7 @@ def _replace_lookups(localization, matches):
                 value, attribute["displayType"], multi_level, is_percent
             )
 
+        if value is not None:
             localization._plain_text = localization._plain_text.replace(
                 f"${{{match[0]}({match[1]})}}", value
             ).replace("per level Pts", "Pts per level")
@@ -348,7 +354,9 @@ def command(force):
     total = texts.count()
     changed_count = 0
 
-    with click.progressbar(texts) as pbar:
+    with click.progressbar(
+        texts.iterator(), length=total, show_pos=True, show_percent=True
+    ) as pbar:
         for localized_text in pbar:
             changed = False
 
