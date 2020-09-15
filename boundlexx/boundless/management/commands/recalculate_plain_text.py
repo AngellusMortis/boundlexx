@@ -307,10 +307,6 @@ def _replace_lookups(localization, matches):
         elif match_type == "ACTION":
             value = name
 
-        # GUI_SKILLS_STEALTH_EPIC_DESCRIPTION
-        # GUI_SKILLS_HEALING_EPIC_DESCRIPTION
-        # GUI_SKILLS_GRAPPLE_MASTERY_DESCRIPTION
-
         if value is not None and not isinstance(value, str):
             attribute = attributes["archetypes"]["Character"]["attributes"][
                 attribute_name
