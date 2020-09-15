@@ -15,6 +15,7 @@ from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Color, Item, Skill
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex, get_next_rank_update
 from boundlexx.notifications.models import ExoworldNotification
+from config.storages import select_storage
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
 PROTECTION_SKILLS_CACHE = "boundless:protection_skills"
@@ -296,7 +297,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     start = models.DateTimeField(blank=True, null=True, db_index=True)
     end = models.DateTimeField(blank=True, null=True, db_index=True)
 
-    image = models.ImageField(blank=True, null=True)
+    image = models.ImageField(blank=True, null=True, storage=select_storage("worlds"))
     exo_notification_sent = models.NullBooleanField()
 
     def __str__(self):

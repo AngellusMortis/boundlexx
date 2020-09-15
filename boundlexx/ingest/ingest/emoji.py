@@ -39,7 +39,7 @@ def run():
 
             _, created = Emoji.objects.get_or_create(
                 name=out_name,
-                defaults={"image": get_django_image(image, f"emoji/{out_name}.png")},
+                defaults={"image": get_django_image(image, f"{out_name}.png")},
             )
 
             if created:

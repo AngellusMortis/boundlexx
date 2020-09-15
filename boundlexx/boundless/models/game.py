@@ -13,6 +13,7 @@ from django_prometheus.models import ExportModelOperationsMixin
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.boundless.utils import get_block_color_item_ids, get_next_rank_update
+from config.storages import select_storage
 
 
 class GameObjManager(PolymorphicManager):
@@ -303,7 +304,7 @@ class Skill(models.Model):
     )
     bundle_prefix = models.CharField(max_length=128)
     affected_by_other_skills = models.BooleanField()
-    icon = models.ImageField()
+    icon = models.ImageField(storage=select_storage("skills"))
 
     class Meta:
         indexes = [
@@ -393,7 +394,7 @@ class Recipe(GameObj):
 
 class Emoji(models.Model):
     name = models.CharField(max_length=32, db_index=True)
-    image = models.ImageField()
+    image = models.ImageField(storage=select_storage("emoji"))
 
     def __str__(self):
         return f":{self.name}:"

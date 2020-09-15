@@ -37,8 +37,8 @@ def run():
                 skill_group.save()
 
             for skill_dict in skill_group_dict["skills"]:
-                name = f"skills/{skill_dict['icon']}.png"
-                image = get_image(f"gui/sprites/distance_maps_bw/icons/{name}")
+                name = f"{skill_dict['icon']}.png"
+                image = get_image(f"gui/sprites/distance_maps_bw/icons/skills/{name}")
 
                 attrs = {
                     "group": skill_group,
