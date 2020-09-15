@@ -108,7 +108,7 @@ def _format_value(value, display_type, multi_level, is_percent):
             pass
     # percentages
     if is_percent or display_type in (2, 12) and isinstance(value, (int, float)):
-        value = int(value * 100)
+        value = int(round(value * 100))
         if display_type == 12:
             format_string = "+{}%"
         else:
@@ -118,8 +118,11 @@ def _format_value(value, display_type, multi_level, is_percent):
         format_string = "25 per {}s"
     # speed
     elif display_type == 4:
-        value = float(value)
-        format_string = "{:.1}m/s"
+        if isinstance(value, int):
+            format_string = "{}m/s"
+        else:
+            value = float(value)
+            format_string = "{:.1}m/s"
     # distance
     elif display_type == 5:
         format_string = "{}m"
@@ -241,7 +244,11 @@ def _replace_constants(current_attribute, formula):
     return "".join(replaced_formula)
 
 
-def _calc(skill, count, input_base, raw_formula):
+def _calc(skill, input_base, raw_formula):
+    count = skill.number_unlocks
+    if count == 1:
+        return input_base
+
     current_attribute = skill.name if skill.name in ATTRIBUTES else None
     if current_attribute == "Zeal":
         current_attribute = "Energy"
@@ -258,7 +265,7 @@ def _calc(skill, count, input_base, raw_formula):
     formula = _replace_constants(current_attribute, raw_formula)
 
     abs_values = []
-    for x in range(count):
+    for x in range(count + 1):
         attribute_value = base + x * input_base
 
         f = formula
@@ -300,6 +307,10 @@ def _replace_lookups(localization, matches):
         elif match_type == "ACTION":
             value = name
 
+        # GUI_SKILLS_STEALTH_EPIC_DESCRIPTION
+        # GUI_SKILLS_HEALING_EPIC_DESCRIPTION
+        # GUI_SKILLS_GRAPPLE_MASTERY_DESCRIPTION
+
         if value is not None and not isinstance(value, str):
             attribute = attributes["archetypes"]["Character"]["attributes"][
                 attribute_name
@@ -308,7 +319,6 @@ def _replace_lookups(localization, matches):
 
                 attr = _calc(
                     skill,
-                    skill.number_unlocks + 1,
                     value,
                     attribute["calculation"],
                 )
