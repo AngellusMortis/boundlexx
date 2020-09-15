@@ -1,4 +1,7 @@
 # pylint: skip-file
+# Adapted from
+# https://gist.github.com/mayumi7/ca9e58a21459ccc76ee09873cff5000f
+# https://forum.playboundless.com/t/documentation-of-itemcolorstrings-dat-structure/45708
 
 from collections import namedtuple
 from struct import unpack_from

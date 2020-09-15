@@ -12,6 +12,9 @@ router.register("colors", views.ColorViewSet, basename="color").register(
     parents_query_lookups=["color__game_id"],
 )
 
+router.register("emojis", views.EmojiViewSet, basename="emoji")
+router.register("game-files", views.GameFileViewSet, basename="game-file")
+
 item_viewset = router.register("items", views.ItemViewSet, basename="item")
 item_viewset.register(
     "resource-counts",
@@ -38,6 +41,9 @@ item_viewset.register(
     parents_query_lookups=["item__game_id"],
 )
 
+router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
+router.register("skills", views.SkillViewSet, basename="skill")
+
 world_viewset = router.register("worlds", views.WorldViewSet, basename="world")
 world_viewset.register(
     "polls",
@@ -51,10 +57,6 @@ world_viewset.register(
     basename="world-distance",
     parents_query_lookups=["world_source__id"],
 )
-
-router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
-router.register("skills", views.SkillViewSet, basename="skill")
-router.register("game-files", views.GameFileViewSet, basename="game-file")
 
 # Wire up our API using automatic URL routing.
 # Additionally, we include login URLs for the browsable API.

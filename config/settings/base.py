@@ -395,14 +395,6 @@ BOUNDLESS_DS_REQUIRES_AUTH = env.bool("BOUNDLESS_DS_REQUIRES_AUTH", default=Fals
 BOUNDLESS_API_WORLD_DELAY = 1
 BOUNDLESS_LOCATION = "/boundless/"
 
-
-# path to Boundless itemcolorstrings.dat
-BOUNDLESS_ITEMS_FILE = "/boundless/assets/archetypes/itemcolorstrings.dat"
-BOUNDLESS_COMPILED_ITEMS_FILE = "/boundless/assets/archetypes/compileditems.msgpack"
-BOUNDLESS_COMPILED_COLOR_PALETTES_FILE = (
-    "/boundless/assets/archetypes/compiledcolorpalettelists.msgpack"
-)
-
 # timeout for making an API request
 BOUNDLESS_API_TIMEOUT = 5
 BOUNDLESS_AUTH_AUTO_CREATE = True

@@ -7,6 +7,7 @@ from boundlexx.api.utils import PURGE_GROUPS, queue_purge_paths
 from boundlexx.boundless.models.game import (
     Color,
     ColorValue,
+    Emoji,
     GameObj,
     Item,
     LocalizedName,
@@ -44,6 +45,7 @@ from boundlexx.boundless.models.world import (
 __all__ = [
     "Color",
     "ColorValue",
+    "Emoji",
     "GameObj",
     "Item",
     "ItemBuyRank",

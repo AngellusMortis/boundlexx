@@ -52,11 +52,11 @@
             "module": "manage",
             "args": [
                 "create_game_objects",
-                "-r"
+                "-e"
             ]
         },
         {
-            "name": "Boundlexx: Debug Commnad",
+            "name": "Boundlexx: Debug Command",
             "type": "python",
             "request": "launch",
             "module": "manage",

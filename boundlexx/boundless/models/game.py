@@ -303,6 +303,7 @@ class Skill(models.Model):
     )
     bundle_prefix = models.CharField(max_length=128)
     affected_by_other_skills = models.BooleanField()
+    icon = models.ImageField()
 
     class Meta:
         indexes = [
@@ -388,3 +389,11 @@ class Recipe(GameObj):
     tints = models.ManyToManyField(Item, related_name="+")
     requirements = models.ManyToManyField(RecipeRequirement)
     levels = models.ManyToManyField(RecipeLevel)
+
+
+class Emoji(models.Model):
+    name = models.CharField(max_length=32, db_index=True)
+    image = models.ImageField()
+
+    def __str__(self):
+        return f":{self.name}:"

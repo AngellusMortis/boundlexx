@@ -5,6 +5,7 @@ from rest_framework.reverse import reverse
 
 from boundlexx.boundless.models import (
     Color,
+    Emoji,
     Item,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
@@ -393,6 +394,7 @@ class SkillSerializer(serializers.ModelSerializer):
     group = SimpleSkillGroupSerializer()
     display_name = LocalizedStringSerializer()
     description = LocalizedStringSerializer()
+    icon_url = AzureImageField(source="icon", allow_null=True)
 
     class Meta:
         model = Skill
@@ -400,6 +402,7 @@ class SkillSerializer(serializers.ModelSerializer):
             "url",
             "name",
             "display_name",
+            "icon_url",
             "description",
             "group",
             "number_unlocks",
@@ -944,4 +947,21 @@ class GameFileSerializer(SimpleGameFileSerializer):
             "file_type",
             "game_version",
             "content",
+        ]
+
+
+class EmojiSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="emoji-detail",
+        lookup_field="name",
+        read_only=True,
+    )
+    image_url = AzureImageField(source="image", allow_null=True)
+
+    class Meta:
+        model = Emoji
+        fields = [
+            "url",
+            "name",
+            "image_url",
         ]
