@@ -26,7 +26,7 @@ class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         queryset = self.filter_queryset(self.get_queryset())
         lookup_name = self.kwargs[self.lookup_field]
         obj = get_object_or_404(
-            queryset, Q(name=lookup_name) | Q(emojialname__name=lookup_name)
+            queryset, Q(name=lookup_name) | Q(emojialtname__name=lookup_name)
         )
 
         # May raise a permission denied
