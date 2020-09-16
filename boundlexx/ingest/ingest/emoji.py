@@ -1,6 +1,6 @@
 import djclick as click
 
-from boundlexx.boundless.models import Emoji
+from boundlexx.boundless.models import Emoji, EmojiAltName
 from boundlexx.ingest.ingest.icon import get_django_image, get_emoji
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
@@ -25,22 +25,17 @@ def run():
                 emoji_layer_data[(2 * index) + 1],
             )
 
-            # Nicer name from nametable (not all emojis have one)
-            readable = emoji_nametable.get(name)
-
-            # If there is a nicer name in the nametable, use this as the filename
-            # Not every emoji has one though
-            if readable:
-                out_name = readable[0]
-            else:
-                out_name = name
-
             image = get_emoji(name, layers)
 
-            _, created = Emoji.objects.get_or_create(
-                name=out_name,
-                defaults={"image": get_django_image(image, f"{out_name}.png")},
+            emoji, created = Emoji.objects.get_or_create(
+                name=name,
+                defaults={"image": get_django_image(image, f"{name}.png")},
             )
+
+            alt_names = emoji_nametable.get(name, [])
+
+            for alt_name in alt_names:
+                EmojiAltName.objects.get_or_create(emoji=emoji, name=alt_name)
 
             if created:
                 emoji_created += 1

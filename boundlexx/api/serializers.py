@@ -962,6 +962,6 @@ class EmojiSerializer(serializers.ModelSerializer):
         model = Emoji
         fields = [
             "url",
-            "name",
+            "names",
             "image_url",
         ]

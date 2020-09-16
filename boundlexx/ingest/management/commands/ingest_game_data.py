@@ -95,9 +95,9 @@ def _process_file(root, filename, game_version):
 
     if json_content:
         if game_file is not None:
-            if version_compare == 1:
-                game_file = None
-            elif game_file.content != json_content:
+            if version_compare == 1 and game_file.content != json_content:
+                click.secho(f"New version of {filepath}...")
+                game_file.delete()
                 game_file = None
 
         if game_file is not None:

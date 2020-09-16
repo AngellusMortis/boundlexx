@@ -401,3 +401,12 @@ class Emoji(models.Model):
 
     class Meta:
         ordering = ["name"]
+
+    @cached_property
+    def names(self):
+        return [self.name] + [a.name for a in self.emojialtname_set.all()]
+
+
+class EmojiAltName(models.Model):
+    emoji = models.ForeignKey(Emoji, on_delete=models.CASCADE)
+    name = models.CharField(max_length=32, db_index=True)

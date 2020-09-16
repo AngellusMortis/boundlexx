@@ -1,5 +1,7 @@
 from typing import List
 
+from django.db.models import Q
+from django.shortcuts import get_object_or_404
 from rest_framework import viewsets
 
 from boundlexx.api.serializers import EmojiSerializer
@@ -15,13 +17,22 @@ EMOJI_EXAMPLE = {
 
 
 class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
-    # authentication_classes = [TokenAuthentication]
-    # permission_classes = [IsAuthenticated]
-
-    queryset = Emoji.objects.all()
+    queryset = Emoji.objects.all().prefetch_related("emojialtname_set")
     serializer_class = EmojiSerializer
     lookup_field = "name"
     ordering_fields: List[str] = []
+
+    def get_object(self):
+        queryset = self.filter_queryset(self.get_queryset())
+        lookup_name = self.kwargs[self.lookup_field]
+        obj = get_object_or_404(
+            queryset, Q(name=lookup_name) | Q(emojialname__name=lookup_name)
+        )
+
+        # May raise a permission denied
+        self.check_object_permissions(self.request, obj)
+
+        return obj
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

@@ -82,14 +82,9 @@ class WorldManager(models.Manager):
         world.region = world_dict["region"]
         world.tier = world_dict["tier"]
         world.size = world_dict["worldSize"]
-        if settings.BOUNDLESS_TESTING_FEATURES:
-            world.world_type = settings.BOUNDLESS_WORLD_TYPE_MAPPING.get(
-                world_dict["worldType"]
-            )
-            world.description = None
-        else:
-            world.world_type = world_dict["worldType"]
-            world.description = world_dict["worldDescription"]
+        world.world_type = settings.BOUNDLESS_WORLD_TYPE_MAPPING.get(
+            world_dict["worldType"]
+        )
         world.time_offset = datetime.utcfromtimestamp(world_dict["timeOffset"]).replace(
             tzinfo=pytz.utc
         )
@@ -234,7 +229,6 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         db_index=True,
         help_text=_("Tier of the world. Starts at 0."),
     )
-    description = models.CharField(_("Description"), max_length=32, null=True)
     size = models.IntegerField(_("World Size"), null=True)
     world_type = models.CharField(
         _("World Type"),
