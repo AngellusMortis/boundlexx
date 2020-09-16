@@ -83,18 +83,14 @@ class WorldFilterSet(FilterSet):
         label=_(
             "Filters start based on a given time contraint. `start_after` sets "
             "lower bound and `start_before` sets upper bound. Format is "
-            "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
-            "local timezone; automatically handles and converts to proper "
-            "time."
+            "<a href='https://en.wikipedia.org/wiki/ISO_8601'>ISO 8601</a>"
         ),
     )
     end = filters.IsoDateTimeFromToRangeFilter(
         label=_(
             "Filters start based on a given time contraint. `end_after` sets "
             "lower bound and `end_before` sets upper bound. Format is "
-            "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
-            "local timezone; automatically handles and converts to proper "
-            "time."
+            "<a href='https://en.wikipedia.org/wiki/ISO_8601'>ISO 8601</a>"
         ),
     )
 
@@ -282,9 +278,7 @@ class TimeseriesFilterSet(FilterSet):
         label=_(
             "Filters based on a given time contraint. `time_after` sets "
             "lower bound and `time_before` sets upper bound. Format is "
-            "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
-            "local timezone; automatically handles and converts to proper "
-            "time."
+            "<a href='https://en.wikipedia.org/wiki/ISO_8601'>ISO 8601</a>"
         ),
     )
     bucket = filters.CharFilter(
