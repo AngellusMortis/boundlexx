@@ -330,6 +330,9 @@ def _parse_forum_topic(topic: int, is_exo: bool):
             block_details = detail
             break
 
+    if block_details is None:
+        return None, None
+
     return world_info, block_details
 
 
@@ -340,6 +343,10 @@ def ingest_exo_world_data():
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:
         world_info, block_details = _parse_forum_topic(topic, is_exo=True)
+
+        if world_info is None or block_details is None:
+            logger.warning("No Block color data for world yet for topic %s")
+            continue
 
         block_colors = _parse_block_details(block_details)
         world, _ = World.objects.get_or_create_forum_world(topic, world_info)
