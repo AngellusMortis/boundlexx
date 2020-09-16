@@ -81,19 +81,19 @@ class WorldFilterSet(FilterSet):
     )
     start = filters.DateTimeFromToRangeFilter(
         label=_(
-            "Filters start base on a given time contraint. `start_after` sets "
+            "Filters start based on a given time contraint. `start_after` sets "
             "lower bound and `start_before` sets upper bound. Format is "
             "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
-            "local timezone;  automatically handles and converts to proper "
+            "local timezone; automatically handles and converts to proper "
             "time."
         ),
     )
     end = filters.DateTimeFromToRangeFilter(
         label=_(
-            "Filters start base on a given time contraint. `end_after` sets "
+            "Filters start based on a given time contraint. `end_after` sets "
             "lower bound and `end_before` sets upper bound. Format is "
             "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
-            "local timezone;  automatically handles and converts to proper "
+            "local timezone; automatically handles and converts to proper "
             "time."
         ),
     )
@@ -283,7 +283,7 @@ class TimeseriesFilterSet(FilterSet):
             "Filters based on a given time contraint. `time_after` sets "
             "lower bound and `time_before` sets upper bound. Format is "
             "`YYYY-MM-DD HH:MM` or `YYYY-MM-DD`. Time is specified in "
-            "local timezone;  automatically handles and converts to proper "
+            "local timezone; automatically handles and converts to proper "
             "time."
         ),
     )
