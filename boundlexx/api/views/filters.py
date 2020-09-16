@@ -79,7 +79,7 @@ class WorldFilterSet(FilterSet):
         label=_("Include previous colors for world (Sovereign only)"),
         method="filter_null",
     )
-    start = filters.DateTimeFromToRangeFilter(
+    start = filters.IsoDateTimeFromToRangeFilter(
         label=_(
             "Filters start based on a given time contraint. `start_after` sets "
             "lower bound and `start_before` sets upper bound. Format is "
@@ -88,7 +88,7 @@ class WorldFilterSet(FilterSet):
             "time."
         ),
     )
-    end = filters.DateTimeFromToRangeFilter(
+    end = filters.IsoDateTimeFromToRangeFilter(
         label=_(
             "Filters start based on a given time contraint. `end_after` sets "
             "lower bound and `end_before` sets upper bound. Format is "
@@ -277,7 +277,7 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
 
 
 class TimeseriesFilterSet(FilterSet):
-    time = filters.DateTimeFromToRangeFilter(
+    time = filters.IsoDateTimeFromToRangeFilter(
         method="filter_time",
         label=_(
             "Filters based on a given time contraint. `time_after` sets "
