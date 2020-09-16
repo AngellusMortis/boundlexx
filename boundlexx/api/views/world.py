@@ -40,12 +40,16 @@ BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = World.objects.all().prefetch_related(
-        "worldblockcolor_set",
-        "worldblockcolor_set__item",
-        "worldblockcolor_set__color",
-        "itembuyrank_set",
-        "itemsellrank_set",
+    queryset = (
+        World.objects.all()
+        .select_related("assignment")
+        .prefetch_related(
+            "worldblockcolor_set",
+            "worldblockcolor_set__item",
+            "worldblockcolor_set__color",
+            "itembuyrank_set",
+            "itemsellrank_set",
+        )
     )
     serializer_class = WorldSerializer
     lookup_field = "id"
