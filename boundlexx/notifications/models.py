@@ -161,11 +161,11 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_update_notification(self, world):
         send_update = (
             world.address is not None
-            and world.is_exo
             and world.notification_sent is False
             and (
                 (world.forum_id and world.image.name)
                 or timezone.now() > world.start + timedelta(days=1)
+                or not world.is_exo
             )
         )
 
