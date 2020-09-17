@@ -464,18 +464,26 @@ class WorldNotification(NotificationBase):
 
 
 class ExoworldNotification(NotificationBase):
+    objects = NewWorldNotificationManager()
+
     _world_type = "exoworld"
 
 
 class SovereignWorldNotification(WorldNotification):
+    objects = NewWorldNotificationManager()
+
     _world_type = "sovereign world"
 
 
 class CreativeWorldNotification(WorldNotification):
+    objects = NewWorldNotificationManager()
+
     _world_type = "creative world"
 
 
 class HomeworldNotification(WorldNotification):
+    objects = NewWorldNotificationManager()
+
     _world_type = "homeworld"
 
 
