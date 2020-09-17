@@ -122,12 +122,14 @@ def _scan_worlds(lower, upper):
                             "Could not do inital world poll world: %s",
                             world.display_name,
                         )
+                        world_data = None
                     else:
                         raise
 
-                WorldPoll.objects.create_from_game_dict(
-                    world_data, poll_dict, world=world, new_world=True
-                )
+                if world_data is not None:
+                    WorldPoll.objects.create_from_game_dict(
+                        world_data, poll_dict, world=world, new_world=True
+                    )
 
     logger.info("Found %s world(s)", worlds_found)
 
