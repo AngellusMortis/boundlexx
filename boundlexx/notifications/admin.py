@@ -21,6 +21,7 @@ class DiscordWebhookSubscriptionAdmin(admin.ModelAdmin):
 class WorldNotificationAdmin(admin.ModelAdmin):
     list_display = [
         "id",
+        "name",
         "active",
     ]
 

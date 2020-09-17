@@ -187,11 +187,11 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             world.save()
 
 
-class ExoworldNotification(NotificationBase):
+class WorldNotification(NotificationBase):
     objects = NewWorldNotificationManager()
 
     _context = None
-    _world_type = "exoworld"
+    _world_type = "world"
 
     def _get_colors(self, world):
         # never get colors for Creative worlds
@@ -463,15 +463,19 @@ class ExoworldNotification(NotificationBase):
         return embeds, files
 
 
-class SovereignWorldNotification(ExoworldNotification):
+class ExoworldNotification(NotificationBase):
+    _world_type = "exoworld"
+
+
+class SovereignWorldNotification(WorldNotification):
     _world_type = "sovereign world"
 
 
-class CreativeWorldNotification(ExoworldNotification):
+class CreativeWorldNotification(WorldNotification):
     _world_type = "creative world"
 
 
-class HomeworldNotification(ExoworldNotification):
+class HomeworldNotification(WorldNotification):
     _world_type = "homeworld"
 
 
