@@ -189,10 +189,7 @@ class ExoworldNotification(NotificationBase):
     _context = None
     _world_type = "exoworld"
 
-    def _get_context(self, world, resources=None):
-        if self._context is not None:
-            return self._context
-
+    def _get_colors(self, world):
         # never get colors for Creative worlds
         if world.is_creative:
             colors = None
@@ -201,6 +198,13 @@ class ExoworldNotification(NotificationBase):
             if colors.count() == 0:
                 colors = None
 
+        return colors
+
+    def _get_context(self, world, resources=None):
+        if self._context is not None:
+            return self._context
+
+        colors = self._get_colors(world)
         color_groups: Dict[str, list] = {}
         if colors is not None:
             for group_name in settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER:
