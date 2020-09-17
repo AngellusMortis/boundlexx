@@ -305,11 +305,18 @@ class WorldNotification(NotificationBase):
                 "value": (f"{naturaltime(world.start)}\n" f"{world.start.isoformat()}"),
                 "inline": True,
             },
-            {
-                "name": "End",
-                "value": f"{naturaltime(world.end)}\n{world.end.isoformat()}",
-                "inline": True,
-            },
+        ]
+
+        if world.end is not None:
+            main_embed["fields"].append(
+                {
+                    "name": "End",
+                    "value": f"{naturaltime(world.end)}\n{world.end.isoformat()}",
+                    "inline": True,
+                },
+            )
+
+        main_embed["fields"] += [
             {
                 "name": "Server Region",
                 "value": f"{world.get_region_display()}",
@@ -463,26 +470,19 @@ class WorldNotification(NotificationBase):
         return embeds, files
 
 
-class ExoworldNotification(NotificationBase):
-    objects = NewWorldNotificationManager()
-
+class ExoworldNotification(WorldNotification):
     _world_type = "exoworld"
 
 
 class SovereignWorldNotification(WorldNotification):
-    objects = NewWorldNotificationManager()
-
     _world_type = "sovereign world"
 
 
 class CreativeWorldNotification(WorldNotification):
-    objects = NewWorldNotificationManager()
-
     _world_type = "creative world"
 
 
 class HomeworldNotification(WorldNotification):
-    objects = NewWorldNotificationManager()
 
     _world_type = "homeworld"
 
