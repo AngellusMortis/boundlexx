@@ -93,6 +93,10 @@ class DiscordWebhookSubscription(SubscriptionBase):
 class NotificationBase(PolymorphicModel):
     subscription = models.ForeignKey(SubscriptionBase, on_delete=models.CASCADE)
     active = models.BooleanField(default=True)
+    name = models.CharField(max_length=16, blank=True, null=True)
+
+    def __str__(self):
+        return f"{self.__class__.__name__}: {self.name}"
 
     def markdown(self, **kwargs):
         return None
@@ -145,7 +149,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
                 world, world_poll.resources
             )
         else:
-            return
+            HomeworldNotification.objects.send_notification(world, world_poll.resources)
 
         if (
             world.image.name
@@ -177,7 +181,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             elif world.is_sovereign:
                 SovereignWorldNotification.objects.send_notification(world)
             else:
-                return
+                HomeworldNotification.objects.send_notification(world)
 
             world.notification_sent = True
             world.save()
@@ -465,6 +469,10 @@ class SovereignWorldNotification(ExoworldNotification):
 
 class CreativeWorldNotification(ExoworldNotification):
     _world_type = "creative world"
+
+
+class HomeworldNotification(ExoworldNotification):
+    _world_type = "homeworld"
 
 
 class FailedTaskNotification(NotificationBase):

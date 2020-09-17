@@ -36,25 +36,36 @@ def update_perm_worlds():
 
 @app.task
 def search_exo_worlds():
-    most_recent_world = (
-        World.objects.filter(id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID)
-        .order_by("-id")
-        .first()
-    )
+    existing_worlds = World.objects.filter(
+        id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
+        end__isnull=False,
+        end__gt=timezone.now() - settings.BOUNDLEXX_WORLD_SEARCH_OFFSET,
+    ).order_by("id")
 
-    if most_recent_world is None:
+    existing_ids = set()
+    lowest_id = settings.BOUNDLESS_EXO_EXPIRED_BASE_ID
+    highest_id = -1
+
+    for world in existing_worlds.iterator():
+        existing_ids.add(world.id)
+        if world.id > highest_id:
+            highest_id = world.id
+        if world.id < lowest_id:
+            lowest_id = world.id
+
+    if highest_id == -1:
         logger.warning("No worlds found to use as a start")
         return
 
-    worlds_lower = max(most_recent_world.id - settings.BOUNDLESS_EXO_SEARCH_RADIUS, 1)
-    worlds_upper = most_recent_world.id + settings.BOUNDLESS_EXO_SEARCH_RADIUS
+    all_ids = set(
+        range(lowest_id, highest_id + 1 + settings.BOUNDLESS_EXO_SEARCH_RADIUS)
+    )
 
-    if worlds_lower == most_recent_world:
-        worlds_lower += 1
+    ids_to_scan = sorted(all_ids - existing_ids)
 
-    logger.info("Starting scan for exo worlds (%s, %s)", worlds_lower, worlds_upper)
+    logger.info("Starting scan for exo worlds (%s)", ids_to_scan)
 
-    _, worlds = _scan_worlds(worlds_lower, worlds_upper)
+    _, worlds = _scan_worlds(ids_to_scan)
 
     worlds_found = 0
     for world in worlds:
@@ -84,7 +95,9 @@ def discover_all_worlds(start_id=None):
     for chunk in chunks:
         logger.info("Starting scan for worlds (%s, %s)", chunk[0], chunk[1])
 
-        created, worlds = _scan_worlds(chunk[0], chunk[1])
+        ids_to_scan = list(range(chunk[0], chunk[1] + 1))
+
+        created, worlds = _scan_worlds(ids_to_scan)
         worlds_found += created
 
         new_worlds += worlds
@@ -92,9 +105,9 @@ def discover_all_worlds(start_id=None):
     logger.info("Scan Complete. Found %s world(s)", worlds_found)
 
 
-def _scan_worlds(lower, upper):
+def _scan_worlds(ids_to_scan):
     client = BoundlessClient()
-    worlds = get_worlds(lower, upper, client=client)
+    worlds = get_worlds(ids_to_scan, client=client)
 
     worlds_found = 0
     world_objs = []
@@ -136,13 +149,13 @@ def _scan_worlds(lower, upper):
     return worlds_found, world_objs
 
 
-def get_worlds(lower, upper, client=None):
+def get_worlds(ids_to_scan, client=None):
     if client is None:
         client = BoundlessClient()
 
     worlds: List[dict] = []
 
-    for world_id in range(lower, upper + 1):
+    for world_id in ids_to_scan:
         world_data = client.get_world_data(world_id)
 
         if world_data is not None:
