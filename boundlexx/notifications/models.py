@@ -193,9 +193,13 @@ class ExoworldNotification(NotificationBase):
         if self._context is not None:
             return self._context
 
-        colors = world.worldblockcolor_set.all().order_by("item__game_id")
-        if colors.count() == 0:
+        # never get colors for Creative worlds
+        if world.is_creative:
             colors = None
+        else:
+            colors = world.worldblockcolor_set.all().order_by("item__game_id")
+            if colors.count() == 0:
+                colors = None
 
         color_groups: Dict[str, list] = {}
         if colors is not None:

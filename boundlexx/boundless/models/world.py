@@ -611,6 +611,7 @@ class WorldBlockColor(
                         color=self.color,
                         world__end__isnull=False,
                         world__end__lt=self.world.start,
+                        world__is_creative=False,
                     ).count()
                     == 0
                 )
