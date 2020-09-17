@@ -130,19 +130,31 @@ class PolymorphicNotificationManager(PolymorphicManager):
             notification.subscription.send(embed=embed, files=files, markdown=markdown)
 
 
-class ExoworldNotificationManager(PolymorphicNotificationManager):
+class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
         world = world_poll.world
-        super().send_notification(world, world_poll.resources)
+
+        if world.is_exo:
+            ExoworldNotification.objects.send_notification(world, world_poll.resources)
+        elif world.is_creative:
+            CreativeWorldNotification.objects.send_notification(
+                world, world_poll.resources
+            )
+        elif world.is_sovereign:
+            SovereignWorldNotification.objects.send_notification(
+                world, world_poll.resources
+            )
+        else:
+            return
 
         if (
             world.image.name
             and world.forum_id
             and world.worldblockcolor_set.count() > 0
         ):
-            world.exo_notification_sent = True
+            world.notification_sent = True
         else:
-            world.exo_notification_sent = False
+            world.notification_sent = False
 
             world.save()
 
@@ -150,7 +162,7 @@ class ExoworldNotificationManager(PolymorphicNotificationManager):
         send_update = (
             world.address is not None
             and world.is_exo
-            and world.exo_notification_sent is False
+            and world.notification_sent is False
             and (
                 (world.forum_id and world.image.name)
                 or timezone.now() > world.start + timedelta(days=1)
@@ -158,15 +170,24 @@ class ExoworldNotificationManager(PolymorphicNotificationManager):
         )
 
         if send_update:
-            super().send_notification(world)
-            world.exo_notification_sent = True
+            if world.is_exo:
+                ExoworldNotification.objects.send_notification(world)
+            elif world.is_creative:
+                CreativeWorldNotification.objects.send_notification(world)
+            elif world.is_sovereign:
+                SovereignWorldNotification.objects.send_notification(world)
+            else:
+                return
+
+            world.notification_sent = True
             world.save()
 
 
 class ExoworldNotification(NotificationBase):
-    objects = ExoworldNotificationManager()
+    objects = NewWorldNotificationManager()
 
     _context = None
+    _world_type = "exoworld"
 
     def _get_context(self, world, resources=None):
         if self._context is not None:
@@ -244,9 +265,9 @@ class ExoworldNotification(NotificationBase):
         if is_update:
             main_embed[
                 "description"
-            ] = "New information is avaiable for the new exoworld!"
+            ] = f"New information is avaiable for the new {self._world_type}!"
         else:
-            main_embed["description"] = "A new exoworld world as appeared!"
+            main_embed["description"] = f"A new {self._world_type} world as appeared!"
 
         if world.forum_url:
             main_embed["url"] = world.forum_url
@@ -428,6 +449,14 @@ class ExoworldNotification(NotificationBase):
             embeds.append(color_embed)
 
         return embeds, files
+
+
+class SovereignWorldNotification(ExoworldNotification):
+    _world_type = "sovereign world"
+
+
+class CreativeWorldNotification(ExoworldNotification):
+    _world_type = "creative world"
 
 
 class FailedTaskNotification(NotificationBase):

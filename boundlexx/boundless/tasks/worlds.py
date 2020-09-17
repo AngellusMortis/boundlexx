@@ -4,6 +4,7 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.db.models import Q
 from django.utils import timezone
+from requests.exceptions import HTTPError
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.models import World, WorldDistance, WorldPoll
@@ -111,9 +112,18 @@ def _scan_worlds(lower, upper):
             world_objs.append(world)
 
             if not world.is_locked:
-                world_data, poll_dict = client.get_world_poll(
-                    world_dict["pollData"], world_dict["worldData"]
-                )
+                try:
+                    world_data, poll_dict = client.get_world_poll(
+                        world_dict["pollData"], world_dict["worldData"]
+                    )
+                except HTTPError as ex:
+                    if world.is_sovereign and ex.response.status_code == 400:
+                        logger.warning(
+                            "Could not do inital world poll world: %s",
+                            world.display_name,
+                        )
+                    else:
+                        raise
 
                 WorldPoll.objects.create_from_game_dict(
                     world_data, poll_dict, world=world, new_world=True
@@ -157,14 +167,21 @@ def poll_worlds(world_ids=None):
         try:
             world_data, poll_data = client.get_world_poll_by_id(world.id)
         except HTTP_ERRORS as ex:
-            errors_total += 1
-            logger.error("%s while polling world %s", ex, world)
+            if (
+                world.is_sovereign
+                and hasattr(ex, "response")
+                and ex.response.status_code == 400  # type: ignore
+            ):
+                logger.warning("Could not do poll world %s", world.display_name)
+            else:
+                errors_total += 1
+                logger.error("%s while polling world %s", ex, world)
 
-            if errors_total > 5:
-                raise Exception(  # pylint: disable=raise-missing-from
-                    "Aborting due to large number of HTTP errors"
-                )
-            continue
+                if errors_total > 5:
+                    raise Exception(  # pylint: disable=raise-missing-from
+                        "Aborting due to large number of HTTP errors"
+                    )
+                continue
 
         if world_data is None:
             logger.info("World %s no longer in API, marking inactive...", world)

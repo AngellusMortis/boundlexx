@@ -292,7 +292,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     end = models.DateTimeField(blank=True, null=True, db_index=True)
 
     image = models.ImageField(blank=True, null=True, storage=select_storage("worlds"))
-    exo_notification_sent = models.NullBooleanField()
+    notification_sent = models.NullBooleanField()
 
     def __str__(self):
         return self.display_name
@@ -393,15 +393,15 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         if self.protection_points is None:
             return None
 
-        points = "5 points + Pie"
+        points = "5 levels + Pie"
         if self.protection_points == 1:
-            points = "1 point"
+            points = "1 level"
         elif self.protection_points == 3:
-            points = "3 points"
+            points = "3 levels"
         elif self.protection_points == 5:
-            points = "4 points"
+            points = "4 levels"
         elif self.protection_points == 7:
-            points = "5 points"
+            points = "5 levels"
 
         protection_type = self.protection_skill.name.split(" ")[0]
 
@@ -789,9 +789,7 @@ class WorldPollManager(models.Manager):
             )
 
             calculate_distances.delay([world.id])
-
-            if world.is_exo:
-                ExoworldNotification.objects.send_new_notification(world_poll)
+            ExoworldNotification.objects.send_new_notification(world_poll)
 
         return world_poll
 
