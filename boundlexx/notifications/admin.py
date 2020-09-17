@@ -1,11 +1,11 @@
 from django.contrib import admin
 
 from boundlexx.notifications.models import (
+    CreativeWorldNotification,
     DiscordWebhookSubscription,
     ExoworldNotification,
-    SovereignWorldNotification,
-    CreativeWorldNotification,
     FailedTaskNotification,
+    SovereignWorldNotification,
 )
 
 
