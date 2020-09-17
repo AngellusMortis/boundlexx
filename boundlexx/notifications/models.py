@@ -275,7 +275,7 @@ class ExoworldNotification(NotificationBase):
                 "description"
             ] = f"New information is avaiable for the new {self._world_type}!"
         else:
-            main_embed["description"] = f"A new {self._world_type} world as appeared!"
+            main_embed["description"] = f"A new {self._world_type} has appeared!"
 
         if world.forum_url:
             main_embed["url"] = world.forum_url
