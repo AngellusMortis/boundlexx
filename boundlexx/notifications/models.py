@@ -231,7 +231,7 @@ class ExoworldNotification(NotificationBase):
                 ]
 
         context = {"world": world, "color_groups": color_groups}
-        if resources is not None:
+        if resources is not None and not world.is_creative:
             embedded_resources = []
             surface_resources = []
 
