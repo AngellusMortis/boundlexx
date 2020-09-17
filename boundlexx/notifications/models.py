@@ -445,7 +445,7 @@ class ExoworldNotification(NotificationBase):
         main_embed, files = self._main_embed(world, resources is None)
         embeds.append(main_embed)
 
-        if resources is not None:
+        if not world.is_creative and resources is not None:
             resource_embed = self._resource_embed(
                 context["embedded_resources"], context["surface_resources"]
             )
