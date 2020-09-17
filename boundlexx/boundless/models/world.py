@@ -76,6 +76,7 @@ class WorldManager(models.Manager):
             created = True
 
         created = created or world.address is None
+        default_public = world_dict.get("owner", None) is None
 
         world.display_name = world_dict["displayName"]
         world.name = world_dict["name"]
@@ -102,7 +103,7 @@ class WorldManager(models.Manager):
         world.owner = world_dict.get("owner", None)
         world.assignment_id = world_dict.get("assignment", None)
         world.is_locked = world_dict.get("locked", False)
-        world.is_public = world_dict.get("public", True)
+        world.is_public = world_dict.get("public", default_public)
         world.number_of_regions = world_dict["numRegions"]
         world.active = True
 
