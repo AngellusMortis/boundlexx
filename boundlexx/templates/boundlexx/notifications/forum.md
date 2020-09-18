@@ -7,7 +7,8 @@
 ![|30x30]({{ icons.type|key:world.world_type }}) Type : **{{ world.get_world_type_display }}**
 ![|30x30]({{ icons.tier }}) Tier : **{{ world.get_tier_display }}**{% if world.protection_points %}
 ![|30x30]({{ icons.atmosphere|key:world.atmosphere_name }}) Atmosphere : **{{ world.protection }}**{% else %}
-![|30x30]({{ icons.type.Normal }}) Atmosphere : **{{ world.protection }}**{% endif %}
+![|30x30]({{ icons.atmosphere.Normal }}) Atmosphere : **Normal**{% endif %}
+![|30x30]({{ icons.name }}) Size : **{{ world.display_size }}**
 ![|30x30]({{ icons.liquid }}) Surface : **{{ world.surface_liquid }}**
 ![|30x30]({{ icons.liquid }}) Underground : **{{ world.core_liquid }}**
 **-------------------------------------------------------------------**{% if world.assignment %}{% if world.assignment.forum_url %}

@@ -511,6 +511,23 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
 
         return self.get_tier_display()[:-4]
 
+    @property
+    def display_size(self):
+        size = str(self.size)
+
+        if self.size == 192:
+            size = "3km"
+        elif self.size == 288:
+            size = "4.5km"
+        elif self.size == 384:
+            size = "6km"
+
+        regions = "Regions"
+        if self.number_of_regions == 1:
+            regions = "Region"
+
+        return f"{size} ({self.number_of_regions} {regions})"
+
 
 class WorldDistance(
     ExportModelOperationsMixin("world_distance"), models.Model  # type: ignore

@@ -15,7 +15,7 @@ World Type: {{ world.get_world_type_display }}
 Protection: {{ world.protection }}
 Closest Planet: {{ world.assignment }}{% if world.assignment_distance %} @{{ world.assignment_distance }} blinksecs ({{ world.assignment_cost }}c){% endif %}
 
-World Size (16-block chunks): {{ world.size }}
+World Size: {{ world.display_size }}
 Number of Regions: {{ world.number_of_regions }}
 Surface Liquid: {{ world.surface_liquid }}
 Core Liquid: {{ world.core_liquid }}
