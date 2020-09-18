@@ -32,7 +32,7 @@
 {% for group_name, color_group in color_groups.items %}{% if group_name %}
 
 _**[{{ group_name|title }}]**_
-{% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_ -{% if world.is_exo %}{% if color.exist_on_perm %} ![|20x20]({{ icons.timelapse }})**_[∞]()_**{% else %}{% if color.is_new_color %}![|25x25]({{ icons.exo_color_new }}){% else %}{% if color.exist_via_transform %} ![|25x25]({{ icons.by_recipe }}){% endif %}{% if color.days_since_last %} ![|20x20]({{ icons.timelapse }}) **_[{{ color.days_since_last }}]()_**{% endif %}{% endif %}{% endif %}{% endif %}
+{% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% if world.is_exo %} -{% if color.exist_on_perm %} ![|20x20]({{ icons.timelapse }})**_[∞]()_**{% else %}{% if color.is_new_color %}![|25x25]({{ icons.exo_color_new }}){% else %}{% if color.exist_via_transform %} ![|25x25]({{ icons.by_recipe }}){% endif %}{% if color.days_since_last %} ![|20x20]({{ icons.timelapse }}) **_[{{ color.days_since_last }}]()_**{% endif %}{% endif %}{% endif %}{% endif %}
 {% endfor %}{% endfor %}
 [/details]
 **-------------------------------------------------------------------**{% endif %}{% if embedded_resources %}
