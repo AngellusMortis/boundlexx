@@ -15,6 +15,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
+    ForumFormatSerialzier,
     SimpleWorldRequestBasketPriceSerializer,
     SimpleWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
@@ -35,6 +36,7 @@ from boundlexx.boundless.models import (
     WorldDistance,
     WorldPoll,
 )
+from boundlexx.notifications.models import ExoworldNotification
 
 BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
 
@@ -183,6 +185,39 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             return self.get_paginated_response(serializer.data)
 
         serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    request_baskets.example = {
+        "request_baskets": {
+            "value": get_list_example(examples.WORLD_REQUEST_BASKETS_EXAMPLE)
+        }
+    }
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=ForumFormatSerialzier,
+        url_path="forum-format",
+    )
+    def forum_format(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Request Baskets for given world
+        """
+
+        world = self.get_object()
+        resources = None
+
+        if world.worldpoll_set.count() > 0:
+            resources = world.worldpoll_set.first().resources
+
+        title, body = ExoworldNotification().forum(world, resources)
+
+        serializer = self.get_serializer({"title": title, "body": body})
 
         return Response(serializer.data)
 

@@ -965,3 +965,8 @@ class EmojiSerializer(serializers.ModelSerializer):
             "names",
             "image_url",
         ]
+
+
+class ForumFormatSerialzier(NullSerializer):
+    title = serializers.CharField(read_only=True)
+    body = serializers.CharField(read_only=True)

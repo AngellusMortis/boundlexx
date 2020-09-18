@@ -50,7 +50,6 @@ FORUM_LOOKUP_IMAGES = {
     "warpcost": "upload://9dzMQi3rgBh0OJyl88r7mSNedwR.png",
     "exo_color": "upload://ya3ST9IB6OehJNYg6jY559ku9PH.png",
     "exo_color_new": "upload://lr0si60hUaEwkOP3UIsJFR7l0Lw.png",
-    "found": "upload://zD2zpXxDh5CfNIo1mwNqRcr9rKo.png",
     "by_recipe": "upload://xFrZpq1fBHP9zGCYGSZMyX3SfLo.png",
     "timelapse": "upload://oHqrS83ax0p0hsCLuR2mJnaoW6K.png",
     "colors": {
