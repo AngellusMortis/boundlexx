@@ -76,7 +76,9 @@ class WorldManager(models.Manager):
             created = True
 
         created = created or world.address is None
-        default_public = world_dict.get("owner", None) is None
+        default_public = world_dict.get("owner", None) is None or world_dict.get(
+            "creative", False
+        )
 
         world.display_name = world_dict["displayName"]
         world.name = world_dict["name"]
@@ -360,7 +362,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         return amount
 
     @cached_property
-    def protection_skill(self):
+    def atmosphere_name(self):
         protection_type = "Volatile"
         if self.world_type in (
             World.WorldType.TYPE_LUSH,
@@ -377,6 +379,10 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         ):
             protection_type = "Potent"
 
+        return protection_type
+
+    @cached_property
+    def protection_skill(self):
         skills = cache.get(PROTECTION_SKILLS_CACHE)
         if skills is None:
             skills = list(Skill.objects.filter(group__name="Exploration"))
@@ -384,7 +390,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
 
         protection_skill = None
         for skill in skills:
-            if skill.name.startswith(protection_type):
+            if skill.name.startswith(self.atmosphere_name):
                 protection_skill = skill
                 break
         return protection_skill
@@ -497,6 +503,13 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     @property
     def next_request_basket_update(self):
         return get_next_rank_update(self.itembuyrank_set.all())
+
+    @property
+    def tier_name(self):
+        if self.tier is None:
+            return None
+
+        return self.get_tier_display()[:-4]
 
 
 class WorldDistance(
