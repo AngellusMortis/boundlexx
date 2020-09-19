@@ -71,6 +71,8 @@ services:
       - redis
       - postgres
     command: /start-celeryworker
+    environment:
+      - CELERY_WORKER_QUEUES=main,distance,cache
 
   celerybeat:
     <<: *django

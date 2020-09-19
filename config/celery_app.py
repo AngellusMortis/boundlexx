@@ -5,6 +5,7 @@ from celery import Celery
 from celery.app.task import Task
 from celery.signals import after_setup_task_logger, task_postrun
 from django.core.cache import cache
+from kombu import Queue
 
 from boundlexx.utils.logging import RedisTaskLogger
 
@@ -12,6 +13,16 @@ from boundlexx.utils.logging import RedisTaskLogger
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
 app = Celery("boundlexx")
+app.conf.task_default_queue = "main"
+app.conf.task_queues = (
+    Queue("main"),
+    Queue("distance"),
+    Queue("cache"),
+)
+app.conf.task_routes = {
+    "boundlexx.boundless.tasks.worlds.calculate_distances": "distance",
+    "boundlexx.api.tasks.purge_cache": "cache",
+}
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.

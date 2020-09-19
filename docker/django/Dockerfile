@@ -61,6 +61,7 @@ COPY --chown=django:django ./docker/bin/format.sh /format.sh
 RUN chmod +x /format.sh
 
 USER django
+ENV CELERY_WORKER_QUEUES "main,distance,cache"
 
 WORKDIR /app
 
