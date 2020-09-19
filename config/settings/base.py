@@ -338,6 +338,11 @@ CELERY_BROKER_URL = env("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = "django-db"
 CELERY_RESULT_EXTENDED = True
 CELERY_RESULT_EXPIRES = timedelta(days=7)
+CELERY_DEFAULT_QUEUE = "main"
+CELERY_ROUTES = {
+    "boundlexx.boundless.tasks.worlds.calculate_distances": "distance",
+    "boundlexx.api.tasks.purge_cache": "cache",
+}
 CELERY_CACHE_BACKEND = "default"
 CELERY_ACCEPT_CONTENT = ["json"]
 CELERY_TASK_SERIALIZER = "json"
