@@ -145,22 +145,28 @@ def get_worlds(ids_to_scan, client=None):
 
 @app.task
 def poll_perm_worlds():
-    _poll_worlds(World.objects.filter(end__isnull=True))
+    _poll_worlds(World.objects.filter(end__isnull=True, active=True))
 
 
 @app.task
 def poll_exo_worlds():
-    _poll_worlds(World.objects.filter(owner__isnull=True, end__isnull=False))
+    _poll_worlds(
+        World.objects.filter(owner__isnull=True, end__isnull=False, active=True)
+    )
 
 
 @app.task
 def poll_sovereign_worlds():
-    _poll_worlds(World.objects.filter(owner__isnull=False, is_creative=False))
+    _poll_worlds(
+        World.objects.filter(owner__isnull=False, is_creative=False, active=True)
+    )
 
 
 @app.task
 def poll_creative_worlds():
-    _poll_worlds(World.objects.filter(owner__isnull=False, is_creative=True))
+    _poll_worlds(
+        World.objects.filter(owner__isnull=False, is_creative=True, active=True)
+    )
 
 
 @app.task
