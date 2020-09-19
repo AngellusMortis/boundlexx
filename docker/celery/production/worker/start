@@ -5,4 +5,4 @@ set -o pipefail
 set -o nounset
 
 
-celery -A config.celery_app worker -E -l INFO -Q $CELERY_WORKER_QUEUES
+celery -A config.celery_app worker -E -l INFO -Q $CELERY_WORKER_QUEUES -n $CELERY_WORKER_NAME
