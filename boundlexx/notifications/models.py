@@ -743,7 +743,7 @@ class WorldNotification(NotificationBase):
         resource_embed["fields"] = fields
         return resource_embed
 
-    def _color_embed(self, color_groups):
+    def _color_embed(self, world, color_groups):
         color_embed: dict = {"title": "Block Colors"}
         fields: List[Dict[str, str]] = []
         for group_name, color_group in color_groups.items():
@@ -755,12 +755,19 @@ class WorldNotification(NotificationBase):
                 )
 
                 extra = []
-                if color.is_new_color:
-                    extra.append("**NEW**")
-                if color.exist_via_transform:
-                    extra.append("**TRANSFORM**")
-                if color.exist_via_transform:
-                    extra.append(f"**Days: {color.days_since_last}**")
+                if world.is_exo:
+                    if color.is_new_exo_color:
+                        extra.append("**NEW**")
+                    elif color.first_world is None:
+                        if color.exist_via_transform:
+                            extra.append("**TRANS**")
+                        if color.exist_via_exo_transform:
+                            extra.append("**EXOTRANS**")
+                        if color.days_since_last:
+                            extra.append(f"**Days: {color.days_since_last_exo}**")
+                elif world.is_sovereign and not world.is_creative:
+                    if color.is_new_color:
+                        extra.append("**NEW**")
 
                 value += f" {' | '.join(extra)}"
 
@@ -788,7 +795,7 @@ class WorldNotification(NotificationBase):
             if resource_embed is not None:
                 embeds.append(resource_embed)
 
-        color_embed = self._color_embed(context["color_groups"])
+        color_embed = self._color_embed(world, context["color_groups"])
         if color_embed is not None:
             embeds.append(color_embed)
 

@@ -61,7 +61,7 @@
             "request": "launch",
             "module": "manage",
             "args": [
-                "recalculate_plain_text",
+                "add_resource_averages",
             ]
         },
         {

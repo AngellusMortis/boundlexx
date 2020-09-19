@@ -1,3 +1,4 @@
+# pylint: disable=too-many-lines
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 from rest_framework.relations import Hyperlink
@@ -353,6 +354,7 @@ class ItemResourceCountSerializer(serializers.ModelSerializer):
             "is_embedded",
             "percentage",
             "count",
+            "average_per_chunk",
         ]
 
 
@@ -367,6 +369,7 @@ class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
             "is_embedded",
             "percentage",
             "count",
+            "average_per_chunk",
         ]
 
 
@@ -587,15 +590,25 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
     item = SimpleItemSerializer()
     color = SimpleColorSerializer()
 
+    via_transform_world = SimpleWorldSerializer(allow_null=True)
+    via_exo_transform_world = SimpleWorldSerializer(allow_null=True)
+    last_exo_world = SimpleWorldSerializer(allow_null=True)
+
     class Meta:
         model = WorldBlockColor
         fields = [
             "item",
             "color",
-            "is_new_color",
             "exist_on_perm",
+            "sovereign_only",
+            "is_new_color",
+            "is_new_exo_color",
+            "via_transform_world",
             "exist_via_transform",
-            "days_since_last",
+            "via_exo_transform_world",
+            "exist_via_exo_transform",
+            "last_exo_world",
+            "days_since_last_exo",
         ]
 
 
@@ -624,15 +637,25 @@ class BlockColorSerializer(serializers.ModelSerializer):
     item = SimpleItemSerializer()
     world = SimpleWorldSerializer()
 
+    via_transform_world = SimpleWorldSerializer(allow_null=True)
+    via_exo_transform_world = SimpleWorldSerializer(allow_null=True)
+    last_exo_world = SimpleWorldSerializer(allow_null=True)
+
     class Meta:
         model = WorldBlockColor
         fields = [
             "item",
             "world",
-            "is_new_color",
             "exist_on_perm",
+            "sovereign_only",
+            "is_new_color",
+            "is_new_exo_color",
+            "via_transform_world",
             "exist_via_transform",
-            "days_since_last",
+            "via_exo_transform_world",
+            "exist_via_exo_transform",
+            "last_exo_world",
+            "days_since_last_exo",
         ]
 
 
@@ -650,15 +673,25 @@ class ItemColorSerializer(serializers.ModelSerializer):
 class WorldColorSerializer(serializers.ModelSerializer):
     world = SimpleWorldSerializer()
 
+    via_transform_world = SimpleWorldSerializer(allow_null=True)
+    via_exo_transform_world = SimpleWorldSerializer(allow_null=True)
+    last_exo_world = SimpleWorldSerializer(allow_null=True)
+
     class Meta:
         model = WorldBlockColor
         fields = [
             "color",
             "world",
-            "is_new_color",
             "exist_on_perm",
+            "sovereign_only",
+            "is_new_color",
+            "is_new_exo_color",
+            "via_transform_world",
             "exist_via_transform",
-            "days_since_last",
+            "via_exo_transform_world",
+            "exist_via_exo_transform",
+            "last_exo_world",
+            "days_since_last_exo",
         ]
 
 

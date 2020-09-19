@@ -297,34 +297,16 @@ class WorldPollInline(admin.TabularInline):
 
 
 class WorldBlockColorInline(admin.TabularInline):
+    fk_name = "world"
     model = WorldBlockColor
-
-    def is_new_color(self, obj):
-        return obj.is_new_color
-
-    def exist_on_perm(self, obj):
-        return obj.exist_on_perm
-
-    def exist_via_transform(self, obj):
-        return obj.exist_via_transform
-
-    is_new_color.boolean = True  # type: ignore
-    exist_on_perm.boolean = True  # type: ignore
-    exist_via_transform.boolean = True  # type: ignore
 
     fields = [
         "item",
         "color",
-        "is_new_color",
-        "exist_on_perm",
-        "exist_via_transform",
     ]
     readonly_fields = [
         "item",
         "color",
-        "is_new_color",
-        "exist_on_perm",
-        "exist_via_transform",
     ]
     can_delete = False
     max_num = 0

@@ -49,6 +49,9 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             "worldblockcolor_set",
             "worldblockcolor_set__item",
             "worldblockcolor_set__color",
+            "worldblockcolor_set___via_transform_world",
+            "worldblockcolor_set___via_exo_transform_world",
+            "worldblockcolor_set___last_exo_world",
             "itembuyrank_set",
             "itemsellrank_set",
         )
