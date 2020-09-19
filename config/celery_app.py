@@ -14,14 +14,7 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
 app = Celery("boundlexx")
 app.conf.task_default_queue = "default"
-app.conf.task_queues = (
-    Queue("default", Exchange("default"), routing_key="task.#"),
-    Queue("distance", Exchange("distance"), routing_key="distance.#"),
-    Queue("cache", Exchange("cache"), routing_key="cache.#"),
-    Queue("notify", Exchange("notify"), routing_key="notify.#"),
-    Queue("poll", Exchange("poll"), routing_key="poll.#"),
-    Queue("shop", Exchange("shop"), routing_key="shop.#"),
-)
+app.conf.task_create_missing_queues = True
 app.conf.task_default_exchange = "tasks"
 app.conf.task_default_exchange_type = "topic"
 app.conf.task_default_routing_key = "task.default"

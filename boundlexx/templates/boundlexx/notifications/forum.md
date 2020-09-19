@@ -43,6 +43,7 @@ _**[Embedded World Resources]**_
 <tr><td>{{ forloop.counter }}</td><td>{{ resource.item.english }}</td><td>{{ resource.count|intcomma }}</td><td>{{ resource.percentage }}%</td>{% endfor %}
 </table>
 
+
 _**[Surface World Resources]**_
 <table>
 <tr><th>Rank</th><th>Resource Name</th><th>Absolute Count</th><th>Percentage</th></tr>{% for resource in surface_resources %}
