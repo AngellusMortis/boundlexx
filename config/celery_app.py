@@ -5,7 +5,7 @@ from celery import Celery
 from celery.app.task import Task
 from celery.signals import after_setup_task_logger, task_postrun
 from django.core.cache import cache
-from kombu import Queue
+from kombu import Exchange, Queue
 
 from boundlexx.utils.logging import RedisTaskLogger
 
@@ -15,13 +15,16 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 app = Celery("boundlexx")
 app.conf.task_default_queue = "default"
 app.conf.task_queues = (
-    Queue("default"),
-    Queue("distance"),
-    Queue("cache"),
-    Queue("notify"),
-    Queue("poll"),
-    Queue("shop"),
+    Queue("default", Exchange("default"), routing_key="task.#"),
+    Queue("distance", Exchange("distance"), routing_key="distance.#"),
+    Queue("cache", Exchange("cache"), routing_key="cache.#"),
+    Queue("notify", Exchange("notify"), routing_key="notify.#"),
+    Queue("poll", Exchange("poll"), routing_key="poll.#"),
+    Queue("shop", Exchange("shop"), routing_key="shop.#"),
 )
+app.conf.task_default_exchange = "tasks"
+app.conf.task_default_exchange_type = "topic"
+app.conf.task_default_routing_key = "task.default"
 app.conf.task_routes = {
     "boundlexx.boundless.tasks.worlds.calculate_distances": {"queue": "distance"},
     "boundlexx.api.tasks.purge_cache": {"queue": "cache"},
