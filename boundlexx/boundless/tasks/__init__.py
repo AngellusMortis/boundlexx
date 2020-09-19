@@ -7,19 +7,26 @@ from boundlexx.boundless.tasks.shop import try_update_prices
 from boundlexx.boundless.tasks.worlds import (
     calculate_distances,
     discover_all_worlds,
+    poll_creative_worlds,
+    poll_exo_worlds,
+    poll_perm_worlds,
+    poll_sovereign_worlds,
     poll_worlds,
-    search_exo_worlds,
-    update_perm_worlds,
+    search_new_worlds,
 )
 
 __all__ = [
-    "try_update_prices",
-    "update_perm_worlds",
-    "search_exo_worlds",
+    "calculate_distances",
     "discover_all_worlds",
-    "poll_worlds",
     "ingest_exo_world_data",
     "ingest_perm_world_data",
     "ingest_world_data",
-    "calculate_distances",
+    "poll_creative_worlds",
+    "poll_exo_worlds",
+    "poll_perm_worlds",
+    "poll_sovereign_worlds",
+    "poll_worlds",
+    "search_new_worlds",
+    "search_new_worlds",
+    "try_update_prices",
 ]

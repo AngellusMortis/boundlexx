@@ -72,7 +72,7 @@ services:
       - postgres
     command: /start-celeryworker
     environment:
-      - CELERY_WORKER_QUEUES=main,distance,cache
+      - CELERY_WORKER_QUEUES=default,distance,cache,notify,poll,shop
 
   celerybeat:
     <<: *django

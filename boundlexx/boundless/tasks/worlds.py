@@ -14,28 +14,7 @@ logger = get_task_logger(__name__)
 
 
 @app.task
-def update_perm_worlds():
-    client = BoundlessClient()
-
-    worlds = client.gameservers.values()
-    logger.info("Found %s worlds from discovery server.", len(worlds))
-
-    worlds_created = 0
-    for world_dict in worlds:
-        try:
-            _, created = World.objects.get_or_create_from_game_dict(world_dict)
-        except Exception:
-            logger.warning(world_dict)
-            raise
-
-        if created:
-            worlds_created += 1
-
-    logger.info("Import %s world(s)", worlds_created)
-
-
-@app.task
-def search_exo_worlds():
+def search_new_worlds():
     existing_worlds = World.objects.filter(
         id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
         end__isnull=False,
@@ -162,6 +141,26 @@ def get_worlds(ids_to_scan, client=None):
             worlds.append(world_data)
 
     return worlds
+
+
+@app.task
+def poll_perm_worlds():
+    poll_worlds(World.objects.filter(end__isnull=True))
+
+
+@app.task
+def poll_exo_worlds():
+    poll_worlds(World.objects.filter(owner__isnull=True, end__isnull=False))
+
+
+@app.task
+def poll_sovereign_worlds():
+    poll_worlds(World.objects.filter(owner__isnull=False, is_creative=False))
+
+
+@app.task
+def poll_creative_worlds():
+    poll_worlds(World.objects.filter(owner__isnull=False, is_creative=True))
 
 
 @app.task

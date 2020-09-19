@@ -13,15 +13,21 @@ from boundlexx.utils.logging import RedisTaskLogger
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "config.settings.local")
 
 app = Celery("boundlexx")
-app.conf.task_default_queue = "main"
+app.conf.task_default_queue = "default"
 app.conf.task_queues = (
-    Queue("main"),
+    Queue("default"),
     Queue("distance"),
     Queue("cache"),
+    Queue("notify"),
+    Queue("poll"),
+    Queue("shop"),
 )
 app.conf.task_routes = {
     "boundlexx.boundless.tasks.worlds.calculate_distances": "distance",
     "boundlexx.api.tasks.purge_cache": "cache",
+    "boundlexx.notifications.*": "notify",
+    "boundlexx.boundless.tasks.worlds.poll_*": "poll",
+    "boundlexx.boundless.tasks.shop.*": "shop",
 }
 
 # Using a string here means the worker doesn't have to serialize
