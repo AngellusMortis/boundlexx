@@ -18,7 +18,14 @@ if admin.site.is_registered(TaskResult):
 @admin.register(TaskResult)
 class TaskResultAdmin(admin.ModelAdmin):
     date_hierarchy = "date_done"
-    list_display = ("task_id", "task_name", "date_done", "status", "worker")
+    list_display = (
+        "task_id",
+        "task_name",
+        "date_created",
+        "date_done",
+        "status",
+        "worker",
+    )
     list_filter = ("status", "date_done", "task_name", "worker")
     readonly_fields = (
         "date_created",
