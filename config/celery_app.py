@@ -24,6 +24,7 @@ app.conf.task_routes = {
     "boundlexx.boundless.tasks.worlds.poll_*": {"queue": "poll"},
     "boundlexx.boundless.tasks.shop.*": {"queue": "shop"},
 }
+app.conf.broker_transport_options = {"visibility_timeout": 60}
 
 # Using a string here means the worker doesn't have to serialize
 # the configuration object to child processes.
