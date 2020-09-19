@@ -5,7 +5,7 @@ from celery import Celery
 from celery.app.task import Task
 from celery.signals import after_setup_task_logger, task_postrun
 from django.core.cache import cache
-from kombu import Exchange, Queue
+from kombu import Queue
 
 from boundlexx.utils.logging import RedisTaskLogger
 
