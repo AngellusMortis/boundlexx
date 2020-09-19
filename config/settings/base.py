@@ -114,6 +114,7 @@ THIRD_PARTY_APPS = [
     "rest_framework",
     "rest_framework.authtoken",
     "django_json_widget",
+    "corsheaders",
 ]
 
 LOCAL_APPS = [
@@ -177,6 +178,7 @@ AUTH_PASSWORD_VALIDATORS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.locale.LocaleMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -284,6 +286,8 @@ ADMIN_URL = "admin/"
 ADMINS = [("Angellus", "angellus@mort.is")]
 # https://docs.djangoproject.com/en/dev/ref/settings/#managers
 MANAGERS = ADMINS
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # LOGGING
 # ------------------------------------------------------------------------------

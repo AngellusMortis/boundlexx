@@ -23,11 +23,11 @@ app.conf.task_queues = (
     Queue("shop"),
 )
 app.conf.task_routes = {
-    "boundlexx.boundless.tasks.worlds.calculate_distances": "distance",
-    "boundlexx.api.tasks.purge_cache": "cache",
-    "boundlexx.notifications.*": "notify",
-    "boundlexx.boundless.tasks.worlds.poll_*": "poll",
-    "boundlexx.boundless.tasks.shop.*": "shop",
+    "boundlexx.boundless.tasks.worlds.calculate_distances": {"queue": "distance"},
+    "boundlexx.api.tasks.purge_cache": {"queue": "cache"},
+    "boundlexx.notifications.*": {"queue": "notify"},
+    "boundlexx.boundless.tasks.worlds.poll_*": {"queue": "poll"},
+    "boundlexx.boundless.tasks.shop.*": {"queue": "shop"},
 }
 
 # Using a string here means the worker doesn't have to serialize

@@ -4,6 +4,7 @@ click
 django-admin-tools
 django-celery-results
 django-click
+django-cors-headers
 django-environ
 django-filter
 django-json-widget
