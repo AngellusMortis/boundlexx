@@ -145,22 +145,22 @@ def get_worlds(ids_to_scan, client=None):
 
 @app.task
 def poll_perm_worlds():
-    poll_worlds(World.objects.filter(end__isnull=True))
+    _poll_worlds(World.objects.filter(end__isnull=True))
 
 
 @app.task
 def poll_exo_worlds():
-    poll_worlds(World.objects.filter(owner__isnull=True, end__isnull=False))
+    _poll_worlds(World.objects.filter(owner__isnull=True, end__isnull=False))
 
 
 @app.task
 def poll_sovereign_worlds():
-    poll_worlds(World.objects.filter(owner__isnull=False, is_creative=False))
+    _poll_worlds(World.objects.filter(owner__isnull=False, is_creative=False))
 
 
 @app.task
 def poll_creative_worlds():
-    poll_worlds(World.objects.filter(owner__isnull=False, is_creative=True))
+    _poll_worlds(World.objects.filter(owner__isnull=False, is_creative=True))
 
 
 @app.task
@@ -170,6 +170,10 @@ def poll_worlds(world_ids=None):
     else:
         worlds = World.objects.filter(id__in=world_ids)
 
+    _poll_worlds(worlds)
+
+
+def _poll_worlds(worlds):
     client = BoundlessClient()
     errors_total = 0
 
