@@ -288,7 +288,7 @@ def _normalize_world_info(world_info):
 
     if "tier" in world_info:
         # new format
-        match = re.match(r"\w+ \((\d+)\)", world_info["id"])
+        match = re.match(r"\w+ \((\d+)\)", world_info["tier"])
         if match:
             world_info["tier"] = match.group(1)
         world_info["tier"] = int(world_info["tier"]) - 1
