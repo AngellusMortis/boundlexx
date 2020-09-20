@@ -594,18 +594,29 @@ class WorldDistance(
 
 
 class WorldBlockColorManager(models.Manager):
-    def get_or_create_color(self, world, item, color):
+    def get_or_create_color(self, world, item, color, default=None):
+        if default is None:
+            default = True
+            if world.is_sovereign:
+                default = False
+
         created = False
-        block_color = self.filter(world=world, item=item, active=True).first()
+
+        if default:
+            block_color = self.filter(world=world, item=item, default=True).first()
+        else:
+            block_color = self.filter(world=world, item=item, active=True).first()
 
         if block_color is None or (
-            world.owner is not None and block_color.color != color
+            not default and world.owner is not None and block_color.color != color
         ):
             if world.owner is not None:
                 self.filter(world=world, item=item, active=True).update(active=False)
 
             created = True
-            block_color = self.create(world=world, item=item, color=color, active=True)
+            block_color = self.create(
+                world=world, item=item, color=color, active=True, default=default
+            )
         elif block_color.color != color:
             block_color.color = color
             block_color.save()

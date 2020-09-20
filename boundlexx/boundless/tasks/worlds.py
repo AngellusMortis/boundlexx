@@ -194,7 +194,7 @@ def _poll_worlds(worlds):
             if (
                 world.is_sovereign
                 and hasattr(ex, "response")
-                and ex.response is not None
+                and ex.response is not None  # type: ignore
                 and ex.response.status_code == 400  # type: ignore
             ):
                 logger.warning("Could not do poll world %s", world.display_name)
