@@ -717,7 +717,7 @@ class WorldNotification(NotificationBase):
                         if color.days_since_exo:
                             extra.append(f"**Days: {color.days_since_exo}**")
                 elif world.is_sovereign and not world.is_creative:
-                    if color.is_new_color:
+                    if color.is_new:
                         extra.append("**NEW**")
 
                 value += f" {' | '.join(extra)}"
