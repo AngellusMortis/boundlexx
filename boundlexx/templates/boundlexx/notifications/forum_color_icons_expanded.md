@@ -12,7 +12,10 @@
                  ![|25x25]({{ icons.by_recipe }})
             {% endif %}
             {% if color.days_since_exo %}
-                 ![|20x20]({{ icons.timelapse }}) **_{% if color.last_exo and color.last_exo.forum_url %}[{{ color.days_since_exo }}]({{ color.last_exo.forum_url }}){% else %}{{ color.days_since_exo }}{% endif %}_**
+               {% if color.transform_first_world or color.transform_last_exo %}
+               -
+               {% endif %}
+                 ![|20x20]({{ icons.timelapse }})**_{% if color.last_exo and color.last_exo.forum_url %}[{{ color.days_since_exo }}]({{ color.last_exo.forum_url }}){% else %}{{ color.days_since_exo }}{% endif %}_**
             {% endif %}
         {% endif %}
     {% endif %}

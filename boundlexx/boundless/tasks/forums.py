@@ -78,7 +78,7 @@ def _clean_line(line):
         if name in parts[0]:
             parts[0] = corrected_name
 
-    # Waxy Foilage/Weeping Waxcap and Twisted Wood Trunk/Twisted Aloba
+    # Waxy Foliage/Weeping Waxcap and Twisted Wood Trunk/Twisted Aloba
     # have similar names, make sure we know the difference
     if "Wax" in parts[0] and parts[0] != "Weeping Waxcap":
         parts[0] = "Waxy Foliage"

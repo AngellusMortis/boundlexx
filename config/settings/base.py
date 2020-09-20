@@ -561,7 +561,7 @@ BOUNDLESS_WORLD_POLL_GROUP_ORDER = {
     "": [9555],
     "rock": [10798, 10794, 10802],
     "wood": [10830, 10838, 10834],
-    "foilage": [10822, 10818, 10826],
+    "foliage": [10822, 10818, 10826],
     "soil": [11588, 11592, 11584, 10846, 10850, 10814, 10810],
     "grass": [3085, 6157, 13],
     "misc": [10870, 10842, 10806, 10866, 10854, 10858, 10862],
@@ -578,9 +578,9 @@ BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS = {
     10830: "wood",  # Ancient Trunk
     10838: "wood",  # Lustrous Trunk
     10834: "wood",  # Twisted Trunk
-    10822: "foilage",  # Exotic Leaves
-    10818: "foilage",  # Lust Leaves
-    10826: "foilage",  # Waxy Leaves
+    10822: "foliage",  # Exotic Leaves
+    10818: "foliage",  # Lust Leaves
+    10826: "foliage",  # Waxy Leaves
     11588: "soil",  # Clay Soil
     11592: "soil",  # Peaty Soil
     11584: "soil",  # Silty Soil

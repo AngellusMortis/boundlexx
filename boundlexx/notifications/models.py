@@ -52,6 +52,9 @@ FORUM_LOOKUP_IMAGES = {
     "exo_color_new": "upload://lr0si60hUaEwkOP3UIsJFR7l0Lw.png",
     "by_recipe": "upload://xFrZpq1fBHP9zGCYGSZMyX3SfLo.png",
     "timelapse": "upload://oHqrS83ax0p0hsCLuR2mJnaoW6K.png",
+    "owner": "upload://8UfHjxV1950IdfuKNcDumg9equG.png",
+    "permissions": "upload://zbesXUQO9RZUEP7TNiHA24EVT9w.png",
+    "portal": "upload://2GR4nUcRGOaMMDzj452JuqxVMWr.png",
     "colors": {
         0: "upload://pLWvEwsdJfVxylVUaST7zDfJnnP.png",
         1: "upload://l3M345enn9ycGBw61qecq1a8DLm.png",
