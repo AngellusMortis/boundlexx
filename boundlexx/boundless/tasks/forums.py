@@ -22,6 +22,7 @@ FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_topics"
 
 FORUM_EXO_WORLD_CATEGORY = "exoworlds/31"
 FORUM_PERM_WORLD_CATEGORY = "worlds/33"
+DEFAULT_IMAGE = "https://forum.playboundless.com/uploads/default/original/3X/6/8/683d21dfac3159456b0074eb6fa1898be6ec9e97.png"
 
 
 def _get_topics(category: str):
@@ -197,7 +198,13 @@ def _get_world_image(raw_html, name):
         attribute = "src"
 
     if len(images) > 0:
+        if attribute == "src":
+            if images[0].get("width") != "300" or images[0].get("height") != "300":
+                return None
+
         image_url = images[0].get(attribute)
+        if image_url == DEFAULT_IMAGE:
+            return None
         logger.info("Downloading image for topic %s", image_url)
 
         response = requests.get(image_url)
@@ -233,6 +240,8 @@ def _parse_world_info(raw_html):
 
             if parts[0] == "world":
                 parts[0] = "name"
+            elif parts[0] == "region":
+                parts[0] = "server"
 
             if len(parts[0]) == 0 or parts[0] in ("∞", ">= 0"):
                 continue
@@ -250,9 +259,16 @@ def _parse_world_info(raw_html):
 
     parsed_data = {}
     for line in parsed_lines:
-        if line[0] in ("name", "type", "tier", "start", "end", "server"):
+        if line[0] in ("name", "id", "type", "tier", "start", "end", "server"):
             if line[0] == "tier":
+                # new format
+                match = re.match(r"\w+ \((\d+)\)", line[1])
+                if match:
+                    line[1] = match.group(1)
+
                 line[1] = int(line[1]) - 1
+            if line[0] == "id":
+                line[1] = int(line[1])
             parsed_data[line[0]] = line[1]
 
     return parsed_data
@@ -308,9 +324,9 @@ def _parse_forum_topic(topic: int, is_exo: bool):
         world_info["image"] = image
 
     if is_exo:
-        expected_fields = 7
+        expected_fields = 8
     else:
-        expected_fields = 6
+        expected_fields = 7
         if "end" in world_info:
             del world_info["end"]
 
@@ -318,7 +334,7 @@ def _parse_forum_topic(topic: int, is_exo: bool):
         logger.warning(
             "Could not parse all world data for topic %s\nFound %s\n%s",
             topic,
-            world_info.keys(),
+            list(world_info.keys()),
             raw_html.get_text().split("\n"),
         )
 
@@ -337,8 +353,9 @@ def _parse_forum_topic(topic: int, is_exo: bool):
 
 
 @app.task
-def ingest_exo_world_data():
-    topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
+def ingest_exo_world_data(topics=None):
+    if topics is None:
+        topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
 
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:

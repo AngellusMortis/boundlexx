@@ -128,11 +128,14 @@ class WorldManager(models.Manager):
 
         # else, see if world exist from elsewhere
         if world is None:
-            world = self.filter(
-                display_name=world_info["name"],
-                owner__isnull=True,
-                active=True,
-            ).first()
+            if "id" in world_info:
+                world = self.filter(id=world_info["id"]).first()
+            else:
+                world = self.filter(
+                    display_name=world_info["name"],
+                    owner__isnull=True,
+                    active=True,
+                ).first()
 
             # wrong world, this one comes from another forum post
             if world is not None and world.forum_id is not None:
@@ -140,8 +143,13 @@ class WorldManager(models.Manager):
 
         # otherwise, create it
         if world is None:
+            world_id = (
+                world_info.get("id")
+                or settings.BOUNDLESS_EXO_EXPIRED_BASE_ID + forum_id
+            )
+
             world, created = self.get_or_create(
-                id=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID + forum_id,
+                id=world_id,
                 display_name=world_info["name"],
             )
 
