@@ -15,6 +15,7 @@ from boundlexx.boundless.models import (
     WorldBlockColor,
     WorldCreatureColor,
 )
+from boundlexx.boundless.tasks import recalculate_colors
 from boundlexx.notifications.models import ExoworldNotification
 
 logger = logging.getLogger("ingest")
@@ -119,6 +120,7 @@ class WorldWSDataView(views.APIView):
         )
 
         if block_colors_created > 0:
+            recalculate_colors.delay([world.id])
             ExoworldNotification.objects.send_update_notification(world)
 
         return Response(
