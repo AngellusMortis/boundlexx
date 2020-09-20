@@ -1,4 +1,3 @@
-# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from datetime import datetime, timedelta
@@ -641,7 +640,7 @@ class WorldBlockColorManager(models.Manager):
         return block_color, created
 
 
-class WorldBlockColor(  # pylint: disable=too-many-instance-attributes
+class WorldBlockColor(
     ExportModelOperationsMixin("world_block_color"), models.Model  # type: ignore # noqa E501
 ):
     objects = WorldBlockColorManager()
