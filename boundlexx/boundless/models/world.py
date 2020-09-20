@@ -468,7 +468,11 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
                 distance = client.get_world_distance(self.id, world.id)
                 # value is returned as a float, no idea how cost formula works
                 # with non-whole numbers
-                if distance is not None and not distance.is_integer():
+                if (
+                    distance is None
+                    or distance is not None
+                    and not distance.is_integer()
+                ):
                     raise ValueError(
                         "Unexpected distance number: "
                         f"{self.id} to {world.id} = {distance}"
