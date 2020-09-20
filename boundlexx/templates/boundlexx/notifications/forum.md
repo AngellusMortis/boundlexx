@@ -1,6 +1,6 @@
 {% load humanize tz utils %}{% if world.image %}![|300x300]({{ world.image.url }}){% else %}![|300x300]({{ icons.world_image }}){% endif %}{% if world.is_sovereign %}
 **-------------------------[Sovereign Details]------------------------**
-![|30x30]({{ icons.name }}) Owner : **{% if username %}{{ username }}{% else %}ADD YOUR NAME HERE{% endif %}**
+![|30x30]({{ icons.name }}) Owner : **{% if username %}@{{ username }}{% else %}ADD YOUR NAME HERE{% endif %}**
 ![|30x30]({{ icons.name }}) Permissions : **{% if perms %}{% if perms.can_visit %}Can{% else %}No{% endif %} Visit | {% if perms.can_edit %}Can{% else %}No{% endif %} Edit | {% if perms.can_claim %}Can{% else %}No{% endif %} Claim{% else %}Can|No Visit - Can|No Edit - Can|No Claim{% endif %}**{% endif %}
 **--------------------------[🌍 World Details]-------------------------**
 ![|30x30]({{ icons.name }}) Name : **{{ world.display_name }}**
