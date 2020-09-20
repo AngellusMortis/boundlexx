@@ -111,7 +111,7 @@ def recalculate_colors(world_ids=None, log=None):
             base_transform = WorldBlockColor.objects.filter(
                 item_id__in=block_color.transform_group,
                 color=block_color.color,
-                default=True,
+                is_default=True,
                 time__lte=block_color.time,
             ).filter(Q(world__isnull=True) | Q(world__is_creative=False))
 
