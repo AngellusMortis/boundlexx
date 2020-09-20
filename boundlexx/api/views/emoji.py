@@ -17,7 +17,7 @@ EMOJI_EXAMPLE = {
 
 
 class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
-    queryset = Emoji.objects.all().prefetch_related("emojialtname_set")
+    queryset = Emoji.objects.filter(active=True).prefetch_related("emojialtname_set")
     serializer_class = EmojiSerializer
     lookup_field = "name"
     ordering_fields: List[str] = []

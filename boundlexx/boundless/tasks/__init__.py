@@ -91,7 +91,7 @@ def recalculate_colors(world_ids=None, log=None):
             base_compare = WorldBlockColor.objects.filter(
                 item=block_color.item,
                 color=block_color.color,
-                default=True,
+                is_default=True,
                 time__lt=block_color.time,
             ).filter(Q(world__isnull=True) | Q(world__is_creative=False))
 

@@ -2,7 +2,7 @@ from django import forms
 
 from boundlexx.boundless.models import World
 
-BASE_QUERY = World.objects.filter(owner__isnull=False)
+BASE_QUERY = World.objects.all()
 
 
 class ForumFormatForm(forms.Form):
