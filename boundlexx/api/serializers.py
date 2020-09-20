@@ -557,7 +557,7 @@ class ResourcesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ResourceCount
-        fields = ["item", "is_embedded", "percentage", "count"]
+        fields = ["item", "is_embedded", "percentage", "count", "average_per_chunk"]
 
 
 class WorldPollExtraSerializer(serializers.ModelSerializer):
