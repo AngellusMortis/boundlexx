@@ -42,6 +42,7 @@ django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
 django-cors-headers==3.5.0  # via -r /app/requirements/in/base.in
 django-coverage-plugin==1.8.0  # via -r /app/requirements/in/dev.in
+django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
 django-debug-toolbar==2.2  # via -r /app/requirements/in/dev.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-extensions==3.0.9  # via -r /app/requirements/in/dev.in

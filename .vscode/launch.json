@@ -61,7 +61,7 @@
             "request": "launch",
             "module": "manage",
             "args": [
-                "add_resource_averages",
+                "recalculate_colors",
             ]
         },
         {

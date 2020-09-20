@@ -31,6 +31,7 @@ django-celery-beat==2.0.0  # via -r /app/requirements/in/base.in
 django-celery-results==1.2.1  # via -r /app/requirements/in/base.in
 django-click==2.2.0       # via -r /app/requirements/in/base.in
 django-cors-headers==3.5.0  # via -r /app/requirements/in/base.in
+django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
 django-json-widget==1.0.1  # via -r /app/requirements/in/base.in

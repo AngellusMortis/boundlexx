@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -391,7 +391,7 @@ class NotificationBase(PolymorphicModel):
     def __str__(self):
         return f"{self.__class__.__name__}: {self.name}"
 
-    def markdown(self, **kwargs):
+    def markdown(self, *args, **kwargs):
         return None
 
     def embed(self, *args, **kwargs):
@@ -551,8 +551,10 @@ class WorldNotification(NotificationBase):
         self._context = context
         return self._context
 
-    def _template(self, world, template, resources=None):
+    def _template(self, world, template, resources=None, extra=None):
         context = self._get_context(world, resources)
+        if extra is not None:
+            context.update(extra)
 
         message = ""
 
@@ -563,16 +565,7 @@ class WorldNotification(NotificationBase):
 
         return self._markdown_replace(message)
 
-    def markdown(self, world, resources=None):  # pylint: disable=arguments-differ
-        if resources is None:
-            return self._template(
-                world, "boundlexx/notifications/exoworld_update.md", resources=None
-            )
-        return self._template(
-            world, "boundlexx/notifications/exoworld.md", resources=None
-        )
-
-    def forum(self, world, resources):  # pylint: disable=arguments-differ
+    def forum(self, world, resources, extra=None):  # pylint: disable=arguments-differ
         world_class = "Homeworld"
 
         if world.is_exo:
@@ -590,19 +583,35 @@ class WorldNotification(NotificationBase):
         )
 
         return title, self._template(
-            world, "boundlexx/notifications/forum.md", resources=resources
+            world, "boundlexx/notifications/forum.md", resources=resources, extra=extra
         )
 
     def _main_embed(self, world, is_update=False):
         files: Optional[Dict[str, str]] = None
 
-        main_embed = {}
+        main_embed: Dict[str, Any] = {
+            "fields": [
+                {
+                    "name": "🌍 World Details",
+                    "value": (
+                        f"\n\n**ID**: {world.id}\n"
+                        f"**Type**: {world.get_world_type_display()}\n"
+                        f"**Tier**: {world.get_tier_display()}\n"
+                        f"**Atmosphere**: {world.protection or 'Normal'}\n"
+                        f"**Size**: {world.display_size}\n"
+                        f"**Liquid**: ▲ {world.surface_liquid} | "
+                        f"▼ {world.core_liquid}\n"
+                        f"**Region**: {world.get_region_display()}\n"
+                    ),
+                }
+            ]
+        }
         main_embed["title"] = world.display_name
 
         if is_update:
             main_embed[
                 "description"
-            ] = f"New information is avaiable for the new {self._world_type}!"
+            ] = f"New information is avaiable for this {self._world_type}!"
         else:
             main_embed["description"] = f"A new {self._world_type} has appeared!"
 
@@ -614,89 +623,31 @@ class WorldNotification(NotificationBase):
 
             files = {world.image.name: world.image.url}
 
-        main_embed["fields"] = [
-            {
-                "name": "ID",
-                "value": f"{world.name} ({world.id})",
-                "inline": True,
-            },
-            {
-                "name": "Server",
-                "value": f"{world.address}",
-                "inline": True,
-            },
-            {
-                "name": "Start",
-                "value": (f"{naturaltime(world.start)}\n" f"{world.start.isoformat()}"),
-                "inline": True,
-            },
-        ]
-
-        if world.end is not None:
+        if world.assignment is not None:
             main_embed["fields"].append(
                 {
-                    "name": "End",
-                    "value": f"{naturaltime(world.end)}\n{world.end.isoformat()}",
-                    "inline": True,
-                },
+                    "name": "🧭 Distance Details",
+                    "value": (
+                        f"**{world.assignment_distance} blinksecs** from "
+                        f"**{world.assignment}** (cost: **{world.assignment_cost}c**)"
+                    ),
+                }
             )
 
-        main_embed["fields"] += [
-            {
-                "name": "Server Region",
-                "value": f"{world.get_region_display()}",
-                "inline": True,
-            },
-            {
-                "name": "Tier",
-                "value": f"{world.get_tier_display()}",
-                "inline": True,
-            },
-            {
-                "name": "World Type",
-                "value": f"{world.get_world_type_display()}",
-                "inline": True,
-            },
-            {
-                "name": "Protection",
-                "value": f"{world.protection}",
-                "inline": True,
-            },
-            {
-                "name": "World Size (16-block chunks)",
-                "value": f"{world.size}",
-                "inline": True,
-            },
-            {
-                "name": "Number of Regions",
-                "value": f"{world.number_of_regions}",
-                "inline": True,
-            },
-            {
-                "name": "Surface Liquid",
-                "value": f"{world.surface_liquid}",
-                "inline": True,
-            },
-            {
-                "name": "Core Liquid",
-                "value": f"{world.core_liquid}",
-                "inline": True,
-            },
-        ]
-
-        if world.assignment is not None:
-            value = f"{world.assignment}"
-            if world.assignment_distance is not None:
-                value += (
-                    f" @{world.assignment_distance} blinksecs"
-                    f" ({world.assignment_cost}c)"
+        if world.start is not None:
+            timestring = (
+                f"Appeared {naturaltime(world.start)} ({world.start.isoformat()})"
+            )
+            if world.end is not None:
+                timestring += (
+                    f"\nLast until {naturaltime(world.end)} ({world.end.isoformat()})"
                 )
 
             main_embed["fields"].append(
                 {
-                    "name": "Closest Planet",
-                    "value": value,
-                }
+                    "name": "⏱ Time Details",
+                    "value": timestring,
+                },
             )
 
         return main_embed, files
@@ -756,15 +707,15 @@ class WorldNotification(NotificationBase):
 
                 extra = []
                 if world.is_exo:
-                    if color.is_new_exo_color:
+                    if color.is_new_exo:
                         extra.append("**NEW**")
-                    elif color.first_world is None:
-                        if color.exist_via_transform:
+                    else:
+                        if color.transform_first_world is not None:
                             extra.append("**TRANS**")
-                        if color.exist_via_exo_transform:
+                        if color.transform_last_exo is not None:
                             extra.append("**EXOTRANS**")
-                        if color.days_since_last:
-                            extra.append(f"**Days: {color.days_since_last_exo}**")
+                        if color.days_since_exo:
+                            extra.append(f"**Days: {color.days_since_exo}**")
                 elif world.is_sovereign and not world.is_creative:
                     if color.is_new_color:
                         extra.append("**NEW**")

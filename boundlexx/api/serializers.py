@@ -590,25 +590,34 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
     item = SimpleItemSerializer()
     color = SimpleColorSerializer()
 
-    via_transform_world = SimpleWorldSerializer(allow_null=True)
-    via_exo_transform_world = SimpleWorldSerializer(allow_null=True)
-    last_exo_world = SimpleWorldSerializer(allow_null=True)
+    is_perm = serializers.BooleanField()
+    is_sovereign_only = serializers.BooleanField()
+    is_exo_only = serializers.BooleanField()
+    days_since_exo = serializers.IntegerField(allow_null=True)
+    days_since_transform_exo = serializers.IntegerField(allow_null=True)
+    first_world = SimpleWorldSerializer(allow_null=True)
+    last_exo = SimpleWorldSerializer(allow_null=True)
+    transform_first_world = SimpleWorldSerializer(allow_null=True)
+    transform_last_exo = SimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
         fields = [
             "item",
             "color",
-            "exist_on_perm",
-            "sovereign_only",
-            "is_new_color",
-            "is_new_exo_color",
-            "via_transform_world",
-            "exist_via_transform",
-            "via_exo_transform_world",
-            "exist_via_exo_transform",
-            "last_exo_world",
-            "days_since_last_exo",
+            "is_default",
+            "is_perm",
+            "is_sovereign_only",
+            "is_exo_only",
+            "is_new",
+            "is_new_exo",
+            "is_new_transform",
+            "days_since_exo",
+            "days_since_transform_exo",
+            "first_world",
+            "last_exo",
+            "transform_first_world",
+            "transform_last_exo",
         ]
 
 
@@ -637,61 +646,101 @@ class BlockColorSerializer(serializers.ModelSerializer):
     item = SimpleItemSerializer()
     world = SimpleWorldSerializer()
 
-    via_transform_world = SimpleWorldSerializer(allow_null=True)
-    via_exo_transform_world = SimpleWorldSerializer(allow_null=True)
-    last_exo_world = SimpleWorldSerializer(allow_null=True)
+    is_perm = serializers.BooleanField()
+    is_sovereign_only = serializers.BooleanField()
+    is_exo_only = serializers.BooleanField()
+    days_since_exo = serializers.IntegerField(allow_null=True)
+    days_since_transform_exo = serializers.IntegerField(allow_null=True)
+    first_world = SimpleWorldSerializer(allow_null=True)
+    last_exo = SimpleWorldSerializer(allow_null=True)
+    transform_first_world = SimpleWorldSerializer(allow_null=True)
+    transform_last_exo = SimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
         fields = [
             "item",
             "world",
-            "exist_on_perm",
-            "sovereign_only",
-            "is_new_color",
-            "is_new_exo_color",
-            "via_transform_world",
-            "exist_via_transform",
-            "via_exo_transform_world",
-            "exist_via_exo_transform",
-            "last_exo_world",
-            "days_since_last_exo",
+            "is_default",
+            "is_perm",
+            "is_sovereign_only",
+            "is_exo_only",
+            "is_new",
+            "is_new_exo",
+            "is_new_transform",
+            "days_since_exo",
+            "days_since_transform_exo",
+            "first_world",
+            "last_exo",
+            "transform_first_world",
+            "transform_last_exo",
         ]
 
 
 class ItemColorSerializer(serializers.ModelSerializer):
     color = SimpleColorSerializer()
 
+    is_perm = serializers.BooleanField()
+    is_sovereign_only = serializers.BooleanField()
+    is_exo_only = serializers.BooleanField()
+    days_since_exo = serializers.IntegerField(allow_null=True)
+    days_since_transform_exo = serializers.IntegerField(allow_null=True)
+    first_world = SimpleWorldSerializer(allow_null=True)
+    last_exo = SimpleWorldSerializer(allow_null=True)
+    transform_first_world = SimpleWorldSerializer(allow_null=True)
+    transform_last_exo = SimpleWorldSerializer(allow_null=True)
+
     class Meta:
         model = WorldBlockColor
         fields = [
             "color",
-            "exist_on_perm",
+            "is_default",
+            "is_perm",
+            "is_sovereign_only",
+            "is_exo_only",
+            "is_new",
+            "is_new_exo",
+            "is_new_transform",
+            "days_since_exo",
+            "days_since_transform_exo",
+            "first_world",
+            "last_exo",
+            "transform_first_world",
+            "transform_last_exo",
         ]
 
 
 class WorldColorSerializer(serializers.ModelSerializer):
     world = SimpleWorldSerializer()
 
-    via_transform_world = SimpleWorldSerializer(allow_null=True)
-    via_exo_transform_world = SimpleWorldSerializer(allow_null=True)
-    last_exo_world = SimpleWorldSerializer(allow_null=True)
+    is_perm = serializers.BooleanField()
+    is_sovereign_only = serializers.BooleanField()
+    is_exo_only = serializers.BooleanField()
+    days_since_exo = serializers.IntegerField(allow_null=True)
+    days_since_transform_exo = serializers.IntegerField(allow_null=True)
+    first_world = SimpleWorldSerializer(allow_null=True)
+    last_exo = SimpleWorldSerializer(allow_null=True)
+    transform_first_world = SimpleWorldSerializer(allow_null=True)
+    transform_last_exo = SimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
         fields = [
             "color",
             "world",
-            "exist_on_perm",
-            "sovereign_only",
-            "is_new_color",
-            "is_new_exo_color",
-            "via_transform_world",
-            "exist_via_transform",
-            "via_exo_transform_world",
-            "exist_via_exo_transform",
-            "last_exo_world",
-            "days_since_last_exo",
+            "is_default",
+            "is_perm",
+            "is_sovereign_only",
+            "is_exo_only",
+            "is_new",
+            "is_new_exo",
+            "is_new_transform",
+            "days_since_exo",
+            "days_since_transform_exo",
+            "first_world",
+            "last_exo",
+            "transform_first_world",
+            "transform_last_exo",
         ]
 
 

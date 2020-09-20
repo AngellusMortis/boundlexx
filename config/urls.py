@@ -6,8 +6,11 @@ from django.views import defaults as default_views
 from django.views.generic.base import RedirectView
 from django.views.static import serve
 
+from boundlexx.api.views import ForumFormatView
+
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
+    path("forum-format/", ForumFormatView.as_view(), name="forum_format"),
     path("admin_tools/", include("admin_tools.urls")),
     path("api/", include("boundlexx.api.urls")),
     path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),

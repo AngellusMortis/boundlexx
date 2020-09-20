@@ -10,6 +10,7 @@ from boundlexx.api.views.item import (
     ItemViewSet,
 )
 from boundlexx.api.views.skill import SkillGroupViewSet, SkillViewSet
+from boundlexx.api.views.util import ForumFormatView
 from boundlexx.api.views.world import (
     WorldDistanceViewSet,
     WorldPollViewSet,
@@ -32,4 +33,5 @@ __all__ = [
     "WorldPollViewSet",
     "WorldViewSet",
     "WorldWSDataView",
+    "ForumFormatView",
 ]

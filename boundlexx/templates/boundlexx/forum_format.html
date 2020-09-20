@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Boundless Forum World Template Generator{% endblock %}
+
+{% block content %}
+<h1>Boundless Forum World Template Generator</h1>
+
+<p>A simple form to help you generate the standard Boundless World for the Boundless Forums. Only works with Sovereign and Creative worlds.</p>
+
+<form class="form-horizontal" method="post" action="{% url 'forum_format' %}">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <div class="control-group">
+        <div class="controls">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+{% endblock content %}

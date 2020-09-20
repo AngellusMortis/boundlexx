@@ -32,10 +32,13 @@ def run():
                 defaults={"image": get_django_image(image, f"{name}.png")},
             )
 
-            alt_names = emoji_nametable.get(name, [])
+            alt_names = emoji_nametable.get(name)
+            emoji.active = alt_names is not None
+            emoji.save()
 
-            for alt_name in alt_names:
-                EmojiAltName.objects.get_or_create(emoji=emoji, name=alt_name)
+            if alt_names is not None:
+                for alt_name in alt_names:
+                    EmojiAltName.objects.get_or_create(emoji=emoji, name=alt_name)
 
             if created:
                 emoji_created += 1

@@ -393,6 +393,7 @@ class Recipe(GameObj):
 
 
 class Emoji(models.Model):
+    active = models.BooleanField(default=True)
     name = models.CharField(max_length=32, db_index=True)
     image = models.ImageField(storage=select_storage("emoji"))
 

@@ -115,6 +115,7 @@ THIRD_PARTY_APPS = [
     "rest_framework.authtoken",
     "django_json_widget",
     "corsheaders",
+    "crispy_forms",
 ]
 
 LOCAL_APPS = [
@@ -377,6 +378,7 @@ REST_FRAMEWORK = {
 REST_FRAMEWORK_EXTENSIONS = {
     "DEFAULT_PARENT_LOOKUP_KWARG_NAME_PREFIX": "",
 }
+CRISPY_TEMPLATE_PACK = "bootstrap4"
 
 SERVE_STATIC_FILES_DEV = env.bool("SERVE_STATIC_FILES_DEV", False)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_SSL", "on")

@@ -15,7 +15,6 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
-    ForumFormatSerialzier,
     SimpleWorldRequestBasketPriceSerializer,
     SimpleWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
@@ -36,7 +35,6 @@ from boundlexx.boundless.models import (
     WorldDistance,
     WorldPoll,
 )
-from boundlexx.notifications.models import ExoworldNotification
 
 BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
 
@@ -49,9 +47,10 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             "worldblockcolor_set",
             "worldblockcolor_set__item",
             "worldblockcolor_set__color",
-            "worldblockcolor_set___via_transform_world",
-            "worldblockcolor_set___via_exo_transform_world",
-            "worldblockcolor_set___last_exo_world",
+            "worldblockcolor_set__first_world",
+            "worldblockcolor_set__last_exo",
+            "worldblockcolor_set__transform_first_world",
+            "worldblockcolor_set__transform_last_exo",
             "itembuyrank_set",
             "itemsellrank_set",
         )
@@ -196,33 +195,6 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             "value": get_list_example(examples.WORLD_REQUEST_BASKETS_EXAMPLE)
         }
     }
-
-    @action(
-        detail=True,
-        methods=["get"],
-        serializer_class=ForumFormatSerialzier,
-        url_path="forum-format",
-    )
-    def forum_format(
-        self,
-        request,
-        id=None,  # pylint: disable=redefined-builtin # noqa A002
-    ):
-        """
-        Gets current Request Baskets for given world
-        """
-
-        world = self.get_object()
-        resources = None
-
-        if world.worldpoll_set.count() > 0:
-            resources = world.worldpoll_set.first().resources
-
-        title, body = ExoworldNotification().forum(world, resources)
-
-        serializer = self.get_serializer({"title": title, "body": body})
-
-        return Response(serializer.data)
 
     request_baskets.example = {
         "request_baskets": {

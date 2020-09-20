@@ -366,6 +366,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
 
     @cached_property
     def atmosphere_name(self):
+        if self.protection_points is None:
+            return "Normal"
+
         protection_type = "Volatile"
         if self.world_type in (
             World.WorldType.TYPE_LUSH,
@@ -615,295 +618,104 @@ class WorldBlockColor(  # pylint: disable=too-many-instance-attributes
 ):
     objects = WorldBlockColorManager()
 
-    world = models.ForeignKey(World, on_delete=models.CASCADE)
+    world = models.ForeignKey(World, on_delete=models.CASCADE, blank=True, null=True)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
+    is_default = models.BooleanField(
+        default=True, help_text=_("Is this the color the world spawned with?")
+    )
 
     time = models.DateTimeField(auto_now_add=True)
     active = models.BooleanField(default=True)
+
+    is_new = models.BooleanField(
+        default=False,
+        help_text=_("This is the first time this WBC has appeared on non-Exo"),
+    )
+    first_world = models.ForeignKey(
+        World,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("First non-Exo world with this color"),
+        related_name="+",
+    )
+    last_exo = models.ForeignKey(
+        World,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("Most recent Exo with this color (only for Exo WBCs)"),
+        related_name="+",
+    )
+
+    is_new_transform = models.BooleanField(
+        default=False,
+        help_text=_("This is the first time this WBC has been avaiable via transform"),
+    )
+    transform_first_world = models.ForeignKey(
+        World,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_("First non-Exo WBC that can transform into this one"),
+        related_name="+",
+    )
+    transform_last_exo = models.ForeignKey(
+        World,
+        on_delete=models.SET_NULL,
+        blank=True,
+        null=True,
+        help_text=_(
+            "Most recent Exo WBC that can transform into this one (only for Exo WBCs)"
+        ),
+        related_name="+",
+    )
+
+    class Meta:
+        ordering = ["item_id"]
 
     @property
     def transform_group(self):
         return settings.BOUNDLESS_TRANSFORMATION_GROUPS.get(self.item.game_id)
 
-    _exist_on_perm = models.NullBooleanField()
-    _sovereign_only = models.NullBooleanField()
-
     @property
-    def exist_on_perm(self):
-        if self._exist_on_perm is None:
-            if self.world.end is None:
-                exist_on_perm = True
-            else:
-                exist_on_perm = (
-                    WorldBlockColor.objects.filter(
-                        item=self.item,
-                        color=self.color,
-                        world__is_creative=False,
-                        # perm worlds only
-                        world__end__isnull=True,
-                    ).count()
-                    > 0
-                )
-            self._exist_on_perm = exist_on_perm
-            self.save()
-        return self._exist_on_perm
+    def is_new_exo(self):
+        return self.is_new and self.last_exo is None
 
-    @property
-    def sovereign_only(self):
-        if self._sovereign_only is None:
-            if self.exist_on_perm:
-                sovereign_only = False
-            else:
+    @cached_property
+    def _now(self):
+        return None if self.world is None else self.world.start
 
-                sovereign_only = (
-                    WorldBlockColor.objects.filter(
-                        item=self.item,
-                        color=self.color,
-                        world__is_creative=False,
-                        # sovereign worlds only
-                        world__end__isnull=False,
-                        world__owner__isnull=False,
-                    ).count()
-                    > 0
-                )
-            self._sovereign_only = sovereign_only
-        return self._sovereign_only
-
-    _first_world = models.ForeignKey(
-        World, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
-    )
-    _new_color = models.NullBooleanField()
-    _new_exo_color = models.NullBooleanField()
-
-    @property
-    def first_world(self):
-        if self._new_color is True:
+    def _days(self, now, then):
+        if now is None or then is None:
             return None
 
-        if self._first_world is None:
-            wbc = (
-                WorldBlockColor.objects.filter(
-                    item=self.item,
-                    color=self.color,
-                    world__is_creative=False,
-                )
-                # perm or soversign only
-                .filter(
-                    models.Q(world__end__isnull=True)
-                    | models.Q(
-                        world__end__isnull=False,
-                        world__owner__isnull=False,
-                    )
-                )
-                .order_by("world__start")
-                .first()
-            )
-            if wbc is not None:
-                self._first_world = wbc.world
-        return self._first_world
+        return (now - then).days
 
     @property
-    def is_new_color(self):
-        if self._new_color is None:
-            if self.world.end is None:
-                new_color = True
-            else:
-                new_color = (
-                    WorldBlockColor.objects.filter(
-                        item=self.item,
-                        color=self.color,
-                        world__is_creative=False,
-                        # sovereign worlds only
-                        world__end__isnull=False,
-                        world__owner__isnull=False,
-                    )
-                    .order_by("world__start")
-                    .count()
-                    == 0
-                )
-
-            self._new_color = new_color
-            self.save()
-        return self._new_color
+    def is_perm(self):
+        return self.first_world is not None and self.first_world.is_perm
 
     @property
-    def is_new_exo_color(self):
-        if self._new_exo_color is None:
-            if not self.world.is_exo:
-                return None
-
-            if self.exist_on_perm:
-                new_color = False
-            else:
-                new_color = (
-                    WorldBlockColor.objects.filter(
-                        item=self.item,
-                        color=self.color,
-                        world__is_creative=False,
-                        world__end__lt=self.world.start,
-                    ).count()
-                    == 0
-                )
-
-            self._new_exo_color = new_color
-            self.save()
-        return self._new_exo_color
-
-    _via_transform_world = models.ForeignKey(
-        World, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
-    )
-    _exist_via_transform = models.NullBooleanField()
+    def is_sovereign_only(self):
+        return self.first_world is not None and self.first_world.is_sovereign
 
     @property
-    def via_transform_world(self):
-        if (
-            self._exist_via_transform is False
-            or self.transform_group is None
-            or self.is_new_exo_color is not False
-        ):
-            return None
-
-        if self._via_transform_world is None:
-            wbc = (
-                WorldBlockColor.objects.filter(
-                    item__game_id__in=self.transform_group,
-                    color=self.color,
-                    world__is_creative=False,
-                    world__end__lt=self.world.start,
-                )
-                # perm or soversign only
-                .filter(
-                    models.Q(world__end__isnull=True)
-                    | models.Q(
-                        world__end__isnull=False,
-                        world__owner__isnull=False,
-                    )
-                )
-                .select_related("world")
-                .order_by("-world__start")
-                .first()
-            )
-            if wbc is not None:
-                self._via_transform_world = wbc.world
-        return self._via_transform_world
+    def is_exo_only(self):
+        return self.first_world is None
 
     @property
-    def exist_via_transform(self):
-        if self._exist_via_transform is None:
-            # exist vis transform can only appear to non-new exo colors
-            if self.transform_group is None or self.is_new_exo_color is not False:
-                return None
+    def days_since_exo(self):
+        then = None if self.last_exo is None else self.last_exo.end
 
-            if self.exist_on_perm or self.sovereign_only:
-                exist_via_transform = False
-            else:
-                exist_via_transform = self.via_transform_world is not None
-
-            self._exist_via_transform = exist_via_transform
-            self.save()
-        return self._exist_via_transform
-
-    _via_exo_transform_world = models.ForeignKey(
-        World, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
-    )
-    _exist_via_exo_transform = models.NullBooleanField()
+        return self._days(self._now, then)
 
     @property
-    def via_exo_transform_world(self):
-        if (
-            self._exist_via_exo_transform is False
-            or self.transform_group is None
-            or self.is_new_exo_color is not False
-        ):
-            return None
+    def days_since_transform_exo(self):
+        then = None if self.transform_last_exo is None else self.transform_last_exo.end
 
-        if self._via_exo_transform_world is None:
-            wbc = (
-                WorldBlockColor.objects.filter(
-                    item__game_id__in=self.transform_group,
-                    color=self.color,
-                    world__is_creative=False,
-                    world__end__lt=self.world.start,
-                    # exo worlds only
-                    world__end__isnull=False,
-                    world__owner__isnull=True,
-                )
-                .select_related("world")
-                .order_by("-world__end")
-                .first()
-            )
-            if wbc is not None:
-                self._via_exo_transform_world = wbc.world
-        return self._via_exo_transform_world
-
-    @property
-    def exist_via_exo_transform(self):
-        if self._exist_via_exo_transform is None:
-            # exist via transform can only appear to non-new exo colors
-            if self.transform_group is None or self.is_new_exo_color is not False:
-                return None
-
-            if self.exist_on_perm or self.sovereign_only:
-                exist_via_transform = False
-            else:
-                exist_via_transform = self.via_exo_transform_world is not None
-
-            self._exist_via_exo_transform = exist_via_transform
-            self.save()
-        return self._exist_via_exo_transform
-
-    _last_exo_world = models.ForeignKey(
-        World, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
-    )
-    _days_since_last_exo = models.IntegerField(null=True, blank=True)
-
-    @property
-    def last_exo_world(self):
-        if self._days_since_last_exo == -1 or self.is_new_exo_color is not False:
-            return None
-
-        if self._last_exo_world is None:
-            wbc = (
-                WorldBlockColor.objects.filter(
-                    item=self.item,
-                    color=self.color,
-                    world__is_creative=False,
-                    world__end__lt=self.world.start,
-                    # exo worlds only
-                    world__end__isnull=False,
-                    world__owner__isnull=True,
-                )
-                .select_related("world")
-                .order_by("-world__end")
-                .first()
-            )
-            if wbc is not None:
-                self._last_exo_world = wbc.world
-        return self._last_exo_world
-
-    @property
-    def days_since_last_exo(self):
-        if self._days_since_last_exo == -1:
-            return None
-        if self._days_since_last_exo is not None:
-            return self._days_since_last_exo
-
-        # property can only exist for non-new Exo colors
-        if self.is_new_exo_color is not False:
-            return None
-
-        if self.exist_on_perm or self.sovereign_only:
-            self._days_since_last_exo = -1
-        else:
-            self._days_since_last_exo = (
-                self.world.start - self.last_exo_world.end
-            ).days
-        self.save()
-
-        if self._days_since_last_exo == -1:
-            return None
-        return self._days_since_last_exo
+        return self._days(self._now, then)
 
 
 class WorldCreatureColor(
