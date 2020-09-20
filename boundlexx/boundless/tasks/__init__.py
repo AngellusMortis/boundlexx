@@ -96,12 +96,12 @@ def recalculate_colors(world_ids=None, log=None):
                 time__lt=block_color.time,
             ).filter(Q(world__isnull=True) | Q(world__is_creative=False))
 
-            wbc = base_compare.filter(NON_EXO).first()
+            wbc = base_compare.filter(NON_EXO).order_by("world__start").first()
             block_color.is_new = wbc is None
             if wbc is not None:
                 block_color.first_world = wbc.world
 
-            wbc = base_compare.filter(**EXO).first()
+            wbc = base_compare.filter(**EXO).order_by("-world__start").first()
             if wbc is not None:
                 block_color.last_exo = wbc.world
 
