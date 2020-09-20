@@ -78,13 +78,14 @@ def recalculate_colors(world_ids=None, log=None):
         wbcs.iterator(), length=wbcs.count(), show_percent=True, show_pos=True
     ) as pbar:
         for block_color in pbar:
+            block_color.is_new = False
+            block_color.first_world = None
+            block_color.last_exo = None
+            block_color.is_new_transform = False
+            block_color.transform_first_world = None
+            block_color.transform_last_exo = None
+
             if block_color.world is not None and block_color.world.is_creative:
-                block_color.is_new = False
-                block_color.first_world = None
-                block_color.last_exo = None
-                block_color.is_new_transform = False
-                block_color.transform_first_world = None
-                block_color.transform_last_exo = None
                 block_color.save()
                 continue
 
