@@ -15,7 +15,7 @@
     {% endif %}
 {% else %}
     {% if world.is_sovereign and not world.is_creative %}
-        {% if color.is_new_exo_color %}
+        {% if color.is_new %}
              - ![|25x25]({{ icons.exo_color_new }})
         {% endif %}
     {% endif %}
