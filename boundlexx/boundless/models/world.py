@@ -120,6 +120,22 @@ class WorldManager(models.Manager):
 
         return world, created
 
+    def _get_world_by_info(self, world_info):
+        if "id" in world_info:
+            world = self.filter(id=world_info["id"]).first()
+        else:
+            world = self.filter(
+                display_name=world_info["name"],
+                owner__isnull=True,
+                active=True,
+            ).first()
+
+        # wrong world, this one comes from another forum post
+        if world is not None and world.forum_id is not None:
+            world = None
+
+        return world
+
     def get_or_create_forum_world(self, forum_id, world_info):
         created = False
 
@@ -128,18 +144,7 @@ class WorldManager(models.Manager):
 
         # else, see if world exist from elsewhere
         if world is None:
-            if "id" in world_info:
-                world = self.filter(id=world_info["id"]).first()
-            else:
-                world = self.filter(
-                    display_name=world_info["name"],
-                    owner__isnull=True,
-                    active=True,
-                ).first()
-
-            # wrong world, this one comes from another forum post
-            if world is not None and world.forum_id is not None:
-                world = None
+            world = self._get_world_by_info(world_info)
 
         # otherwise, create it
         if world is None:

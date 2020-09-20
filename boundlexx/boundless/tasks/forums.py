@@ -22,7 +22,7 @@ FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_topics"
 
 FORUM_EXO_WORLD_CATEGORY = "exoworlds/31"
 FORUM_PERM_WORLD_CATEGORY = "worlds/33"
-DEFAULT_IMAGE = "https://forum.playboundless.com/uploads/default/original/3X/6/8/683d21dfac3159456b0074eb6fa1898be6ec9e97.png"
+DEFAULT_IMAGE = "https://forum.playboundless.com/uploads/default/original/3X/6/8/683d21dfac3159456b0074eb6fa1898be6ec9e97.png"  # noqa: E501
 
 
 def _get_topics(category: str):
@@ -260,15 +260,6 @@ def _parse_world_info(raw_html):
     parsed_data = {}
     for line in parsed_lines:
         if line[0] in ("name", "id", "type", "tier", "start", "end", "server"):
-            if line[0] == "tier":
-                # new format
-                match = re.match(r"\w+ \((\d+)\)", line[1])
-                if match:
-                    line[1] = match.group(1)
-
-                line[1] = int(line[1]) - 1
-            if line[0] == "id":
-                line[1] = int(line[1])
             parsed_data[line[0]] = line[1]
 
     return parsed_data
@@ -294,6 +285,16 @@ def _normalize_world_info(world_info):
         world_info["end"] = dateparser.parse(world_info["end"]).replace(
             tzinfo=timezone.utc
         )
+
+    if "tier" in world_info:
+        # new format
+        match = re.match(r"\w+ \((\d+)\)", world_info["id"])
+        if match:
+            world_info["tier"] = match.group(1)
+        world_info["tier"] = int(world_info["tier"]) - 1
+
+    if "id" in world_info:
+        world_info["id"] = int(world_info["id"])
 
     return world_info
 
