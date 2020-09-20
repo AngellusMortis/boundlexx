@@ -603,7 +603,7 @@ class WorldBlockColorManager(models.Manager):
         created = False
 
         if default:
-            block_color = self.filter(world=world, item=item, default=True).first()
+            block_color = self.filter(world=world, item=item, is_default=True).first()
         else:
             block_color = self.filter(world=world, item=item, active=True).first()
 
@@ -615,7 +615,7 @@ class WorldBlockColorManager(models.Manager):
 
             created = True
             block_color = self.create(
-                world=world, item=item, color=color, active=True, default=default
+                world=world, item=item, color=color, active=True, is_default=default
             )
         elif block_color.color != color:
             block_color.color = color
