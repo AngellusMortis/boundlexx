@@ -37,7 +37,7 @@ class ForumFormatForm(forms.Form):
     )
     portal_directions = forms.CharField(
         required=True,
-        max_length=50,
+        max_length=100,
         help_text="Directions to help players find the portal to your world",
         label="Portal Directions",
     )
