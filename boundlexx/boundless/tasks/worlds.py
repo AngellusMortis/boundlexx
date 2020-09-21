@@ -50,7 +50,7 @@ def search_new_worlds(ids_to_scan=None):
         ids_to_scan = _get_search_ids()
 
         if ids_to_scan is None:
-            return None
+            return
 
     logger.info("Starting scan for exo worlds (%s)", ids_to_scan)
 
