@@ -33,7 +33,7 @@ def _get_search_ids():
 
     if highest_id == -1:
         logger.warning("No worlds found to use as a start")
-        return
+        return None
 
     all_ids = set(
         range(lowest_id, highest_id + 1 + settings.BOUNDLESS_EXO_SEARCH_RADIUS)
@@ -48,6 +48,9 @@ def _get_search_ids():
 def search_new_worlds(ids_to_scan=None):
     if ids_to_scan is None:
         ids_to_scan = _get_search_ids()
+
+        if ids_to_scan is None:
+            return None
 
     logger.info("Starting scan for exo worlds (%s)", ids_to_scan)
 

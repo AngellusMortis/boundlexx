@@ -221,6 +221,41 @@ def _get_world_image(raw_html, name):
     return image
 
 
+def _parse_line(line, raw_line):
+    parsed_line = None
+
+    if " : " in line:
+        parts = [
+            p.encode("utf8").decode("ascii", errors="ignore").strip()
+            for p in line.split(" : ")
+        ]
+
+        if parts[0] == "world":
+            parts[0] = "name"
+        elif parts[0] == "region":
+            parts[0] = "server"
+        elif parts[0] == "appeared":
+            parts[0] = "start"
+        elif parts[0] == "last until" or parts[0] == "last seen":
+            parts[0] = "end"
+
+        if len(parts[0]) == 0 or parts[0] in ("∞", ">= 0"):
+            return None
+
+        if parts[0] == "name":
+            parts[1] = raw_line.split(" : ")[-1].strip()
+
+        parsed_line = parts
+    elif "appeared" in line:
+        parsed_line = ["start", line.split("appeared ")[-1].strip()]
+    elif "last until" in line:
+        parsed_line = ["end", line.split("last until ")[-1].strip()]
+    elif "last seen" in line:
+        parsed_line = ["end", line.split("last seen ")[-1].strip()]
+
+    return parsed_line
+
+
 def _parse_world_info(raw_html):
     lines = raw_html.get_text().split("\n")
 
@@ -232,34 +267,9 @@ def _parse_world_info(raw_html):
         if "blocks color" in line:
             break
 
-        if " : " in line:
-            parts = [
-                p.encode("utf8").decode("ascii", errors="ignore").strip()
-                for p in line.split(" : ")
-            ]
-
-            if parts[0] == "world":
-                parts[0] = "name"
-            elif parts[0] == "region":
-                parts[0] = "server"
-            elif parts[0] == "appeared":
-                parts[0] = "start"
-            elif parts[0] == "last until" or parts[0] == "last seen":
-                parts[0] = "end"
-
-            if len(parts[0]) == 0 or parts[0] in ("∞", ">= 0"):
-                continue
-
-            if parts[0] == "name":
-                parts[1] = raw_line.split(" : ")[-1].strip()
-
-            parsed_lines.append(parts)
-        elif "appeared" in line:
-            parsed_lines.append(["start", line.split("appeared ")[-1].strip()])
-        elif "last until" in line:
-            parsed_lines.append(["end", line.split("last until ")[-1].strip()])
-        elif "last seen" in line:
-            parsed_lines.append(["end", line.split("last seen ")[-1].strip()])
+        parsed_line = _parse_line(line, raw_line)
+        if parsed_line is not None:
+            parsed_lines.append(parsed_line)
 
     parsed_data = {}
     for line in parsed_lines:
