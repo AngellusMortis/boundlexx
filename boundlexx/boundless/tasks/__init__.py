@@ -6,6 +6,7 @@ from boundlexx.boundless.models import WorldBlockColor
 from boundlexx.boundless.tasks.forums import (
     ingest_exo_world_data,
     ingest_perm_world_data,
+    ingest_sovereign_world_data,
 )
 from boundlexx.boundless.tasks.sheets import ingest_world_data
 from boundlexx.boundless.tasks.shop import try_update_prices
@@ -28,6 +29,7 @@ __all__ = [
     "discover_all_worlds",
     "ingest_exo_world_data",
     "ingest_perm_world_data",
+    "ingest_sovereign_world_data",
     "ingest_world_data",
     "poll_creative_worlds",
     "poll_exo_worlds",

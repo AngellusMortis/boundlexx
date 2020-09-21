@@ -13,8 +13,7 @@ from config.celery_app import app
 logger = get_task_logger(__name__)
 
 
-@app.task
-def search_new_worlds():
+def _get_search_ids():
     existing_worlds = World.objects.filter(
         id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
         end__isnull=False,
@@ -41,6 +40,14 @@ def search_new_worlds():
     )
 
     ids_to_scan = sorted(all_ids - existing_ids)
+
+    return ids_to_scan
+
+
+@app.task
+def search_new_worlds(ids_to_scan=None):
+    if ids_to_scan is None:
+        ids_to_scan = _get_search_ids()
 
     logger.info("Starting scan for exo worlds (%s)", ids_to_scan)
 

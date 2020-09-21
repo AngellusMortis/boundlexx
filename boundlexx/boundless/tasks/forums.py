@@ -242,6 +242,10 @@ def _parse_world_info(raw_html):
                 parts[0] = "name"
             elif parts[0] == "region":
                 parts[0] = "server"
+            elif parts[0] == "appeared":
+                parts[0] = "start"
+            elif parts[0] == "last until" or parts[0] == "last seen":
+                parts[0] = "end"
 
             if len(parts[0]) == 0 or parts[0] in ("∞", ">= 0"):
                 continue
@@ -299,7 +303,7 @@ def _normalize_world_info(world_info):
     return world_info
 
 
-def _parse_forum_topic(topic: int, is_exo: bool):
+def _parse_forum_topic(topic: int, is_perm: bool):
     response = requests.get(f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json")
     response.raise_for_status()
 
@@ -324,12 +328,12 @@ def _parse_forum_topic(topic: int, is_exo: bool):
     if image is not None:
         world_info["image"] = image
 
-    if is_exo:
-        expected_fields = 8
-    else:
+    if is_perm:
         expected_fields = 7
         if "end" in world_info:
             del world_info["end"]
+    else:
+        expected_fields = 8
 
     if len(world_info) < expected_fields:
         logger.warning(
@@ -347,27 +351,20 @@ def _parse_forum_topic(topic: int, is_exo: bool):
             block_details = detail
             break
 
-    if block_details is None:
-        return None, None
-
     return world_info, block_details
 
 
-@app.task
-def ingest_exo_world_data(topics=None):
-    if topics is None:
-        topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
-
+def _ingest_world_data(topics, is_perm=False, is_sovereign=False):
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:
-        world_info, block_details = _parse_forum_topic(topic, is_exo=True)
+        world_info, block_details = _parse_forum_topic(topic, is_perm=False)
 
-        if world_info is None or block_details is None:
-            logger.warning("No Block color data for world yet for topic %s")
-            continue
-
-        block_colors = _parse_block_details(block_details)
-        world, _ = World.objects.get_or_create_forum_world(topic, world_info)
+        block_colors = []
+        if block_details is not None:
+            block_colors = _parse_block_details(block_details)
+        world, _ = World.objects.get_or_create_forum_world(
+            topic, world_info, is_sovereign
+        )
 
         number_created = 0
         for block_color in block_colors:
@@ -394,32 +391,15 @@ def ingest_exo_world_data(topics=None):
 
 
 @app.task
+def ingest_sovereign_world_data(topics):
+    _ingest_world_data(topics, True, True)
+
+
+@app.task
+def ingest_exo_world_data():
+    _ingest_world_data(_get_topics(FORUM_EXO_WORLD_CATEGORY), False, False)
+
+
+@app.task
 def ingest_perm_world_data():
-    topics = _get_topics(FORUM_PERM_WORLD_CATEGORY)
-
-    logger.info("Found %s topic(s) to parse", len(topics))
-    for topic in topics:
-        world_info, block_details = _parse_forum_topic(topic, is_exo=False)
-
-        block_colors = _parse_block_details(block_details)
-        world, _ = World.objects.get_or_create_forum_world(topic, world_info)
-
-        number_created = 0
-        for block_color in block_colors:
-            _, created = WorldBlockColor.objects.get_or_create_color(
-                world=world, item=block_color[0], color=block_color[1]
-            )
-
-            if created:
-                number_created += 1
-
-        parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
-        parse_cache.append(topic)
-        cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
-
-        logger.info(
-            "Topic %s: Imported %s block color details for world %s",
-            topic,
-            number_created,
-            world,
-        )
+    _ingest_world_data(_get_topics(FORUM_PERM_WORLD_CATEGORY), True, False)

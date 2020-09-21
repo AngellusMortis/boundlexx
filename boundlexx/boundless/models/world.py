@@ -119,13 +119,13 @@ class WorldManager(models.Manager):
 
         return world, created
 
-    def _get_world_by_info(self, world_info):
+    def _get_world_by_info(self, world_info, is_sovereign=False):
         if "id" in world_info:
             world = self.filter(id=world_info["id"]).first()
         else:
             world = self.filter(
                 display_name=world_info["name"],
-                owner__isnull=True,
+                owner__isnull=not is_sovereign,
                 active=True,
             ).first()
 
@@ -135,15 +135,16 @@ class WorldManager(models.Manager):
 
         return world
 
-    def get_or_create_forum_world(self, forum_id, world_info):
+    def get_or_create_forum_world(self, forum_id, world_info, is_sovereign=False):
         created = False
+        do_refresh = False
 
         # see if world exists that was created by this method before
         world = self.filter(forum_id=forum_id).first()
 
         # else, see if world exist from elsewhere
         if world is None:
-            world = self._get_world_by_info(world_info)
+            world = self._get_world_by_info(world_info, is_sovereign)
 
         # otherwise, create it
         if world is None:
@@ -174,15 +175,19 @@ class WorldManager(models.Manager):
         new_data = False
         if "image" in world_info and (world.image is None or not world.image.name):
             world.image = world_info["image"]
+            do_refresh = True
             new_data = True
         if world.forum_id is None:
             world.forum_id = forum_id
             new_data = True
 
+        world.save()
+        # URL for image file may change
+        if do_refresh:
+            world.refresh_from_db()
+
         if new_data:
             ExoworldNotification.objects.send_update_notification(world)
-
-        world.save()
 
         return world, created
 

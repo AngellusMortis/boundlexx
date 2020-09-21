@@ -33,7 +33,9 @@
                 "info",
                 "-P",
                 "solo",
-            ]
+                "-Q",
+                "default,distance,cache,notify,poll,shop"
+            ],
         },
         {
             "name": "Boundlexx: Debug Ingest",
