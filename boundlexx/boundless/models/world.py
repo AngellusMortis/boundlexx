@@ -826,16 +826,20 @@ class WorldPollManager(models.Manager):
         for rank, leader in enumerate(poll_dict["leaderboard"]):
             rank += 1
 
-            LeaderboardRecord.objects.create(
-                world_poll=world_poll,
-                world_rank=rank,
-                guild_tag=leader["mayor"].get("guildTag", ""),
-                mayor_id=leader["mayor"]["id"],
-                mayor_name=leader["mayor"]["name"],
-                mayor_type=leader["mayor"]["type"],
-                name=leader["name"],
-                prestige=leader["prestige"],
-            )
+            try:
+                LeaderboardRecord.objects.create(
+                    world_poll=world_poll,
+                    world_rank=rank,
+                    guild_tag=leader["mayor"].get("guildTag", ""),
+                    mayor_id=leader["mayor"]["id"],
+                    mayor_name=leader["mayor"]["name"],
+                    mayor_type=leader["mayor"]["type"],
+                    name=leader["name"],
+                    prestige=leader["prestige"],
+                )
+            except UnicodeEncodeError:
+                # some beacons are just... werid?
+                pass
 
         world_poll.refresh_from_db()
 
