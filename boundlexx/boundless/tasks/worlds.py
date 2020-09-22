@@ -12,6 +12,8 @@ from config.celery_app import app
 
 logger = get_task_logger(__name__)
 
+MAX_WORLDS_PER_POLL = 100
+
 
 def _get_search_ids():
     existing_worlds = World.objects.filter(
@@ -189,7 +191,21 @@ def poll_worlds(world_ids=None):
     _poll_worlds(worlds)
 
 
+def _split_polls(worlds):
+    worlds = list(worlds)
+
+    num_runs = len(worlds) // MAX_WORLDS_PER_POLL + 1
+    logger.info("Spliting polling into %s runs", num_runs)
+    while len(worlds) > MAX_WORLDS_PER_POLL:
+        poll_worlds.delay([w.id for w in worlds[:MAX_WORLDS_PER_POLL]])
+        worlds = worlds[MAX_WORLDS_PER_POLL:]
+
+
 def _poll_worlds(worlds):
+    if len(worlds) > MAX_WORLDS_PER_POLL:
+        _split_polls(worlds)
+        return
+
     client = BoundlessClient()
     errors_total = 0
 
