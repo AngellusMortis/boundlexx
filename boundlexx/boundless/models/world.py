@@ -814,6 +814,8 @@ class WorldBlockColorManager(models.Manager):
         blocks = self._get_blocks_by_id(color_data.keys())
         colors = self._get_colors()
 
+        self._log(logger, "Number of blocks: %s", len(blocks))
+
         default_colors = []
         possible_colors: List[Tuple[Item, List[Color]]] = []
 
