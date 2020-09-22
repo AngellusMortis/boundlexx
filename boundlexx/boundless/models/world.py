@@ -804,7 +804,11 @@ class WorldBlockColorManager(models.Manager):
 
         return block_colors_created
 
-    def create_colors_from_wc(self, world, color_data):
+    def _log(self, logger, *args):
+        if logger is not None:
+            logger.info(*args)
+
+    def create_colors_from_wc(self, world, color_data, logger=None):
         block_colors_created = 0
 
         blocks = self._get_blocks_by_id(color_data.keys())
@@ -830,7 +834,15 @@ class WorldBlockColorManager(models.Manager):
 
             possible_colors.append((block.block_item, possible))
 
+        self._log(
+            logger,
+            "Found %s default, %s possible",
+            len(default_colors),
+            len(possible_colors),
+        )
+
         block_colors_created += self._create_default_colors(world, default_colors)
+        self._log(logger, "Created %s default", block_colors_created)
         block_colors_created += self._create_unknown_colors(possible_colors)
 
         return block_colors_created
