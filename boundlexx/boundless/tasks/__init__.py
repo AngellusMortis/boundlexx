@@ -136,8 +136,12 @@ def recalculate_colors(world_ids=None, log=None):
 
 @app.task
 def add_world_control_data(world_id, world_control_data):
+    ws_data = {}
+    for block_id, data in world_control_data.items():
+        ws_data[int(block_id)] = data
+
     block_colors_created = WorldBlockColor.objects.create_colors_from_wc(
-        World.objects.get(pk=world_id), world_control_data, logger=logger
+        World.objects.get(pk=world_id), ws_data, logger=logger
     )
 
     logger.info("Created %s color(s)", block_colors_created)

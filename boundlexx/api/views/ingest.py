@@ -139,7 +139,6 @@ class WorldControlDataView(views.APIView):
                         raise TypeError
 
                 color_data[int(block_id)] = colors
-            colors = request.data["colors"]
 
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
@@ -148,6 +147,7 @@ class WorldControlDataView(views.APIView):
         if world_id is None:
             return None
 
+        print(color_data.keys())
         return (world_id, color_data)
 
     def _get_world(self, world_id):
