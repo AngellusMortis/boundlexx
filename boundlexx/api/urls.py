@@ -64,4 +64,5 @@ urlpatterns = [
     path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),
     path("v1/", include((router.urls, "api"), namespace="v1")),
     path("ingest-ws-data/", views.WorldWSDataView.as_view()),
+    path("ingest-wc-data/", views.WorldControlDataView.as_view()),
 ]

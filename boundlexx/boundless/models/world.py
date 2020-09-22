@@ -1,6 +1,8 @@
+# pylint: disable=too-many-lines
 from __future__ import annotations
 
 from datetime import datetime, timedelta
+from typing import Dict, List, Tuple
 
 import pytz
 from django.conf import settings
@@ -12,7 +14,7 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import BoundlessClient
-from boundlexx.boundless.models.game import Color, Item, Skill
+from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex, get_next_rank_update
 from boundlexx.notifications.models import ExoworldNotification
 from config.storages import select_storage
@@ -615,6 +617,35 @@ class WorldDistance(
 
 
 class WorldBlockColorManager(models.Manager):
+    def _get_default_sovereign_wbc(self, world, item):
+        block_color = self.filter(world=world, item=item, is_default=True).first()
+
+        if block_color is None and world.owner is not None:
+            block_color = self.filter(
+                world__isnull=True, item=item, is_default=True
+            ).first()
+            if block_color is not None:
+                block_color.world = world
+                block_color.save()
+
+        return block_color
+
+    def get_or_create_unknown_color(self, item, color):
+        created = False
+        block_color = (
+            self.filter(item=item, color=color, is_default=True)
+            .filter(models.Q(world__isnull=True) | models.Q(world__owner__isnull=False))
+            .first()
+        )
+
+        if block_color is None:
+            block_color = self.create(
+                world=None, item=item, color=color, is_default=True, active=False
+            )
+            created = True
+
+        return block_color, created
+
     def get_or_create_color(self, world, item, color, default=None):
         if default is None:
             default = True
@@ -624,9 +655,11 @@ class WorldBlockColorManager(models.Manager):
         created = False
 
         if default:
-            block_color = self.filter(world=world, item=item, is_default=True).first()
+            block_color = self._get_default_sovereign_wbc(world, item)
         else:
-            block_color = self.filter(world=world, item=item, active=True).first()
+            block_color = self.filter(
+                world=world, item=item, is_default=False, active=True
+            ).first()
 
         if block_color is None or (
             not default and world.owner is not None and block_color.color != color
@@ -643,6 +676,166 @@ class WorldBlockColorManager(models.Manager):
             block_color.save()
 
         return block_color, created
+
+    def _get_blocks(self, attr, **lookup):
+        block_cache: Dict[str, Block] = {}
+        blocks = Block.objects.filter(**lookup).select_related("block_item")
+        for block in blocks.all():
+            block_cache[getattr(block, attr)] = block
+
+        return block_cache
+
+    def _get_blocks_by_name(self, names):
+        return self._get_blocks("name", name__in=names)
+
+    def _get_blocks_by_id(self, ids):
+        return self._get_blocks("game_id", game_id__in=ids)
+
+    def _get_colors(self):
+        colors = {}
+        for color in Color.objects.all():
+            colors[color.game_id] = color
+
+        return colors
+
+    def _get_wbcs(self, **lookup):
+        wbcs = self.filter(**lookup).select_related("item", "world", "color")
+
+        wbc_cache = {}
+        for wbc in wbcs.all():
+            wbc_cache[wbc.item.game_id] = wbc
+
+        return wbc_cache
+
+    def _update_existing_color(self, wbc, color, default):
+        create = False
+        if wbc is None:
+            create = True
+        elif wbc.color != color:
+            if default:
+                wbc.color = color
+            else:
+                wbc.active = False
+                create = True
+            wbc.save()
+
+        return create
+
+    def create_colors_from_ws(self, world, block_colors):
+        default = True
+        if world.is_sovereign:
+            default = False
+
+        if default:
+            wbcs = self._get_wbcs(world=world, is_default=True)
+        else:
+            wbcs = self._get_wbcs(world=world, is_default=False, active=True)
+
+        blocks = self._get_blocks_by_name(block_colors.keys())
+        colors = self._get_colors()
+
+        block_colors_created = 0
+        for block_name, color_id in block_colors.items():
+            block = blocks.get(block_name)
+
+            if block is not None and block.block_item is not None:
+                wbc = wbcs.get(block.block_item.game_id)
+                color = colors[color_id]
+
+                create = self._update_existing_color(wbc, color, default)
+                if create:
+                    WorldBlockColor.objects.create(
+                        world=world,
+                        item=block.block_item,
+                        color=color,
+                        is_default=default,
+                        active=True,
+                    )
+                    block_colors_created += 1
+
+        return block_colors_created
+
+    def _create_default_colors(self, world, default_colors):
+        block_colors_created = 0
+
+        wbcs = self._get_wbcs(world=world, is_default=True)
+
+        for default_color in default_colors:
+            block_color = wbcs.get(default_color[0].game_id)
+
+            if block_color is not None:
+                if block_color.color != default_color[1]:
+                    block_color.color = default_color[1]
+                    block_color.save()
+            else:
+                block_color = self.create(
+                    world=world,
+                    item=default_color[0],
+                    color=default_color[1],
+                    is_default=True,
+                    active=False,
+                )
+                block_colors_created += 1
+
+        return block_colors_created
+
+    def _create_unknown_colors(self, possible_colors):
+        block_colors_created = 0
+
+        all_wbcs = self.filter(is_default=True).select_related("item", "world", "color")
+        wbcs: Dict[int, Dict[int, bool]] = {}
+        for wbc in all_wbcs.all().iterator():
+            ecolors = wbcs.get(wbc.item.game_id, {})
+            ecolors[wbc.color.game_id] = True
+            wbcs[wbc.item.game_id] = ecolors
+
+        print(len(wbcs))
+        for item, pcolors in possible_colors:
+            ecolors = wbcs.get(item.game_id, {})
+            print(item, ecolors)
+            for color in pcolors:
+                if ecolors.get(color.game_id, False):
+                    self.create(
+                        world=None,
+                        item=item,
+                        color=color,
+                        is_default=True,
+                        active=False,
+                    )
+                    block_colors_created += 1
+
+        return block_colors_created
+
+    def create_colors_from_wc(self, world, color_data):
+        block_colors_created = 0
+
+        blocks = self._get_blocks_by_id(color_data.keys())
+        colors = self._get_colors()
+
+        default_colors = []
+        possible_colors: List[Tuple[Item, List[Color]]] = []
+
+        for block_id, data in color_data.items():
+            block = blocks.get(block_id)
+
+            if block is None or block.block_item is None:
+                continue
+
+            default_id = data["default"]
+            default_colors.append((block.block_item, colors[default_id]))
+
+            possible = []
+            for color_id in data["possible"]:
+                if color_id in (0, default_id):
+                    continue
+                possible.append(colors[color_id])
+
+            possible_colors.append((block.block_item, possible))
+
+        block_colors_created += self._create_default_colors(world, default_colors)
+        block_colors_created += self._create_unknown_colors(possible_colors)
+
+        return block_colors_created
 
 
 class WorldBlockColor(
@@ -826,20 +1019,25 @@ class WorldPollManager(models.Manager):
         for rank, leader in enumerate(poll_dict["leaderboard"]):
             rank += 1
 
+            args = {
+                "world_poll": world_poll,
+                "world_rank": rank,
+                "guild_tag": leader["mayor"].get("guildTag", ""),
+                "mayor_id": leader["mayor"]["id"],
+                "mayor_name": leader["mayor"]["name"],
+                "mayor_type": leader["mayor"]["type"],
+                "name": leader["name"],
+                "prestige": leader["prestige"],
+            }
+
             try:
-                LeaderboardRecord.objects.create(
-                    world_poll=world_poll,
-                    world_rank=rank,
-                    guild_tag=leader["mayor"].get("guildTag", ""),
-                    mayor_id=leader["mayor"]["id"],
-                    mayor_name=leader["mayor"]["name"],
-                    mayor_type=leader["mayor"]["type"],
-                    name=leader["name"],
-                    prestige=leader["prestige"],
-                )
+                LeaderboardRecord.objects.create(**args)
             except UnicodeEncodeError:
                 # some beacons are just... werid?
-                pass
+                args["name"] = (
+                    args["name"].encode("latin1", errors="replace").decode("latin1")
+                )
+                LeaderboardRecord.objects.create(**args)
 
         world_poll.refresh_from_db()
 

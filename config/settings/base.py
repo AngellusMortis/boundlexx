@@ -372,6 +372,7 @@ REST_FRAMEWORK = {
         "rest_framework.renderers.JSONRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
+    "DEFAULT_THROTTLE_RATES": {"user": "1/minute"},
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "boundlexx.api.negotiation.IgnoreClientContentNegotiation",  # noqa: E501
 }
 

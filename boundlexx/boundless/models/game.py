@@ -207,7 +207,7 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     item_subtitle = models.ForeignKey(
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )
-    string_id = models.CharField(_("String ID"), max_length=64)
+    string_id = models.CharField(_("String ID"), max_length=64, db_index=True)
     name = models.CharField(_("Name"), max_length=64)
     mint_value = models.FloatField(_("Chrysominter Value"), null=True, blank=True)
     list_type = models.ForeignKey(
@@ -261,6 +261,20 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     @property
     def next_request_basket_update(self):
         return get_next_rank_update(self.itembuyrank_set.all())
+
+
+class AltItem(GameObj):
+    name = models.CharField(_("String ID"), max_length=64)
+    base_item = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
+
+
+class Block(GameObj):
+    name = models.CharField(_("Name"), max_length=64, unique=True)
+    block_item = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
 
 
 class SkillGroup(models.Model):

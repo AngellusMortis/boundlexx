@@ -1,7 +1,7 @@
 from boundlexx.api.views.color import BlockColorViewSet, ColorViewSet
 from boundlexx.api.views.emoji import EmojiViewSet
 from boundlexx.api.views.gamefile import GameFileViewSet
-from boundlexx.api.views.ingest import WorldWSDataView
+from boundlexx.api.views.ingest import WorldControlDataView, WorldWSDataView
 from boundlexx.api.views.item import (
     ItemColorsViewSet,
     ItemResourceCountViewSet,
@@ -33,5 +33,6 @@ __all__ = [
     "WorldPollViewSet",
     "WorldViewSet",
     "WorldWSDataView",
+    "WorldControlDataView",
     "ForumFormatView",
 ]

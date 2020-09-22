@@ -34,7 +34,7 @@
                 "-P",
                 "solo",
                 "-Q",
-                "default,distance,cache,notify,poll,shop"
+                "default,distance,cache,notify,poll,shop,control"
             ],
         },
         {
@@ -54,7 +54,7 @@
             "module": "manage",
             "args": [
                 "create_game_objects",
-                "-se"
+                "-i"
             ]
         },
         {

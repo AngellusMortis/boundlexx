@@ -5,6 +5,8 @@ from django.dispatch import receiver
 
 from boundlexx.api.utils import PURGE_GROUPS, queue_purge_paths
 from boundlexx.boundless.models.game import (
+    AltItem,
+    Block,
     Color,
     ColorValue,
     Emoji,
@@ -44,6 +46,8 @@ from boundlexx.boundless.models.world import (
 )
 
 __all__ = [
+    "AltItem",
+    "Block",
     "Color",
     "ColorValue",
     "Emoji",
@@ -181,7 +185,8 @@ def queue_purge_cache_block_colors(sender, instance=None, **kwargs):
 
     for index, path in enumerate(paths):
         path = path.replace("{item_id}", str(instance.item.game_id))
-        path = path.replace("{world_id}", str(instance.world.id))
+        if instance.world is not None:
+            path = path.replace("{world_id}", str(instance.world.id))
         paths[index] = path.replace("{color_id}", str(instance.color.game_id))
 
     queue_purge_paths(paths)

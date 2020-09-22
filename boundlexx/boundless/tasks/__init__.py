@@ -2,7 +2,7 @@ import djclick as click
 from celery.utils.log import get_task_logger
 from django.db.models import Q
 
-from boundlexx.boundless.models import WorldBlockColor
+from boundlexx.boundless.models import World, WorldBlockColor
 from boundlexx.boundless.tasks.forums import (
     ingest_exo_world_data,
     ingest_perm_world_data,
@@ -25,6 +25,7 @@ from config.celery_app import app
 logger = get_task_logger(__name__)
 
 __all__ = [
+    "add_world_control_data",
     "calculate_distances",
     "discover_all_worlds",
     "ingest_exo_world_data",
@@ -131,3 +132,14 @@ def recalculate_colors(world_ids=None, log=None):
                 block_color.is_new_transform = False
 
             block_color.save()
+
+
+@app.task
+def add_world_control_data(world_id, world_control_data):
+    block_colors_created = WorldBlockColor.objects.create_colors_from_wc(
+        World.objects.get(pk=world_id), world_control_data
+    )
+
+    if block_colors_created > 0:
+        recalculate_colors.delay([world_id])
+        # ExoworldNotification.objects.send_update_notification(world)

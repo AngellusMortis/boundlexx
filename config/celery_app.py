@@ -23,6 +23,7 @@ app.conf.task_routes = {
     "boundlexx.notifications.*": {"queue": "notify"},
     "boundlexx.boundless.tasks.worlds.poll_*": {"queue": "poll"},
     "boundlexx.boundless.tasks.shop.*": {"queue": "shop"},
+    "boundlexx.boundless.tasks.add_world_control_data": {"queue": "control"},
 }
 app.conf.broker_transport_options = {"visibility_timeout": 60}
 
