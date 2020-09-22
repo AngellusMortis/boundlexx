@@ -110,6 +110,26 @@ class ResourceCountLinkField(serializers.ModelField):
         return None
 
 
+class SovereignColorsLinkField(serializers.ModelField):
+    def __init__(self, *args, **kwargs):
+        kwargs["read_only"] = True
+        kwargs["model_field"] = None
+        kwargs["allow_null"] = True
+        super().__init__(*args, **kwargs)
+
+    def to_representation(self, value):  # pylint: disable=arguments-differ
+        return Hyperlink(value, None)
+
+    def get_attribute(self, obj):
+        if obj.has_colors:
+            return reverse(
+                "item-sovereign-colors",
+                kwargs={"game_id": obj.game_id},
+                request=self.context["request"],
+            )
+        return None
+
+
 class ShopURL(serializers.ModelField):
     def __init__(self, *args, **kwargs):
         kwargs["read_only"] = True

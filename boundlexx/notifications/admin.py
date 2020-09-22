@@ -6,6 +6,7 @@ from boundlexx.notifications.models import (
     ExoworldNotification,
     FailedTaskNotification,
     HomeworldNotification,
+    SovereignColorNotification,
     SovereignWorldNotification,
 )
 
@@ -18,7 +19,7 @@ class DiscordWebhookSubscriptionAdmin(admin.ModelAdmin):
     ]
 
 
-class WorldNotificationAdmin(admin.ModelAdmin):
+class NotificationAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "name",
@@ -27,28 +28,30 @@ class WorldNotificationAdmin(admin.ModelAdmin):
 
 
 @admin.register(ExoworldNotification)
-class ExoworldNotificationAdmin(WorldNotificationAdmin):
+class ExoworldNotificationAdmin(NotificationAdmin):
     pass
 
 
 @admin.register(SovereignWorldNotification)
-class SovereignWorldNotificationAdmin(WorldNotificationAdmin):
+class SovereignWorldNotificationAdmin(NotificationAdmin):
     pass
 
 
 @admin.register(CreativeWorldNotification)
-class CreativeWorldNotificationAdmin(WorldNotificationAdmin):
+class CreativeWorldNotificationAdmin(NotificationAdmin):
     pass
 
 
 @admin.register(HomeworldNotification)
-class HomeworldNotificationAdmin(WorldNotificationAdmin):
+class HomeworldNotificationAdmin(NotificationAdmin):
+    pass
+
+
+@admin.register(SovereignColorNotification)
+class SovereignColorNotificationAdmin(NotificationAdmin):
     pass
 
 
 @admin.register(FailedTaskNotification)
-class FailedTaskNotificationAdmin(admin.ModelAdmin):
-    list_display = [
-        "id",
-        "active",
-    ]
+class FailedTaskNotificationAdmin(NotificationAdmin):
+    pass

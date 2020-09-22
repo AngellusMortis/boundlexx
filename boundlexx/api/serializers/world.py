@@ -268,6 +268,16 @@ class ItemColorSerializer(serializers.ModelSerializer):
         ]
 
 
+class PossibleColorSerializer(serializers.ModelSerializer):
+    color = SimpleColorSerializer()
+
+    class Meta:
+        model = WorldBlockColor
+        fields = [
+            "color",
+        ]
+
+
 class WorldColorSerializer(serializers.ModelSerializer):
     world = SimpleWorldSerializer()
 

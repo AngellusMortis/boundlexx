@@ -1,6 +1,7 @@
 from typing import List
 
 from django.conf import settings
+from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -17,6 +18,7 @@ from boundlexx.api.serializers import (
     ItemResourceCountTimeSeriesSerializer,
     ItemResourceCountTimeSeriesTBSerializer,
     ItemSerializer,
+    PossibleColorSerializer,
     SimpleItemRequestBasketPriceSerializer,
     SimpleItemShopStandPriceSerializer,
     SimpleWorldSerializer,
@@ -130,6 +132,10 @@ ITEM_RESOURCE_TIMESERIES_EXAMPLE = {
     "count": 6051899,
 }
 
+ITEM_SOVEREIGN_COLORS_EXAMPLE = {
+    "color": {"url": f"{get_base_url()}/api/v1/colors/1/", "game_id": 1}
+}
+
 
 class ItemViewSet(
     DescriptiveAutoSchemaMixin,
@@ -193,10 +199,10 @@ class ItemViewSet(
     def shop_stands(
         self,
         request,
-        game_id=None,  # pylint: disable=redefined-builtin # noqa A002
+        game_id=None,
     ):
         """
-        Gets current Shop Stands for given world
+        Gets current Shop Stands for given item
         """
 
         item = self.get_object()
@@ -227,10 +233,10 @@ class ItemViewSet(
     def request_baskets(
         self,
         request,
-        game_id=None,  # pylint: disable=redefined-builtin # noqa A002
+        game_id=None,
     ):
         """
-        Gets current Request Baskets for given world
+        Gets current Request Baskets for given item
         """
 
         item = self.get_object()
@@ -250,6 +256,48 @@ class ItemViewSet(
 
     request_baskets.example = {
         "request_baskets": {"value": get_list_example(ITEM_REQUEST_BASKETS_EXAMPLE)}
+    }
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=PossibleColorSerializer,
+        url_path="sovereign-colors",
+    )
+    def sovereign_colors(
+        self,
+        request,
+        game_id=None,
+    ):
+        """
+        Gets current Possible Sovereign Color choices for given item
+        """
+
+        item = self.get_object()
+
+        queryset = (
+            WorldBlockColor.objects.filter(item=item, is_default=True)
+            .filter(
+                Q(world__isnull=True)
+                | Q(world__end__isnull=True, world__is_creative=False)
+                | Q(world__owner__isnull=False, world__is_creative=False)
+            )
+            .select_related("color")
+            .order_by("color__game_id")
+            .distinct("color__game_id")
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    sovereign_colors.example = {
+        "sovereign_colors": {"value": get_list_example(ITEM_SOVEREIGN_COLORS_EXAMPLE)}
     }
 
 

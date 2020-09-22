@@ -769,8 +769,50 @@ class CreativeWorldNotification(WorldNotification):
 
 
 class HomeworldNotification(WorldNotification):
-
     _world_type = "homeworld"
+
+
+class SovereignColorNotification(NotificationBase):
+    objects = PolymorphicNotificationManager()
+
+    def embed(self, item, colors, new_ids):  # pylint: disable=arguments-differ
+        lines = []
+        fields = []
+
+        title = "Color Details"
+        colors = sorted(colors, key=lambda c: c.game_id)
+        for color in colors:
+            line = f"_{color.default_name} ({color.game_id})_"
+
+            if color.game_id in new_ids:
+                line += " **NEW**"
+            lines.append(line)
+
+            if len(lines) == 40:
+                fields.append(
+                    {
+                        "name": title,
+                        "value": "\n".join(lines),
+                    }
+                )
+
+                title = "cont'd"
+                lines = []
+
+        fields.append(
+            {
+                "name": title,
+                "value": "\n".join(lines),
+            }
+        )
+
+        main_embed: Dict[str, Any] = {
+            "title": item.english,
+            "description": "New Sovereign selectable colors found!",
+            "fields": fields,
+        }
+
+        return [main_embed], None
 
 
 class FailedTaskNotification(NotificationBase):

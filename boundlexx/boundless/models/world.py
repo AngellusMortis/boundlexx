@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Tuple
+from typing import Dict, List, Set, Tuple
 
 import pytz
 from django.conf import settings
@@ -16,7 +16,10 @@ from django_prometheus.models import ExportModelOperationsMixin
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import convert_linear_rgb_to_hex, get_next_rank_update
-from boundlexx.notifications.models import ExoworldNotification
+from boundlexx.notifications.models import (
+    ExoworldNotification,
+    SovereignColorNotification,
+)
 from config.storages import select_storage
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
@@ -756,7 +759,7 @@ class WorldBlockColorManager(models.Manager):
         return block_colors_created
 
     def _create_default_colors(self, world, default_colors):
-        block_colors_created = 0
+        block_colors = {}
 
         wbcs = self._get_wbcs(world=world, is_default=True)
 
@@ -775,24 +778,35 @@ class WorldBlockColorManager(models.Manager):
                     is_default=True,
                     active=False,
                 )
-                block_colors_created += 1
+                block_colors[block_color.item.game_id] = block_color
 
-        return block_colors_created
+        return block_colors
 
-    def _create_unknown_colors(self, possible_colors):
+    def _create_unknown_colors(self, possible_colors, new_colors):
         block_colors_created = 0
 
-        all_wbcs = self.filter(is_default=True).select_related("item", "world", "color")
-        wbcs: Dict[int, Dict[int, bool]] = {}
+        all_wbcs = (
+            self.filter(is_default=True)
+            .filter(
+                models.Q(world__isnull=True)
+                | models.Q(world__end__isnull=True, world__is_creative=False)
+                | models.Q(world__owner__isnull=False, world__is_creative=False)
+            )
+            .select_related("item", "world", "color")
+        )
+        wbcs: Dict[int, Set[int]] = {}
         for wbc in all_wbcs.all().iterator():
-            ecolors = wbcs.get(wbc.item.game_id, {})
-            ecolors[wbc.color.game_id] = True
+            ecolors = wbcs.get(wbc.item.game_id, set())
+            ecolors.add(wbc.color.game_id)
             wbcs[wbc.item.game_id] = ecolors
 
         for item, pcolors in possible_colors:
-            ecolors = wbcs.get(item.game_id, {})
+            new_color_ids = set()
+
+            ecolors = wbcs.get(item.game_id, set())
             for color in pcolors:
-                if not ecolors.get(color.game_id, False):
+                if color.game_id not in ecolors:
+                    new_color_ids.add(color.game_id)
                     self.create(
                         world=None,
                         item=item,
@@ -801,6 +815,16 @@ class WorldBlockColorManager(models.Manager):
                         active=False,
                     )
                     block_colors_created += 1
+
+            if item.game_id in new_colors:
+                new_wbc = new_colors[item.game_id]
+                pcolors.append(new_wbc.color)
+                new_color_ids.add(new_wbc.color.game_id)
+
+            if len(new_color_ids) > 0:
+                SovereignColorNotification.objects.send_notification(
+                    item, pcolors, list(new_color_ids)
+                )
 
         return block_colors_created
 
@@ -849,9 +873,12 @@ class WorldBlockColorManager(models.Manager):
             len(possible_colors),
         )
 
-        block_colors_created += self._create_default_colors(world, default_colors)
+        new_block_colors = self._create_default_colors(world, default_colors)
+        block_colors_created += len(new_block_colors)
         self._log(logger, "Created %s default", block_colors_created)
-        block_colors_created += self._create_unknown_colors(possible_colors)
+        block_colors_created += self._create_unknown_colors(
+            possible_colors, new_block_colors
+        )
 
         return block_colors_created
 

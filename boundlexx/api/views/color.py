@@ -112,7 +112,7 @@ class BlockColorViewSet(
         "world__name",
         "world__display_name",
     ]
-    ordering = ["-rank", "item__game_id"]
+    ordering = ["-rank", "item__game_id", "color__game_id"]
     ordering_fields: List[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003

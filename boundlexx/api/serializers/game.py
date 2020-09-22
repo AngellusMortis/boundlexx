@@ -12,6 +12,7 @@ from boundlexx.api.serializers.base import (
     SimpleItemSerializer,
     SimpleSkillGroupSerializer,
     SimpleWorldSerializer,
+    SovereignColorsLinkField,
 )
 from boundlexx.boundless.models import (
     Color,
@@ -85,6 +86,7 @@ class ItemSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     colors_url = ItemColorsLinkField()
+    sovereign_colors_url = SovereignColorsLinkField()
     localization = LocalizedNameSerializer(
         source="localizedname_set",
         many=True,
@@ -102,6 +104,7 @@ class ItemSerializer(serializers.ModelSerializer):
         fields = [
             "url",
             "colors_url",
+            "sovereign_colors_url",
             "game_id",
             "name",
             "string_id",
