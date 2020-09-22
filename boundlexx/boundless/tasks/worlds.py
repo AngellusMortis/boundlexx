@@ -191,13 +191,20 @@ def poll_worlds(world_ids=None):
     _poll_worlds(worlds)
 
 
+@app.task
+def poll_worlds_split(world_ids):
+    worlds = World.objects.filter(id__in=world_ids)
+
+    _poll_worlds(worlds)
+
+
 def _split_polls(worlds):
     worlds = list(worlds)
 
     num_runs = len(worlds) // MAX_WORLDS_PER_POLL + 1
     logger.info("Spliting polling into %s runs", num_runs)
     while len(worlds) > MAX_WORLDS_PER_POLL:
-        poll_worlds.delay([w.id for w in worlds[:MAX_WORLDS_PER_POLL]])
+        poll_worlds_split.delay([w.id for w in worlds[:MAX_WORLDS_PER_POLL]])
         worlds = worlds[MAX_WORLDS_PER_POLL:]
 
 

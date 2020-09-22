@@ -473,13 +473,11 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
         )
 
         if send_update:
+            # no sovereign/creative worlds
+            # Block Colors change over time
             if world.is_exo:
                 ExoworldNotification.objects.send_notification(world)
-            elif world.is_creative:
-                CreativeWorldNotification.objects.send_notification(world)
-            elif world.is_sovereign:
-                SovereignWorldNotification.objects.send_notification(world)
-            else:
+            elif world.is_perm:
                 HomeworldNotification.objects.send_notification(world)
 
             world.notification_sent = True
