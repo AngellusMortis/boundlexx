@@ -184,6 +184,13 @@ def poll_creative_worlds():
 @app.task
 def poll_worlds(world_ids=None):
     if world_ids is None:
+        # make sure perm worlds are always active
+        World.objects.filter(
+            owner__isnull=True,
+            end__isnull=True,
+            assignment__isnull=True,
+            address__isnull=False,
+        ).update(active=True)
         worlds = World.objects.filter(active=True)
     else:
         worlds = World.objects.filter(id__in=world_ids)
