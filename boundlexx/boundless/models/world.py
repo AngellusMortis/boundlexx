@@ -811,7 +811,9 @@ class WorldBlockColorManager(models.Manager):
     def create_colors_from_wc(self, world, color_data, logger=None):
         block_colors_created = 0
 
-        blocks = self._get_blocks_by_id(color_data.keys())
+        block_ids = list(color_data.keys())
+        self._log(logger, "Block IDs: %s", block_ids)
+        blocks = self._get_blocks_by_id(block_ids)
         colors = self._get_colors()
 
         self._log(logger, "Number of blocks: %s", len(blocks))
