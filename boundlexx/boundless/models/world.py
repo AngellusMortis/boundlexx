@@ -789,12 +789,10 @@ class WorldBlockColorManager(models.Manager):
             ecolors[wbc.color.game_id] = True
             wbcs[wbc.item.game_id] = ecolors
 
-        print(len(wbcs))
         for item, pcolors in possible_colors:
             ecolors = wbcs.get(item.game_id, {})
-            print(item, ecolors)
             for color in pcolors:
-                if ecolors.get(color.game_id, False):
+                if not ecolors.get(color.game_id, False):
                     self.create(
                         world=None,
                         item=item,
