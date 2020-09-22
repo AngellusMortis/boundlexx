@@ -78,6 +78,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "id",
             "name",
             "display_name",
+            "address",
             "image_url",
             "forum_url",
             "assignment",
