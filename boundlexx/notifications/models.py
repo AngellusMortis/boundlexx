@@ -495,8 +495,10 @@ class WorldNotification(NotificationBase):
         if world.is_creative:
             colors = None
         else:
-            colors = world.worldblockcolor_set.filter(active=True).order_by(
-                "item__game_id"
+            colors = (
+                world.worldblockcolor_set.filter(active=True)
+                .order_by("item__game_id", "-time")
+                .distinct("item__game_id")
             )
             if colors.count() == 0:
                 colors = None
