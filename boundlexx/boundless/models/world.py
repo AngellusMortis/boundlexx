@@ -823,7 +823,9 @@ class WorldBlockColorManager(models.Manager):
 
             if len(new_color_ids) > 0:
                 SovereignColorNotification.objects.send_notification(
-                    item, pcolors, list(new_color_ids)
+                    item,
+                    Color.objects.filter(game_id__in=list(new_color_ids)),
+                    list(new_color_ids),
                 )
 
         return block_colors_created
