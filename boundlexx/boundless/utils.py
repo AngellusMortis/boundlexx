@@ -112,6 +112,9 @@ def strip_formatting(string):
         format_string = match.group(0)
         inner = match.group(1)
 
+        if len(inner) == 0:
+            continue
+
         # strip all colors
         if inner[0] == "#":
             final_string = final_string.replace(format_string, "", 1)
