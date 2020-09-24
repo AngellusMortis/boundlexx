@@ -19,12 +19,12 @@ billiard==3.6.3.0         # via celery
 cachetools==4.1.1         # via google-auth, steam
 celery==4.4.7             # via -r /app/requirements/in/base.in, django-celery-beat, django-celery-results, flower
 certifi==2020.6.20        # via msrest, requests
-cffi==1.14.2              # via argon2-cffi, cryptography
+cffi==1.14.3              # via argon2-cffi, cryptography
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r /app/requirements/in/base.in, django-click
 colorama==0.4.3           # via -r /app/requirements/in/base.in
 coloredlogs==14.0         # via -r /app/requirements/in/base.in
-cryptography==3.1         # via adal, azure-storage-common
+cryptography==3.1.1       # via adal, azure-storage-common
 dateparser==0.7.6         # via -r /app/requirements/in/base.in
 django-admin-tools==0.9.0  # via -r /app/requirements/in/base.in
 django-celery-beat==2.0.0  # via -r /app/requirements/in/base.in
@@ -42,23 +42,25 @@ django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lo
 django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-storages[azure]==1.10.1  # via -r /app/requirements/in/base.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.10            # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-timezone-field, djangorestframework
-djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, drf-extensions
+django==3.0.10            # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-timezone-field, djangorestframework, djangorestframework-msgpack
+git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e  # via -r /app/requirements/in/base.in
+djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, djangorestframework-msgpack, drf-extensions
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 filetype==1.0.7           # via -r /app/requirements/in/base.in
 flower==0.9.5             # via -r /app/requirements/in/base.in
 future==0.18.2            # via django-json-widget
 gevent-eventemitter==2.1  # via steam
-gevent==20.6.2            # via gevent-eventemitter, steam
+gevent==20.9.0            # via gevent-eventemitter, steam
 google-auth-oauthlib==0.4.1  # via gspread
-google-auth==1.21.2       # via google-auth-oauthlib, gspread
-greenlet==0.4.16          # via gevent
+google-auth==1.21.3       # via google-auth-oauthlib, gspread
+greenlet==0.4.17          # via gevent
 gspread==3.6.0            # via -r /app/requirements/in/base.in
 humanfriendly==8.2        # via coloredlogs
 humanize==2.6.0           # via flower
 idna==2.10                # via requests
 isodate==0.6.0            # via msrest
 kombu==4.6.11             # via celery
+msgpack-python==0.5.6     # via djangorestframework-msgpack
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
 msrest==0.6.19            # via azure-mgmt-cdn, msrestazure
 msrestazure==0.6.4        # via azure-mgmt-cdn
@@ -73,7 +75,7 @@ pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
 pyjwt==1.7.1              # via adal
 python-crontab==2.5.1     # via django-celery-beat
-python-dateutil==2.8.1    # via adal, azure-storage-common, dateparser, python-crontab
+python-dateutil==2.8.1    # via adal, azure-storage-common, dateparser, djangorestframework-msgpack, python-crontab
 python-redis-lock[django]==3.6.0  # via -r /app/requirements/in/base.in
 python-slugify==4.0.1     # via -r /app/requirements/in/base.in
 pytz==2020.1              # via celery, dateparser, django, django-timezone-field, flower, tzlocal

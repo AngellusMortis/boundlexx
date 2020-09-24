@@ -425,3 +425,10 @@ class Emoji(models.Model):
 class EmojiAltName(models.Model):
     emoji = models.ForeignKey(Emoji, on_delete=models.CASCADE)
     name = models.CharField(max_length=32, db_index=True)
+
+
+class ForumImage(models.Model):
+    game_obj = models.OneToOneField(GameObj, on_delete=models.CASCADE)
+    url = models.TextField()
+    checksum = models.CharField(max_length=64)
+    shortcut_url = models.CharField(max_length=64)

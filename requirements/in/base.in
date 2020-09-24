@@ -17,6 +17,7 @@ django-rest-fuzzysearch
 django-storages[azure]
 django<3.1
 djangorestframework
+git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e
 drf-extensions
 python-redis-lock[django]
 

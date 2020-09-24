@@ -15,6 +15,7 @@ from boundlexx.api.serializers.base import (
     SovereignColorsLinkField,
 )
 from boundlexx.boundless.models import (
+    Block,
     Color,
     Emoji,
     Item,
@@ -333,4 +334,23 @@ class EmojiSerializer(serializers.ModelSerializer):
             "url",
             "names",
             "image_url",
+        ]
+
+
+class BlockSerialzier(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="block-detail",
+        lookup_field="game_id",
+        read_only=True,
+    )
+
+    item = SimpleItemSerializer(source="block_item")
+
+    class Meta:
+        model = Block
+        fields = [
+            "url",
+            "game_id",
+            "name",
+            "item",
         ]

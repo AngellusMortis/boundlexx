@@ -1,15 +1,18 @@
 from collections import namedtuple
 from typing import List
 
-from django.db.models import Q
+from django.db.models import Prefetch, Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from rest_framework_extensions.mixins import NestedViewSetMixin
+from rest_framework_msgpack.renderers import MessagePackRenderer
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.examples import world as examples
@@ -19,6 +22,7 @@ from boundlexx.api.serializers import (
     SimpleWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
     WorldDistanceSerializer,
+    WorldDumpSerializer,
     WorldPollLeaderboardSerializer,
     WorldPollResourcesSerializer,
     WorldPollSerializer,
@@ -32,6 +36,7 @@ from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemShopStandPrice,
     World,
+    WorldBlockColor,
     WorldDistance,
     WorldPoll,
 )
@@ -196,11 +201,55 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         }
     }
 
-    request_baskets.example = {
-        "request_baskets": {
-            "value": get_list_example(examples.WORLD_REQUEST_BASKETS_EXAMPLE)
-        }
-    }
+    @method_decorator(cache_page(3600))
+    @action(
+        detail=False,
+        methods=["get"],
+        serializer_class=WorldDumpSerializer,
+        url_path="dump",
+        renderer_classes=[MessagePackRenderer],
+    )
+    def dump(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Returns all details about a world in a single request. Cached for 60
+        minutes. Only supports `msgpack` format and not support `json` or `api.
+        """
+
+        queryset = World.objects.all().prefetch_related(
+            Prefetch(
+                "worldblockcolor_set",
+                queryset=WorldBlockColor.objects.filter(active=True)
+                .order_by("world_id", "item__game_id", "-time")
+                .distinct("world_id", "item__game_id"),
+                to_attr="active_colors",
+            ),
+            Prefetch(
+                "worldpoll_set",
+                queryset=WorldPoll.objects.filter(active=True)
+                .order_by("world_id", "-time")
+                .distinct("world_id"),
+                to_attr="latest_poll",
+            ),
+            "latest_poll__resourcecount_set",
+            "latest_poll__leaderboardrecord_set",
+            "latest_poll__resourcecount_set__item",
+            "latest_poll__resourcecount_set__world_poll",
+            "active_colors__color",
+            "active_colors__item",
+            "active_colors__world",
+            "active_colors__first_world",
+            "active_colors__last_exo",
+            "active_colors__transform_first_world",
+            "active_colors__transform_last_exo",
+        )
+        serializer = self.get_serializer(queryset, many=True)
+
+        response = Response(serializer.data)
+        return response
 
 
 class WorldPollViewSet(

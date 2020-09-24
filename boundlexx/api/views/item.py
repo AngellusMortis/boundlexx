@@ -13,6 +13,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
+    BlockSerialzier,
     ItemColorSerializer,
     ItemResourceCountSerializer,
     ItemResourceCountTimeSeriesSerializer,
@@ -32,6 +33,7 @@ from boundlexx.api.views.filters import (
 )
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
 from boundlexx.boundless.models import (
+    Block,
     Item,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
@@ -517,3 +519,38 @@ class ItemColorsViewSet(
 
     retrieve.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
     retrieve.operation_id = "item-colors-color"  # type: ignore # noqa E501
+
+
+class BlockViewSet(
+    DescriptiveAutoSchemaMixin,
+    viewsets.ReadOnlyModelViewSet,
+):
+    queryset = (
+        Block.objects.filter(block_item__isnull=False)
+        .select_related("block_item")
+        .order_by("game_id")
+    )
+    serializer_class = BlockSerialzier
+    lookup_field = "game_id"
+
+    def list(self, request, *args, **kwargs):  # noqa A003
+        """
+        Retrieves the list of blocks with their item mapping
+        """
+
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
+
+    # list.example = {"list": {"value": get_list_example(ITEM_EXAMPLE)}}  # type: ignore # noqa E501
+
+    def retrieve(
+        self,
+        request,
+        *args,
+        **kwargs,
+    ):  # pylint: disable=arguments-differ
+        """
+        Retrieves a block with its item mapping
+        """
+        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
+
+    # retrieve.example = {"retrieve": {"value": ITEM_EXAMPLE}}  # type: ignore # noqa E501

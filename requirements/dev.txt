@@ -27,13 +27,13 @@ black==20.8b1             # via -r /app/requirements/in/dev.in
 cachetools==4.1.1         # via google-auth, steam
 celery==4.4.7             # via -r /app/requirements/in/base.in, django-celery-beat, django-celery-results, flower
 certifi==2020.6.20        # via msrest, requests
-cffi==1.14.2              # via argon2-cffi, cryptography
+cffi==1.14.3              # via argon2-cffi, cryptography
 chardet==3.0.4            # via requests
 click==7.1.2              # via -r /app/requirements/in/base.in, black, django-click, pip-tools
 colorama==0.4.3           # via -r /app/requirements/in/base.in
 coloredlogs==14.0         # via -r /app/requirements/in/base.in
 coverage[toml]==5.3       # via -r /app/requirements/in/dev.in, django-coverage-plugin, pytest-cov
-cryptography==3.1         # via adal, azure-storage-common
+cryptography==3.1.1       # via adal, azure-storage-common
 dateparser==0.7.6         # via -r /app/requirements/in/base.in
 decorator==4.4.2          # via ipython
 django-admin-tools==0.9.0  # via -r /app/requirements/in/base.in
@@ -43,7 +43,7 @@ django-click==2.2.0       # via -r /app/requirements/in/base.in
 django-cors-headers==3.5.0  # via -r /app/requirements/in/base.in
 django-coverage-plugin==1.8.0  # via -r /app/requirements/in/dev.in
 django-crispy-forms==1.9.2  # via -r /app/requirements/in/base.in
-django-debug-toolbar==2.2  # via -r /app/requirements/in/dev.in
+django-debug-toolbar==3.1  # via -r /app/requirements/in/dev.in
 django-environ==0.4.5     # via -r /app/requirements/in/base.in
 django-extensions==3.0.9  # via -r /app/requirements/in/dev.in
 django-filter==2.3.0      # via -r /app/requirements/in/base.in
@@ -56,8 +56,9 @@ django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-storages[azure]==1.10.1  # via -r /app/requirements/in/base.in
 django-stubs==1.5.0       # via -r /app/requirements/in/dev.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.0.10            # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-stubs, django-timezone-field, djangorestframework
-djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, drf-extensions
+django==3.0.10            # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-stubs, django-timezone-field, djangorestframework, djangorestframework-msgpack
+git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e  # via -r /app/requirements/in/base.in
+djangorestframework==3.11.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, djangorestframework-msgpack, drf-extensions
 docutils==0.16            # via sphinx
 drf-extensions==0.6.0     # via -r /app/requirements/in/base.in
 factory-boy==3.0.1        # via -r /app/requirements/in/dev.in
@@ -72,12 +73,12 @@ flake8==3.8.3             # via -r /app/requirements/in/dev.in, flake8-bugbear, 
 flower==0.9.5             # via -r /app/requirements/in/base.in
 future==0.18.2            # via django-json-widget
 gevent-eventemitter==2.1  # via steam
-gevent==20.6.2            # via gevent-eventemitter, steam
+gevent==20.9.0            # via gevent-eventemitter, steam
 gitdb==4.0.5              # via gitpython
 gitpython==3.1.8          # via bandit
 google-auth-oauthlib==0.4.1  # via gspread
-google-auth==1.21.2       # via google-auth-oauthlib, gspread
-greenlet==0.4.16          # via gevent
+google-auth==1.21.3       # via google-auth-oauthlib, gspread
+greenlet==0.4.17          # via gevent
 gspread==3.6.0            # via -r /app/requirements/in/base.in
 humanfriendly==8.2        # via coloredlogs
 humanize==2.6.0           # via flower
@@ -88,7 +89,7 @@ ipdb==0.13.3              # via -r /app/requirements/in/dev.in
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.18.1           # via ipdb
 isodate==0.6.0            # via msrest
-isort==5.5.2              # via flake8-isort, pylint
+isort==5.5.3              # via flake8-isort, pylint
 jedi==0.17.2              # via ipython
 jinja2==2.11.2            # via sphinx
 kombu==4.6.11             # via celery
@@ -96,6 +97,7 @@ lazy-object-proxy==1.4.3  # via astroid
 markupsafe==1.1.1         # via jinja2
 mccabe==0.6.1             # via flake8, pylint
 more-itertools==8.5.0     # via pytest
+msgpack-python==0.5.6     # via djangorestframework-msgpack
 msgpack==1.0.0            # via -r /app/requirements/in/base.in
 msrest==0.6.19            # via azure-mgmt-cdn, msrestazure
 msrestazure==0.6.4        # via azure-mgmt-cdn
@@ -137,7 +139,7 @@ pytest-dotenv==0.5.2      # via -r /app/requirements/in/dev.in
 pytest-sugar==0.9.4       # via -r /app/requirements/in/dev.in
 pytest==6.0.0rc1          # via -r /app/requirements/in/dev.in, pytest-cov, pytest-django, pytest-dotenv, pytest-sugar
 python-crontab==2.5.1     # via django-celery-beat
-python-dateutil==2.8.1    # via adal, azure-storage-common, dateparser, faker, python-crontab
+python-dateutil==2.8.1    # via adal, azure-storage-common, dateparser, djangorestframework-msgpack, faker, python-crontab
 python-dotenv==0.14.0     # via pytest-dotenv
 python-redis-lock[django]==3.6.0  # via -r /app/requirements/in/base.in
 python-slugify==4.0.1     # via -r /app/requirements/in/base.in

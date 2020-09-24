@@ -287,6 +287,7 @@ class SimpleItemSerializer(serializers.ModelSerializer):
         fields = [
             "url",
             "game_id",
+            "name",
             "string_id",
         ]
 
