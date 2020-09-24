@@ -118,6 +118,7 @@ def warm_world_dump():
     if not acquired:
         return
 
+    rescheduled = False
     try:
         domain = Site.objects.get_current().domain
         path = reverse("api:world-dump")
@@ -127,21 +128,27 @@ def warm_world_dump():
         except (requests.HTTPError, ReadTimeout):
             logger.info("Timeout while making request, rescheduling...")
             _reschedule(timezone.now() + timedelta(seconds=60))
+            rescheduled = True
             return
 
         if not r.ok:
             logger.info("Bad response code, rescheduling...")
             _reschedule(timezone.now() + timedelta(seconds=60))
+            rescheduled = True
             return
 
         if "X-Cache" not in r.headers or r.headers["X-Cache"] != "HIT":
             logger.info("Response not cached, rescheduling...")
             _reschedule(timezone.now() + timedelta(seconds=10))
+            rescheduled = True
             return
 
         expires = parsedate_to_datetime(r.headers["Expires"])
 
         logger.info("Request cached! Rescheduling for %s", expires)
         _reschedule(expires + timedelta(seconds=5))
+        rescheduled = True
     finally:
+        if not rescheduled:
+            _reschedule(timezone.now() + timedelta(seconds=60))
         lock.release()
