@@ -411,7 +411,7 @@ class EmojiManager(models.Manager):
         return (
             self.filter(active=True)
             .filter(models.Q(name=name) | models.Q(emojialtname__name=name))
-            .get()
+            .first()
         )
 
 
