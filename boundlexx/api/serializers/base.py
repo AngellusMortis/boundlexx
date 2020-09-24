@@ -242,7 +242,13 @@ class SimpleWorldSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = World
-        fields = ["url", "id", "display_name"]
+        fields = [
+            "url",
+            "id",
+            "display_name",
+            "text_name",
+            "html_name",
+        ]
 
 
 class SimpleSkillGroupSerializer(serializers.ModelSerializer):

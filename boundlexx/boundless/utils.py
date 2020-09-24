@@ -1,9 +1,12 @@
+import re
 import struct
 from datetime import timedelta
 
 from django.core.cache import cache
+from django.utils.safestring import mark_safe
 
 ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
+FORMATTING_REGEX = r":([^:]*):"
 
 
 def convert_linear_to_s(linear):
@@ -101,3 +104,113 @@ def get_block_color_item_ids():
         cache.set(ITEM_COLOR_IDS_KEYS, item_ids, timeout=86400)
 
     return item_ids
+
+
+def strip_formatting(string):
+    final_string = string[:]
+    for match in re.finditer(FORMATTING_REGEX, string):
+        format_string = match.group(0)
+        inner = match.group(1)
+
+        # strip all colors
+        if inner[0] == "#":
+            final_string = final_string.replace(format_string, "", 1)
+        # replace emoji with their emoji name
+        else:
+            final_string = final_string.replace(format_string, inner, 1)
+
+    return final_string
+
+
+def replace_color(string, format_string, inner, colors):
+    color_name = inner[1:].replace(" ", "").replace("_", "").lower()
+    the_color = None
+    hex_color = None
+    the_color_name = None
+
+    for color in colors:
+        for localized in color.localizedname_set.all():
+            compare_name = localized.name.replace(" ", "").replace("_", "").lower()
+
+            if color_name == compare_name:
+                the_color = color
+                break
+
+        if the_color is not None:
+            break
+
+    if the_color is not None:
+        hex_color = the_color.base_color
+        the_color_name = (
+            the_color.default_name.replace(" ", "").replace("_", "").lower()
+        )
+    else:
+        try:
+            int(color_name, 16)
+        except ValueError:
+            pass
+        else:
+            hex_color = inner
+
+    if hex_color is not None:
+        span_tag = f'<span style="color:{hex_color}" color="color">'
+        if the_color_name is not None:
+            span_tag = span_tag.replace('">', f' {the_color_name}">')
+
+        string = string.replace(format_string, span_tag, 1) + "</span>"
+    else:
+        string = string.replace(format_string, "", 1)
+
+    return string
+
+
+def html_name(string, colors=None):
+    from boundlexx.boundless.models.game import (  # pylint: disable=cyclic-import
+        Color,
+        Emoji,
+    )
+
+    if colors is None:
+        colors = list(
+            Color.objects.all().prefetch_related("localizedname_set", "colorvalue_set")
+        )
+    final_string = string[:]
+
+    for match in re.finditer(FORMATTING_REGEX, string):
+        format_string = match.group(0)
+        inner = match.group(1)
+
+        # strip all colors
+        if inner[0] == "#":
+            final_string = replace_color(final_string, format_string, inner, colors)
+        # replace emoji with resolved emoji
+        else:
+            try:
+                emoji = Emoji.objects.get_by_name(inner.lower())
+            except Emoji.DoesNotExist:
+                pass
+            else:
+                html_emoji = f'<img src="{emoji.image.url}" class="emoji">'
+                final_string = final_string.replace(format_string, html_emoji, 1)
+
+    return mark_safe(final_string)  # nosec
+
+
+def calculate_extra_names(world, new_name, colors=None):
+    if world.display_name != new_name:
+        world.text_name = None
+        world.sort_name = None
+        world.html_name = None
+
+    if world.text_name is None:
+        world.text_name = strip_formatting(world.display_name)
+
+    if world.sort_name is None:
+        world.sort_name = world.text_name.lower()
+
+    if world.html_name is None:
+        world.html_name = html_name(world.display_name, colors=colors)
+
+    world.display_name = new_name
+
+    return world

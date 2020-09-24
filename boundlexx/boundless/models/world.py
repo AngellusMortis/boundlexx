@@ -15,7 +15,11 @@ from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
-from boundlexx.boundless.utils import convert_linear_rgb_to_hex, get_next_rank_update
+from boundlexx.boundless.utils import (
+    calculate_extra_names,
+    convert_linear_rgb_to_hex,
+    get_next_rank_update,
+)
 from boundlexx.notifications.models import (
     ExoworldNotification,
     SovereignColorNotification,
@@ -85,7 +89,7 @@ class WorldManager(models.Manager):
             "creative", False
         )
 
-        world.display_name = world_dict["displayName"]
+        world = calculate_extra_names(world, world_dict["displayName"])
         world.name = world_dict["name"]
         world.region = world_dict["region"]
         world.tier = world_dict["tier"]
@@ -320,7 +324,12 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     image = models.ImageField(blank=True, null=True, storage=select_storage("worlds"))
     notification_sent = models.NullBooleanField()
 
-    _html_name = models.TextField(blank=True, null=True)
+    is_public_edit = models.NullBooleanField()
+    is_public_claim = models.NullBooleanField()
+
+    html_name = models.TextField(blank=True, null=True)
+    text_name = models.TextField(blank=True, null=True)
+    sort_name = models.TextField(blank=True, null=True, db_index=True)
 
     def __str__(self):
         return self.display_name
@@ -561,10 +570,8 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
         return f"{size} ({self.number_of_regions} {regions})"
 
     @property
-    def html_name(self):
-        if self._html_name is None:
-            self._html_name = None
-        return self._html_name
+    def has_perm_data(self):
+        return self.is_public_claim is not None and self.is_public_edit is not None
 
 
 class WorldDistance(

@@ -140,6 +140,13 @@ class WorldControlDataView(views.APIView):
 
                 color_data[int(block_id)] = colors
 
+            # force eval permission data to verify it
+            perms = {
+                "can_visit": bool(request.data["global_perms"]["can_visit"]),
+                "can_edit": bool(request.data["global_perms"]["can_edit"]),
+                "can_claim": bool(request.data["global_perms"]["can_claim"]),
+            }
+
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
             return None
@@ -147,7 +154,7 @@ class WorldControlDataView(views.APIView):
         if world_id is None:
             return None
 
-        return (world_id, color_data)
+        return (world_id, color_data, perms)
 
     def _get_world(self, world_id):
         if world_id is not None:
@@ -171,6 +178,10 @@ class WorldControlDataView(views.APIView):
         world = self._get_world(data[0])
         if world is None:
             return Response(status=425)
+
+        world.is_public = data[2]["can_visit"]
+        world.is_public_edit = data[2]["can_edit"]
+        world.is_public_claim = data[2]["can_claim"]
 
         add_world_control_data.delay(world.id, data[1])
         return Response(

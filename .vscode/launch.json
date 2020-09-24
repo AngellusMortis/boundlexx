@@ -19,6 +19,15 @@
             ],
         },
         {
+            "name": "Boundlexx: Shell",
+            "type": "python",
+            "request": "launch",
+            "module": "manage",
+            "args": [
+                "shell_plus",
+            ]
+        },
+        {
             "name": "Boundlexx: Celery",
             "type": "python",
             "request": "launch",

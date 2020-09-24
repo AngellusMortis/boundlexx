@@ -406,10 +406,21 @@ class Recipe(GameObj):
     levels = models.ManyToManyField(RecipeLevel)
 
 
+class EmojiManager(models.Manager):
+    def get_by_name(self, name):
+        return (
+            self.filter(active=True)
+            .filter(models.Q(name=name) | models.Q(emojialtname__name=name))
+            .get()
+        )
+
+
 class Emoji(models.Model):
     active = models.BooleanField(default=True)
     name = models.CharField(max_length=32, db_index=True)
     image = models.ImageField(storage=select_storage("emoji"))
+
+    objects = EmojiManager()
 
     def __str__(self):
         return f":{self.name}:"
