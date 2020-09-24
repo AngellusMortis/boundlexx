@@ -180,6 +180,9 @@ def html_name(string, colors=None):
         format_string = match.group(0)
         inner = match.group(1)
 
+        if len(inner) == 0:
+            continue
+
         # strip all colors
         if inner[0] == "#":
             final_string = replace_color(final_string, format_string, inner, colors)
