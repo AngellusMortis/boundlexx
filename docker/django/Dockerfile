@@ -8,7 +8,7 @@ ENV PYTEST ""
 ENV DJANGO_MANAGE ""
 
 RUN apt-get update \
-  && apt-get install -y build-essential libpq-dev gettext nodejs npm \
+  && apt-get install -y build-essential libpq-dev gettext nodejs npm git \
   && npm install -g steam-user \
   && pip install pip --upgrade \
   # cleaning up unused files
