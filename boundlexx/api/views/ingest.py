@@ -147,6 +147,8 @@ class WorldControlDataView(views.APIView):
                 "can_claim": bool(request.data["global_perms"]["can_claim"]),
             }
 
+            finalized = bool(request.data["finalized"])
+
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
             return None
@@ -154,7 +156,7 @@ class WorldControlDataView(views.APIView):
         if world_id is None:
             return None
 
-        return (world_id, color_data, perms)
+        return (world_id, color_data, perms, finalized)
 
     def _get_world(self, world_id):
         if world_id is not None:
@@ -182,6 +184,7 @@ class WorldControlDataView(views.APIView):
         world.is_public = data[2]["can_visit"]
         world.is_public_edit = data[2]["can_edit"]
         world.is_public_claim = data[2]["can_claim"]
+        world.is_finalized = data[3]
 
         add_world_control_data.delay(world.id, data[1])
         return Response(

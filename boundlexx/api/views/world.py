@@ -10,7 +10,6 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.reverse import reverse
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_msgpack.renderers import MessagePackRenderer
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
@@ -18,6 +17,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import (
+    KindOfSimpleWorldSerializer,
     SimpleWorldRequestBasketPriceSerializer,
     SimpleWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
@@ -96,6 +96,15 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": examples.WORLD_EXAMPLE}}  # type: ignore # noqa E501
+
+    @action(
+        detail=False,
+        methods=["get"],
+        serializer_class=KindOfSimpleWorldSerializer,
+        url_path="simple",
+    )
+    def simple(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
 
     @action(
         detail=True,
@@ -343,21 +352,9 @@ class WorldPollViewSet(
             world_poll, context={"request": request}
         )
 
-        return Response(
-            {
-                "world_poll_id": id,
-                "world_poll_url": reverse(
-                    "world-poll-detail",
-                    kwargs={"world_id": world_id, "id": id},
-                    request=request,
-                ),
-                "resources": serializer.data,
-            }
-        )
+        return Response(serializer.data)
 
-    resources.example = {
-        "leaderboard": {"value": examples.WORLD_POLL_RESOURCES_EXAMPLE}
-    }
+    resources.example = {"resources": {"value": examples.WORLD_POLL_RESOURCES_EXAMPLE}}
 
 
 class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):

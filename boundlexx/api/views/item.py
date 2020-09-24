@@ -398,8 +398,12 @@ class ItemResourceCountViewSet(
         "world_poll__world__display_name",
         "world_poll__world__name",
     ]
-    ordering = ["-rank", "world_poll__world_id"]
-    ordering_fields: List[str] = []
+    ordering = ["-rank", "world_poll__world_id", "-count"]
+    ordering_fields: List[str] = [
+        "count",
+        "average_per_chunk",
+        "percentage",
+    ]
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

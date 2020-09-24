@@ -99,6 +99,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "is_public",
             "is_public_edit",
             "is_public_claim",
+            "is_finalized",
             "number_of_regions",
             "start",
             "end",
@@ -478,3 +479,23 @@ class WorldPollTBSerializer(NullSerializer):
     total_prestige_variance = serializers.FloatField(
         source="worldpollresult__total_prestige_variance",
     )
+
+
+class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="world-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+
+    class Meta:
+        model = World
+        fields = [
+            "url",
+            "id",
+            "display_name",
+            "text_name",
+            "html_name",
+            "tier",
+            "world_type",
+        ]

@@ -20,8 +20,10 @@ from boundlexx.api.views.world import (
 
 __all__ = [
     "BlockColorViewSet",
+    "BlockViewSet",
     "ColorViewSet",
     "EmojiViewSet",
+    "ForumFormatView",
     "GameFileViewSet",
     "ItemColorsViewSet",
     "ItemResourceCountViewSet",
@@ -30,11 +32,9 @@ __all__ = [
     "ItemViewSet",
     "SkillGroupViewSet",
     "SkillViewSet",
+    "WorldControlDataView",
     "WorldDistanceViewSet",
     "WorldPollViewSet",
     "WorldViewSet",
     "WorldWSDataView",
-    "WorldControlDataView",
-    "ForumFormatView",
-    "BlockViewSet",
 ]

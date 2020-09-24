@@ -326,6 +326,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
 
     is_public_edit = models.NullBooleanField()
     is_public_claim = models.NullBooleanField()
+    is_finalized = models.NullBooleanField()
 
     html_name = models.TextField(blank=True, null=True)
     text_name = models.TextField(blank=True, null=True)
