@@ -111,27 +111,37 @@ def _reschedule(run_time):
 
 @app.task
 def warm_world_dump():
-    domain = Site.objects.get_current().domain
-    path = reverse("api:world-dump")
+    lock = cache.lock("boundlexx:api:warm_world_dump")
+
+    acquired = lock.acquire(blocking=True, timeout=1)
+
+    if not acquired:
+        return
 
     try:
-        r = requests.get(f"https://{domain}{path}", timeout=10)
-    except (requests.HTTPError, ReadTimeout):
-        logger.info("Timeout while making request, rescheduling...")
-        _reschedule(timezone.now() + timedelta(seconds=60))
-        return
+        domain = Site.objects.get_current().domain
+        path = reverse("api:world-dump")
 
-    if not r.ok:
-        logger.info("Bad response code, rescheduling...")
-        _reschedule(timezone.now() + timedelta(seconds=60))
-        return
+        try:
+            r = requests.get(f"https://{domain}{path}", timeout=10)
+        except (requests.HTTPError, ReadTimeout):
+            logger.info("Timeout while making request, rescheduling...")
+            _reschedule(timezone.now() + timedelta(seconds=60))
+            return
 
-    if "X-Cache" not in r.headers or r.headers["X-Cache"] != "HIT":
-        logger.info("Response not cached, rescheduling...")
-        _reschedule(timezone.now() + timedelta(seconds=10))
-        return
+        if not r.ok:
+            logger.info("Bad response code, rescheduling...")
+            _reschedule(timezone.now() + timedelta(seconds=60))
+            return
 
-    expires = parsedate_to_datetime(r.headers["Expires"])
+        if "X-Cache" not in r.headers or r.headers["X-Cache"] != "HIT":
+            logger.info("Response not cached, rescheduling...")
+            _reschedule(timezone.now() + timedelta(seconds=10))
+            return
 
-    logger.info("Request cached! Rescheduling for %s", expires)
-    _reschedule(expires + timedelta(seconds=5))
+        expires = parsedate_to_datetime(r.headers["Expires"])
+
+        logger.info("Request cached! Rescheduling for %s", expires)
+        _reschedule(expires + timedelta(seconds=5))
+    finally:
+        lock.release()
