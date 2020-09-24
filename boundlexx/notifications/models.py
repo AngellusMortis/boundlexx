@@ -821,7 +821,9 @@ class FailedTaskNotification(NotificationBase):
     objects = PolymorphicNotificationManager()
 
     def markdown(self, task):  # pylint: disable=arguments-differ
-        output = task.traceback.split("\n")
+        output = ""
+        if task.traceback is not None:
+            output = task.traceback.split("\n")
 
         messages = []
         message: List[str] = []
