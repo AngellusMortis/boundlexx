@@ -145,6 +145,12 @@ def warm_world_dump():
 
         expires = parsedate_to_datetime(r.headers["Expires"])
 
+        if expires < timezone.now():
+            logger.info("Expiration date in the past! Rescheduling...")
+            _reschedule(timezone.now() + timedelta(minutes=5))
+            rescheduled = True
+            return
+
         logger.info("Request cached! Rescheduling for %s", expires)
         _reschedule(expires + timedelta(seconds=5))
         rescheduled = True
