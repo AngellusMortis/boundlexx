@@ -124,7 +124,7 @@ def color_from_hex_string(hex_string, colors=None):
             color_hex = f"#{hex_string[:3]}"
         elif len(hex_string) == 5:
             color_hex = f"#0{hex_string}"
-        elif len(hex_string) > 6:
+        elif len(hex_string) >= 6:
             color_hex = f"#{hex_string[:6]}"
 
     return color_hex, the_color
