@@ -20,6 +20,11 @@ class ForumFormatForm(forms.Form):
         ),
         label="World ID",
     )
+    will_renew = forms.NullBooleanField(
+        required=True,
+        help_text="Do you plan to renew this world?",
+        label="Will Renew?",
+    )
     can_visit = forms.BooleanField(
         required=False,
         help_text="Can Everyone warp/use portals to your world?",
