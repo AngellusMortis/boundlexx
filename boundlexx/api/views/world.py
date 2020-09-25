@@ -69,7 +69,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     ]
     filterset_class = WorldFilterSet
     ordering = ["-rank", "id"]
-    ordering_fields: List[str] = ["sort_name"]
+    ordering_fields: List[str] = ["sort_name", "start", "end"]
     search_fields = [
         "name",
         "display_name",
