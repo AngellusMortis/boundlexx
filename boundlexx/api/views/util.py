@@ -21,6 +21,7 @@ class ForumFormatView(FormView):
             },
             "directions": form.cleaned_data["portal_directions"],
             "username": form.cleaned_data["username"],
+            "will_renew": form.cleaned_data["will_renew"],
         }
 
         if world.worldpoll_set.count() > 0:

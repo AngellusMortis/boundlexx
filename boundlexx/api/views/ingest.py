@@ -115,30 +115,16 @@ class WorldWSDataView(views.APIView):
         )
 
 
-class WorldControlDataView(views.APIView):
+class WorldControlSimpleDataView(views.APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    throttle_classes = [UserRateThrottle]
 
     def _get_data(self, request):
         world_id = None
-        color_data = {}
 
         try:
             if "world_id" in request.data:
                 world_id = int(request.data["world_id"])
-
-            # walk data just to make sure it is valid
-            for block_id, colors in request.data["colors"].items():
-
-                if not isinstance(colors["default"], int):
-                    raise TypeError
-
-                for color in colors["possible"]:
-                    if not isinstance(color, int):
-                        raise TypeError
-
-                color_data[int(block_id)] = colors
 
             # force eval permission data to verify it
             perms = {
@@ -156,7 +142,7 @@ class WorldControlDataView(views.APIView):
         if world_id is None:
             return None
 
-        return (world_id, color_data, perms, finalized)
+        return (world_id, perms, finalized)
 
     def _get_world(self, world_id):
         if world_id is not None:
@@ -170,23 +156,58 @@ class WorldControlDataView(views.APIView):
 
         return world
 
-    def post(self, request, *args, **kwargs):
+    def process_data(self, request):
         data = self._get_data(request)
 
         if data is None:
             logger.warning("Bad ingest data:\n%s", request.data)
-            return Response(status=400)
+            return Response(status=400), None
 
         world = self._get_world(data[0])
         if world is None:
-            return Response(status=425)
+            return Response(status=425), None
 
-        world.is_public = data[2]["can_visit"]
-        world.is_public_edit = data[2]["can_edit"]
-        world.is_public_claim = data[2]["can_claim"]
-        world.is_finalized = data[3]
+        world.is_public = data[1]["can_visit"]
+        world.is_public_edit = data[1]["can_edit"]
+        world.is_public_claim = data[1]["can_claim"]
+        world.is_finalized = data[2]
+        world.save()
 
-        add_world_control_data.delay(world.id, data[1])
-        return Response(
-            status=200,
-        )
+        return None, world
+
+    def post(self, request, *args, **kwargs):
+        response, _ = self.process_data(request)
+
+        if response is None:
+            response = Response(status=200)
+        return response
+
+
+class WorldControlDataView(WorldControlSimpleDataView):
+    throttle_classes = [UserRateThrottle]
+
+    def post(self, request, *args, **kwargs):
+        response, world = self.process_data(request)
+
+        if response is not None:
+            return response
+
+        color_data = {}
+        try:
+            # walk data just to make sure it is valid
+            for block_id, colors in request.data["colors"].items():
+
+                if not isinstance(colors["default"], int):
+                    raise TypeError
+
+                for color in colors["possible"]:
+                    if not isinstance(color, int):
+                        raise TypeError
+
+                color_data[int(block_id)] = colors
+        except Exception:  # pylint: disable=broad-except
+            logger.warning("Bad ingest data:\n%s", request.data)
+            return Response(status=400)
+
+        add_world_control_data.delay(world.id, color_data)
+        return Response(status=200)

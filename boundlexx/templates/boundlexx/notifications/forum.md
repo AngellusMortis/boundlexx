@@ -1,7 +1,7 @@
 {% load humanize tz utils %}{% if world.image %}![|300x300]({{ world.image.url }}){% else %}![{{ world.display_name }}|300x300]({{ icons.world_image }}){% endif %}{% if world.is_sovereign %}
 **-------------------[Sovereign Details]-------------------**
 ![|30x30]({{ icons.owner }}) Owner : **{% if username %}@{{ username }}{% else %}ADD YOUR NAME HERE{% endif %}**
-![|30x30]({{ icons.permissions }}) Permissions : **{% if world.has_perm_data %}{% if world.is_public %}Can{% else %}No{% endif %} Visit | {% if world.is_public_edit %}Can{% else %}No{% endif %} Edit | {% if world.is_public_claim %}Can{% else %}No{% endif %} Claim{% else %}{% if perms %}{% if perms.can_visit %}Can{% else %}No{% endif %} Visit | {% if perms.can_edit %}Can{% else %}No{% endif %} Edit | {% if perms.can_claim %}Can{% else %}No{% endif %} Claim{% else %}Can|No Visit - Can|No Edit - Can|No Claim{% endif %}{% endif %}**{% endif %}
+![|30x30]({{ icons.permissions }}) Permissions : **{% if world.has_perm_data %}{% if world.is_public %}:white_check_mark:{% else %}:x:{% endif %} Visit | {% if world.is_public_edit %}:white_check_mark:{% else %}:x:{% endif %} Edit | {% if world.is_public_claim %}:white_check_mark:{% else %}:x:{% endif %} Claim{% else %}{% if perms %}{% if perms.can_visit %}:white_check_mark:{% else %}:x:{% endif %} Visit | {% if perms.can_edit %}:white_check_mark:{% else %}:x:{% endif %} Edit | {% if perms.can_claim %}:white_check_mark:{% else %}:x:{% endif %} Claim{% else %}:white_check_mark:|:x: Visit - :white_check_mark:|:x: Edit - :white_check_mark:|:x: Claim{% endif %}{% endif %}**{% endif %}
 **--------------------[🌍 World Details]--------------------**
 ![|30x30]({{ icons.name }}) ID : **{{ world.id }}**
 ![|30x30]({{ icons.name }}) Name : **{{ world.display_name }}**
@@ -16,8 +16,10 @@
 ![|30x30]({{ icons.warpcost }}) Warp Cost : **{{ world.assignment_cost }}c**{% endif %}{% if world.is_sovereign %}
 ![|30x30]({{ icons.portal }}) Portals : **{% if directions %}{{ directions }}{% else %}ADD PORTALS HERE{% endif %}**{% endif %}{% endif %}{% if world.start %}
 **---------------------[⏱ Time Details]---------------------**
-![|30x30]({{ icons.lifetime }}) Appeared **[date={{ world.start|utc|date:"Y-m-d" }} time={{ world.start|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% if world.end %}{% if not perms or not will_renew %}
-![|30x30]({{ icons.lifetime }}) Last until **[date={{ world.end|utc|date:"Y-m-d" }} time={{ world.end|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% endif %}{% endif %}{% endif %}
+![|30x30]({{ icons.lifetime }}) Appeared **[date={{ world.start|utc|date:"Y-m-d" }} time={{ world.start|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% if world.end %}
+![|30x30]({{ icons.lifetime }}) Last until **[date={{ world.end|utc|date:"Y-m-d" }} time={{ world.end|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% endif %}{% if will_renew != None %}{% if will_renew %}
+![|30x30]({{ icons.lifetime }}) Will Renew : :white_check_mark:{% else %}
+![|30x30]({{ icons.lifetime }}) Will Renew : :x:{% endif %}{% endif %}{% endif %}
 **-------------------------------------------------------------------**{% if color_groups %}
 [details="Blocks Colors"]
 **-------------------------------------------------------------------**{% if not world.is_perm %}

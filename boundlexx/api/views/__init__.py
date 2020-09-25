@@ -1,7 +1,11 @@
 from boundlexx.api.views.color import BlockColorViewSet, ColorViewSet
 from boundlexx.api.views.emoji import EmojiViewSet
 from boundlexx.api.views.gamefile import GameFileViewSet
-from boundlexx.api.views.ingest import WorldControlDataView, WorldWSDataView
+from boundlexx.api.views.ingest import (
+    WorldControlDataView,
+    WorldControlSimpleDataView,
+    WorldWSDataView,
+)
 from boundlexx.api.views.item import (
     BlockViewSet,
     ItemColorsViewSet,
@@ -33,6 +37,7 @@ __all__ = [
     "SkillGroupViewSet",
     "SkillViewSet",
     "WorldControlDataView",
+    "WorldControlSimpleDataView",
     "WorldDistanceViewSet",
     "WorldPollViewSet",
     "WorldViewSet",
