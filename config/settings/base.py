@@ -116,6 +116,7 @@ THIRD_PARTY_APPS = [
     "django_json_widget",
     "corsheaders",
     "crispy_forms",
+    "robots",
 ]
 
 LOCAL_APPS = [
@@ -392,6 +393,7 @@ SERVE_STATIC_FILES_DEV = env.bool("SERVE_STATIC_FILES_DEV", False)
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_SSL", "on")
 
 CACHE_DURATION = 60 * 60 * 24
+ROBOTS_USE_SITEMAP = False
 
 
 # base URL for discovery server
