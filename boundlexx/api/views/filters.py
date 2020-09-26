@@ -1,10 +1,25 @@
 from django.conf import settings
+from django.core.exceptions import SuspiciousOperation
 from django.db.models import F, Func, Value
 from django.utils.translation import ugettext as _
 from django_filters.rest_framework import FilterSet, filters
 
 from boundlexx.boundless.models import Item, ResourceCount, World, WorldBlockColor
 from boundlexx.boundless.utils import get_block_color_item_ids
+
+DEFAULT_FILTERS = ["limit", "offset", "ordering", "search"]
+
+
+class BaseFilterSet(FilterSet):
+    def filter_queryset(self, queryset):
+        allowed_filters = set(DEFAULT_FILTERS + list(self.form.cleaned_data.keys()))
+        actual_filters = set(self.request.query_params.keys())
+
+        disallowed = actual_filters - allowed_filters
+        if len(disallowed) > 0:
+            raise SuspiciousOperation("Invalid Filter")
+
+        return super().filter_queryset(queryset)
 
 
 class LangFilter(filters.ChoiceFilter):
@@ -21,7 +36,7 @@ class LangFilter(filters.ChoiceFilter):
         return qs
 
 
-class LocalizationFilterSet(FilterSet):
+class LocalizationFilterSet(BaseFilterSet):
     lang = LangFilter()
 
 
@@ -63,7 +78,7 @@ class ItemFilterSet(LocalizationFilterSet):
         return queryset
 
 
-class WorldFilterSet(FilterSet):
+class WorldFilterSet(BaseFilterSet):
     is_exo = filters.BooleanFilter(
         label=_("Filter out exo/non exoworlds"), method="filter_exo"
     )
@@ -140,7 +155,7 @@ class WorldFilterSet(FilterSet):
         return queryset
 
 
-class WorldBlockColorFilterSet(FilterSet):
+class WorldBlockColorFilterSet(BaseFilterSet):
     is_exo = filters.BooleanFilter(
         label=_("Filter out exo/non exoworlds"), method="filter_exo"
     )
@@ -200,7 +215,7 @@ class WorldBlockColorFilterSet(FilterSet):
         return queryset
 
 
-class ItemResourceCountFilterSet(FilterSet):
+class ItemResourceCountFilterSet(BaseFilterSet):
     is_exo = filters.BooleanFilter(
         label=_("Filter out exo/non exoworlds"), method="filter_exo"
     )
@@ -272,7 +287,7 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
         return queryset
 
 
-class TimeseriesFilterSet(FilterSet):
+class TimeseriesFilterSet(BaseFilterSet):
     time = filters.IsoDateTimeFromToRangeFilter(
         method="filter_time",
         label=_(
