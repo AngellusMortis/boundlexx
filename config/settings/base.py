@@ -373,7 +373,13 @@ REST_FRAMEWORK = {
         "rest_framework_msgpack.renderers.MessagePackRenderer",
         "rest_framework.renderers.BrowsableAPIRenderer",
     ],
-    "DEFAULT_THROTTLE_RATES": {"user": "1/minute"},
+    "DEFAULT_THROTTLE_RATES": {
+        "user": "1/minute",
+        "anon": "5/second",
+    },
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.AnonRateThrottle",
+    ],
     "DEFAULT_CONTENT_NEGOTIATION_CLASS": "boundlexx.api.negotiation.IgnoreClientContentNegotiation",  # noqa: E501
 }
 
