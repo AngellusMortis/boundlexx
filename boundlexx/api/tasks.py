@@ -40,6 +40,10 @@ def purge_cache(all_paths=False):
     if all_paths:
         paths = PURGE_GROUPS["__all__"]
     else:
+        if not settings.AZURE_CDN_DYNAMIC_PURGE:
+            logger.info("Dynamic purging disabled")
+            return
+
         with cache.lock(PURGE_CACHE_LOCK, expire=10, auto_renewal=False):
             paths = cache.get(PURGE_CACHE_PATHS)
 

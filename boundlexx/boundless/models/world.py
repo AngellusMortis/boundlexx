@@ -790,7 +790,7 @@ class WorldBlockColorManager(models.Manager):
 
         return block_colors
 
-    def _create_unknown_colors(self, possible_colors, new_colors):
+    def _create_unknown_colors(self, possible_colors, default_colors):
         block_colors_created = 0
 
         all_wbcs = (
@@ -824,10 +824,11 @@ class WorldBlockColorManager(models.Manager):
                     )
                     block_colors_created += 1
 
-            if item.game_id in new_colors:
-                new_wbc = new_colors[item.game_id]
-                pcolors.append(new_wbc.color)
-                new_color_ids.add(new_wbc.color.game_id)
+            if item.game_id in default_colors:
+                wbc = default_colors[item.game_id]
+
+                if wbc.is_new:
+                    new_color_ids.add(wbc.color.game_id)
 
             if len(new_color_ids) > 0:
                 new_color_ids_list = list(new_color_ids)

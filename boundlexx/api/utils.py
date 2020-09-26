@@ -64,6 +64,9 @@ def get_base_url(admin=False):
 def queue_purge_paths(new_paths):
     schedule_task = False
 
+    if not settings.AZURE_CDN_DYNAMIC_PURGE:
+        return
+
     with cache.lock(PURGE_CACHE_LOCK, expire=10, auto_renewal=False):
         paths = cache.get(PURGE_CACHE_PATHS)
 
