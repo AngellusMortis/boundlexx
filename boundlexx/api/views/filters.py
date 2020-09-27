@@ -7,7 +7,7 @@ from django_filters.rest_framework import FilterSet, filters
 from boundlexx.boundless.models import Item, ResourceCount, World, WorldBlockColor
 from boundlexx.boundless.utils import get_block_color_item_ids
 
-DEFAULT_FILTERS = ["limit", "offset", "ordering", "search"]
+DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
 
 
 class BaseFilterSet(FilterSet):
