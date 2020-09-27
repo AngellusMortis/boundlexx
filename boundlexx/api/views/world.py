@@ -265,11 +265,15 @@ class WorldPollViewSet(
     TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
 ):
     schema = DescriptiveAutoSchema(tags=["World"])
-    queryset = WorldPoll.objects.all().prefetch_related(
-        "worldpollresult_set",
-        "leaderboardrecord_set",
-        "resourcecount_set",
-        "resourcecount_set__item",
+    queryset = (
+        WorldPoll.objects.all()
+        .select_related("world")
+        .prefetch_related(
+            "worldpollresult_set",
+            "leaderboardrecord_set",
+            "resourcecount_set",
+            "resourcecount_set__item",
+        )
     )
     serializer_class = WorldPollSerializer
     time_bucket_serializer_class = WorldPollTBSerializer

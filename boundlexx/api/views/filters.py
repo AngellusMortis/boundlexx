@@ -12,7 +12,15 @@ DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
 
 class BaseFilterSet(FilterSet):
     def filter_queryset(self, queryset):
-        allowed_filters = set(DEFAULT_FILTERS + list(self.form.cleaned_data.keys()))
+        allowed_filters = set(DEFAULT_FILTERS)
+
+        for key, field in self.form.fields.items():
+            if isinstance(field, filters.IsoDateTimeFromToRangeFilter.field_class):
+                allowed_filters.add(f"{key}_before")
+                allowed_filters.add(f"{key}_after")
+            else:
+                allowed_filters.add(key)
+
         actual_filters = set(self.request.query_params.keys())
 
         disallowed = actual_filters - allowed_filters

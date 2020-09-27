@@ -1119,7 +1119,9 @@ class WorldPoll(ExportModelOperationsMixin("world_poll"), models.Model):  # type
 
     @property
     def result(self):
-        return self.worldpollresult_set.first()
+        for result in self.worldpollresult_set.all():
+            return result
+        return None
 
     @property
     def resources(self):
