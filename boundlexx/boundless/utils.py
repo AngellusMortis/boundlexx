@@ -217,6 +217,7 @@ def calculate_extra_names(world, new_name, colors=None):
         world.text_name = None
         world.sort_name = None
         world.html_name = None
+        world.display_name = new_name
 
     if world.text_name is None:
         world.text_name = html_name(world.display_name, strip=True, colors=colors)
@@ -226,7 +227,5 @@ def calculate_extra_names(world, new_name, colors=None):
 
     if world.html_name is None:
         world.html_name = html_name(world.display_name, colors=colors)
-
-    world.display_name = new_name
 
     return world
