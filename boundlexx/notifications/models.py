@@ -55,6 +55,7 @@ FORUM_LOOKUP_IMAGES = {
     "owner": "upload://8UfHjxV1950IdfuKNcDumg9equG.png",
     "permissions": "upload://zbesXUQO9RZUEP7TNiHA24EVT9w.png",
     "portal": "upload://2GR4nUcRGOaMMDzj452JuqxVMWr.png",
+    "perm_color": "upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png",
     "colors": {
         0: "upload://pLWvEwsdJfVxylVUaST7zDfJnnP.png",
         1: "upload://l3M345enn9ycGBw61qecq1a8DLm.png",
@@ -313,6 +314,58 @@ FORUM_LOOKUP_IMAGES = {
         254: "upload://rakfKVysJH00oCVzgtyRWz4OFrK.png",
         255: "upload://vA17uae1fZRg3mPQsLcXKbdzq55.png",
     },
+    "homeworld": {
+        1: "upload://vCbNVAN8mpRumL7qbH9XBESPkZO.png",
+        2: "upload://76B7oFjBkbTmjHPZVdU8eyo7eFs.png",
+        3: "upload://vSfkYZetUaDnS9FeJusYqvL3Lgc.png",
+        4: "upload://h3Od69m3W4ZAAv7qsHIuHwI6pzA.png",
+        5: "upload://uSSWHxoRgMTxZuEWi8LsYJBdxPQ.png",
+        6: "upload://yxhgJI5MZlS5vVocopBuIjp3dHL.png",
+        7: "upload://akOhETwRzQIXfPdAGbFwJqIj7Pj.png",
+        8: "upload://1dgOvXf3DVSpRTtAtmKJZVgbDwJ.png",
+        9: "upload://z1mdrKPqY2zDElpjxIx8El4zxeI.png",
+        10: "upload://etEGdmxFZaYNMFvAJQ89kjQMULf.png",
+        11: "upload://b6jKdaM9RQuxD9nzHmIu2i3x06S.png",
+        12: "upload://hBezkN6fc7qeHBbrnuqZo6u8iOU.png",
+        13: "upload://jlaw1hiEflhfNFEFjy2KW1sBsdx.png",
+        14: "upload://gxt7SY2UR5PJxejqqkhquYovEME.png",
+        15: "upload://u6hasjYVrg4sJtKiKB4jAjal2t7.png",
+        16: "upload://p5UqLCgfrLVQ8DqouN6hYviPh8m.png",
+        17: "upload://52hBHLRo3YFEp6nzCIwIG1O8UVW.png",
+        18: "upload://bjaqhPXi4pQv5rjDh2DCSMv0jh.png",
+        19: "upload://2DU9kvCt2six9xG3NNrJFRWWl7p.png",
+        20: "upload://gVZBHYhKGz7SwvbI5M48Co5IO7T.png",
+        21: "upload://wcbLv8Pdadqh4w2AX4DGcqQX31Q.png",
+        22: "upload://9vwOmVHBunNG8MuzaxHiTZwzs2g.png",
+        23: "upload://jYL8MoHWE21fzXtHGDgWhyZqjoR.png",
+        24: "upload://bu13pInzTg8kp1oRIEtF8hsyRUB.png",
+        25: "upload://sylxZJgclCwEdwKu0NgU4bd23Jr.png",
+        26: "upload://4uUhpreWqLIVt9YfSvdHpawIkOR.png",
+        27: "upload://f6uyp7MC33Mp69URS0B6TsTSJuQ.png",
+        28: "upload://2N50kTR9zkz4kJu0ktkn18PVV5Z.png",
+        29: "upload://9JK249eagZIPdFTYVBpLBxmiGaY.png",
+        30: "upload://scIHOJwg5GZA4olQlfUqfzYQvug.png",
+        31: "upload://m7q5vPRUwHYRAJumvKLnUvcZjDA.png",
+        32: "upload://hOcY97pg3Mhtv982WorNImOQj0U.png",
+        33: "upload://8CG9K06TCjsm5CWdNe8oiXcfMwj.png",
+        34: "upload://cwifUp1AFZJr85qn3Eb8aZrGyqd.png",
+        35: "upload://kWhRmVKdTzBxgHgWnEh1YZxYXAO.png",
+        36: "upload://tyTZD49DGLMPOZNZgPF6RcQF6UL.png",
+        37: "upload://8Pognll0lrw8lUyYqjnevaZl0tf.png",
+        38: "upload://A3264cvkIhFbf9EgzYkxR41LWSK.png",
+        39: "upload://zp3Mus4859PtgLLWXGzROpIrepj.png",
+        40: "upload://uIEz1nsW2qveBU7HXQv1ebZQYYx.png",
+        41: "upload://miJJHWTmdQkxpzuI3FPURiLIISV.png",
+        42: "upload://uPIL6rJAH6e8m8Mt2nkwRuxCq5R.png",
+        43: "upload://lng3kk19dL9oe3q3MaXKNdmF01y.png",
+        44: "upload://8Ld4qvLFr8UDzGpD2iGuJ4dA2oz.png",
+        45: "upload://xfzqBLcqQtyP79VQqkqfdXyB8Of.png",
+        46: "upload://57K5AxGCyNNUlcL6S0JKij07vjF.png",
+        47: "upload://8PtPCOf2WQtIOkfgy5HvUe1U8C8.png",
+        48: "upload://bRdEOb2CxQ7hkG8qJydssJX0xoH.png",
+        49: "upload://7A22yg3KWrBDspfH0m57veqLP1U.png",
+        50: "upload://ac991J9KkizDooVBI5VJOaGyzVm.png",
+    },
 }
 
 
@@ -490,26 +543,23 @@ class WorldNotification(NotificationBase):
     _context = None
     _world_type = "world"
 
-    def _get_colors(self, world):
+    def _get_colors(self, world, default=False):
         # never get colors for Creative worlds
         if world.is_creative:
             colors = None
         else:
+            kwargs = {"active": True}
+            if default:
+                kwargs = {"is_default": True}
+
             colors = (
-                world.worldblockcolor_set.filter(active=True)
+                world.worldblockcolor_set.filter(**kwargs)
                 .order_by("item__game_id", "-time")
                 .distinct("item__game_id")
             )
             if colors.count() == 0:
                 colors = None
 
-        return colors
-
-    def _get_context(self, world, resources=None):
-        if self._context is not None:
-            return self._context
-
-        colors = self._get_colors(world)
         color_groups: Dict[str, list] = {}
         if colors is not None:
             for group_name in settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER:
@@ -535,9 +585,24 @@ class WorldNotification(NotificationBase):
                     c[1] for c in sorted(color_groups[group_name], key=lambda g: g[0])
                 ]
 
+        return color_groups
+
+    def _get_context(self, world, resources=None):
+        if self._context is not None:
+            return self._context
+
+        color_groups = self._get_colors(world)
+        default_color_groups = None
+        if world.is_sovereign:
+            default_color_groups = self._get_colors(world, default=True)
+
+            if len(default_color_groups) == 0:
+                default_color_groups = None
+
         context = {
             "world": world,
             "color_groups": color_groups,
+            "default_color_groups": default_color_groups,
             "icons": FORUM_LOOKUP_IMAGES,
         }
         if resources is not None and not world.is_creative:

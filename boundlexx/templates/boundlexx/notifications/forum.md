@@ -20,12 +20,25 @@
 ![|30x30]({{ icons.lifetime }}) Last until **[date={{ world.end|utc|date:"Y-m-d" }} time={{ world.end|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% endif %}{% if will_renew != None %}{% if will_renew %}
 ![|30x30]({{ icons.lifetime }}) Will Renew : :white_check_mark:{% else %}
 ![|30x30]({{ icons.lifetime }}) Will Renew : :x:{% endif %}{% endif %}{% endif %}
-**-------------------------------------------------------------------**{% if color_groups %}
-[details="Blocks Colors"]
-**-------------------------------------------------------------------**{% if not world.is_perm %}
-![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_{% if world.is_exo %}
-![|25x25]({{ icons.by_recipe }}) **:** _Can be obtained by **Recipe/Transmutation**_
-![|20x20]({{ icons.timelapse }})**_[∞]()_** **:** _Obtained on Homeworld_
+**-------------------------------------------------------------------**{% if default_color_groups %}
+[details="Default Blocks Colors"]
+**-------------------------------------------------------------------**
+![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
+[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld_
+**-------------------------------------------------------------------**
+
+{% for group_name, color_group in default_color_groups.items %}{% if group_name %}
+
+_**[{{ group_name|title }}]**_
+{% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
+{% endfor %}{% endfor %}
+[/details]
+**-------------------------------------------------------------------**{% endif %}{% if color_groups %}
+[details="{% if world.is_sovereign %}Current {% endif %}Blocks Colors"]
+**-------------------------------------------------------------------**{% if not world.is_perm %}{% if world.is_exo %}
+![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
+![|25x25]({{ icons.by_recipe }}) **:** _Can be obtained by **Recipe/Transmutation**_{% endif %}
+[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld_{% if world.is_exo %}
 ![|20x20]({{ icons.timelapse }})**_[>= 0]()_** **:** _Exo Exclusive **last occurrence** in **Days**_{% endif %}{% endif %}
 **-------------------------------------------------------------------**
 
@@ -39,14 +52,14 @@ _**[{{ group_name|title }}]**_
 [details="Initial Resources"]
 **------------[Embedded World Resources]------------**
 <table>
-<tr><th>Rank</th><th>Resource Name</th><th>Absolute Count</th><th>Percentage</th></tr>{% for resource in embedded_resources %}
-<tr><td>{{ forloop.counter }}</td><td>{{ resource.item.english }}</td><td>{{ resource.count|intcomma }}</td><td>{{ resource.percentage }}%</td>{% endfor %}
+<tr><th>Rank</th><th>Resource Name</th><th>Absolute Count</th><th>Percentage</th><th>Average Per Chunk</th></tr>{% for resource in embedded_resources %}
+<tr><td>{{ forloop.counter }}</td><td>{{ resource.item.english }}</td><td>{{ resource.count|intcomma }}</td><td>{{ resource.percentage }}%</td><td>{{ resource.average_per_chunk }}</td>{% endfor %}
 </table>
 
 
 **--------------[Surface World Resources]--------------**
 <table>
-<tr><th>Rank</th><th>Resource Name</th><th>Absolute Count</th><th>Percentage</th></tr>{% for resource in surface_resources %}
-<tr><td>{{ forloop.counter }}</td><td>{{ resource.item.english }}</td><td>{{ resource.count|intcomma }}</td><td>{{ resource.percentage }}%</td>{% endfor %}
+<tr><th>Rank</th><th>Resource Name</th><th>Absolute Count</th><th>Percentage</th><th>Average Per Chunk</th></tr>{% for resource in surface_resources %}
+<tr><td>{{ forloop.counter }}</td><td>{{ resource.item.english }}</td><td>{{ resource.count|intcomma }}</td><td>{{ resource.percentage }}%</td><td>{{ resource.average_per_chunk }}</td>{% endfor %}
 </table>
 [/details]{% endif %}
