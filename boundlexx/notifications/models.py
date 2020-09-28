@@ -556,10 +556,15 @@ class WorldNotification(NotificationBase):
 
             colors = (
                 world.worldblockcolor_set.filter(**kwargs)
-                .select_related("item", "color")
-                .prefetch_related(
-                    "item__localized_name_set", "color__localized_name_set"
+                .select_related(
+                    "item",
+                    "color",
+                    "first_world",
+                    "last_exo",
+                    "transform_first_world",
+                    "transform_last_exo",
                 )
+                .prefetch_related("item__localizedname_set", "color__localizedname_set")
                 .order_by("item__game_id", "-time")
                 .distinct("item__game_id")
             )

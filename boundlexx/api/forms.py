@@ -2,7 +2,7 @@ from django import forms
 
 from boundlexx.boundless.models import World
 
-BASE_QUERY = World.objects.all()
+BASE_QUERY = World.objects.all().select_related("assignment")
 
 
 class ForumFormatForm(forms.Form):
@@ -61,7 +61,7 @@ class ForumFormatForm(forms.Form):
         else:
             world_name = cleaned_data.get("world_name")
             try:
-                world = BASE_QUERY.get(display_name=world_name)
+                BASE_QUERY.get(display_name=world_name)
             except World.DoesNotExist:
                 self.add_error(
                     "world_name",

@@ -25,7 +25,12 @@ class ForumFormatView(FormView):
         }
 
         if world.worldpoll_set.count() > 0:
-            resources = world.worldpoll_set.first().resources
+            resources = (
+                world.worldpoll_set.prefetch_related("resourcecount_set")
+                .first()
+                .resources.order_by("-count")
+                .select_related("item")
+            )
 
         title, body = ExoworldNotification().forum(world, resources, extra=extra)
 
