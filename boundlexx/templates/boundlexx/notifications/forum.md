@@ -1,7 +1,7 @@
 {% load humanize tz utils %}{% if world.image %}![|300x300]({{ world.image.url }}){% else %}![{{ world.display_name }}|300x300]({{ icons.world_image }}){% endif %}{% if world.is_sovereign %}
 **-------------------[Sovereign Details]-------------------**
 ![|30x30]({{ icons.owner }}) Owner : **{% if username %}@{{ username }}{% else %}ADD YOUR NAME HERE{% endif %}**
-![|30x30]({{ icons.permissions }}) Permissions : **{% if world.has_perm_data %}{% if world.is_public %}:white_check_mark:{% else %}:x:{% endif %} Visit | {% if world.is_public_edit %}:white_check_mark:{% else %}:x:{% endif %} Edit | {% if world.is_public_claim %}:white_check_mark:{% else %}:x:{% endif %} Claim{% else %}{% if perms %}{% if perms.can_visit %}:white_check_mark:{% else %}:x:{% endif %} Visit | {% if perms.can_edit %}:white_check_mark:{% else %}:x:{% endif %} Edit | {% if perms.can_claim %}:white_check_mark:{% else %}:x:{% endif %} Claim{% else %}:white_check_mark:|:x: Visit - :white_check_mark:|:x: Edit - :white_check_mark:|:x: Claim{% endif %}{% endif %}**{% endif %}
+![|30x30]({{ icons.permissions }}) Permissions : **{% if world.has_perm_data %}{% if world.is_public %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Visit | {% if world.is_public_edit %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Edit | {% if world.is_public_claim %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Claim{% else %}{% if perms %}{% if perms.can_visit %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Visit | {% if perms.can_edit %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Edit | {% if perms.can_claim %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Claim{% else %}![Yes|25x25]({{ icons.yes }})|![No|25x25]({{ icons.no }}) Visit - ![Yes|25x25]({{ icons.yes }})|![No|25x25]({{ icons.no }}) Edit - ![Yes|25x25]({{ icons.yes }})|![No|25x25]({{ icons.no }}) Claim{% endif %}{% endif %}**{% endif %}
 **--------------------[🌍 World Details]--------------------**
 ![|30x30]({{ icons.name }}) ID : **{{ world.id }}**
 ![|30x30]({{ icons.name }}) Name : **{{ world.display_name }}**
@@ -18,13 +18,13 @@
 **---------------------[⏱ Time Details]---------------------**
 ![|30x30]({{ icons.lifetime }}) Appeared **[date={{ world.start|utc|date:"Y-m-d" }} time={{ world.start|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% if world.end %}
 ![|30x30]({{ icons.lifetime }}) Last until **[date={{ world.end|utc|date:"Y-m-d" }} time={{ world.end|utc|date:"G:i:s" }} format="LLL" timezones="UTC"]**{% endif %}{% if will_renew != None %}{% if will_renew %}
-![|30x30]({{ icons.lifetime }}) Will Renew : :white_check_mark:{% else %}
-![|30x30]({{ icons.lifetime }}) Will Renew : :x:{% endif %}{% endif %}{% endif %}
+![|30x30]({{ icons.lifetime }}) Will Renew : ![Yes|25x25]({{ icons.yes }}){% else %}
+![|30x30]({{ icons.lifetime }}) Will Renew : ![No|25x25]({{ icons.no }}){% endif %}{% endif %}{% endif %}
 **-------------------------------------------------------------------**{% if default_color_groups %}
 [details="Default Blocks Colors"]
 **-------------------------------------------------------------------**
 ![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
-[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld_
+[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld (clickable)_
 **-------------------------------------------------------------------**
 
 {% for group_name, color_group in default_color_groups.items %}{% if group_name %}
@@ -38,7 +38,7 @@ _**[{{ group_name|title }}]**_
 **-------------------------------------------------------------------**{% if not world.is_perm %}{% if world.is_exo %}
 ![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
 ![|25x25]({{ icons.by_recipe }}) **:** _Can be obtained by **Recipe/Transmutation**_{% endif %}
-[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld_{% if world.is_exo %}
+[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld (clickable)_{% if world.is_exo %}
 ![|20x20]({{ icons.timelapse }})**_[>= 0]()_** **:** _Exo Exclusive **last occurrence** in **Days**_{% endif %}{% endif %}
 **-------------------------------------------------------------------**
 

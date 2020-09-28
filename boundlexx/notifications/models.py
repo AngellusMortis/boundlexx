@@ -56,6 +56,8 @@ FORUM_LOOKUP_IMAGES = {
     "permissions": "upload://zbesXUQO9RZUEP7TNiHA24EVT9w.png",
     "portal": "upload://2GR4nUcRGOaMMDzj452JuqxVMWr.png",
     "perm_color": "upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png",
+    "no": "upload://lUw9F65kR3NVYsTkOSLN9EvSRcO.png",
+    "yes": "upload://jLQDuByRq1uNMUafarQRF6ZrAu1.png",
     "colors": {
         0: "upload://pLWvEwsdJfVxylVUaST7zDfJnnP.png",
         1: "upload://l3M345enn9ycGBw61qecq1a8DLm.png",
@@ -554,6 +556,10 @@ class WorldNotification(NotificationBase):
 
             colors = (
                 world.worldblockcolor_set.filter(**kwargs)
+                .select_related("item", "color")
+                .prefetch_related(
+                    "item__localized_name_set", "color__localized_name_set"
+                )
                 .order_by("item__game_id", "-time")
                 .distinct("item__game_id")
             )
