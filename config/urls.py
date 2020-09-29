@@ -11,6 +11,7 @@ from boundlexx.api.views import ForumFormatView
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),
     path("robots.txt", include("robots.urls")),
+    path("favicon.ico/", RedirectView.as_view(url="/static/img/logo.ico")),
     path("forum-format/", ForumFormatView.as_view(), name="forum_format"),
     path("admin_tools/", include("admin_tools.urls")),
     path("api/", include("boundlexx.api.urls")),
