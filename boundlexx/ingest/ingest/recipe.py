@@ -145,6 +145,9 @@ def run():
                 "power": recipe_dict["powerRequired"],
                 "group_name": recipe_dict["recipeGroupName"],
                 "knowledge_unlock_level": recipe_dict["knowledgeUnlockLevel"],
+                "required_event": recipe_dict.get("onlyDuringTimeLimitedEvents"),
+                "required_backer_tier": recipe_dict.get("minBackerTierNeeded")
+                or recipe_dict.get("accountFlagBitMaskNeeded"),
             }
             recipe, created = Recipe.objects.get_or_create(
                 game_id=recipe_dict["ID"], defaults=attrs

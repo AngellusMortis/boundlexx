@@ -42,6 +42,9 @@ item_viewset.register(
     parents_query_lookups=["item__game_id"],
 )
 
+router.register("recipe-groups", views.RecipeGroupViewSet, basename="recipe-group")
+router.register("recipes", views.RecipeViewSet, basename="recipe")
+
 router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
 router.register("skills", views.SkillViewSet, basename="skill")
 

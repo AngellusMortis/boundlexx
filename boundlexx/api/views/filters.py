@@ -1,10 +1,16 @@
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
-from django.db.models import F, Func, Value
+from django.db.models import F, Func, Q, Value
 from django.utils.translation import ugettext as _
 from django_filters.rest_framework import FilterSet, filters
 
-from boundlexx.boundless.models import Item, ResourceCount, World, WorldBlockColor
+from boundlexx.boundless.models import (
+    Item,
+    Recipe,
+    ResourceCount,
+    World,
+    WorldBlockColor,
+)
 from boundlexx.boundless.utils import get_block_color_item_ids
 
 DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
@@ -331,3 +337,39 @@ class SkillFilterSet(LocalizationFilterSet):
 
     def filter_group(self, queryset, name, value):
         return queryset.filter(group__name=value)
+
+
+class RecipeFilterSet(LocalizationFilterSet):
+    input_id = filters.NumberFilter(method="filter_input")
+    output_id = filters.NumberFilter(method="filter_output")
+    is_event = filters.BooleanFilter(method="filter_event")
+    requires_backer = filters.BooleanFilter(method="filter_backer")
+
+    class Meta:
+        model = Recipe
+        fields = [
+            "machine",
+        ]
+
+    def filter_input(self, queryset, name, value):
+        return queryset.filter(
+            Q(levels__inputs__item__game_id=value)
+            | Q(levels__inputs__group__members__game_id=value)
+        )
+
+    def filter_output(self, queryset, name, value):
+        return queryset.filter(output__game_id=value)
+
+    def filter_event(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(required_event__isnull=False)
+        elif value is False:
+            queryset = queryset.filter(required_event__isnull=True)
+        return queryset
+
+    def filter_backer(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(required_backer_tier__isnull=False)
+        elif value is False:
+            queryset = queryset.filter(required_backer_tier__isnull=True)
+        return queryset

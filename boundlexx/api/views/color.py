@@ -1,12 +1,19 @@
 from typing import List
 
+from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
+from rest_framework.decorators import action
+from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
-from boundlexx.api.serializers import BlockColorSerializer, ColorSerializer
+from boundlexx.api.serializers import (
+    BlockColorSerializer,
+    ColorSerializer,
+    PossibleItemSerializer,
+)
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import LocalizationFilterSet, WorldBlockColorFilterSet
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
@@ -77,6 +84,44 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": COLOR_EXAMPLE}}  # type: ignore # noqa E501
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=PossibleItemSerializer,
+        url_path="sovereign-blocks",
+    )
+    def sovereign_blocks(
+        self,
+        request,
+        game_id=None,
+    ):
+        """
+        Gets current Possible Sovereign Blocks choices for given color
+        """
+
+        color = self.get_object()
+
+        queryset = (
+            WorldBlockColor.objects.filter(color=color, is_default=True)
+            .filter(
+                Q(world__isnull=True)
+                | Q(world__end__isnull=True, world__is_creative=False)
+                | Q(world__owner__isnull=False, world__is_creative=False)
+            )
+            .select_related("item")
+            .order_by("item__game_id")
+            .distinct("item__game_id")
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
 
 
 class BlockColorViewSet(

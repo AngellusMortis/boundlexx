@@ -629,6 +629,46 @@ BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS = {
     10791: "fungus",  # Tinted-Burst
 }
 
+BOUNDLESS_BOWS = {
+    "CORROSIVE": {
+        "best": ["topaz"],
+        "neutral": ["sapphire", "diamond"],
+        "lucent": ["rift"],
+    },
+    "SHOCK": {
+        "best": ["amethyst"],
+        "neutral": ["emerald", "ruby"],
+        "lucent": ["umbris"],
+    },
+    "BLAST": {
+        "best": ["emerald"],
+        "neutral": ["amethyst", "sapphire"],
+        "lucent": ["umbris"],
+    },
+    "TOXIC": {"best": ["diamond"], "neutral": ["ruby", "topaz"], "lucent": ["blink"]},
+    "CHILL": {
+        "best": ["ruby"],
+        "neutral": ["diamond", "amethyst"],
+        "lucent": ["blink"],
+    },
+    "BURN": {"best": ["sapphire"], "neutral": ["emerald", "topaz"], "lucent": ["rift"]},
+    "DARKMATTER": {
+        "best": ["diamond", "topaz"],
+        "neutral": [],
+        "lucent": ["rift", "blink"],
+    },
+    "RIFT": {
+        "best": ["ruby", "amethyst"],
+        "neutral": [],
+        "lucent": ["blink", "umbris"],
+    },
+    "BLINK": {
+        "best": ["sapphire", "emerald"],
+        "neutral": [],
+        "lucent": ["rift", "umbris"],
+    },
+}
+
 API_PROTOCOL = env("API_PROTOCOL", default="http")
 
 STEAM_USERNAME = env("STEAM_USERNAME", default=None)

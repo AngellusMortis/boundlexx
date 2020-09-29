@@ -201,7 +201,7 @@ class WorldManager(models.Manager):
         return world, created
 
 
-class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
+class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore  # pylint: disable=too-many-public-methods  # noqa: E501
     objects = WorldManager()
 
     class Region(models.TextChoices):
@@ -573,6 +573,13 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore
     @property
     def has_perm_data(self):
         return self.is_public_claim is not None and self.is_public_edit is not None
+
+    @property
+    def bows(self):
+        if self.world_type is None:
+            return None
+
+        return settings.BOUNDLESS_BOWS.get(self.world_type)
 
 
 class WorldDistance(

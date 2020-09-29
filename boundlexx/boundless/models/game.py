@@ -330,7 +330,7 @@ class Skill(models.Model):
 
 
 class RecipeGroup(models.Model):
-    name = models.CharField(max_length=32)
+    name = models.CharField(max_length=32, unique=True)
     display_name = models.ForeignKey(LocalizedString, on_delete=models.CASCADE)
     members = models.ManyToManyField(Item)
 
@@ -385,17 +385,26 @@ class Recipe(GameObj):
         SUPERCHARGED = "Supercharged", _("Supercharged")
 
     class GroupType(models.TextChoices):
-        DECORATIVE_STONE = "Powered", _("Powered")
+        POWERED = "Powered", _("Powered")
         UNDEFINED = "Overdriven", _("Overdriven")
         SUPERCHARGED = "Supercharged", _("Supercharged")
 
+    class EventType(models.TextChoices):
+        GLEAMBOW_RACING = "GLEAMBOW_RACING", _("Gleambow Racting")
+        CHRISTMAS = "CHRISTMAS", _("Christmas")
+        VALENTINES = "VALENTINES", _("Valentines")
+        HALLOWEEN = "HALLOWEEN", _("Halloween")
+        BIRTHDAY = "BIRTHDAY", _("Birthday")
+
     heat = models.PositiveSmallIntegerField()
     craft_xp = models.PositiveSmallIntegerField()
-    machine = models.CharField(max_length=16, choices=MachineType.choices, null=True)
+    machine = models.CharField(
+        max_length=16, choices=MachineType.choices, null=True, blank=True, db_index=True
+    )
     output = models.ForeignKey(Item, on_delete=models.CASCADE)
     can_hand_craft = models.BooleanField()
     machine_level = models.CharField(
-        max_length=16, choices=MachineLevelType.choices, blank=True
+        max_length=16, choices=MachineLevelType.choices, null=True, blank=True
     )
     power = models.PositiveIntegerField()
     group_name = models.CharField(max_length=32)
@@ -404,6 +413,10 @@ class Recipe(GameObj):
     tints = models.ManyToManyField(Item, related_name="+")
     requirements = models.ManyToManyField(RecipeRequirement)
     levels = models.ManyToManyField(RecipeLevel)
+    required_event = models.CharField(
+        max_length=16, choices=EventType.choices, null=True, blank=True
+    )
+    required_backer_tier = models.PositiveSmallIntegerField(null=True, blank=True)
 
 
 class EmojiManager(models.Manager):

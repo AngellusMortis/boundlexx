@@ -22,6 +22,12 @@ from boundlexx.boundless.models import (
 )
 
 
+class BowSerializer(NullSerializer):
+    best = serializers.ListField(child=serializers.CharField())
+    neutral = serializers.ListField(child=serializers.CharField())
+    lucent = serializers.ListField(child=serializers.CharField())
+
+
 class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
@@ -53,6 +59,8 @@ class WorldSerializer(serializers.ModelSerializer):
 
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
     next_request_basket_update = serializers.DateTimeField(allow_null=True)
+
+    bows = BowSerializer()
 
     protection_points = serializers.IntegerField(
         allow_null=True,
@@ -107,6 +115,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "water_color",
             "surface_liquid",
             "core_liquid",
+            "bows",
         ]
 
 
@@ -281,6 +290,16 @@ class PossibleColorSerializer(serializers.ModelSerializer):
         model = WorldBlockColor
         fields = [
             "color",
+        ]
+
+
+class PossibleItemSerializer(serializers.ModelSerializer):
+    item = SimpleItemSerializer()
+
+    class Meta:
+        model = WorldBlockColor
+        fields = [
+            "item",
         ]
 
 

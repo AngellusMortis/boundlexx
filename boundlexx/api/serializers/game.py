@@ -11,6 +11,7 @@ from boundlexx.api.serializers.base import (
     ResourceCountLinkField,
     SimpleItemSerializer,
     SimpleSkillGroupSerializer,
+    SimpleSkillSerializer,
     SimpleWorldSerializer,
     SovereignColorsLinkField,
 )
@@ -21,6 +22,11 @@ from boundlexx.boundless.models import (
     Item,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
+    Recipe,
+    RecipeGroup,
+    RecipeInput,
+    RecipeLevel,
+    RecipeRequirement,
     ResourceCount,
     Skill,
     SkillGroup,
@@ -353,4 +359,111 @@ class BlockSerialzier(serializers.ModelSerializer):
             "game_id",
             "name",
             "item",
+        ]
+
+
+class SimpleRecipeGroupSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="recipe-group-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+
+    class Meta:
+        model = RecipeGroup
+        fields = [
+            "url",
+            "id",
+            "name",
+        ]
+
+
+class RecipeGroupSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="recipe-group-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+    display_name = LocalizedStringSerializer()
+    members = SimpleItemSerializer(many=True)
+
+    class Meta:
+        model = RecipeGroup
+        fields = [
+            "url",
+            "id",
+            "name",
+            "display_name",
+            "members",
+        ]
+
+
+class RecipeRequirementSerializer(serializers.ModelSerializer):
+    skill = SimpleSkillSerializer()
+
+    class Meta:
+        model = RecipeRequirement
+        fields = [
+            "skill",
+            "level",
+        ]
+
+
+class RecipeInputSerializer(serializers.ModelSerializer):
+    group = SimpleRecipeGroupSerializer(allow_null=True)
+    item = SimpleItemSerializer(allow_null=True)
+
+    class Meta:
+        model = RecipeInput
+        fields = [
+            "group",
+            "item",
+        ]
+
+
+class RecipeLevelSerializer(serializers.ModelSerializer):
+    inputs = RecipeInputSerializer(many=True)
+
+    class Meta:
+        model = RecipeLevel
+        fields = [
+            "level",
+            "wear",
+            "spark",
+            "duration",
+            "output_quantity",
+            "inputs",
+        ]
+
+
+class RecipeSerializer(serializers.ModelSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="recipe-detail",
+        lookup_field="id",
+        read_only=True,
+    )
+    output = SimpleItemSerializer()
+    requirements = RecipeRequirementSerializer(many=True)
+    tints = SimpleItemSerializer(many=True)
+    levels = RecipeLevelSerializer(many=True)
+
+    class Meta:
+        model = Recipe
+        fields = [
+            "url",
+            "id",
+            "heat",
+            "craft_xp",
+            "machine",
+            "output",
+            "can_hand_craft",
+            "machine_level",
+            "power",
+            "group_name",
+            "knowledge_unlock_level",
+            "tints",
+            "requirements",
+            "levels",
+            "required_event",
+            "required_backer_tier",
         ]

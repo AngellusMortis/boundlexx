@@ -14,6 +14,7 @@ from boundlexx.api.views.item import (
     ItemResourceWorldListViewSet,
     ItemViewSet,
 )
+from boundlexx.api.views.recipe import RecipeGroupViewSet, RecipeViewSet
 from boundlexx.api.views.skill import SkillGroupViewSet, SkillViewSet
 from boundlexx.api.views.util import ForumFormatView
 from boundlexx.api.views.world import (
@@ -34,6 +35,8 @@ __all__ = [
     "ItemResourceTimeseriesViewSet",
     "ItemResourceWorldListViewSet",
     "ItemViewSet",
+    "RecipeGroupViewSet",
+    "RecipeViewSet",
     "SkillGroupViewSet",
     "SkillViewSet",
     "WorldControlDataView",
