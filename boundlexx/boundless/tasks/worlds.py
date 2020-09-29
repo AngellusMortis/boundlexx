@@ -251,6 +251,7 @@ def _split_polls(worlds):
     if len(worlds) > 0:
         worlds_ids = [w.id for w in worlds]
         logger.info("Run %s: %s", run, worlds_ids)
+        poll_worlds_split.delay(worlds_ids)
 
 
 def _poll_worlds(worlds):
