@@ -255,17 +255,18 @@ def _split_polls(worlds):
 
 
 def _poll_worlds(worlds):
-    if len(worlds) > MAX_WORLDS_PER_POLL:
+    total = len(worlds)
+    if total > MAX_WORLDS_PER_POLL:
         _split_polls(worlds)
         return
 
     client = BoundlessClient()
     errors_total = 0
 
-    for world in worlds:
+    for index, world in enumerate(worlds):
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
 
-        logger.info("Polling world %s", world.display_name)
+        logger.info("Polling world %s (%s/%s)", world.display_name, index + 1, total)
 
         try:
             world_data, poll_data = client.get_world_poll_by_id(world.id)
