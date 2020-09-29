@@ -278,7 +278,6 @@ def _poll_worlds(worlds):
                 and ex.response.status_code == 400  # type: ignore
             ):
                 logger.warning("Could not do poll world %s", world.display_name)
-                continue
             else:
                 errors_total += 1
                 logger.error("%s while polling world %s", ex, world)
@@ -287,7 +286,7 @@ def _poll_worlds(worlds):
                     raise Exception(  # pylint: disable=raise-missing-from
                         "Aborting due to large number of HTTP errors"
                     )
-                continue
+            continue
 
         if world_data is None:
             logger.info("World %s no longer in API, marking inactive...", world)
