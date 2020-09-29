@@ -219,7 +219,7 @@ def _poll_with_lock_multi(name, worlds):
 
 
 def _poll_with_lock(name, worlds):
-    lock = cache.lock(f"boundlexx:tasks:poll:{name}")
+    lock = cache.lock(f"boundlexx:tasks:poll:{name}", expire=120, auto_renewal=False)
 
     acquired = lock.acquire(blocking=True, timeout=1)
 
@@ -229,7 +229,10 @@ def _poll_with_lock(name, worlds):
     try:
         _poll_worlds(worlds)
     finally:
-        lock.release()
+        try:
+            lock.release()
+        except Exception as ex:
+            logger.warning("Could not release lock: %s", ex)
 
 
 def _split_polls(worlds):
