@@ -12,19 +12,16 @@ def command():
     client = SteamClient()
     client.set_credential_location(settings.STEAM_SENTRY_DIR)
 
-    click.echo("Logging into Steam...")
-    client.cli_login(username=settings.STEAM_USERNAME, password=settings.STEAM_PASSWORD)
+    for index, username in enumerate(settings.STEAM_USERNAMES):
+        click.echo(f"Logging into Steam as {username}...")
+        client.cli_login(username=username, password=settings.STEAM_PASSWORDS[index])
 
-    time.sleep(5)
+        time.sleep(5)
 
-    # copy to correct location for `auth-ticket.js`
-    src = os.path.join(
-        settings.STEAM_SENTRY_DIR, f"{settings.STEAM_USERNAME}_sentry.bin"
-    )
-    dest = os.path.join(
-        settings.STEAM_SENTRY_DIR, f"sentry.{settings.STEAM_USERNAME}.bin"
-    )
-    copy2(src, dest)
+        # copy to correct location for `auth-ticket.js`
+        src = os.path.join(settings.STEAM_SENTRY_DIR, f"{username}_sentry.bin")
+        dest = os.path.join(settings.STEAM_SENTRY_DIR, f"sentry.{username}.bin")
+        copy2(src, dest)
 
-    click.echo("Login successful. Steam Guard should not prompt anymore")
-    client.logout()
+        click.echo("Login successful. Steam Guard should not prompt anymore")
+        client.logout()

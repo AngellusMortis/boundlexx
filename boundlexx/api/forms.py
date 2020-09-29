@@ -25,6 +25,11 @@ class ForumFormatForm(forms.Form):
         help_text="Do you plan to renew this world?",
         label="Will Renew?",
     )
+    compactness = forms.NullBooleanField(
+        required=False,
+        help_text="Is Beacon compactness enabled?",
+        label="Beacon Compactness?",
+    )
     can_visit = forms.BooleanField(
         required=False,
         help_text="Can Everyone warp/use portals to your world?",

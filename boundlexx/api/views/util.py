@@ -19,6 +19,7 @@ class ForumFormatView(FormView):
                 "can_edit": form.cleaned_data["can_edit"],
                 "can_claim": form.cleaned_data["can_claim"],
             },
+            "compactness": form.cleaned_data["compactness"],
             "directions": form.cleaned_data["portal_directions"],
             "username": form.cleaned_data["username"],
             "will_renew": form.cleaned_data["will_renew"],
