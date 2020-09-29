@@ -2,6 +2,7 @@ from typing import List
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
+from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 from requests.exceptions import HTTPError
@@ -157,27 +158,29 @@ def get_worlds(ids_to_scan, client=None):
 
 @app.task
 def poll_perm_worlds():
-    _poll_worlds(World.objects.filter(end__isnull=True, active=True))
+    _poll_with_lock("perm", World.objects.filter(end__isnull=True, active=True))
 
 
 @app.task
 def poll_exo_worlds():
-    _poll_worlds(
-        World.objects.filter(owner__isnull=True, end__isnull=False, active=True)
+    _poll_with_lock(
+        "exo", World.objects.filter(owner__isnull=True, end__isnull=False, active=True)
     )
 
 
 @app.task
 def poll_sovereign_worlds():
-    _poll_worlds(
-        World.objects.filter(owner__isnull=False, is_creative=False, active=True)
+    _poll_with_lock(
+        "sovereign",
+        World.objects.filter(owner__isnull=False, is_creative=False, active=True),
     )
 
 
 @app.task
 def poll_creative_worlds():
-    _poll_worlds(
-        World.objects.filter(owner__isnull=False, is_creative=True, active=True)
+    _poll_with_lock(
+        "creative",
+        World.objects.filter(owner__isnull=False, is_creative=True, active=True),
     )
 
 
@@ -191,18 +194,42 @@ def poll_worlds(world_ids=None):
             assignment__isnull=True,
             address__isnull=False,
         ).update(active=True)
-        worlds = World.objects.filter(active=True)
+        worlds = World.objects.filter(active=True).order_by("id")
     else:
-        worlds = World.objects.filter(id__in=world_ids)
+        worlds = World.objects.filter(id__in=world_ids).order_by("id")
 
-    _poll_worlds(worlds)
+    _poll_with_lock_multi("poll", worlds)
 
 
 @app.task
 def poll_worlds_split(world_ids):
-    worlds = World.objects.filter(id__in=world_ids)
+    worlds = World.objects.filter(id__in=world_ids).order_by("id")
 
-    _poll_worlds(worlds)
+    _poll_with_lock_multi("poll_split", worlds)
+
+
+def _poll_with_lock_multi(name, worlds):
+    first = worlds.first()
+
+    if first is None:
+        return
+
+    count = worlds.count()
+    _poll_with_lock(f"{name}:{first.id}:{count}", worlds)
+
+
+def _poll_with_lock(name, worlds):
+    lock = cache.lock(f"boundlexx:tasks:poll:{name}")
+
+    acquired = lock.acquire(blocking=True, timeout=1)
+
+    if not acquired:
+        return
+
+    try:
+        _poll_worlds(worlds)
+    finally:
+        lock.release()
 
 
 def _split_polls(worlds):
