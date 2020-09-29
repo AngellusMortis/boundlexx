@@ -1,9 +1,9 @@
 from collections import namedtuple
+from logging import getLogger
 from typing import List
 
 from django.db.models import Prefetch, Q
 from django.http import Http404
-from django.shortcuts import get_object_or_404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
@@ -42,6 +42,8 @@ from boundlexx.boundless.models import (
 )
 
 BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
+
+logger = getLogger(__file__)
 
 
 class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
@@ -379,14 +381,25 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
         source_world_id = self.kwargs.get("world_source__id", None)
 
         if world_id == source_world_id:
-            obj = get_object_or_404(
-                queryset, world_source__id=world_id, world_dest__id=world_id
+            queryset = queryset.filter(
+                world_source__id=world_id, world_dest__id=world_id
             )
         else:
-            obj = get_object_or_404(
-                queryset,
-                Q(world_source__id=world_id) | Q(world_dest__id=world_id),
+            queryset = queryset.filter(
+                Q(world_source__id=world_id) | Q(world_dest__id=world_id)
             )
+
+        if queryset.count() > 1:
+            logger.warning(
+                "Duplicate World Distance calculations! %s %s",
+                world_id,
+                source_world_id,
+            )
+
+        obj = queryset.first()
+
+        if obj is None:
+            raise Http404
 
         # May raise a permission denied
         self.check_object_permissions(self.request, obj)
