@@ -278,6 +278,7 @@ def _poll_worlds(worlds):
                 and ex.response.status_code == 400  # type: ignore
             ):
                 logger.warning("Could not do poll world %s", world.display_name)
+                continue
             else:
                 errors_total += 1
                 logger.error("%s while polling world %s", ex, world)
