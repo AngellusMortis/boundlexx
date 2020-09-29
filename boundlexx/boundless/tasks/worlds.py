@@ -231,7 +231,7 @@ def _poll_with_lock(name, worlds):
     finally:
         try:
             lock.release()
-        except Exception as ex:
+        except Exception as ex:  # pylint: disable=broad-except
             logger.warning("Could not release lock: %s", ex)
 
 
