@@ -237,9 +237,17 @@ def _split_polls(worlds):
 
     num_runs = len(worlds) // MAX_WORLDS_PER_POLL + 1
     logger.info("Spliting polling into %s runs", num_runs)
+    run = 1
     while len(worlds) > MAX_WORLDS_PER_POLL:
-        poll_worlds_split.delay([w.id for w in worlds[:MAX_WORLDS_PER_POLL]])
+        worlds_ids = [w.id for w in worlds[:MAX_WORLDS_PER_POLL]]
+        logger.info("Run %s: %s", run, worlds_ids)
+        poll_worlds_split.delay(worlds_ids)
         worlds = worlds[MAX_WORLDS_PER_POLL:]
+        run += 1
+
+    if len(worlds) > 0:
+        worlds_ids = [w.id for w in worlds]
+        logger.info("Run %s: %s", run, worlds_ids)
 
 
 def _poll_worlds(worlds):
