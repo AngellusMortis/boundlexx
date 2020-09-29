@@ -407,8 +407,8 @@ BOUNDLESS_PASSWORDS = env.list("BOUNDLESS_PASSWORDS", default=[])
 BOUNDLESS_DS_REQUIRES_AUTH = env.bool("BOUNDLESS_DS_REQUIRES_AUTH", default=False)
 
 # number of seconds between calls to each world
-BOUNDLESS_API_WORLD_DELAY = env("BOUNDLESS_API_WORLD_DELAY", default=1)
-BOUNDLESS_API_DS_DELAY = env("BOUNDLESS_API_DS_DELAY", default=1)
+BOUNDLESS_API_WORLD_DELAY = int(env("BOUNDLESS_API_WORLD_DELAY", default=1))
+BOUNDLESS_API_DS_DELAY = int(env("BOUNDLESS_API_DS_DELAY", default=1))
 BOUNDLESS_LOCATION = "/boundless/"
 
 # timeout for making an API request
