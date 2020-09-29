@@ -260,6 +260,7 @@ def _poll_worlds(worlds):
         return
 
     client = BoundlessClient()
+    logger.info("Boundless user: %s", client.user["boundless"]["username"])
     errors_total = 0
 
     for index, world in enumerate(worlds):
