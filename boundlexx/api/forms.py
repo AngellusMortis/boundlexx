@@ -66,7 +66,7 @@ class ForumFormatForm(forms.Form):
         else:
             world_name = cleaned_data.get("world_name")
             try:
-                BASE_QUERY.get(display_name=world_name)
+                world = BASE_QUERY.get(display_name=world_name)
             except World.DoesNotExist:
                 self.add_error(
                     "world_name",
