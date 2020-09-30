@@ -110,6 +110,7 @@ class WorldManager(models.Manager):
         world.ip_address = world_dict.get("ipAddr")
         world.api_url = world_dict.get("apiURL")
         world.websocket_url = world_dict.get("websocketURL")
+        world.special_type = world_dict.get("specialWorldType")
         world.is_creative = world_dict.get("creative", False)
         world.owner = world_dict.get("owner", None)
         world.assignment_id = world_dict.get("assignment", None)
@@ -235,6 +236,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         TYPE_RIFT = "RIFT", _("Rift")
         TYPE_BLINK = "BLINK", _("Blink")
 
+    class WorldSpecialType(models.IntegerChoices):
+        COLOR_CYCLE = 1, _("Color-Cycling")
+
     class Meta:
         ordering = ["id"]
         indexes = [
@@ -306,6 +310,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         help_text=_("If this world is public"),
     )
     number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
+    special_type = models.PositiveSmallIntegerField(
+        _("Special Type"), choices=WorldSpecialType.choices, null=True, db_index=True
+    )
 
     atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"), null=True)
     atmosphere_color_g = models.FloatField(_("Atmosphere Linear G Color"), null=True)
@@ -741,7 +748,7 @@ class WorldBlockColorManager(models.Manager):
 
     def create_colors_from_ws(self, world, block_colors):
         default = True
-        if world.is_sovereign:
+        if world.is_sovereign or world.special_type == 1:
             default = False
 
         if default:

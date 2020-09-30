@@ -5,7 +5,8 @@
 ![|30x30]({{ icons.permissions }}) Beacon Compactness : **{% if compactness %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %}**{% endif %}{% endif %}
 **--------------------[🌍 World Details]--------------------**
 ![|30x30]({{ icons.name }}) ID : **{{ world.id }}**
-![|30x30]({{ icons.name }}) Name : **{{ world.display_name }}**
+![|30x30]({{ icons.name }}) Name : **{{ world.display_name }}**{% if world.special_type %}
+![|30x30]({{ icons.name }}) Special Type : **{{ world.get_special_type_display }}**{% endif %}
 ![|30x30]({{ icons.type|key:world.world_type }}) Type : **{{ world.get_world_type_display }}**
 ![|30x30]({{ icons.tier }}) Tier : **{{ world.get_tier_display }}**
 ![|30x30]({{ icons.atmosphere|key:world.atmosphere_name }}) Atmosphere : {% if world.protection %}**{{ world.protection }}**{% else %}Normal{% endif %}
@@ -34,7 +35,9 @@ _**[{{ group_name|title }}]**_
 {% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
 {% endfor %}{% endfor %}
 [/details]
-**-------------------------------------------------------------------**{% endif %}{% if color_groups %}
+**-------------------------------------------------------------------**{% endif %}{% if world.special_type == 1 %}
+**Block Colors** : This world is a "Color-Cycling" world. That means the colors change at random.
+**-------------------------------------------------------------------**{% else %}{% if color_groups %}
 [details="{% if world.is_sovereign %}Current {% endif %}Blocks Colors"]
 **-------------------------------------------------------------------**{% if not world.is_perm %}{% if world.is_exo %}
 ![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
@@ -49,7 +52,7 @@ _**[{{ group_name|title }}]**_
 {% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
 {% endfor %}{% endfor %}
 [/details]
-**-------------------------------------------------------------------**{% endif %}{% if embedded_resources %}
+**-------------------------------------------------------------------**{% endif %}{% endif %}{% if embedded_resources %}
 [details="Initial Resources"]
 **------------[Embedded World Resources]------------**
 <table>

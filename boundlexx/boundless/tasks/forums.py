@@ -22,6 +22,7 @@ FORUM_PARSE_TOPIC_CACHE_KEY = "boundless:parsed_topics"
 
 FORUM_EXO_WORLD_CATEGORY = "exoworlds/31"
 FORUM_PERM_WORLD_CATEGORY = "worlds/33"
+FORUM_SOVEREIGN_WORLD_CATEGORY = "sovereign/39"
 DEFAULT_IMAGE = "https://forum.playboundless.com/uploads/default/original/3X/6/8/683d21dfac3159456b0074eb6fa1898be6ec9e97.png"  # noqa: E501
 
 
@@ -291,14 +292,18 @@ def _normalize_world_info(world_info):
                 break
 
     if "start" in world_info:
-        world_info["start"] = dateparser.parse(world_info["start"]).replace(
-            tzinfo=timezone.utc
-        )
+        start = dateparser.parse(world_info["start"])
+        if start is None:
+            del world_info["start"]
+        else:
+            world_info["start"] = start.replace(tzinfo=timezone.utc)
 
     if "end" in world_info:
-        world_info["end"] = dateparser.parse(world_info["end"]).replace(
-            tzinfo=timezone.utc
-        )
+        end = dateparser.parse(world_info["end"])
+        if end is None:
+            del world_info["end"]
+        else:
+            world_info["start"] = end.replace(tzinfo=timezone.utc)
 
     if "tier" in world_info:
         # new format
@@ -308,25 +313,37 @@ def _normalize_world_info(world_info):
         world_info["tier"] = int(world_info["tier"]) - 1
 
     if "id" in world_info:
-        world_info["id"] = int(world_info["id"])
+        try:
+            world_info["id"] = int(world_info["id"])
+        except ValueError:
+            del world_info["id"]
 
     return world_info
 
 
-def _parse_forum_topic(topic: int, is_perm: bool):
+def _parse_forum_topic(topic: int, is_perm: bool, is_sovereign: bool = False):
+    logger.info("Paring topic: %s", topic)
     response = requests.get(f"{settings.BOUNDLESS_FORUM_BASE_URL}/t/{topic}.json")
     response.raise_for_status()
 
     data = response.json()
 
-    world_info = _parse_title(data["title"])
+    world_info = {}
+    # players often set the title to whatever. do not parse
+    if not is_sovereign:
+        world_info = _parse_title(data["title"])
     raw_html = BeautifulSoup(data["post_stream"]["posts"][0]["cooked"], "html.parser")
 
-    title_name = world_info["name"]
+    # players not using our template
+    if is_sovereign and "-------------------" not in str(raw_html):
+        logger.warning("Sovereign post not using standard format: %s", topic)
+        return None, None
+
+    title_name = world_info.get("name")
     world_info.update(_parse_world_info(raw_html))
     world_info = _normalize_world_info(world_info)
 
-    if world_info["name"] != title_name:
+    if title_name is not None and world_info["name"] != title_name:
         logger.warning(
             "Different between world name in title and forum post: %s vs. %s",
             title_name,
@@ -367,7 +384,12 @@ def _parse_forum_topic(topic: int, is_perm: bool):
 def _ingest_world_data(topics, is_perm=False, is_sovereign=False):
     logger.info("Found %s topic(s) to parse", len(topics))
     for topic in topics:
-        world_info, block_details = _parse_forum_topic(topic, is_perm=False)
+        world_info, block_details = _parse_forum_topic(
+            topic, is_perm=is_perm, is_sovereign=is_sovereign
+        )
+
+        if world_info is None:
+            continue
 
         block_colors = []
         if block_details is not None:
@@ -385,23 +407,27 @@ def _ingest_world_data(topics, is_perm=False, is_sovereign=False):
             if created:
                 number_created += 1
 
-        # only add world as parsed if the data is "complete" and has image
-        cutoff = dj_timezone.now() - timedelta(days=7)
-        if "image" in world_info or world.start < cutoff:
-            parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
-            parse_cache.append(topic)
-            cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
+        if world.id < settings.BOUNDLESS_EXO_EXPIRED_BASE_ID:
+            # only add world as parsed if the data is "complete" and has image
+            cutoff = dj_timezone.now() - timedelta(days=7)
+            if "image" in world_info or world.start < cutoff:
+                parse_cache = cache.get(FORUM_PARSE_TOPIC_CACHE_KEY, [])
+                parse_cache.append(topic)
+                cache.set(FORUM_PARSE_TOPIC_CACHE_KEY, parse_cache, timeout=2592000)
 
-        logger.info(
-            "Topic %s: Imported %s block color details for world %s",
-            topic,
-            number_created,
-            world,
-        )
+            logger.info(
+                "Topic %s: Imported %s block color details for world %s",
+                topic,
+                number_created,
+                world,
+            )
 
 
 @app.task
-def ingest_sovereign_world_data(topics):
+def ingest_sovereign_world_data(topics=None):
+    if topics is None:
+        topics = _get_topics(FORUM_SOVEREIGN_WORLD_CATEGORY)
+
     _ingest_world_data(topics, True, True)
 
 

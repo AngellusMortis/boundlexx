@@ -133,6 +133,7 @@ class WorldFilterSet(BaseFilterSet):
             "is_creative",
             "is_locked",
             "is_public",
+            "special_type",
             "start",
             "end",
         ]

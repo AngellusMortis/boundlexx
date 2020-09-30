@@ -656,10 +656,14 @@ class WorldNotification(NotificationBase):
         elif world.is_sovereign:
             world_class = "Sovereign World"
 
+        special_type = ""
+        if world.special_type:
+            special_type = f"{world.get_special_type_display()} "
+
         title = (
             f"[{world.display_name}] "
             f"--[T{world.tier + 1} - {world.tier_name} "
-            f"{world.get_world_type_display()} {world_class}]-- "
+            f"{world.get_world_type_display()} {special_type}{world_class}]-- "
             f"[{'Active' if world.active else 'Inactive'}]"
         )
 
