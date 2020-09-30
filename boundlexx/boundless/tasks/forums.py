@@ -280,7 +280,7 @@ def _parse_world_info(raw_html):
     return parsed_data
 
 
-def _normalize_world_info(world_info):
+def _normalize_world_info(world_info):  # pylint: disable=too-many-branches
     if "type" in world_info:
         world_info["type"] = world_info["type"].upper()
 
