@@ -3,14 +3,16 @@ from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 
 class DescriptiveAutoSchema(AutoSchema):
-    def __init__(self, *args, tags=None, **kwargs):
-        self._tags = tags
-        super().__init__(*args, **kwargs)
+    def get_tags(self, path, method):
+        tags = super().get_tags(path, method)
+
+        for index, tag in enumerate(tags):
+            tags[index] = tag.title()
+
+        return tags
 
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
-
-        tags = [self.view.basename.title()]
 
         action = getattr(self.view, self.view.action)
         if hasattr(action, "operation_id"):
@@ -24,7 +26,6 @@ class DescriptiveAutoSchema(AutoSchema):
 
         operation["summary"] = summary
         operation["operationId"] = operation_id
-        operation["tags"] = self._tags or tags
 
         if hasattr(action, "example"):
             operation["responses"]["200"]["content"]["application/json"][

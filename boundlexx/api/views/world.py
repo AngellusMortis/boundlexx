@@ -266,7 +266,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 class WorldPollViewSet(
     TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
 ):
-    schema = DescriptiveAutoSchema(tags=["World"])
+    schema = DescriptiveAutoSchema(tags=["Worlds"])
     queryset = (
         WorldPoll.objects.all()
         .select_related("world")
@@ -369,7 +369,7 @@ class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
         .select_related("world_source", "world_dest")
         .order_by("distance")
     )
-    schema = DescriptiveAutoSchema(tags=["World"])
+    schema = DescriptiveAutoSchema(tags=["Worlds"])
     serializer_class = WorldDistanceSerializer
     lookup_field = "world_id"
 

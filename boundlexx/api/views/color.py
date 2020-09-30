@@ -128,7 +128,7 @@ class BlockColorViewSet(
     NestedViewSetMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Color"])
+    schema = DescriptiveAutoSchema()
     queryset = (
         WorldBlockColor.objects.filter(world__is_creative=False)
         .select_related(

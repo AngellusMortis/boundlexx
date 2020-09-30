@@ -308,7 +308,7 @@ class ItemViewSet(
 class ItemResourceTimeseriesViewSet(
     TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
 ):
-    schema = DescriptiveAutoSchema(tags=["Item"])
+    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(world_poll__world__active=True)
     serializer_class = ItemResourceCountTimeSeriesSerializer
     time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
@@ -350,7 +350,7 @@ class ItemResourceTimeseriesViewSet(
 class ItemResourceWorldListViewSet(
     NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):
-    schema = DescriptiveAutoSchema(tags=["Item"])
+    schema = DescriptiveAutoSchema(tags=["Items"])
     serializer_class = SimpleWorldSerializer
 
     def get_queryset(self):
@@ -383,7 +383,7 @@ class ItemResourceCountViewSet(
     NestedViewSetMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Item"])
+    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(
         world_poll__active=True, world_poll__world__active=True
     ).select_related("world_poll", "world_poll__world", "item")
@@ -462,7 +462,7 @@ class ItemColorsViewSet(
     NestedViewSetMixin,
     viewsets.ReadOnlyModelViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Item"])
+    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = (
         WorldBlockColor.objects.filter(world__is_creative=False)
         .select_related(
