@@ -65,6 +65,7 @@ class BoundlexxSchemaGenerator(SchemaGenerator):
         return info
 
     def get_schema(self, request=None, public=False):
+        self.url = reverse(f"{request.version}:api-docs")
         schema = super().get_schema(request=request, public=public)
 
         schema["info"] = self.get_info(request)
