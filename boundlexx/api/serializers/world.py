@@ -517,4 +517,9 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
             "html_name",
             "tier",
             "world_type",
+            "is_sovereign",
+            "is_perm",
+            "is_exo",
+            "is_creative",
+            "is_locked",
         ]
