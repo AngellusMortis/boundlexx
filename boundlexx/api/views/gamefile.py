@@ -32,7 +32,11 @@ class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet)
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    queryset = GameFile.objects.all()
+    queryset = (
+        GameFile.objects.all()
+        .order_by("folder", "filename", "-game_version")
+        .distinct("folder", "filename")
+    )
     serializer_class = SimpleGameFileSerializer
     detail_serializer_class = GameFileSerializer
     lookup_field = "id"

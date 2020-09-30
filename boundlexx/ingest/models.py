@@ -1,6 +1,5 @@
 import os
 
-from django.contrib.postgres.fields import JSONField
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -31,7 +30,7 @@ class GameFile(ExportModelOperationsMixin("game_file"), models.Model):  # type: 
         help_text=_("Version of the game file was ingest from"),
         db_index=True,
     )
-    content = JSONField(encoder=DjangoJSONEncoder)
+    content = models.JSONField(encoder=DjangoJSONEncoder)
 
     class Meta:
         unique_together = (

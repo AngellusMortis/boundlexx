@@ -322,11 +322,11 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     end = models.DateTimeField(blank=True, null=True, db_index=True)
 
     image = models.ImageField(blank=True, null=True, storage=select_storage("worlds"))
-    notification_sent = models.NullBooleanField()
+    notification_sent = models.BooleanField(null=True)
 
-    is_public_edit = models.NullBooleanField()
-    is_public_claim = models.NullBooleanField()
-    is_finalized = models.NullBooleanField()
+    is_public_edit = models.BooleanField(null=True)
+    is_public_claim = models.BooleanField(null=True)
+    is_finalized = models.BooleanField(null=True)
 
     html_name = models.TextField(blank=True, null=True)
     text_name = models.TextField(blank=True, null=True)

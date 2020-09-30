@@ -52,11 +52,11 @@ class DescriptiveAutoSchema(AutoSchema):
 
 
 class BoundlexxSchemaGenerator(SchemaGenerator):
-    def get_info(self, request):  # pylint: disable=arguments-differ
+    def get_info(self, request=None):  # pylint: disable=arguments-differ
         # Title and version are required by openapi specification 3.x
         info = {
             "title": self.title or "",
-            "version": getattr(request, "version", ""),
+            "version": getattr(request, "version", self.version) or "",
         }
 
         if self.description is not None:
@@ -64,25 +64,9 @@ class BoundlexxSchemaGenerator(SchemaGenerator):
 
         return info
 
-    def get_paths(self, request=None):
-        self.url = reverse(f"{request.version}:api-docs")
-
-        return super().get_paths(request=request)
-
     def get_schema(self, request=None, public=False):
-        """
-        Generate a OpenAPI schema.
-        """
-        self._initialise_endpoints()
+        schema = super().get_schema(request=request, public=public)
 
-        paths = self.get_paths(request)
-        if not paths:
-            return None
-
-        schema = {
-            "openapi": "3.0.2",
-            "info": self.get_info(request),
-            "paths": paths,
-        }
+        schema["info"] = self.get_info(request)
 
         return schema

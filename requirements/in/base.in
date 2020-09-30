@@ -16,17 +16,19 @@ django-redis
 django-rest-fuzzysearch
 django-robots
 django-storages[azure]
-django<3.1
+django
 djangorestframework
-drf-extensions
+git+https://github.com/chibisov/drf-extensions.git@002a67ce
 git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e
 python-redis-lock[django]
+
 
 # Celery
 celery<5
 django-celery-beat
 flower
 
+# Misc
 azure-mgmt-cdn
 beautifulsoup4
 colorama
@@ -34,6 +36,7 @@ coloredlogs
 dateparser
 filetype
 gspread
+ipython
 msgpack
 pillow
 psycopg2 --no-binary psycopg2
