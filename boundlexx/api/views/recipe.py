@@ -1,6 +1,7 @@
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import viewsets
 
+from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import RecipeGroupSerializer, RecipeSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import LocalizationFilterSet, RecipeFilterSet
@@ -140,6 +141,8 @@ RECIPE_GROUP_EXAMPLE = {
 
 
 class RecipeGroupViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+    schema = DescriptiveAutoSchema(tags=["Skills"])
+
     queryset = (
         RecipeGroup.objects.all()
         .select_related("display_name")

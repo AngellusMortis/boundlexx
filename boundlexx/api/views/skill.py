@@ -4,6 +4,7 @@ from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters, viewsets
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
+from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import SkillGroupSerializer, SkillSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import LocalizationFilterSet, SkillFilterSet
@@ -56,6 +57,8 @@ SKILL_GROUP_EXAMPLE = {
 
 
 class SkillGroupViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+    schema = DescriptiveAutoSchema(tags=["Skills"])
+
     queryset = (
         SkillGroup.objects.all()
         .select_related("display_name")
