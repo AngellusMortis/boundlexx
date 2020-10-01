@@ -2,7 +2,8 @@ from typing import List
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import viewsets
+from rest_framework import filters, viewsets
+from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.serializers import EmojiSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
@@ -20,6 +21,12 @@ class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Emoji.objects.filter(active=True).prefetch_related("emojialtname_set")
     serializer_class = EmojiSerializer
     lookup_field = "name"
+    filter_backends = [
+        RankedFuzzySearchFilter,
+        filters.OrderingFilter,
+    ]
+    search_fields = ["name", "emojialtname__name"]
+    ordering = ["-rank", "name"]
     ordering_fields: List[str] = []
 
     def get_object(self):

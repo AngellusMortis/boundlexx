@@ -439,7 +439,9 @@ class Emoji(models.Model):
         return f":{self.name}:"
 
     class Meta:
-        ordering = ["name"]
+        indexes = [
+            GinIndex(fields=["name"]),
+        ]
 
     @cached_property
     def names(self):
@@ -449,6 +451,11 @@ class Emoji(models.Model):
 class EmojiAltName(models.Model):
     emoji = models.ForeignKey(Emoji, on_delete=models.CASCADE)
     name = models.CharField(max_length=32, db_index=True)
+
+    class Meta:
+        indexes = [
+            GinIndex(fields=["name"]),
+        ]
 
 
 class ForumImage(models.Model):
