@@ -157,7 +157,7 @@ class WorldManager(models.Manager):
             world = self._get_world_by_info(world_info, is_sovereign)
 
         # otherwise, create it
-        if world is None:
+        if world is None and not is_sovereign:
             world_id = (
                 world_info.get("id")
                 or settings.BOUNDLESS_EXO_EXPIRED_BASE_ID + forum_id
@@ -167,6 +167,9 @@ class WorldManager(models.Manager):
                 id=world_id,
                 display_name=world_info["name"],
             )
+
+        if world is None:
+            return None, None
 
         if "tier" in world_info and world.tier is None:
             world.tier = world_info["tier"]

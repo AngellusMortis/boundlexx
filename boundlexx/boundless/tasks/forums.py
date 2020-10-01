@@ -398,6 +398,10 @@ def _ingest_world_data(topics, is_perm=False, is_sovereign=False):
             topic, world_info, is_sovereign
         )
 
+        if world is None:
+            logger.info("Could find world for topic: %s", topic)
+            continue
+
         number_created = 0
         for block_color in block_colors:
             _, created = WorldBlockColor.objects.get_or_create_color(
