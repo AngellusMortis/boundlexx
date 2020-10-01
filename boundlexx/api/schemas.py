@@ -32,6 +32,9 @@ class DescriptiveAutoSchema(AutoSchema):
                 "examples"
             ] = action.example
 
+        if hasattr(action, "deprecated"):
+            operation["deprecated"] = action.deprecated
+
         return operation
 
     def _get_path_parameters(self, path, method):

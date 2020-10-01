@@ -79,12 +79,18 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
-        Retrieves the list of worlds avaiable in Boundless
+        Retrieves the list of worlds avaiable in Boundless.
+
+        This endpoint is deprecated in favor of `/api/v1/worlds/simple/`.
+
+        The functionality of this endpoint will be replaced with that one in the
+        on 1 December 2020.
         """
 
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(examples.WORLD_EXAMPLE)}}  # type: ignore # noqa E501
+    list.deprecated = True
 
     def retrieve(
         self,
