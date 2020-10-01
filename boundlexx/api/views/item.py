@@ -27,6 +27,7 @@ from boundlexx.api.serializers import (
 )
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.views.filters import (
+    DedupedFilter,
     ItemColorFilterSet,
     ItemFilterSet,
     ItemResourceCountFilterSet,
@@ -162,6 +163,7 @@ class ItemViewSet(
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = ItemFilterSet
     search_fields = ["string_id", "localizedname__name"]
@@ -394,6 +396,7 @@ class ItemResourceCountViewSet(
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = ItemResourceCountFilterSet
     search_fields = [
@@ -477,6 +480,7 @@ class ItemColorsViewSet(
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = ItemColorFilterSet
     search_fields = [

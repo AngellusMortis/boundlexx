@@ -7,6 +7,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.serializers import EmojiSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
+from boundlexx.api.views.filters import DedupedFilter
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Emoji
 
@@ -24,6 +25,7 @@ class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     filter_backends = [
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     search_fields = ["name", "emojialtname__name"]
     ordering = ["-rank", "name"]

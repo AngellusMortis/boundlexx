@@ -7,7 +7,11 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.serializers import SkillGroupSerializer, SkillSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import LocalizationFilterSet, SkillFilterSet
+from boundlexx.api.views.filters import (
+    DedupedFilter,
+    LocalizationFilterSet,
+    SkillFilterSet,
+)
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Skill, SkillGroup
 
@@ -70,6 +74,7 @@ class SkillGroupViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSe
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = LocalizationFilterSet
     ordering = ["-rank", "id"]
@@ -114,6 +119,7 @@ class SkillViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = SkillFilterSet
     ordering = ["-rank", "id"]

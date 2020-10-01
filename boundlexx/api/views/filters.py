@@ -3,6 +3,7 @@ from django.core.exceptions import SuspiciousOperation
 from django.db.models import F, Func, Q, Value
 from django.utils.translation import ugettext as _
 from django_filters.rest_framework import FilterSet, filters
+from rest_framework.filters import BaseFilterBackend
 
 from boundlexx.boundless.models import (
     Item,
@@ -14,6 +15,22 @@ from boundlexx.boundless.models import (
 from boundlexx.boundless.utils import get_block_color_item_ids
 
 DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
+
+
+class DedupedFilter(BaseFilterBackend):
+    def filter_queryset(self, request, queryset, view):
+        # only remove duplicates from list views
+        if view.detail:
+            return queryset
+
+        pks = []
+        final_result = []
+        for item in queryset.iterator():
+            if item.pk not in pks:
+                final_result.append(item)
+                pks.append(item.pk)
+
+        return final_result
 
 
 class BaseFilterSet(FilterSet):

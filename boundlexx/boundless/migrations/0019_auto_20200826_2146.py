@@ -8,9 +8,6 @@ import storages.backends.azure_storage
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0019_auto_20200826_2146_squashed_0048_auto_20200930_1058'), ('boundless', '0020_auto_20200930_1100'), ('boundless', '0021_world_special_type'), ('boundless', '0022_auto_20201001_0937'), ('boundless', '0023_auto_20201001_1020'), ('boundless', '0024_auto_20201001_1021')]
-
     dependencies = [
         ('boundless', '0018_auto_20200809_2316'),
     ]

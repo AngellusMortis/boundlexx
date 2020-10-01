@@ -15,7 +15,11 @@ from boundlexx.api.serializers import (
     PossibleItemSerializer,
 )
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import LocalizationFilterSet, WorldBlockColorFilterSet
+from boundlexx.api.views.filters import (
+    DedupedFilter,
+    LocalizationFilterSet,
+    WorldBlockColorFilterSet,
+)
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Color, WorldBlockColor
 
@@ -57,6 +61,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = LocalizationFilterSet
     search_fields = ["localizedname__name"]
@@ -148,6 +153,7 @@ class BlockColorViewSet(
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = WorldBlockColorFilterSet
     search_fields = [

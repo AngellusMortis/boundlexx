@@ -30,7 +30,7 @@ from boundlexx.api.serializers import (
     WorldSerializer,
 )
 from boundlexx.api.utils import get_list_example
-from boundlexx.api.views.filters import WorldFilterSet
+from boundlexx.api.views.filters import DedupedFilter, WorldFilterSet
 from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
 from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
@@ -68,6 +68,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
+        DedupedFilter,
     ]
     filterset_class = WorldFilterSet
     ordering = ["-rank", "id"]
