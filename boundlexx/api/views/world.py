@@ -90,7 +90,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(examples.WORLD_EXAMPLE)}}  # type: ignore # noqa E501
-    list.deprecated = True
+    list.deprecated = True  # type: ignore
 
     def retrieve(
         self,
