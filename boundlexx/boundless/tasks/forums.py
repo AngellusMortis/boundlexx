@@ -160,7 +160,7 @@ def _parse_title(title):
     type_str = parts[1].lower()
     match = re.search(r"(t|tier )(\d)", type_str)
     if match:
-        tier = int(match.group(2)) - 1
+        tier = match.group(2)
 
     for choice in World.WorldType.choices:
         if choice[0].lower() in type_str:
@@ -436,10 +436,16 @@ def ingest_sovereign_world_data(topics=None):
 
 
 @app.task
-def ingest_exo_world_data():
-    _ingest_world_data(_get_topics(FORUM_EXO_WORLD_CATEGORY), False, False)
+def ingest_exo_world_data(topics=None):
+    if topics is None:
+        topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
+
+    _ingest_world_data(topics, False, False)
 
 
 @app.task
-def ingest_perm_world_data():
-    _ingest_world_data(_get_topics(FORUM_PERM_WORLD_CATEGORY), True, False)
+def ingest_perm_world_data(topics=None):
+    if topics is None:
+        topics = _get_topics(FORUM_PERM_WORLD_CATEGORY)
+
+    _ingest_world_data(topics, True, False)
