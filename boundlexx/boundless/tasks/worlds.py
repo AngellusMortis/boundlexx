@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import List
 
 from celery.utils.log import get_task_logger
@@ -185,13 +187,17 @@ def poll_creative_worlds():
 @app.task
 def poll_worlds(world_ids=None):
     if world_ids is None:
-        # make sure perm worlds are always active
+        # make sure perm worlds or unexpired worlds are always active
         World.objects.filter(
-            owner__isnull=True,
-            end__isnull=True,
-            assignment__isnull=True,
-            address__isnull=False,
+            Q(
+                owner__isnull=True,
+                end__isnull=True,
+                assignment__isnull=True,
+                address__isnull=False,
+            )
+            | Q(end__isnull=False, end__gt=timezone.now())
         ).update(active=True)
+
         worlds = World.objects.filter(active=True).order_by("id")
     else:
         worlds = World.objects.filter(id__in=world_ids).order_by("id")
