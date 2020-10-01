@@ -563,10 +563,16 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
 
     @property
     def next_shop_stand_update(self):
+        if not self.is_public or self.is_creative:
+            return None
+
         return get_next_rank_update(self.itemsellrank_set.all())
 
     @property
     def next_request_basket_update(self):
+        if not self.is_public or self.is_creative:
+            return None
+
         return get_next_rank_update(self.itembuyrank_set.all())
 
     @property

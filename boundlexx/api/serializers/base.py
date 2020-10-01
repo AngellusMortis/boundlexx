@@ -151,6 +151,9 @@ class ShopURL(serializers.ModelField):
 
 class RequestBasketsURL(ShopURL):
     def get_url(self, obj):
+        if not obj.is_public or obj.is_creative:
+            return None
+
         return reverse(
             "world-request-baskets",
             kwargs={"id": obj.id},
@@ -160,6 +163,9 @@ class RequestBasketsURL(ShopURL):
 
 class ShopStandsURL(ShopURL):
     def get_url(self, obj):
+        if not obj.is_public or obj.is_creative:
+            return None
+
         return reverse(
             "world-shop-stands",
             args={"id": obj.id},

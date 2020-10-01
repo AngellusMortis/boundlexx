@@ -157,6 +157,7 @@ def _update_prices():
                 end__isnull=False,
                 end__gt=timezone.now(),
                 owner__isnull=False,
+                is_public=True,
             )
         )
         .exclude(api_url="")
