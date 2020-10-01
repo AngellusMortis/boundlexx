@@ -145,9 +145,8 @@ class WorldManager(models.Manager):
 
         return world
 
-    def get_or_create_forum_world(self, forum_id, world_info, is_sovereign=False):
+    def _get_forum_world(self, forum_id, world_info, is_sovereign=False):
         created = False
-        do_refresh = False
 
         # see if world exists that was created by this method before
         world = self.filter(forum_id=forum_id).first()
@@ -167,6 +166,13 @@ class WorldManager(models.Manager):
                 id=world_id,
                 display_name=world_info["name"],
             )
+
+        return world, created
+
+    def get_or_create_forum_world(self, forum_id, world_info, is_sovereign=False):
+        do_refresh = False
+
+        world, created = self._get_forum_world(forum_id, world_info, is_sovereign)
 
         if world is None:
             return None, None
