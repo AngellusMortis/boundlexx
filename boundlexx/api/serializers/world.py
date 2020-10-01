@@ -84,6 +84,7 @@ class WorldSerializer(serializers.ModelSerializer):
             "shop_stands_url",
             "next_shop_stand_update",
             "id",
+            "active",
             "name",
             "display_name",
             "text_name",
@@ -179,6 +180,7 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
         fields = [
             "item",
             "color",
+            "active",
             "is_default",
             "is_perm",
             "is_sovereign_only",
@@ -235,6 +237,7 @@ class BlockColorSerializer(serializers.ModelSerializer):
         fields = [
             "item",
             "world",
+            "active",
             "is_default",
             "is_perm",
             "is_sovereign_only",
@@ -268,6 +271,7 @@ class ItemColorSerializer(serializers.ModelSerializer):
         model = WorldBlockColor
         fields = [
             "color",
+            "active",
             "is_default",
             "is_perm",
             "is_sovereign_only",
@@ -322,6 +326,7 @@ class WorldColorSerializer(serializers.ModelSerializer):
         fields = [
             "color",
             "world",
+            "active",
             "is_default",
             "is_perm",
             "is_sovereign_only",
@@ -513,6 +518,7 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
         fields = [
             "url",
             "id",
+            "active",
             "display_name",
             "text_name",
             "html_name",

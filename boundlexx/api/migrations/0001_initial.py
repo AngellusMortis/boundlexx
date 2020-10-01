@@ -5,9 +5,6 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('api', '0001_create_trigram'), ('api', '0002_create_median_function')]
-
     initial = True
 
     dependencies = [

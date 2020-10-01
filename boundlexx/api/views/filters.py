@@ -136,6 +136,7 @@ class WorldFilterSet(BaseFilterSet):
             "special_type",
             "start",
             "end",
+            "active",
         ]
 
     def filter_exo(self, queryset, name, value):
@@ -163,7 +164,10 @@ class WorldFilterSet(BaseFilterSet):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
 
-        if "id" not in self.request.parser_context["kwargs"]:
+        if (
+            "id" not in self.request.parser_context["kwargs"]
+            and self.form.cleaned_data["active"] is None
+        ):
             if self.form.cleaned_data["show_inactive"] is not True:
                 queryset = queryset.filter(active=True)
 
@@ -182,12 +186,18 @@ class WorldBlockColorFilterSet(BaseFilterSet):
         label=_("Include previous avaiable Sovereign colors"),
         method="filter_null",
     )
+    show_inactive = filters.BooleanFilter(
+        label=_("Include inactive worlds (no longer in game API)"),
+        method="filter_null",
+    )
 
     class Meta:
         model = WorldBlockColor
         fields = [
+            "active",
             "item__string_id",
             "item__game_id",
+            "world__active",
             "world__tier",
             "world__region",
             "world__world_type",
@@ -224,8 +234,17 @@ class WorldBlockColorFilterSet(BaseFilterSet):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
 
-        if self.form.cleaned_data["show_inactive_colors"] is not True:
+        if (
+            self.form.cleaned_data["show_inactive_colors"] is not True
+            and self.form.cleaned_data["active"] is None
+        ):
             queryset = queryset.filter(active=True)
+
+        if (
+            self.form.cleaned_data["show_inactive"] is not True
+            and self.form.cleaned_data["world__active"] is None
+        ):
+            queryset = queryset.filter(world__active=True)
 
         return queryset
 
@@ -278,11 +297,17 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
         label=_("Include previous avaiable Sovereign colors"),
         method="filter_null",
     )
+    show_inactive = filters.BooleanFilter(
+        label=_("Include inactive worlds (no longer in game API)"),
+        method="filter_null",
+    )
 
     class Meta:
         model = WorldBlockColor
         fields = [
+            "active",
             "color__game_id",
+            "world__active",
             "world__tier",
             "world__region",
             "world__world_type",
@@ -296,8 +321,17 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
     def filter_queryset(self, queryset):
         queryset = super().filter_queryset(queryset)
 
-        if self.form.cleaned_data["show_inactive_colors"] is not True:
+        if (
+            self.form.cleaned_data["show_inactive_colors"] is not True
+            and self.form.cleaned_data["active"] is None
+        ):
             queryset = queryset.filter(active=True)
+
+        if (
+            self.form.cleaned_data["show_inactive"] is not True
+            and self.form.cleaned_data["world__active"] is None
+        ):
+            queryset = queryset.filter(world__active=True)
 
         return queryset
 

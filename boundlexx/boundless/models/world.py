@@ -321,9 +321,16 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     water_color_g = models.FloatField(_("Water Linear G Color"), null=True)
     water_color_b = models.FloatField(_("Water Linear B Color"), null=True)
 
-    forum_id = models.PositiveIntegerField(null=True, blank=True)
+    forum_id = models.PositiveIntegerField(
+        null=True,
+        blank=True,
+    )
 
-    active = models.BooleanField(default=True, db_index=True)
+    active = models.BooleanField(
+        default=True,
+        db_index=True,
+        help_text="Does this world still exist (returned by game API)?",
+    )
 
     start = models.DateTimeField(blank=True, null=True, db_index=True)
     end = models.DateTimeField(blank=True, null=True, db_index=True)
@@ -922,7 +929,10 @@ class WorldBlockColor(
     )
 
     time = models.DateTimeField(auto_now_add=True)
-    active = models.BooleanField(default=True)
+    active = models.BooleanField(
+        default=True,
+        help_text=_("Is this the current color for the world?"),
+    )
 
     is_new = models.BooleanField(
         default=False,

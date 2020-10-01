@@ -676,21 +676,24 @@ class WorldNotification(NotificationBase):
 
         main_embed: Dict[str, Any] = {
             "fields": [
-                {
-                    "name": "🌍 World Details",
-                    "value": (
-                        f"\n\n**ID**: {world.id}\n"
-                        f"**Type**: {world.get_world_type_display()}\n"
-                        f"**Tier**: {world.get_tier_display()}\n"
-                        f"**Atmosphere**: {world.protection or 'Normal'}\n"
-                        f"**Size**: {world.display_size}\n"
-                        f"**Liquid**: ▲ {world.surface_liquid} | "
-                        f"▼ {world.core_liquid}\n"
-                        f"**Region**: {world.get_region_display()}\n"
-                    ),
-                }
+                {"name": "🌍 World Details", "value": (f"\n\n**ID**: {world.id}\n")}
             ]
         }
+
+        if world.special_type is not None:
+            main_embed["fields"][0][
+                "value"
+            ] += f"**Special Type**: {world.get_special_type_display()}\n"
+
+        main_embed["fields"][0]["value"] += (
+            f"**Type**: {world.get_world_type_display()}\n"
+            f"**Tier**: {world.get_tier_display()}\n"
+            f"**Atmosphere**: {world.protection or 'Normal'}\n"
+            f"**Size**: {world.display_size}\n"
+            f"**Liquid**: ▲ {world.surface_liquid} | "
+            f"▼ {world.core_liquid}\n"
+            f"**Region**: {world.get_region_display()}\n"
+        )
         main_embed["title"] = world.display_name
 
         if is_update:
@@ -794,7 +797,7 @@ class WorldNotification(NotificationBase):
                 if world.is_exo:
                     if color.is_new_exo:
                         extra.append("**NEW**")
-                    else:
+                    elif not color.is_perm:
                         if color.transform_first_world is not None:
                             extra.append("**TRANS**")
                         if color.transform_last_exo is not None:
@@ -802,7 +805,7 @@ class WorldNotification(NotificationBase):
                         if color.days_since_exo:
                             extra.append(f"**Days: {color.days_since_exo}**")
                 elif world.is_sovereign and not world.is_creative:
-                    if color.is_new:
+                    if color.is_new and color.is_default:
                         extra.append("**NEW**")
 
                 value += f" {' | '.join(extra)}"
@@ -831,9 +834,10 @@ class WorldNotification(NotificationBase):
             if resource_embed is not None:
                 embeds.append(resource_embed)
 
-        color_embed = self._color_embed(world, context["color_groups"])
-        if color_embed is not None:
-            embeds.append(color_embed)
+        if world.special_type != 1:
+            color_embed = self._color_embed(world, context["color_groups"])
+            if color_embed is not None:
+                embeds.append(color_embed)
 
         return embeds, files
 

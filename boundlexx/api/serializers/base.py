@@ -234,7 +234,7 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
 
 
 class SimpleWorldSerializer(serializers.ModelSerializer):
-    url = ActiveWorldUrlHyperlinkField(
+    url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
         read_only=True,
@@ -245,6 +245,7 @@ class SimpleWorldSerializer(serializers.ModelSerializer):
         fields = [
             "url",
             "id",
+            "active",
             "display_name",
             "text_name",
             "html_name",

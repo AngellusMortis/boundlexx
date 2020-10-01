@@ -8,9 +8,6 @@ import storages.backends.azure_storage
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0019_auto_20200826_2146'), ('boundless', '0020_world_image'), ('boundless', '0021_world_exo_notification_sent'), ('boundless', '0022_auto_20200831_1318'), ('boundless', '0023_worldblockcolor__days_since_last'), ('boundless', '0024_auto_20200902_1658'), ('boundless', '0025_worldblockcolor_time'), ('boundless', '0026_auto_20200912_1701'), ('boundless', '0027_skills_recipes'), ('boundless', '0028_auto_20200915_0931'), ('boundless', '0029_emojialtname'), ('boundless', '0030_remove_world_description'), ('boundless', '0031_auto_20200917_0917'), ('boundless', '0032_auto_20200919_0844'), ('boundless', '0033_resourcecount__average_per_chunk'), ('boundless', '0034_auto_20200919_1009'), ('boundless', '0035_auto_20200919_1137'), ('boundless', '0036_auto_20200919_1534'), ('boundless', '0037_emoji_active'), ('boundless', '0038_auto_20200919_2034'), ('boundless', '0039_auto_20200919_2135'), ('boundless', '0040_auto_20200921_1932'), ('boundless', '0041_forumimage'), ('boundless', '0042_forumimage_checksum'), ('boundless', '0043_forumimage_shortcut_url'), ('boundless', '0044_auto_20200924_1341'), ('boundless', '0045_world_is_finalized'), ('boundless', '0046_auto_20200928_2332'), ('boundless', '0047_auto_20200928_2338'), ('boundless', '0048_auto_20200930_1058')]
-
     dependencies = [
         ('boundless', '0018_auto_20200809_2316'),
     ]
