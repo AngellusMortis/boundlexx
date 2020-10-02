@@ -196,10 +196,11 @@ def poll_worlds(world_ids=None):
                 assignment__isnull=True,
                 address__isnull=False,
             )
-            | Q(end__isnull=False, end__gt=timezone.now())
         ).update(active=True)
 
-        worlds = World.objects.filter(active=True).order_by("id")
+        worlds = World.objects.filter(
+            Q(active=True) | Q(end__isnull=False, end__gt=timezone.now())
+        ).order_by("id")
     else:
         worlds = World.objects.filter(id__in=world_ids).order_by("id")
 
