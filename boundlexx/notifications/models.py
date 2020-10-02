@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import logging
+import os
 from datetime import timedelta
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple
@@ -425,7 +426,22 @@ class WorldNotification(NotificationBase):
         temp_file.write(img_response.content)
         temp_file.close()
 
-        forum_response = client.upload_image(temp_file.name, "composer", True)
+        kwargs = {
+            "type": "composer",
+            "synchronous": "true",
+        }
+
+        try:
+            upload_file = open(temp_file.name, "rb")
+            # upload_image does not properly close file...
+            forum_response = client._post(  # pylint: disable=protected-access
+                "/uploads.json",
+                files={"file": upload_file},
+                **kwargs,
+            )
+        finally:
+            upload_file.close()
+        os.remove(temp_file.name)
 
         forum_image = ForumImage.objects.create(
             image_type=ForumImage.ImageType.WORLD,
@@ -433,6 +449,7 @@ class WorldNotification(NotificationBase):
             url=world.image.url,
             shortcut_url=forum_response["short_url"],
         )
+        forum_image.save()
 
         return forum_image.shortcut_url
 
@@ -488,7 +505,10 @@ class WorldNotification(NotificationBase):
 
         main_embed: Dict[str, Any] = {
             "fields": [
-                {"name": "🌍 World Details", "value": (f"\n\n**ID**: {world.id}\n")}
+                {
+                    "name": "🌍 World Details",
+                    "value": (f"\n\n**ID**: {world.id}\n"),
+                }
             ]
         }
 

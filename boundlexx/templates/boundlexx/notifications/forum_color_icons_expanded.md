@@ -4,7 +4,7 @@
       - ![|25x25]({{ icons.exo_color_new }})
      {% else %}
           {% if color.is_perm %}
-          - **_{% if color.first_world and color.first_world.forum_url %}[![{{ color.first_world.text_name }}|25x25]({{ icons.homeworld|key:color.first_world.id }})]({{ color.first_world.forum_url }}){% else %}![|25x25](upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png){% endif %}_**
+          - **_{% if color.first_world and color.first_world.forum_url %}[![{{ color.first_world.text_name }}|25x25]({{ world_images|key:color.first_world.id }})]({{ color.first_world.forum_url }}){% else %}![|25x25](upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png){% endif %}_**
           {% else %}
                {% if color.transform_first_world or color.transform_last_exo or color.days_since_exo %} -{% endif %}
                {% if color.transform_first_world or color.transform_last_exo %}
@@ -19,7 +19,7 @@
 {% else %}
      {% if world.is_sovereign and not world.is_creative %}
           {% if color.is_perm %}
-           - **_{% if color.first_world and color.first_world.forum_url %}[![{{ color.first_world.text_name }}|25x25]({{ icons.homeworld|key:color.first_world.id }})]({{ color.first_world.forum_url }}){% else %}![|25x25](upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png){% endif %}_**
+           - **_{% if color.first_world and color.first_world.forum_url %}[![{{ color.first_world.text_name }}|25x25]({{ world_images|key:color.first_world.id }})]({{ color.first_world.forum_url }}){% else %}![|25x25](upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png){% endif %}_**
           {% else %}
                {% if color.is_new and color.is_default %}- ![|25x25]({{ icons.exo_color_new }}){% endif %}
           {% endif %}
