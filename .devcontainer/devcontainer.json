@@ -27,7 +27,7 @@
         "python.pythonPath": "/usr/local/bin/python",
         "python.formatting.blackArgs": [
             "--line-length",
-            "79"
+            "88"
         ],
         "python.formatting.provider": "black",
         "python.linting.banditEnabled": true,
@@ -35,11 +35,13 @@
         "python.linting.flake8Enabled": true,
         "python.linting.mypyEnabled": true,
         "python.linting.pylintEnabled": true,
+        "python.linting.pylamaEnabled": false,
         "python.sortImports.args": [
             "--settings-path=${workspaceFolder}/setup.cfg"
         ],
         "python.testing.promptToConfigure": false,
         "python.testing.pytestEnabled": true,
+        "restructuredtext.confPath": "${workspaceFolder}/docs",
         "vscode-coverage-highlighter.defaultState": "disable",
         "vscode-coverage-highlighter.wholeLine": true,
     },
@@ -50,6 +52,7 @@
         "brainfit.vscode-coverage-highlighter",
         "bungcip.better-toml",
         "mikestead.dotenv",
+        "lextudio.restructuredtext",
     ],
     // Uncomment the next line if you want start specific services in your Docker Compose config.
     "runServices": [

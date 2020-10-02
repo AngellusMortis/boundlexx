@@ -9,8 +9,10 @@ Boundlexx
      :alt: Black code style
 
 
-:License: LGPLv3
+:License: MIT
 
+`Changelog <CHANGELOG.rst>`_
+----------------------------
 
 Requirements
 ------------

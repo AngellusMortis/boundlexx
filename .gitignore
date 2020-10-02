@@ -1,6 +1,6 @@
 forum_colors.json
 .local
-.vscode/setting.json
+.vscode/settings.json
 docker-compose.override.yml
 .local.env
 .testing.env
