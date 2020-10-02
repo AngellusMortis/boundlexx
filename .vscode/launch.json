@@ -72,7 +72,8 @@
             "request": "launch",
             "module": "manage",
             "args": [
-                "recalculate_colors",
+                "force_world_notification",
+                "1226",
             ]
         },
         {

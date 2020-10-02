@@ -11,6 +11,7 @@ from requests.exceptions import HTTPError
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.models import World, WorldDistance, WorldPoll
+from boundlexx.notifications.models import ExoworldExpiredNotification
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -259,6 +260,19 @@ def _split_polls(worlds):
         poll_worlds_split.delay(worlds_ids)
 
 
+def _mark_world_inactive(world):
+    logger.info("World %s no longer in API, marking inactive...", world)
+    world.active = False
+    world.save()
+
+    if world.is_exo:
+        resources = None
+        wp = world.worldpoll_set.all().order_by("time").first()
+        if wp is not None:
+            resources = wp.resources
+        ExoworldExpiredNotification.objects.send_notification(world, resources)
+
+
 def _poll_worlds(worlds):
     total = len(worlds)
     if total > settings.BOUNDLESS_MAX_WORLDS_PER_POLL:
@@ -295,9 +309,7 @@ def _poll_worlds(worlds):
             continue
 
         if world_data is None:
-            logger.info("World %s no longer in API, marking inactive...", world)
-            world.active = False
-            world.save()
+            _mark_world_inactive(world)
             continue
 
         try:

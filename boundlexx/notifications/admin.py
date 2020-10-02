@@ -3,20 +3,37 @@ from django.contrib import admin
 from boundlexx.notifications.models import (
     CreativeWorldNotification,
     DiscordWebhookSubscription,
+    ExoworldExpiredNotification,
     ExoworldNotification,
     FailedTaskNotification,
+    ForumCategorySubscription,
+    ForumPMSubscription,
     HomeworldNotification,
     SovereignColorNotification,
     SovereignWorldNotification,
 )
 
 
-@admin.register(DiscordWebhookSubscription)
-class DiscordWebhookSubscriptionAdmin(admin.ModelAdmin):
+class SubscriptionAdmin(admin.ModelAdmin):
     list_display = [
         "id",
         "owner",
     ]
+
+
+@admin.register(DiscordWebhookSubscription)
+class DiscordWebhookSubscriptionAdmin(SubscriptionAdmin):
+    pass
+
+
+@admin.register(ForumCategorySubscription)
+class ForumCategorySubscriptionAdmin(SubscriptionAdmin):
+    pass
+
+
+@admin.register(ForumPMSubscription)
+class ForumPMSubscriptionAdmin(SubscriptionAdmin):
+    pass
 
 
 class NotificationAdmin(admin.ModelAdmin):
@@ -29,6 +46,11 @@ class NotificationAdmin(admin.ModelAdmin):
 
 @admin.register(ExoworldNotification)
 class ExoworldNotificationAdmin(NotificationAdmin):
+    pass
+
+
+@admin.register(ExoworldExpiredNotification)
+class ExoworldExpiredNotificationAdmin(NotificationAdmin):
     pass
 
 

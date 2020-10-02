@@ -48,7 +48,7 @@ django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-robots==4.0        # via -r /app/requirements/in/base.in
 django-storages[azure]==1.10.1  # via -r /app/requirements/in/base.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.1.1             # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-timezone-field, djangorestframework, djangorestframework-msgpack
+django==3.1.2             # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-timezone-field, djangorestframework, djangorestframework-msgpack
 git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e  # via -r /app/requirements/in/base.in
 djangorestframework==3.12.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, djangorestframework-msgpack, drf-extensions
 git+https://github.com/chibisov/drf-extensions.git@002a67ce  # via -r /app/requirements/in/base.in
@@ -62,7 +62,7 @@ google-auth==1.22.0       # via google-auth-oauthlib, gspread
 greenlet==0.4.17          # via gevent
 gspread==3.6.0            # via -r /app/requirements/in/base.in
 humanfriendly==8.2        # via coloredlogs
-humanize==2.6.0           # via flower
+humanize==3.0.0           # via flower
 idna==2.10                # via requests, yarl
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.18.1           # via -r /app/requirements/in/base.in
@@ -88,6 +88,7 @@ pyasn1-modules==0.2.8     # via google-auth
 pyasn1==0.4.8             # via pyasn1-modules, rsa
 pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
+pydiscourse==1.1.0        # via -r /app/requirements/in/base.in
 pygments==2.7.1           # via ipython
 pyjwt==1.7.1              # via adal
 python-crontab==2.5.1     # via django-celery-beat
@@ -99,7 +100,7 @@ pyyaml==5.3.1             # via -r /app/requirements/in/base.in
 redis==3.5.3              # via django-redis, python-redis-lock
 regex==2020.9.27          # via dateparser
 requests-oauthlib==1.3.0  # via google-auth-oauthlib, msrest
-requests==2.24.0          # via adal, azure-storage-common, gspread, msrest, requests-oauthlib, steam
+requests==2.24.0          # via adal, azure-storage-common, gspread, msrest, pydiscourse, requests-oauthlib, steam
 rsa==4.6                  # via google-auth
 semver==2.10.2            # via -r /app/requirements/in/base.in
 six==1.15.0               # via argon2-cffi, cryptography, google-auth, isodate, msrestazure, protobuf, python-dateutil, steam
@@ -118,7 +119,7 @@ vine==1.3.0               # via amqp, celery
 wcwidth==0.2.5            # via prompt-toolkit
 yarl==1.6.0               # via aiohttp
 zope.event==4.5.0         # via gevent
-zope.interface==5.1.0     # via gevent
+zope.interface==5.1.2     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # setuptools

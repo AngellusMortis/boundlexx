@@ -456,10 +456,3 @@ class EmojiAltName(models.Model):
         indexes = [
             GinIndex(fields=["name"]),
         ]
-
-
-class ForumImage(models.Model):
-    game_obj = models.OneToOneField(GameObj, on_delete=models.CASCADE)
-    url = models.TextField()
-    checksum = models.CharField(max_length=64)
-    shortcut_url = models.CharField(max_length=64)

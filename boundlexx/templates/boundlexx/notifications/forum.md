@@ -1,4 +1,4 @@
-{% load humanize tz utils %}{% if world.image %}![|300x300]({{ world.image.url }}){% else %}![{{ world.display_name }}|300x300]({{ icons.world_image }}){% endif %}{% if world.is_sovereign %}
+{% load humanize tz utils %}{% if world.image %}![|300x300]({{ world_images|key:world.id }}){% else %}![{{ world.display_name }}|300x300]({{ icons.world_image }}){% endif %}{% if world.is_sovereign %}
 **-------------------[Sovereign Details]-------------------**
 ![|30x30]({{ icons.owner }}) Owner : **{% if username %}@{{ username }}{% else %}ADD YOUR NAME HERE{% endif %}**
 ![|30x30]({{ icons.permissions }}) Permissions : **{% if world.has_perm_data %}{% if world.is_public %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Visit | {% if world.is_public_edit %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Edit | {% if world.is_public_claim %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Claim{% else %}{% if perms %}{% if perms.can_visit %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Visit | {% if perms.can_edit %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Edit | {% if perms.can_claim %}![Yes|25x25]({{ icons.yes }}){% else %}![No|25x25]({{ icons.no }}){% endif %} Claim{% else %}![Yes|25x25]({{ icons.yes }})|![No|25x25]({{ icons.no }}) Visit - ![Yes|25x25]({{ icons.yes }})|![No|25x25]({{ icons.no }}) Edit - ![Yes|25x25]({{ icons.yes }})|![No|25x25]({{ icons.no }}) Claim{% endif %}{% endif %}**{% if perms and comptactness != None %}
@@ -26,13 +26,13 @@
 [details="Default Blocks Colors"]
 **-------------------------------------------------------------------**
 ![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
-[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld (clickable)_
+[![|25x25]({{ world_images|key:1 }})]() **:** _Obtained on Homeworld (clickable)_
 **-------------------------------------------------------------------**
 
 {% for group_name, color_group in default_color_groups.items %}{% if group_name %}
 
 _**[{{ group_name|title }}]**_
-{% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
+{% endif %}{% for color in color_group %}∟![|30x30]({{ color_images|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
 {% endfor %}{% endfor %}
 [/details]
 **-------------------------------------------------------------------**{% endif %}{% if world.special_type == 1 %}
@@ -42,14 +42,14 @@ _**[{{ group_name|title }}]**_
 **-------------------------------------------------------------------**{% if not world.is_perm %}{% if world.is_exo %}
 ![|25x25]({{ icons.exo_color_new }}) **:** _New Color to this date_
 ![|25x25]({{ icons.by_recipe }}) **:** _Can be obtained by **Recipe/Transmutation**_{% endif %}
-[![|25x25]({{ icons.homeworld|key:1 }})]() **:** _Obtained on Homeworld (clickable)_{% if world.is_exo %}
+[![|25x25]({{ world_images|key:1 }})]() **:** _Obtained on Homeworld (clickable)_{% if world.is_exo %}
 ![|20x20]({{ icons.timelapse }})**_[>= 0]()_** **:** _Exo Exclusive **last occurrence** in **Days**_{% endif %}{% endif %}
 **-------------------------------------------------------------------**
 
 {% for group_name, color_group in color_groups.items %}{% if group_name %}
 
 _**[{{ group_name|title }}]**_
-{% endif %}{% for color in color_group %}∟![|30x30]({{ icons.colors|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
+{% endif %}{% for color in color_group %}∟![|30x30]({{ color_images|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
 {% endfor %}{% endfor %}
 [/details]
 **-------------------------------------------------------------------**{% endif %}{% endif %}{% if embedded_resources %}

@@ -57,15 +57,15 @@ django-redis==4.12.1      # via -r /app/requirements/in/base.in, python-redis-lo
 django-rest-fuzzysearch==0.5.1  # via -r /app/requirements/in/base.in
 django-robots==4.0        # via -r /app/requirements/in/base.in
 django-storages[azure]==1.10.1  # via -r /app/requirements/in/base.in
-django-stubs==1.5.0       # via -r /app/requirements/in/dev.in
+django-stubs==1.6.0       # via -r /app/requirements/in/dev.in
 django-timezone-field==4.0  # via django-celery-beat
-django==3.1.1             # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-stubs, django-timezone-field, djangorestframework, djangorestframework-msgpack
+django==3.1.2             # via -r /app/requirements/in/base.in, django-celery-beat, django-cors-headers, django-debug-toolbar, django-filter, django-model-utils, django-polymorphic, django-redis, django-rest-fuzzysearch, django-storages, django-stubs, django-timezone-field, djangorestframework, djangorestframework-msgpack
 git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e  # via -r /app/requirements/in/base.in
 djangorestframework==3.12.1  # via -r /app/requirements/in/base.in, django-rest-fuzzysearch, djangorestframework-msgpack, drf-extensions
 docutils==0.16            # via sphinx
 git+https://github.com/chibisov/drf-extensions.git@002a67ce  # via -r /app/requirements/in/base.in
 factory-boy==3.0.1        # via -r /app/requirements/in/dev.in
-faker==4.1.3              # via factory-boy
+faker==4.1.6              # via factory-boy
 filetype==1.0.7           # via -r /app/requirements/in/base.in
 flake8-bugbear==20.1.4    # via -r /app/requirements/in/dev.in
 flake8-builtins==1.5.3    # via -r /app/requirements/in/dev.in
@@ -78,17 +78,17 @@ future==0.18.2            # via django-json-widget
 gevent-eventemitter==2.1  # via steam
 gevent==20.9.0            # via gevent-eventemitter, steam
 gitdb==4.0.5              # via gitpython
-gitpython==3.1.8          # via bandit
+gitpython==3.1.9          # via bandit
 google-auth-oauthlib==0.4.1  # via gspread
 google-auth==1.22.0       # via google-auth-oauthlib, gspread
 greenlet==0.4.17          # via gevent
 gspread==3.6.0            # via -r /app/requirements/in/base.in
 humanfriendly==8.2        # via coloredlogs
-humanize==2.6.0           # via flower
+humanize==3.0.0           # via flower
 idna==2.10                # via requests, yarl
 imagesize==1.2.0          # via sphinx
 iniconfig==1.0.1          # via pytest
-ipdb==0.13.3              # via -r /app/requirements/in/dev.in
+ipdb==0.13.4              # via -r /app/requirements/in/dev.in
 ipython-genutils==0.2.0   # via traitlets
 ipython==7.18.1           # via -r /app/requirements/in/base.in, ipdb
 isodate==0.6.0            # via msrest
@@ -106,7 +106,7 @@ msrest==0.6.19            # via azure-mgmt-cdn, msrestazure
 msrestazure==0.6.4        # via azure-mgmt-cdn
 multidict==4.7.6          # via aiohttp, yarl
 mypy-extensions==0.4.3    # via black, mypy
-mypy==0.770               # via -r /app/requirements/in/dev.in, django-stubs
+mypy==0.782               # via -r /app/requirements/in/dev.in, django-stubs
 oauthlib==3.1.0           # via requests-oauthlib
 openapi-spec-validator==0.2.9  # via -r /app/requirements/in/dev.in
 packaging==20.4           # via pytest, pytest-sugar, sphinx
@@ -130,6 +130,7 @@ pyasn1==0.4.8             # via pyasn1-modules, rsa
 pycodestyle==2.6.0        # via flake8
 pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
+pydiscourse==1.1.0        # via -r /app/requirements/in/base.in
 pyflakes==2.2.0           # via flake8
 pygments==2.7.1           # via ipython, sphinx
 pyjwt==1.7.1              # via adal
@@ -154,7 +155,7 @@ pyyaml==5.3.1             # via -r /app/requirements/in/base.in, bandit, openapi
 redis==3.5.3              # via django-redis, python-redis-lock
 regex==2020.9.27          # via black, dateparser
 requests-oauthlib==1.3.0  # via google-auth-oauthlib, msrest
-requests==2.24.0          # via adal, azure-storage-common, gspread, msrest, requests-oauthlib, sphinx, steam
+requests==2.24.0          # via adal, azure-storage-common, gspread, msrest, pydiscourse, requests-oauthlib, sphinx, steam
 rsa==4.6                  # via google-auth
 semver==2.10.2            # via -r /app/requirements/in/base.in
 six==1.15.0               # via argon2-cffi, astroid, bandit, cryptography, django-coverage-plugin, google-auth, isodate, jsonschema, msrestazure, openapi-spec-validator, packaging, pip-tools, protobuf, python-dateutil, steam
@@ -189,7 +190,7 @@ werkzeug==1.0.1           # via -r /app/requirements/in/dev.in
 wrapt==1.12.1             # via astroid
 yarl==1.6.0               # via aiohttp
 zope.event==4.5.0         # via gevent
-zope.interface==5.1.0     # via gevent
+zope.interface==5.1.2     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:
 # pip

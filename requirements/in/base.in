@@ -40,6 +40,7 @@ ipython
 msgpack
 pillow
 psycopg2 --no-binary psycopg2
+pydiscourse
 python-slugify
 pyyaml
 semver

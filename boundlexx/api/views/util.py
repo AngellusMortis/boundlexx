@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.views.generic import FormView
 
 from boundlexx.api.forms import ForumFormatForm
-from boundlexx.notifications.models import ExoworldNotification
+from boundlexx.notifications.models import WorldNotification
 
 
 class ForumFormatView(FormView):
@@ -33,7 +33,7 @@ class ForumFormatView(FormView):
                 .select_related("item")
             )
 
-        title, body = ExoworldNotification().forum(world, resources, extra=extra)
+        _, title, body = WorldNotification().forum(world, resources, extra=extra)
 
         return HttpResponse(
             render(
