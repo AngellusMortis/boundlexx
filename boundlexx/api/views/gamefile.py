@@ -67,6 +67,7 @@ class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet)
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(GAMEFILE_LIST_EXAMPLE)}}  # type: ignore # noqa E501
+    list.operation_id = "listGameFiles"  # type: ignore # noqa E501
 
     def retrieve(
         self,
@@ -82,3 +83,4 @@ class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet)
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": GAMEFILE_EXAMPLE}}  # type: ignore # noqa E501
+    retrieve.operation_id = "retrieveGameFile"  # type: ignore # noqa E501

@@ -229,6 +229,7 @@ class ItemViewSet(
     shop_stands.example = {
         "shop_stands": {"value": get_list_example(ITEM_SHOP_STAND_EXAMPLE)}
     }
+    shop_stands.operation_id = "listItemShopStands"  # noqa E501
 
     @action(
         detail=True,
@@ -263,6 +264,7 @@ class ItemViewSet(
     request_baskets.example = {
         "request_baskets": {"value": get_list_example(ITEM_REQUEST_BASKETS_EXAMPLE)}
     }
+    request_baskets.operation_id = "listItemRequestBaskets"  # noqa E501
 
     @action(
         detail=True,
@@ -305,6 +307,7 @@ class ItemViewSet(
     sovereign_colors.example = {
         "sovereign_colors": {"value": get_list_example(ITEM_SOVEREIGN_COLORS_EXAMPLE)}
     }
+    sovereign_colors.operation_id = "listItemSovereignColors"  # noqa E501
 
 
 class ItemResourceTimeseriesViewSet(
@@ -333,7 +336,7 @@ class ItemResourceTimeseriesViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_TIMESERIES_EXAMPLE)}}  # type: ignore # noqa E501
-    list.operation_id = "list-item-resource-timeseries"  # type: ignore # noqa E501
+    list.operation_id = "listItemResourceTimeseries"  # type: ignore # noqa E501
 
     def retrieve(
         self,
@@ -347,6 +350,7 @@ class ItemResourceTimeseriesViewSet(
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_TIMESERIES_EXAMPLE}}  # type: ignore # noqa E501
+    retrieve.operation_id = "retrieveItemResourceTimeseries"  # type: ignore # noqa E501
 
 
 class ItemResourceWorldListViewSet(
@@ -379,6 +383,7 @@ class ItemResourceWorldListViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCES_WORLD_LIST_EXAMPLE)}}  # type: ignore # noqa E501
+    list.operation_id = "listItemResourceWorlds"  # type: ignore # noqa E501
 
 
 class ItemResourceCountViewSet(
@@ -420,6 +425,7 @@ class ItemResourceCountViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_COUNT_EXAMPLE)}}  # type: ignore # noqa E501
+    list.operation_id = "listItemResourceCounts"  # type: ignore # noqa E501
 
     def retrieve(
         self,
@@ -433,6 +439,7 @@ class ItemResourceCountViewSet(
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_COUNT_EXAMPLE}}  # type: ignore # noqa E501
+    retrieve.operation_id = "retrieveItemResourceCount"  # type: ignore # noqa E501
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
@@ -514,7 +521,7 @@ class ItemColorsViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
-    list.operation_id = "item-colors"  # type: ignore # noqa E501
+    list.operation_id = "listItemColors"  # type: ignore # noqa E501
 
     def retrieve(
         self,
@@ -528,7 +535,7 @@ class ItemColorsViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
-    retrieve.operation_id = "item-colors-color"  # type: ignore # noqa E501
+    retrieve.operation_id = "retrieveItemColors"  # type: ignore # noqa E501
 
 
 class BlockViewSet(

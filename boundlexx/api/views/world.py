@@ -115,6 +115,8 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     def simple(self, request, *args, **kwargs):
         return self.list(request, *args, **kwargs)
 
+    simple.operation_id = "listWorldsSimple"
+
     @action(
         detail=True,
         methods=["get"],
@@ -148,6 +150,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         return Response(serializer.data)
 
     block_colors.example = {"block_colors": {"value": examples.WORLD_COLORS_EXAMPLE}}
+    block_colors.operation_id = "listWorldBlockColors"
 
     @action(
         detail=True,
@@ -182,6 +185,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     shop_stands.example = {
         "shop_stands": {"value": get_list_example(examples.WORLD_SHOP_STANDS_EXAMPLE)}
     }
+    shop_stands.operation_id = "listWorldShopStands"
 
     @action(
         detail=True,
@@ -218,6 +222,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             "value": get_list_example(examples.WORLD_REQUEST_BASKETS_EXAMPLE)
         }
     }
+    request_baskets.operation_id = "listWorldRequestBaskets"
 
     @method_decorator(cache_page(3600))
     @action(
@@ -268,6 +273,8 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         response = Response(serializer.data)
         return response
+
+    dump.operation_id = "dumpWorlds"
 
 
 class WorldPollViewSet(
@@ -344,6 +351,7 @@ class WorldPollViewSet(
     leaderboard.example = {
         "leaderboard": {"value": examples.WORLD_POLL_LEADERBOARD_EXAMPLE}
     }
+    leaderboard.operation_id = "listWorldPollLeaderboards"
 
     @action(
         detail=True,
@@ -368,6 +376,7 @@ class WorldPollViewSet(
         return Response(serializer.data)
 
     resources.example = {"resources": {"value": examples.WORLD_POLL_RESOURCES_EXAMPLE}}
+    resources.operation_id = "listWorldPollResources"
 
 
 class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):

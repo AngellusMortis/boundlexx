@@ -128,6 +128,8 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         return Response(serializer.data)
 
+    sovereign_blocks.operation_id = "listColorSovereignBlocks"  # noqa E501
+
 
 class BlockColorViewSet(
     NestedViewSetMixin,
@@ -174,7 +176,7 @@ class BlockColorViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(COLOR_BLOCKS_EXAMPLE)}}  # type: ignore # noqa E501
-    list.operation_id = "color-blocks"  # type: ignore # noqa E501
+    list.operation_id = "listColorBlocks"  # type: ignore # noqa E501
 
     def retrieve(
         self,
@@ -188,4 +190,4 @@ class BlockColorViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.example = {"list": {"value": get_list_example(COLOR_BLOCKS_EXAMPLE)}}  # type: ignore # noqa E501
-    retrieve.operation_id = "color-blocks-item"  # type: ignore # noqa E501
+    retrieve.operation_id = "retrieveColorBlock"  # type: ignore # noqa E501

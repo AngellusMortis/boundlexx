@@ -1,4 +1,5 @@
-from django.urls import reverse
+import re
+
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 
@@ -18,11 +19,13 @@ class DescriptiveAutoSchema(AutoSchema):
         if hasattr(action, "operation_id"):
             operation_id = action.operation_id
         else:
-            operation_id = f"{self.view.action}-{self.view.basename}".lower()
-            operation_id = operation_id.replace("_", "-")
+            operation_id = (
+                f"{self.view.action.lower()}"
+                f"{self.view.basename.title().replace('-', '')}"
+            )
             if self.view.action.lower() == "list":
                 operation_id += "s"
-        summary = operation_id.title().replace("-", " ")
+        summary = re.sub(r"(?<!^)(?=[A-Z])", " ", operation_id).title()
 
         operation["summary"] = summary
         operation["operationId"] = operation_id
@@ -69,9 +72,18 @@ class BoundlexxSchemaGenerator(SchemaGenerator):
         return info
 
     def get_schema(self, request=None, public=False):
-        self.url = reverse(f"{request.version}:api-docs")
         schema = super().get_schema(request=request, public=public)
 
         schema["info"] = self.get_info(request)
+        schema["servers"] = [
+            {
+                "url": "https://api.boundlexx.app/api/v1",
+                "description": "Live Universe",
+            },
+            {
+                "url": "https://testing.boundlexx.app/api/v1",
+                "description": "Testing Universe",
+            },
+        ]
 
         return schema

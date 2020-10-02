@@ -1,4 +1,9 @@
 
+2020-10-02
+----------
+
+* Fixes operation IDs so they play nicely with `openapi-client-axios` Node.js package
+
 2020-10-01
 ----------
 
