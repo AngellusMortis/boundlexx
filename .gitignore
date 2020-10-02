@@ -1,6 +1,5 @@
 forum_colors.json
 .local
-.vscode/settings.json
 docker-compose.override.yml
 .local.env
 .testing.env
@@ -163,7 +162,6 @@ typings/
 
 ### VisualStudioCode template
 .vscode/*
-!.vscode/settings.json
 !.vscode/tasks.json
 !.vscode/launch.json
 !.vscode/extensions.json
