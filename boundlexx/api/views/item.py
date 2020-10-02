@@ -406,7 +406,7 @@ class ItemResourceCountViewSet(
     ordering = ["-rank", "world_poll__world_id", "-count"]
     ordering_fields: List[str] = [
         "count",
-        "average_per_chunk",
+        "_average_per_chunk",
         "percentage",
     ]
 
