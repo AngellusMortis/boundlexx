@@ -65,7 +65,7 @@ djangorestframework==3.12.1  # via -r /app/requirements/in/base.in, django-rest-
 docutils==0.16            # via sphinx
 git+https://github.com/chibisov/drf-extensions.git@002a67ce  # via -r /app/requirements/in/base.in
 factory-boy==3.0.1        # via -r /app/requirements/in/dev.in
-faker==4.1.6              # via factory-boy
+faker==4.1.8              # via factory-boy
 filetype==1.0.7           # via -r /app/requirements/in/base.in
 flake8-bugbear==20.1.4    # via -r /app/requirements/in/dev.in
 flake8-builtins==1.5.3    # via -r /app/requirements/in/dev.in
@@ -82,6 +82,7 @@ gitpython==3.1.9          # via bandit
 google-auth-oauthlib==0.4.1  # via gspread
 google-auth==1.22.0       # via google-auth-oauthlib, gspread
 greenlet==0.4.17          # via gevent
+groundwork-sphinx-theme==1.1.1  # via -r /app/requirements/in/dev.in
 gspread==3.6.0            # via -r /app/requirements/in/base.in
 humanfriendly==8.2        # via coloredlogs
 humanize==3.0.0           # via flower
@@ -130,7 +131,7 @@ pyasn1==0.4.8             # via pyasn1-modules, rsa
 pycodestyle==2.6.0        # via flake8
 pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
-pydiscourse==1.1.0        # via -r /app/requirements/in/base.in
+pydiscourse==1.1.1        # via -r /app/requirements/in/base.in
 pyflakes==2.2.0           # via flake8
 pygments==2.7.1           # via ipython, sphinx
 pyjwt==1.7.1              # via adal
@@ -162,7 +163,7 @@ six==1.15.0               # via argon2-cffi, astroid, bandit, cryptography, djan
 smmap==3.0.4              # via gitdb
 snowballstemmer==2.0.0    # via sphinx
 soupsieve==2.0.1          # via beautifulsoup4
-sphinx==3.2.1             # via -r /app/requirements/in/dev.in
+sphinx==3.2.1             # via -r /app/requirements/in/dev.in, groundwork-sphinx-theme
 sphinxcontrib-applehelp==1.0.2  # via sphinx
 sphinxcontrib-devhelp==1.0.2  # via sphinx
 sphinxcontrib-htmlhelp==1.0.3  # via sphinx

@@ -30,5 +30,6 @@ pytest-dotenv
 pytest-sugar
 pytest
 
-sphinx
+groundwork-sphinx-theme
 pip-tools
+sphinx

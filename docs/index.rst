@@ -10,7 +10,8 @@ Welcome to Boundlexx's documentation!
    :maxdepth: 2
    :caption: Contents:
 
-   pycharm/configuration
+   history
+   examples
 
 
 

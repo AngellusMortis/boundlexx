@@ -88,7 +88,7 @@ pyasn1-modules==0.2.8     # via google-auth
 pyasn1==0.4.8             # via pyasn1-modules, rsa
 pycparser==2.20           # via cffi
 pycryptodomex==3.9.8      # via steam
-pydiscourse==1.1.0        # via -r /app/requirements/in/base.in
+pydiscourse==1.1.1        # via -r /app/requirements/in/base.in
 pygments==2.7.1           # via ipython
 pyjwt==1.7.1              # via adal
 python-crontab==2.5.1     # via django-celery-beat
