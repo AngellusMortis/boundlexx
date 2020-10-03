@@ -29,6 +29,10 @@ class GameObj(PolymorphicModel):
         unique_together = ("game_id", "polymorphic_ctype")
         ordering = ["game_id"]
 
+        indexes = [
+            GinIndex(fields=["game_id"]),
+        ]
+
     def __str__(self):
         if self.default_name:
             return f"{self.game_id}: {self.default_name}"

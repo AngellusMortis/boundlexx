@@ -52,15 +52,15 @@ if __name__ == "__main__":
 
         env = environ.Env()
 
-        if env.bool("REMOTE_DEBUGGING") and (
-            os.environ.get("RUN_MAIN") or os.environ.get("WERKZEUG_RUN_MAIN")
-        ):
-            import ptvsd
-            import logging
+        # if env.bool("REMOTE_DEBUGGING") and (
+        #     os.environ.get("RUN_MAIN") or os.environ.get("WERKZEUG_RUN_MAIN")
+        # ):
+        #     import ptvsd
+        #     import logging
 
-            logger = logging.getLogger("django")
+        #     logger = logging.getLogger("django")
 
-            ptvsd.enable_attach(address=("127.0.0.1", 3000))
-            logger.info("VS Code Remote debugger running on 127.0.0.1:3000")
+        #     ptvsd.enable_attach(address=("127.0.0.1", 3000))
+        #     logger.info("VS Code Remote debugger running on 127.0.0.1:3000")
 
     execute_from_command_line(sys.argv)

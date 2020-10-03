@@ -1,5 +1,6 @@
 import re
 
+from django.conf import settings
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 
@@ -85,5 +86,13 @@ class BoundlexxSchemaGenerator(SchemaGenerator):
                 "description": "Testing Universe",
             },
         ]
+
+        if settings.DEBUG:
+            schema["servers"].append(
+                {
+                    "url": "https://local-boundlexx.wl.mort.is/api/v1",
+                    "description": "Local Instance",
+                },
+            )
 
         return schema

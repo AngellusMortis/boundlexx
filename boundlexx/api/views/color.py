@@ -64,7 +64,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         DedupedFilter,
     ]
     filterset_class = LocalizationFilterSet
-    search_fields = ["localizedname__name"]
+    search_fields = ["localizedname__name", "game_id"]
     ordering = ["-rank", "game_id"]
     ordering_fields: List[str] = []
 
