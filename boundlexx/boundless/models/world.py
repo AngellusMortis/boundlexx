@@ -252,7 +252,8 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         ordering = ["id"]
         indexes = [
             GinIndex(fields=["name"]),
-            GinIndex(fields=["display_name"]),
+            GinIndex(fields=["text_name"]),
+            GinIndex(fields=["id"]),
         ]
 
     name = models.CharField(_("Name"), max_length=64, null=True, db_index=True)

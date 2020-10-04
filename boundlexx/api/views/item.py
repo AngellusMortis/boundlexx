@@ -166,7 +166,7 @@ class ItemViewSet(
         DedupedFilter,
     ]
     filterset_class = ItemFilterSet
-    search_fields = ["string_id", "localizedname__name"]
+    search_fields = ["string_id", "localizedname__name", "game_id"]
     ordering = ["-rank", "game_id"]
     ordering_fields: List[str] = []
 

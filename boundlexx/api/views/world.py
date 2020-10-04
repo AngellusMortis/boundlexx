@@ -75,7 +75,8 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     ordering_fields: List[str] = ["sort_name", "start", "end"]
     search_fields = [
         "name",
-        "display_name",
+        "id",
+        "text_name",
     ]
 
     def list(self, request, *args, **kwargs):  # noqa A003

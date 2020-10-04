@@ -512,6 +512,7 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
         lookup_field="id",
         read_only=True,
     )
+    image_url = AzureImageField(source="image", allow_null=True)
 
     class Meta:
         model = World
@@ -519,6 +520,7 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
             "url",
             "id",
             "active",
+            "image_url",
             "display_name",
             "text_name",
             "html_name",

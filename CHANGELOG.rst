@@ -1,4 +1,10 @@
 
+2020-10-04
+----------
+
+* Adds searching by ID for Worlds, and GameObjs
+* Adds `image_url` to Worlds Simple
+
 2020-10-02
 ----------
 
