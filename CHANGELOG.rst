@@ -2,6 +2,7 @@
 2020-10-04
 ----------
 
+* Adds alt text/title to emoji images
 * Adds searching by ID for Worlds, and GameObjs
 * Adds `image_url` to Worlds Simple
 
