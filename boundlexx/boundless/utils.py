@@ -209,7 +209,7 @@ def html_name(string, strip=False, colors=None):
                 else:
                     html_emoji = (
                         f'<img src="{emoji.image.url}" class="emoji"'
-                        f' alt="emoji {user_name}" title=":{user_name}:">'
+                        f' alt="emoji {user_name}" title="{user_name}">'
                     )
                     final_string = final_string.replace(format_string, html_emoji, 1)
 
