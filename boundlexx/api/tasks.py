@@ -23,7 +23,7 @@ from boundlexx.api.utils import (
 from config.celery_app import app
 
 MAX_SINGLE_PURGE = 50
-WARM_WORLD_DUMP_TASK = "boundlexx.api.tasks.warm_world_dump"
+WARM_CACHE_TASK = "boundlexx.api.tasks.warm_cache"
 
 logger = get_task_logger(__name__)
 
@@ -90,8 +90,9 @@ def purge_cache(all_paths=False):
             raise
 
 
-def _reschedule(run_time):
-    task = PeriodicTask.objects.filter(task=WARM_WORLD_DUMP_TASK).first()
+def _reschedule(run_time, path):
+    args = f'["{path}"]'
+    task = PeriodicTask.objects.filter(task=WARM_CACHE_TASK, args=args).first()
 
     if task is None:
         interval, _ = IntervalSchedule.objects.get_or_create(
@@ -99,12 +100,13 @@ def _reschedule(run_time):
         )
 
         task = PeriodicTask.objects.create(
-            task=WARM_WORLD_DUMP_TASK,
-            name="Warm Cache - World Dump",
+            task=WARM_CACHE_TASK,
+            name=f"Warm Cache - {path}",
             interval=interval,
             one_off=True,
             start_time=run_time,
             enabled=True,
+            args=args,
         )
     else:
         task.one_off = True
@@ -115,7 +117,16 @@ def _reschedule(run_time):
 
 @app.task
 def warm_world_dump():
-    lock = cache.lock("boundlexx:api:warm_world_dump")
+    _warm_cache(reverse("api:world-dump"))
+
+
+@app.task
+def warm_cache(path):
+    _warm_cache(path)
+
+
+def _warm_cache(path):
+    lock = cache.lock(f"boundlexx:api:warm_cache:{path}")
 
     acquired = lock.acquire(blocking=True, timeout=1)
 
@@ -125,25 +136,24 @@ def warm_world_dump():
     rescheduled = False
     try:
         domain = Site.objects.get_current().domain
-        path = reverse("api:world-dump")
 
         try:
             r = requests.get(f"https://{domain}{path}", timeout=10)
         except (requests.HTTPError, ReadTimeout):
             logger.info("Timeout while making request, rescheduling...")
-            _reschedule(timezone.now() + timedelta(seconds=60))
+            _reschedule(timezone.now() + timedelta(seconds=60), path)
             rescheduled = True
             return
 
         if not r.ok:
             logger.info("Bad response code, rescheduling...")
-            _reschedule(timezone.now() + timedelta(seconds=60))
+            _reschedule(timezone.now() + timedelta(seconds=60), path)
             rescheduled = True
             return
 
         if "X-Cache" not in r.headers or r.headers["X-Cache"] != "HIT":
             logger.info("Response not cached, rescheduling...")
-            _reschedule(timezone.now() + timedelta(seconds=10))
+            _reschedule(timezone.now() + timedelta(seconds=10), path)
             rescheduled = True
             return
 
@@ -151,14 +161,14 @@ def warm_world_dump():
 
         if expires < timezone.now():
             logger.info("Expiration date in the past! Rescheduling...")
-            _reschedule(timezone.now() + timedelta(minutes=5))
+            _reschedule(timezone.now() + timedelta(minutes=5), path)
             rescheduled = True
             return
 
         logger.info("Request cached! Rescheduling for %s", expires)
-        _reschedule(expires + timedelta(seconds=5))
+        _reschedule(expires + timedelta(seconds=5), path)
         rescheduled = True
     finally:
         if not rescheduled:
-            _reschedule(timezone.now() + timedelta(seconds=60))
+            _reschedule(timezone.now() + timedelta(seconds=60), path)
         lock.release()
