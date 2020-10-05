@@ -52,7 +52,7 @@ if settings.DEBUG:
 elif settings.SERVE_STATIC_FILES_DEV:
     urlpatterns += [
         re_path(
-            r"^static/(?P<path>.*)$",
+            r"^" + settings.STATIC_URL[1:] + r"(?P<path>.*)$",
             serve,
             {"document_root": settings.STATIC_ROOT},
         ),
