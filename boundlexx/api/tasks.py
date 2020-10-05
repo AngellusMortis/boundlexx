@@ -8,7 +8,6 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
-from django.urls import reverse
 from django.utils import timezone
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
 from msrestazure.azure_active_directory import ServicePrincipalCredentials
