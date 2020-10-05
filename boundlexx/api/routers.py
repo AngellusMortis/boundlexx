@@ -2,6 +2,7 @@ from django.urls import path
 from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
 from rest_framework_extensions.routers import ExtendedSimpleRouter
+from django.views.decorators.cache import cache_page
 
 from boundlexx.api.schemas import BoundlexxSchemaGenerator
 
@@ -49,7 +50,7 @@ class APIDocsRouter(ExtendedSimpleRouter):
                 TemplateView.as_view(template_name="boundlexx/api/docs.html"),
                 name="api-docs",
             ),
-            path("schema/", schema_view, name="api-schema"),
+            path("schema/", cache_page(86400)(schema_view), name="api-schema"),
         ] + urls
 
         return urls
