@@ -5,6 +5,7 @@ from rest_framework.schemas import get_schema_view
 from rest_framework_extensions.routers import ExtendedSimpleRouter
 
 from boundlexx.api.schemas import BoundlexxSchemaGenerator
+from boundlexx.api.views.util import ForumFormatAPIView
 
 API_DESCRIPTION = """
 Boundless Lexicon API. Everything about the game Boundless
@@ -50,6 +51,7 @@ class APIDocsRouter(ExtendedSimpleRouter):
                 TemplateView.as_view(template_name="boundlexx/api/docs.html"),
                 name="api-docs",
             ),
+            path("forum/", ForumFormatAPIView.as_view(), name="forum-format"),
             path("schema/", cache_page(86400)(schema_view), name="api-schema"),
         ] + urls
 
