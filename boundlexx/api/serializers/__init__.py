@@ -169,7 +169,7 @@ class ForumFormatPostSerialzier(NullSerializer):
         return value
 
     def validate(self, attrs):
-        if self.world.is_sovereign:
+        if self.world.is_sovereign:  # type: ignore
             errors = {}
             for key in [
                 "username",
