@@ -38,7 +38,7 @@ class ForumFormatAPIView(APIView):
         post = self.serializer_class(data=request.data)
 
         if post.is_valid() and post.world is not None:
-            if post.world.is_sovereign:
+            if post.world.is_sovereign:  # type: ignore
                 extra = {
                     "perms": {
                         "can_visit": post.data["can_visit"],
