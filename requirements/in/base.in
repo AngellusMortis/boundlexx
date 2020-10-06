@@ -19,7 +19,7 @@ django-storages[azure]
 django
 djangorestframework
 git+https://github.com/chibisov/drf-extensions.git@002a67ce
-git+https://github.com/johnanthonyjose/django-rest-framework-msgpack.git@062bb84e
+git+https://github.com/AngellusMortis/django-rest-framework-msgpack.git
 python-redis-lock[django]
 
 
