@@ -5,14 +5,6 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Set, Tuple
 
 import pytz
-from django.conf import settings
-from django.contrib.postgres.indexes import GinIndex
-from django.core.cache import cache
-from django.db import models
-from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
-
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
@@ -25,9 +17,19 @@ from boundlexx.notifications.models import (
     SovereignColorNotification,
 )
 from config.storages import select_storage
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.postgres.indexes import GinIndex
+from django.core.cache import cache
+from django.db import models
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
 PROTECTION_SKILLS_CACHE = "boundless:protection_skills"
+
+User = get_user_model()
 
 
 class WorldManager(models.Manager):
@@ -755,21 +757,22 @@ class WorldBlockColorManager(models.Manager):
 
         return wbc_cache
 
-    def _update_existing_color(self, wbc, color, default):
+    def _update_existing_color(self, wbc, color, default, user=None):
         create = False
         if wbc is None:
             create = True
         elif wbc.color != color:
-            if default:
-                wbc.color = color
-            else:
-                wbc.active = False
-                create = True
-            wbc.save()
+            if user is None or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS:
+                if default:
+                    wbc.color = color
+                else:
+                    wbc.active = False
+                    create = True
+                wbc.save()
 
         return create
 
-    def create_colors_from_ws(self, world, block_colors):
+    def create_colors_from_ws(self, world, block_colors, user=None):
         default = True
         if world.is_sovereign or world.special_type == 1:
             default = False
@@ -790,7 +793,7 @@ class WorldBlockColorManager(models.Manager):
                 wbc = wbcs.get(block.block_item.game_id)
                 color = colors[color_id]
 
-                create = self._update_existing_color(wbc, color, default)
+                create = self._update_existing_color(wbc, color, default, user=user)
                 if create:
                     WorldBlockColor.objects.create(
                         world=world,
@@ -798,12 +801,13 @@ class WorldBlockColorManager(models.Manager):
                         color=color,
                         is_default=default,
                         active=True,
+                        uploader=user,
                     )
                     block_colors_created += 1
 
         return block_colors_created
 
-    def _create_default_colors(self, world, default_colors):
+    def _create_default_colors(self, world, default_colors, user=None):
         block_colors = {}
 
         wbcs = self._get_wbcs(world=world, is_default=True)
@@ -822,12 +826,13 @@ class WorldBlockColorManager(models.Manager):
                     color=default_color[1],
                     is_default=True,
                     active=False,
+                    uploader=user,
                 )
                 block_colors[block_color.item.game_id] = block_color
 
         return block_colors
 
-    def _create_unknown_colors(self, possible_colors, default_colors):
+    def _create_unknown_colors(self, possible_colors, default_colors, user=None):
         block_colors_created = 0
 
         all_wbcs = (
@@ -858,6 +863,7 @@ class WorldBlockColorManager(models.Manager):
                         color=color,
                         is_default=True,
                         active=False,
+                        uploader=user,
                     )
                     block_colors_created += 1
 
@@ -910,7 +916,7 @@ class WorldBlockColorManager(models.Manager):
 
         return default_colors, possible_colors
 
-    def create_colors_from_wc(self, world, color_data, logger=None):
+    def create_colors_from_wc(self, world, color_data, logger=None, user=None):
         block_colors_created = 0
 
         default_colors, possible_colors = self._get_possible(color_data, logger)
@@ -922,11 +928,11 @@ class WorldBlockColorManager(models.Manager):
             len(possible_colors),
         )
 
-        new_block_colors = self._create_default_colors(world, default_colors)
+        new_block_colors = self._create_default_colors(world, default_colors, user=user)
         block_colors_created += len(new_block_colors)
         self._log(logger, "Created %s default", block_colors_created)
         block_colors_created += self._create_unknown_colors(
-            possible_colors, new_block_colors
+            possible_colors, new_block_colors, user=user
         )
 
         return block_colors_created
@@ -945,6 +951,9 @@ class WorldBlockColor(
     )
 
     time = models.DateTimeField(auto_now_add=True)
+    created_time = models.DateTimeField(auto_now_add=True)
+    uploader = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
+
     active = models.BooleanField(
         default=True,
         help_text=_("Is this the current color for the world?"),
@@ -1054,6 +1063,8 @@ class WorldCreatureColor(
     world = models.ForeignKey(World, on_delete=models.CASCADE)
     creature_type = models.CharField(max_length=16, choices=CreatureType.choices)
     color_data = models.TextField()
+    time = models.DateTimeField(auto_now_add=True)
+    uploader = models.ForeignKey(User, blank=True, null=True, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = ("world", "creature_type")

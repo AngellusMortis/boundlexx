@@ -44,6 +44,8 @@ class WorldWSDataView(views.APIView):
             logger.warning(traceback.format_exc())
             return None
 
+        logger.info("WS Post from user %s for world %s", request.user, world_id)
+
         if world_id is None and display_name is None:
             return None
 
@@ -70,13 +72,16 @@ class WorldWSDataView(views.APIView):
 
         return world
 
-    def _create_creature_colors(self, world, creature_colors):
+    def _create_creature_colors(self, world, creature_colors, user=None):
         creature_colors_created = 0
         for creature_color in creature_colors:
             _, created = WorldCreatureColor.objects.get_or_create(
                 world=world,
                 creature_type=creature_color[0],
-                defaults={"color_data": json.dumps(creature_color[1])},
+                defaults={
+                    "color_data": json.dumps(creature_color[1]),
+                    "uploader": user,
+                },
             )
 
             if created:
@@ -97,9 +102,11 @@ class WorldWSDataView(views.APIView):
             return Response(status=425)
 
         block_colors_created = WorldBlockColor.objects.create_colors_from_ws(
-            world, data[2]
+            world, data[2], user=request.user
         )
-        creature_colors_created = self._create_creature_colors(world, data[3])
+        creature_colors_created = self._create_creature_colors(
+            world, data[3], user=request.user
+        )
 
         if block_colors_created > 0:
             recalculate_colors.delay([world.id])
@@ -138,6 +145,8 @@ class WorldControlSimpleDataView(views.APIView):
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
             return None
+
+        logger.info("WC Post from user %s for world %s", request.user, world_id)
 
         if world_id is None:
             return None
@@ -209,5 +218,5 @@ class WorldControlDataView(WorldControlSimpleDataView):
             logger.warning("Bad ingest data:\n%s", request.data)
             return Response(status=400)
 
-        add_world_control_data.delay(world.id, color_data)
+        add_world_control_data.delay(world.id, color_data, request.user.id)
         return Response(status=200)

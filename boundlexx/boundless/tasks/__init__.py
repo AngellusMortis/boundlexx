@@ -1,7 +1,4 @@
 import djclick as click
-from celery.utils.log import get_task_logger
-from django.db.models import Q
-
 from boundlexx.boundless.models import World, WorldBlockColor
 from boundlexx.boundless.tasks.forums import (
     ingest_exo_world_data,
@@ -20,9 +17,13 @@ from boundlexx.boundless.tasks.worlds import (
     poll_worlds,
     search_new_worlds,
 )
+from celery.utils.log import get_task_logger
 from config.celery_app import app
+from django.contrib.auth import get_user_model
+from django.db.models import Q
 
 logger = get_task_logger(__name__)
+User = get_user_model()
 
 __all__ = [
     "add_world_control_data",
@@ -135,13 +136,15 @@ def recalculate_colors(world_ids=None, log=None):
 
 
 @app.task
-def add_world_control_data(world_id, world_control_data):
+def add_world_control_data(world_id, world_control_data, user_id):
+    user = User.objects.get(id=user_id)
+
     ws_data = {}
     for block_id, data in world_control_data.items():
         ws_data[int(block_id)] = data
 
     block_colors_created = WorldBlockColor.objects.create_colors_from_wc(
-        World.objects.get(pk=world_id), ws_data, logger=logger
+        World.objects.get(pk=world_id), ws_data, logger=logger, user=user
     )
 
     logger.info("Created %s color(s)", block_colors_created)
