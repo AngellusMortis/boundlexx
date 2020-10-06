@@ -1,4 +1,8 @@
 import djclick as click
+from celery.utils.log import get_task_logger
+from django.contrib.auth import get_user_model
+from django.db.models import Q
+
 from boundlexx.boundless.models import World, WorldBlockColor
 from boundlexx.boundless.tasks.forums import (
     ingest_exo_world_data,
@@ -17,10 +21,7 @@ from boundlexx.boundless.tasks.worlds import (
     poll_worlds,
     search_new_worlds,
 )
-from celery.utils.log import get_task_logger
 from config.celery_app import app
-from django.contrib.auth import get_user_model
-from django.db.models import Q
 
 logger = get_task_logger(__name__)
 User = get_user_model()

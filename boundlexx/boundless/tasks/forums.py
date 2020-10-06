@@ -429,23 +429,64 @@ def _ingest_world_data(topics, is_perm=False, is_sovereign=False):
 
 @app.task
 def ingest_sovereign_world_data(topics=None):
-    if topics is None:
-        topics = _get_topics(FORUM_SOVEREIGN_WORLD_CATEGORY)
+    lock = cache.lock(
+        "boundlexx:tasks:ingest:sovereign", expire=120, auto_renewal=False
+    )
 
-    _ingest_world_data(topics, True, True)
+    acquired = lock.acquire(blocking=True, timeout=1)
+
+    if not acquired:
+        return
+
+    try:
+        if topics is None:
+            topics = _get_topics(FORUM_SOVEREIGN_WORLD_CATEGORY)
+
+        _ingest_world_data(topics, True, True)
+    finally:
+        try:
+            lock.release()
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.warning("Could not release lock: %s", ex)
 
 
 @app.task
 def ingest_exo_world_data(topics=None):
-    if topics is None:
-        topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
+    lock = cache.lock("boundlexx:tasks:ingest:exo", expire=120, auto_renewal=False)
 
-    _ingest_world_data(topics, False, False)
+    acquired = lock.acquire(blocking=True, timeout=1)
+
+    if not acquired:
+        return
+
+    try:
+        if topics is None:
+            topics = _get_topics(FORUM_EXO_WORLD_CATEGORY)
+
+        _ingest_world_data(topics, False, False)
+    finally:
+        try:
+            lock.release()
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.warning("Could not release lock: %s", ex)
 
 
 @app.task
 def ingest_perm_world_data(topics=None):
-    if topics is None:
-        topics = _get_topics(FORUM_PERM_WORLD_CATEGORY)
+    lock = cache.lock("boundlexx:tasks:ingest:perm", expire=120, auto_renewal=False)
 
-    _ingest_world_data(topics, True, False)
+    acquired = lock.acquire(blocking=True, timeout=1)
+
+    if not acquired:
+        return
+
+    try:
+        if topics is None:
+            topics = _get_topics(FORUM_PERM_WORLD_CATEGORY)
+
+        _ingest_world_data(topics, True, False)
+    finally:
+        try:
+            lock.release()
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.warning("Could not release lock: %s", ex)

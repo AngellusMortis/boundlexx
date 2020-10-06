@@ -5,6 +5,15 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Set, Tuple
 
 import pytz
+from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.postgres.indexes import GinIndex
+from django.core.cache import cache
+from django.db import models
+from django.utils.functional import cached_property
+from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
+
 from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
@@ -17,14 +26,6 @@ from boundlexx.notifications.models import (
     SovereignColorNotification,
 )
 from config.storages import select_storage
-from django.conf import settings
-from django.contrib.auth import get_user_model
-from django.contrib.postgres.indexes import GinIndex
-from django.core.cache import cache
-from django.db import models
-from django.utils.functional import cached_property
-from django.utils.translation import gettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
 PROTECTION_SKILLS_CACHE = "boundless:protection_skills"
