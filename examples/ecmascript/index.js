@@ -1,17 +1,18 @@
 // https://github.com/anttiviljami/openapi-client-axios
 // OpenAPI Client generator for Axios
 const OpenAPIClientAxios = require('openapi-client-axios').default;
-// https://github.com/mpyw/axios-case-converter
-// Optional
-// Converts Python backends snake case to standard ECMAScript camelCase
-const applyCaseMiddleware = require('axios-case-converter').default;
+// Optional: You can also use openapi-client-axios-typegen to make Typescript type bindings for client
+// See openapi-client-axios github for examples
+
+// Optional: You can use `msgpack` instead of JSON for some serious download size gains
+// See `msgpack.ts` for how to automatically set it up with Axios
 
 async function main() {
     const api = new OpenAPIClientAxios({ definition: 'https://api.boundlexx.app/api/v1/schema/?format=openapi-json' });
     // or Testing Universe
     api.withServer("Live Universe");
 
-    const client = applyCaseMiddleware(await api.getClient());
+    const client = await api.getClient();
 
     // list worlds with filters
     let res = await client.listWorlds([{ "name": "limit", value: 1, in: "query" }]);

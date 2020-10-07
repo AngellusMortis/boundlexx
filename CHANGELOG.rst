@@ -1,3 +1,8 @@
+2020-10-06
+----------
+
+* Added `/api/v1/forum/` that mimics the actual forum form one.
+* Changes `msgpack` format to follow the same optmization that Boundless uses on their msgpack Serialization
 
 2020-10-04
 ----------
