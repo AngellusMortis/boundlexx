@@ -1,7 +1,7 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from boundlexx.api.serializers.base import (
+from boundlexx.api.v1.serializers.base import (
     AzureImageField,
     ItemColorsLinkField,
     LocalizedNameSerializer,

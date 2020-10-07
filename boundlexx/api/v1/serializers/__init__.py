@@ -2,8 +2,9 @@ from typing import Optional
 
 from rest_framework import serializers
 
-from boundlexx.api.serializers.base import NullSerializer, SimpleWorldSerializer
-from boundlexx.api.serializers.game import (
+from boundlexx.api.common.serializers import NullSerializer
+from boundlexx.api.v1.serializers.base import SimpleWorldSerializer
+from boundlexx.api.v1.serializers.game import (
     BlockSerialzier,
     ColorSerializer,
     EmojiSerializer,
@@ -24,7 +25,7 @@ from boundlexx.api.serializers.game import (
     SkillSerializer,
     SubtitleSerializer,
 )
-from boundlexx.api.serializers.world import (
+from boundlexx.api.v1.serializers.world import (
     BlockColorSerializer,
     ItemColorSerializer,
     ItemResourceCountTimeSeriesTBSerializer,

@@ -12,7 +12,8 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
-from boundlexx.api.serializers import (
+from boundlexx.api.utils import get_base_url, get_list_example
+from boundlexx.api.v1.serializers import (
     BlockSerialzier,
     ItemColorSerializer,
     ItemResourceCountSerializer,
@@ -25,14 +26,13 @@ from boundlexx.api.serializers import (
     SimpleWorldSerializer,
     WorldColorSerializer,
 )
-from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import (
+from boundlexx.api.v1.views.filters import (
     DedupedFilter,
     ItemColorFilterSet,
     ItemFilterSet,
     ItemResourceCountFilterSet,
 )
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
+from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
 from boundlexx.boundless.models import (
     Block,
     Item,

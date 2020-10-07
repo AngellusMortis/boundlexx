@@ -34,14 +34,6 @@ class LocationSerializer(serializers.DictField):
         }
 
 
-class NullSerializer(serializers.Serializer):
-    def create(self, validated_data):
-        return
-
-    def update(self, instance, validated_data):
-        return
-
-
 class NestedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
     def get_url(
         self,

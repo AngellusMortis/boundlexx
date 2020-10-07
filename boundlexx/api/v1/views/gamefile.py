@@ -5,9 +5,9 @@ from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from boundlexx.api.serializers import GameFileSerializer, SimpleGameFileSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.v1.serializers import GameFileSerializer, SimpleGameFileSerializer
+from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.ingest.models import GameFile
 
 GAMEFILE_EXAMPLE = {

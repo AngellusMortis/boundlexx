@@ -6,7 +6,7 @@ from django.views import defaults as default_views
 from django.views.generic.base import RedirectView
 from django.views.static import serve
 
-from boundlexx.api.views import ForumFormatView
+from boundlexx.api.common.views import ForumFormatView
 
 urlpatterns = [
     path(settings.ADMIN_URL, admin.site.urls),

@@ -4,8 +4,8 @@ from django.views.generic import TemplateView
 from rest_framework.schemas import get_schema_view
 from rest_framework_extensions.routers import ExtendedSimpleRouter
 
+from boundlexx.api.common.views import ForumFormatAPIView
 from boundlexx.api.schemas import BoundlexxSchemaGenerator
-from boundlexx.api.views.util import ForumFormatAPIView
 
 API_DESCRIPTION = """
 Boundless Lexicon API. Everything about the game Boundless

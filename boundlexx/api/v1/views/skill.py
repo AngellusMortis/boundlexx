@@ -5,14 +5,14 @@ from rest_framework import filters, viewsets
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.schemas import DescriptiveAutoSchema
-from boundlexx.api.serializers import SkillGroupSerializer, SkillSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import (
+from boundlexx.api.v1.serializers import SkillGroupSerializer, SkillSerializer
+from boundlexx.api.v1.views.filters import (
     DedupedFilter,
     LocalizationFilterSet,
     SkillFilterSet,
 )
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Skill, SkillGroup
 
 SKILL_EXAMPLE = {

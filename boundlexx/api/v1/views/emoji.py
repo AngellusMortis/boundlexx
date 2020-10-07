@@ -5,10 +5,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import filters, viewsets
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
-from boundlexx.api.serializers import EmojiSerializer
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.views.filters import DedupedFilter
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.v1.serializers import EmojiSerializer
+from boundlexx.api.v1.views.filters import DedupedFilter
+from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.boundless.models import Emoji
 
 EMOJI_EXAMPLE = {

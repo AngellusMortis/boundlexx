@@ -16,7 +16,8 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
-from boundlexx.api.serializers import (
+from boundlexx.api.utils import get_list_example
+from boundlexx.api.v1.serializers import (
     KindOfSimpleWorldSerializer,
     SimpleWorldRequestBasketPriceSerializer,
     SimpleWorldShopStandPriceSerializer,
@@ -29,9 +30,8 @@ from boundlexx.api.serializers import (
     WorldPollTBSerializer,
     WorldSerializer,
 )
-from boundlexx.api.utils import get_list_example
-from boundlexx.api.views.filters import DedupedFilter, WorldFilterSet
-from boundlexx.api.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
+from boundlexx.api.v1.views.filters import DedupedFilter, WorldFilterSet
+from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
 from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemShopStandPrice,
