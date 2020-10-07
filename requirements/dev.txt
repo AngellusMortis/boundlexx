@@ -63,7 +63,7 @@ djangorestframework==3.12.1  # via -r /app/requirements/in/base.in, django-rest-
 docutils==0.16            # via sphinx
 git+https://github.com/chibisov/drf-extensions.git@002a67ce  # via -r /app/requirements/in/base.in
 factory-boy==3.1.0        # via -r /app/requirements/in/dev.in
-faker==4.5.0              # via factory-boy
+faker==4.4.0              # via -r /app/requirements/in/dev.in, factory-boy
 filetype==1.0.7           # via -r /app/requirements/in/base.in
 flake8-bugbear==20.1.4    # via -r /app/requirements/in/dev.in
 flake8-builtins==1.5.3    # via -r /app/requirements/in/dev.in
