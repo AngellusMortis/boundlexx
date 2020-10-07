@@ -363,7 +363,7 @@ REST_FRAMEWORK = {
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
-    "ALLOWED_VERSIONS": ["v1"],
+    "ALLOWED_VERSIONS": ["v1", "v2"],
     "DEFAULT_PAGINATION_CLASS": "boundlexx.api.pagination.MaxLimitOffsetPagination",  # noqa
     "DEFAULT_FILTER_BACKENDS": [
         "django_filters.rest_framework.DjangoFilterBackend"

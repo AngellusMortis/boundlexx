@@ -525,6 +525,7 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
             "text_name",
             "html_name",
             "tier",
+            "size",
             "world_type",
             "special_type",
             "is_sovereign",

@@ -78,11 +78,11 @@ class BoundlexxSchemaGenerator(SchemaGenerator):
         schema["info"] = self.get_info(request)
         schema["servers"] = [
             {
-                "url": "https://api.boundlexx.app/api/v1",
+                "url": f"https://api.boundlexx.app/api/{request.version}",
                 "description": "Live Universe",
             },
             {
-                "url": "https://testing.boundlexx.app/api/v1",
+                "url": f"https://testing.boundlexx.app/api/{request.version}",
                 "description": "Testing Universe",
             },
         ]
@@ -90,7 +90,7 @@ class BoundlexxSchemaGenerator(SchemaGenerator):
         if settings.DEBUG:
             schema["servers"].append(
                 {
-                    "url": "https://local-boundlexx.wl.mort.is/api/v1",
+                    "url": f"https://local-boundlexx.wl.mort.is/api/{request.version}",
                     "description": "Local Instance",
                 },
             )
