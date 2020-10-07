@@ -324,7 +324,11 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     )
     number_of_regions = models.PositiveSmallIntegerField(blank=True, null=True)
     special_type = models.PositiveSmallIntegerField(
-        _("Special Type"), choices=WorldSpecialType.choices, null=True, db_index=True
+        _("Special Type"),
+        choices=WorldSpecialType.choices,
+        null=True,
+        db_index=True,
+        help_text=_("`1` = Color-Cycling"),
     )
 
     atmosphere_color_r = models.FloatField(_("Atmosphere Linear R Color"), null=True)

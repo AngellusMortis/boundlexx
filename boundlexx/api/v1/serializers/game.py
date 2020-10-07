@@ -333,6 +333,7 @@ class EmojiSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     image_url = AzureImageField(source="image", allow_null=True)
+    names = serializers.ListField(child=serializers.CharField())
 
     class Meta:
         model = Emoji

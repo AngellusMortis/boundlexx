@@ -72,6 +72,12 @@ class WorldSerializer(serializers.ModelSerializer):
     )
     protection_skill = SimpleSkillSerializer()
 
+    tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
+    special_type = serializers.IntegerField(
+        allow_null=True, help_text=_("`1` = Color-Cycling")
+    )
+    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
+
     class Meta:
         model = World
         fields = [
@@ -513,6 +519,13 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     image_url = AzureImageField(source="image", allow_null=True)
+    text_name = serializers.CharField(allow_null=True, required=True)
+    html_name = serializers.CharField(allow_null=True, required=True)
+    tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
+    special_type = serializers.IntegerField(
+        allow_null=True, help_text=_("`1` = Color-Cycling")
+    )
+    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
 
     class Meta:
         model = World
