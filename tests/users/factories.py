@@ -22,7 +22,7 @@ class UserFactory(DjangoModelFactory):
                 digits=True,
                 upper_case=True,
                 lower_case=True,
-            ).generate(extra_kwargs={})
+            ).generate(params={})
         )
         self.set_password(password)
 
