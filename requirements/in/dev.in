@@ -22,8 +22,7 @@ werkzeug
 coverage[toml]
 django-coverage-plugin
 django-extensions
-factory-boy
-faker<4.5
+factory-boy<3.1.0
 openapi-spec-validator
 pytest-cov
 pytest-django
