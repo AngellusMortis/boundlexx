@@ -51,6 +51,8 @@ class ItemSerializer(SimpleItemSerializer):
     list_type = LocalizedStringSerializer()
     description = LocalizedStringSerializer()
 
+    mint_value = serializers.FloatField()
+
     class Meta:
         model = Item
         fields = [

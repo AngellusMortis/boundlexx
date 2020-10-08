@@ -7,7 +7,7 @@ from django.http import Http404
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -15,7 +15,7 @@ from rest_framework_msgpack.renderers import MessagePackRenderer
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, WorldFilterSet
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
@@ -47,7 +47,7 @@ BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
 logger = getLogger(__file__)
 
 
-class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class WorldViewSet(BoundlexxViewSet):
     queryset = (
         World.objects.all()
         .select_related("assignment")
@@ -279,9 +279,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     dump.operation_id = "dumpWorlds"
 
 
-class WorldPollViewSet(
-    TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
-):
+class WorldPollViewSet(TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet):
     schema = DescriptiveAutoSchema(tags=["Worlds"])
     queryset = (
         WorldPoll.objects.all()
@@ -381,7 +379,7 @@ class WorldPollViewSet(
     resources.operation_id = "listWorldPollResources"
 
 
-class WorldDistanceViewSet(NestedViewSetMixin, viewsets.ReadOnlyModelViewSet):
+class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
     queryset = (
         WorldDistance.objects.filter(world_source__active=True, world_dest__active=True)
         .select_related("world_source", "world_dest")

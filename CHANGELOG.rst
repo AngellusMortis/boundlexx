@@ -1,6 +1,7 @@
 2020-10-08
 ----------
 
+* Fixes performance issue with deuping search results
 * Adds initial pass of v2 endpoints
 
 2020-10-06

@@ -1,16 +1,16 @@
 from typing import List
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, WorldFilterSet
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.common.serializers import SimpleWorldSerializer, WorldSerializer
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.boundless.models import World
 
 
-class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class WorldViewSet(BoundlexxViewSet):
     queryset = World.objects.all()
     serializer_class = SimpleWorldSerializer
     detail_serializer_class = WorldSerializer
@@ -29,12 +29,6 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         "id",
         "text_name",
     ]
-
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return self.detail_serializer_class
-
-        return super().get_serializer_class()
 
     def get_queryset(self):
         queryset = super().get_queryset()

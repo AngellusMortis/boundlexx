@@ -1,15 +1,16 @@
-from rest_framework import viewsets
-
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.common.serializers import BlockSerializer
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.boundless.models import Block
 
 
 class BlockViewSet(
-    DescriptiveAutoSchemaMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
-    queryset = Block.objects.filter(block_item__isnull=False).order_by("game_id")
+    queryset = (
+        Block.objects.filter(block_item__isnull=False)
+        .select_related("block_item")
+        .order_by("game_id")
+    )
     serializer_class = BlockSerializer
     lookup_field = "game_id"
 

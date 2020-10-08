@@ -1,19 +1,18 @@
 from typing import List
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.common.serializers import (
     GameFileSerializer,
     SimpleGameFileSerializer,
 )
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.ingest.models import GameFile
 
 
-class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class GameFileViewSet(BoundlexxViewSet):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 

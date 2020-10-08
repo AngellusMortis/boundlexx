@@ -2,14 +2,14 @@ from typing import List
 
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, LocalizationFilterSet
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
@@ -48,7 +48,7 @@ COLOR_BLOCKS_EXAMPLE = {
 }
 
 
-class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class ColorViewSet(BoundlexxViewSet):
     queryset = Color.objects.filter(active=True).prefetch_related(
         "localizedname_set", "colorvalue_set"
     )
@@ -130,7 +130,7 @@ class ColorViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
 class BlockColorViewSet(
     NestedViewSetMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
     schema = DescriptiveAutoSchema()
     queryset = (

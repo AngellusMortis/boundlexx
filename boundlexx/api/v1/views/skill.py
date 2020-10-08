@@ -1,7 +1,7 @@
 from typing import List
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import (
@@ -9,7 +9,7 @@ from boundlexx.api.common.filters import (
     LocalizationFilterSet,
     SkillFilterSet,
 )
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import URLSkillGroupSerializer, URLSkillSerializer
@@ -60,7 +60,7 @@ SKILL_GROUP_EXAMPLE = {
 }
 
 
-class SkillGroupViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class SkillGroupViewSet(BoundlexxViewSet):
     schema = DescriptiveAutoSchema(tags=["Skills"])
 
     queryset = (
@@ -107,7 +107,7 @@ class SkillGroupViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSe
     retrieve.example = {"retrieve": {"value": SKILL_GROUP_EXAMPLE}}  # type: ignore # noqa E501
 
 
-class SkillViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class SkillViewSet(BoundlexxViewSet):
     queryset = (
         Skill.objects.all()
         .select_related("group", "description", "display_name")

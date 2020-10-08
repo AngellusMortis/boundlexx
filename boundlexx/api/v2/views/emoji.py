@@ -2,16 +2,16 @@ from typing import List
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.common.serializers import EmojiSerializer
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.boundless.models import Emoji
 
 
-class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
+class EmojiViewSet(BoundlexxViewSet):
     queryset = Emoji.objects.filter(active=True).prefetch_related("emojialtname_set")
     serializer_class = EmojiSerializer
     lookup_field = "name"

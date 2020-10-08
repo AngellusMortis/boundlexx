@@ -12,16 +12,16 @@ DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
 
 class DedupedFilter(BaseFilterBackend):
     def filter_queryset(self, request, queryset, view):
-        # only remove duplicates from list views
-        if view.detail:
+        # only remove duplicates from list views with search results
+        if view.detail or "search" not in request.query_params:
             return queryset
 
-        pks = []
+        pks = set()
         final_result = []
-        for item in queryset.iterator():
+        for item in list(queryset):
             if item.pk not in pks:
                 final_result.append(item)
-                pks.append(item.pk)
+                pks.add(item.pk)
 
         return final_result
 

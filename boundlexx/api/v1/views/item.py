@@ -12,7 +12,7 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, ItemFilterSet
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
@@ -141,8 +141,7 @@ ITEM_SOVEREIGN_COLORS_EXAMPLE = {
 
 
 class ItemViewSet(
-    DescriptiveAutoSchemaMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
     queryset = (
         Item.objects.filter(active=True)
@@ -311,7 +310,7 @@ class ItemViewSet(
 
 
 class ItemResourceTimeseriesViewSet(
-    TimeseriesMixin, NestedViewSetMixin, viewsets.ReadOnlyModelViewSet
+    TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(world_poll__world__active=True)
@@ -388,7 +387,7 @@ class ItemResourceWorldListViewSet(
 
 class ItemResourceCountViewSet(
     NestedViewSetMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(
@@ -470,7 +469,7 @@ class ItemResourceCountViewSet(
 
 class ItemColorsViewSet(
     NestedViewSetMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = (
@@ -539,8 +538,7 @@ class ItemColorsViewSet(
 
 
 class BlockViewSet(
-    DescriptiveAutoSchemaMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
     queryset = (
         Block.objects.filter(block_item__isnull=False)

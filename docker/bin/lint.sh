@@ -13,14 +13,14 @@ test $? -eq 0 -a $exit_code -eq 0
 exit_code=$?
 echo
 
-echo "Running pylint..."
-pylint boundlexx tests
+echo "Running isort..."
+isort --check --diff /app/
 test $? -eq 0 -a $exit_code -eq 0
 exit_code=$?
 echo
 
-echo "Running isort..."
-isort --check --diff /app/
+echo "Running bandit..."
+bandit .
 test $? -eq 0 -a $exit_code -eq 0
 exit_code=$?
 echo
@@ -31,8 +31,8 @@ test $? -eq 0 -a $exit_code -eq 0
 exit_code=$?
 echo
 
-echo "Running bandit..."
-bandit .
+echo "Running pylint..."
+pylint boundlexx tests
 test $? -eq 0 -a $exit_code -eq 0
 exit_code=$?
 echo

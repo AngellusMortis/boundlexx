@@ -81,6 +81,7 @@ class WorldSerializer(serializers.ModelSerializer):
     size = serializers.IntegerField(
         help_text=_("`192` = 3km world, `288` = 4.5km world, `384` = 6km world")
     )
+    time_offset = serializers.DateTimeField(allow_null=True)
     world_type = serializers.ChoiceField(choices=World.WorldType.choices)
     region = serializers.ChoiceField(choices=World.Region.choices)
     special_type = serializers.IntegerField(

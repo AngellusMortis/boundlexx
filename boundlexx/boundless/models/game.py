@@ -449,7 +449,12 @@ class Emoji(models.Model):
 
     @cached_property
     def names(self):
-        return [self.name] + [a.name for a in self.emojialtname_set.all()]
+        names = [self.name]
+
+        for alt in self.emojialtname_set.all():
+            names.append(alt.name)
+
+        return names
 
 
 class EmojiAltName(models.Model):

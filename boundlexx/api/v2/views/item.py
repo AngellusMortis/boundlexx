@@ -1,18 +1,17 @@
 from typing import List
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, viewsets
+from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, ItemFilterSet
-from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.common.serializers import ItemSerializer, SimpleItemSerializer
+from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.boundless.models import Item
 
 
 class ItemViewSet(
-    DescriptiveAutoSchemaMixin,
-    viewsets.ReadOnlyModelViewSet,
+    BoundlexxViewSet,
 ):
     queryset = (
         Item.objects.filter(active=True)
