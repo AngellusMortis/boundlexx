@@ -35,12 +35,6 @@ class GameFileViewSet(BoundlexxViewSet):
     ordering = ["-rank", "id"]
     ordering_fields: List[str] = []
 
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return self.detail_serializer_class
-
-        return super().get_serializer_class()
-
     def list(self, request, *args, **kwargs):  # noqa A003
         """
         Retrieves the list of game files from the game Boundless.

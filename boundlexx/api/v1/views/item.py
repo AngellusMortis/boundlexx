@@ -506,12 +506,6 @@ class ItemColorsViewSet(
 
         return queryset
 
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return self.detail_serializer_class
-
-        return super().get_serializer_class()
-
     def list(self, request, *args, **kwargs):  # noqa A003
         """
         Retrieves the list of colors for a given item

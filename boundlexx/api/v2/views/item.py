@@ -34,12 +34,6 @@ class ItemViewSet(
     ordering = ["-rank", "game_id"]
     ordering_fields: List[str] = []
 
-    def get_serializer_class(self):
-        if self.action == "retrieve":
-            return self.detail_serializer_class
-
-        return super().get_serializer_class()
-
     def get_queryset(self):
         queryset = super().get_queryset()
 
