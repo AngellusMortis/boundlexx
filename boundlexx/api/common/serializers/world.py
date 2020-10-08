@@ -67,7 +67,7 @@ class BowSerializer(NullSerializer):
     lucent = serializers.ListField(child=serializers.CharField())
 
 
-class WorldSerializer(serializers.ModelSerializer):
+class WorldSerializer(SimpleWorldSerializer):
     assignment = IDWorldSerializer(allow_null=True)
 
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
