@@ -32,33 +32,59 @@ class WorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
-        read_only=True,
     )
     polls_url = NestedHyperlinkedIdentityField(
         view_name="world-poll-list",
         lookup_field=["id"],
         lookup_url_kwarg=["world_id"],
-        read_only=True,
     )
     block_colors_url = serializers.HyperlinkedIdentityField(
         view_name="world-block-colors",
         lookup_field="id",
-        read_only=True,
     )
     distances_url = NestedHyperlinkedIdentityField(
         view_name="world-distance-list",
         lookup_field=["id"],
         lookup_url_kwarg=["world_source__id"],
-        read_only=True,
     )
     request_baskets_url = RequestBasketsURL()
     shop_stands_url = ShopStandsURL()
-    assignment = SimpleWorldSerializer()
+    assignment = SimpleWorldSerializer(allow_null=True)
     image_url = AzureImageField(source="image", allow_null=True)
     forum_url = serializers.URLField(allow_null=True)
 
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
     next_request_basket_update = serializers.DateTimeField(allow_null=True)
+
+    id = serializers.IntegerField()
+    active = serializers.BooleanField()
+    name = serializers.CharField()
+    text_name = serializers.CharField(allow_null=True)
+    html_name = serializers.CharField(allow_null=True)
+    address = serializers.CharField()
+    image_url = AzureImageField(source="image", allow_null=True)
+    forum_url = serializers.CharField(allow_null=True)
+    tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
+    size = serializers.IntegerField()
+    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
+    region = serializers.ChoiceField(choices=World.Region.choices)
+    special_type = serializers.IntegerField(
+        allow_null=True, help_text=_("`1` = Color-Cycling")
+    )
+    is_sovereign = serializers.BooleanField()
+    is_perm = serializers.BooleanField()
+    is_exo = serializers.BooleanField()
+    is_creative = serializers.BooleanField()
+    is_locked = serializers.BooleanField()
+    is_public = serializers.BooleanField()
+    is_public_edit = serializers.BooleanField(allow_null=True)
+    is_public_claim = serializers.BooleanField(allow_null=True)
+    is_finalized = serializers.BooleanField(allow_null=True)
+    number_of_regions = serializers.IntegerField()
+    start = serializers.DateTimeField(allow_null=True)
+    end = serializers.DateTimeField(allow_null=True)
+    surface_liquid = serializers.CharField()
+    core_liquid = serializers.CharField()
 
     bows = BowSerializer()
 
@@ -71,12 +97,6 @@ class WorldSerializer(serializers.ModelSerializer):
         ),
     )
     protection_skill = SimpleSkillSerializer()
-
-    tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
-    special_type = serializers.IntegerField(
-        allow_null=True, help_text=_("`1` = Color-Cycling")
-    )
-    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
 
     class Meta:
         model = World
@@ -516,16 +536,23 @@ class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
-        read_only=True,
     )
+    id = serializers.IntegerField()
+    active = serializers.BooleanField()
     image_url = AzureImageField(source="image", allow_null=True)
     text_name = serializers.CharField(allow_null=True, required=True)
     html_name = serializers.CharField(allow_null=True, required=True)
     tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
+    size = serializers.IntegerField()
+    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
     special_type = serializers.IntegerField(
         allow_null=True, help_text=_("`1` = Color-Cycling")
     )
-    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
+    is_sovereign = serializers.BooleanField()
+    is_perm = serializers.BooleanField()
+    is_exo = serializers.BooleanField()
+    is_creative = serializers.BooleanField()
+    is_locked = serializers.BooleanField()
 
     class Meta:
         model = World

@@ -237,6 +237,7 @@ class SimpleWorldSerializer(serializers.ModelSerializer):
         lookup_field="id",
         read_only=True,
     )
+    id = serializers.IntegerField()
 
     class Meta:
         model = World
