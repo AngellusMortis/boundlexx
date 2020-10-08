@@ -8,13 +8,8 @@ from rest_framework.response import Response
 from rest_framework.serializers import BaseSerializer
 
 from boundlexx.api.db import Median, Mode
-from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.v1.views.filters import TimeseriesFilterSet
 from boundlexx.api.v1.views.pagination import TimeseriesPagination
-
-
-class DescriptiveAutoSchemaMixin:
-    schema = DescriptiveAutoSchema()
 
 
 class TimeseriesMixin:

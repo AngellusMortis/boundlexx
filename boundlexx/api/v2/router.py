@@ -1,6 +1,6 @@
+from boundlexx.api.common.views import GameFileViewSet
 from boundlexx.api.routers import APIDocsRouter
-
-# from boundlexx.api.v1 import views
+from boundlexx.api.v2 import views
 
 API_DESCRIPTION = """
 Boundless Lexicon API v2. Everything about the game Boundless
@@ -20,18 +20,19 @@ look up.
 """
 
 router = APIDocsRouter(API_DESCRIPTION, "v2")
-# router.register("colors", views.ColorViewSet, basename="color").register(
+router.register("colors", views.ColorViewSet, basename="color")
+# .register(
 #     "blocks",
 #     views.BlockColorViewSet,
 #     basename="color-blocks",
 #     parents_query_lookups=["color__game_id"],
 # )
 
-# router.register("emojis", views.EmojiViewSet, basename="emoji")
-# router.register("game-files", views.GameFileViewSet, basename="game-file")
-# router.register("blocks", views.BlockViewSet, basename="block")
+router.register("emojis", views.EmojiViewSet, basename="emoji")
+router.register("game-files", GameFileViewSet, basename="game-file")
+router.register("blocks", views.BlockViewSet, basename="block")
 
-# item_viewset = router.register("items", views.ItemViewSet, basename="item")
+item_viewset = router.register("items", views.ItemViewSet, basename="item")
 # item_viewset.register(
 #     "resource-counts",
 #     views.ItemResourceCountViewSet,
@@ -60,10 +61,10 @@ router = APIDocsRouter(API_DESCRIPTION, "v2")
 # router.register("recipe-groups", views.RecipeGroupViewSet, basename="recipe-group")
 # router.register("recipes", views.RecipeViewSet, basename="recipe")
 
-# router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
-# router.register("skills", views.SkillViewSet, basename="skill")
+router.register("skill-groups", views.SkillGroupViewSet, basename="skill-group")
+router.register("skills", views.SkillViewSet, basename="skill")
 
-# world_viewset = router.register("worlds", views.WorldViewSet, basename="world")
+world_viewset = router.register("worlds", views.WorldViewSet, basename="world")
 # world_viewset.register(
 #     "polls",
 #     views.WorldPollViewSet,

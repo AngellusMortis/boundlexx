@@ -2,27 +2,7 @@ from rest_framework import serializers
 from rest_framework.relations import Hyperlink
 from rest_framework.reverse import reverse
 
-from boundlexx.boundless.models import (
-    Item,
-    LocalizedName,
-    LocalizedString,
-    LocalizedStringText,
-    SkillGroup,
-    World,
-)
-
-
-class AzureImageField(serializers.ImageField):
-    def to_representation(self, value):
-        if not value:
-            return None
-
-        try:
-            url = value.url
-        except AttributeError:
-            return None
-
-        return url
+from boundlexx.boundless.models import Item, SkillGroup, World
 
 
 class LocationSerializer(serializers.DictField):
@@ -185,59 +165,13 @@ class ItemColorsLinkField(serializers.ModelField):
         return None
 
 
-class LangFilterListSerializer(
-    serializers.ListSerializer
-):  # pylint: disable=abstract-method
-    def to_representation(self, data):
-        data = super().to_representation(data)
-        lang = self.context["request"].query_params.get("lang", "all")
-
-        if lang == "all":
-            return data
-        if lang == "none":
-            return []
-
-        new_data = []
-        for item in data:
-            if item["lang"] == lang:
-                new_data.append(item)
-        data = new_data
-
-        return data
-
-
-class LocalizedStringTextSerializer(serializers.ModelSerializer):
-    plain_text = serializers.CharField()
-
-    class Meta:
-        model = LocalizedStringText
-        list_serializer_class = LangFilterListSerializer
-        fields = ["lang", "text", "plain_text"]
-
-
-class LocalizedStringSerializer(serializers.ModelSerializer):
-    strings = LocalizedStringTextSerializer(many=True)
-
-    class Meta:
-        model = LocalizedString
-        list_serializer_class = LangFilterListSerializer
-        fields = ["string_id", "strings"]
-
-
-class LocalizedNameSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LocalizedName
-        list_serializer_class = LangFilterListSerializer
-        fields = ["lang", "name"]
-
-
-class SimpleWorldSerializer(serializers.ModelSerializer):
+class URLSimpleWorldSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
         read_only=True,
     )
-    id = serializers.IntegerField()
+    id = serializers.IntegerField()  # noqa: A003
 
     class Meta:
         model = World
@@ -251,7 +185,7 @@ class SimpleWorldSerializer(serializers.ModelSerializer):
         ]
 
 
-class SimpleSkillGroupSerializer(serializers.ModelSerializer):
+class URLSimpleSkillGroupSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="skill-group-detail",
         lookup_field="id",
@@ -266,7 +200,7 @@ class SimpleSkillGroupSerializer(serializers.ModelSerializer):
         ]
 
 
-class SimpleSkillSerializer(serializers.ModelSerializer):
+class URLSimpleSkillSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="skill-detail",
         lookup_field="id",
@@ -281,7 +215,7 @@ class SimpleSkillSerializer(serializers.ModelSerializer):
         ]
 
 
-class SimpleItemSerializer(serializers.ModelSerializer):
+class URLSimpleItemSerializer(serializers.ModelSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="item-detail",
         lookup_field="game_id",

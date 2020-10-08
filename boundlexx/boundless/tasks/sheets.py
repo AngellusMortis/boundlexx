@@ -37,6 +37,8 @@ def _update_world(world, start, end, row):
         world.start = start
     if world.end is None and end is not None:
         world.end = end
+    if world.end is not None and world.start is not None and world.size is None:
+        world.size = 192  # exo worlds are always 192
     if world.region is None:
         world.region = row[4].strip()
     if len(row[5].strip()) > 0 and world.assignment_id is None:

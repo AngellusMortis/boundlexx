@@ -11,28 +11,28 @@ from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
+from boundlexx.api.common.filters import DedupedFilter, ItemFilterSet
+from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
-    BlockSerialzier,
     ItemColorSerializer,
     ItemResourceCountSerializer,
     ItemResourceCountTimeSeriesSerializer,
     ItemResourceCountTimeSeriesTBSerializer,
-    ItemSerializer,
     PossibleColorSerializer,
     SimpleItemRequestBasketPriceSerializer,
     SimpleItemShopStandPriceSerializer,
-    SimpleWorldSerializer,
+    URLBlockSerializer,
+    URLItemSerializer,
+    URLSimpleWorldSerializer,
     WorldColorSerializer,
 )
 from boundlexx.api.v1.views.filters import (
-    DedupedFilter,
     ItemColorFilterSet,
-    ItemFilterSet,
     ItemResourceCountFilterSet,
 )
-from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
+from boundlexx.api.v1.views.mixins import TimeseriesMixin
 from boundlexx.boundless.models import (
     Block,
     Item,
@@ -157,7 +157,7 @@ class ItemViewSet(
             "description__strings",
         )
     )
-    serializer_class = ItemSerializer
+    serializer_class = URLItemSerializer
     lookup_field = "game_id"
     filter_backends = [
         DjangoFilterBackend,
@@ -357,7 +357,7 @@ class ItemResourceWorldListViewSet(
     NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
-    serializer_class = SimpleWorldSerializer
+    serializer_class = URLSimpleWorldSerializer
 
     def get_queryset(self):
         item_id = self.kwargs.get("item__game_id")
@@ -547,7 +547,7 @@ class BlockViewSet(
         .select_related("block_item")
         .order_by("game_id")
     )
-    serializer_class = BlockSerialzier
+    serializer_class = URLBlockSerializer
     lookup_field = "game_id"
 
     def list(self, request, *args, **kwargs):  # noqa A003

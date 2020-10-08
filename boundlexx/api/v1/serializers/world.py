@@ -1,16 +1,18 @@
-from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from boundlexx.api.common.serializers import NullSerializer
+from boundlexx.api.common.serializers import (
+    NullSerializer,
+    SimpleWorldSerializer,
+    WorldSerializer,
+)
 from boundlexx.api.v1.serializers.base import (
-    AzureImageField,
     NestedHyperlinkedIdentityField,
     RequestBasketsURL,
     ShopStandsURL,
     SimpleColorSerializer,
-    SimpleItemSerializer,
-    SimpleSkillSerializer,
-    SimpleWorldSerializer,
+    URLSimpleItemSerializer,
+    URLSimpleSkillSerializer,
+    URLSimpleWorldSerializer,
 )
 from boundlexx.boundless.models import (
     LeaderboardRecord,
@@ -22,13 +24,7 @@ from boundlexx.boundless.models import (
 )
 
 
-class BowSerializer(NullSerializer):
-    best = serializers.ListField(child=serializers.CharField())
-    neutral = serializers.ListField(child=serializers.CharField())
-    lucent = serializers.ListField(child=serializers.CharField())
-
-
-class WorldSerializer(serializers.ModelSerializer):
+class URLWorldSerializer(WorldSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
@@ -49,59 +45,14 @@ class WorldSerializer(serializers.ModelSerializer):
     )
     request_baskets_url = RequestBasketsURL()
     shop_stands_url = ShopStandsURL()
-    assignment = SimpleWorldSerializer(allow_null=True)
-    image_url = AzureImageField(source="image", allow_null=True)
-    forum_url = serializers.URLField(allow_null=True)
-
-    next_shop_stand_update = serializers.DateTimeField(allow_null=True)
-    next_request_basket_update = serializers.DateTimeField(allow_null=True)
-
-    id = serializers.IntegerField()
-    active = serializers.BooleanField()
-    name = serializers.CharField()
-    text_name = serializers.CharField(allow_null=True)
-    html_name = serializers.CharField(allow_null=True)
-    address = serializers.CharField()
-    image_url = AzureImageField(source="image", allow_null=True)
-    forum_url = serializers.CharField(allow_null=True)
-    tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
-    size = serializers.IntegerField()
-    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
-    region = serializers.ChoiceField(choices=World.Region.choices)
-    special_type = serializers.IntegerField(
-        allow_null=True, help_text=_("`1` = Color-Cycling")
-    )
-    is_sovereign = serializers.BooleanField()
-    is_perm = serializers.BooleanField()
-    is_exo = serializers.BooleanField()
-    is_creative = serializers.BooleanField()
-    is_locked = serializers.BooleanField()
-    is_public = serializers.BooleanField()
-    is_public_edit = serializers.BooleanField(allow_null=True)
-    is_public_claim = serializers.BooleanField(allow_null=True)
-    is_finalized = serializers.BooleanField(allow_null=True)
-    number_of_regions = serializers.IntegerField()
-    start = serializers.DateTimeField(allow_null=True)
-    end = serializers.DateTimeField(allow_null=True)
-    surface_liquid = serializers.CharField()
-    core_liquid = serializers.CharField()
-
-    bows = BowSerializer()
-
-    protection_points = serializers.IntegerField(
-        allow_null=True,
-        help_text=_(
-            "'points' are not equal to levels in skill. For more details see "
-            '<a href="https://forum.playboundless.com/t/28068/4">this forum '
-            "post</a>."
-        ),
-    )
-    protection_skill = SimpleSkillSerializer()
+    assignment = URLSimpleWorldSerializer(allow_null=True)
+    protection_skill = URLSimpleSkillSerializer()
 
     class Meta:
         model = World
         fields = [
             "url",
+            "id",
             "polls_url",
             "block_colors_url",
             "distances_url",
@@ -109,7 +60,6 @@ class WorldSerializer(serializers.ModelSerializer):
             "next_request_basket_update",
             "shop_stands_url",
             "next_shop_stand_update",
-            "id",
             "active",
             "name",
             "display_name",
@@ -154,7 +104,7 @@ class LeaderboardSerializer(serializers.ModelSerializer):
 
 
 class ResourcesSerializer(serializers.ModelSerializer):
-    item = SimpleItemSerializer()
+    item = URLSimpleItemSerializer()
 
     class Meta:
         model = ResourceCount
@@ -188,7 +138,7 @@ class WorldPollResourcesSerializer(WorldPollExtraSerializer):
 
 
 class WorldBlockColorSerializer(serializers.ModelSerializer):
-    item = SimpleItemSerializer()
+    item = URLSimpleItemSerializer()
     color = SimpleColorSerializer()
 
     is_perm = serializers.BooleanField()
@@ -196,10 +146,10 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
     is_exo_only = serializers.BooleanField()
     days_since_exo = serializers.IntegerField(allow_null=True)
     days_since_transform_exo = serializers.IntegerField(allow_null=True)
-    first_world = SimpleWorldSerializer(allow_null=True)
-    last_exo = SimpleWorldSerializer(allow_null=True)
-    transform_first_world = SimpleWorldSerializer(allow_null=True)
-    transform_last_exo = SimpleWorldSerializer(allow_null=True)
+    first_world = URLSimpleWorldSerializer(allow_null=True)
+    last_exo = URLSimpleWorldSerializer(allow_null=True)
+    transform_first_world = URLSimpleWorldSerializer(allow_null=True)
+    transform_last_exo = URLSimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
@@ -224,8 +174,8 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
 
 
 class WorldDistanceSerializer(serializers.ModelSerializer):
-    world_source = SimpleWorldSerializer()
-    world_dest = SimpleWorldSerializer()
+    world_source = URLSimpleWorldSerializer()
+    world_dest = URLSimpleWorldSerializer()
     cost = serializers.IntegerField()
     min_portal_cost = serializers.IntegerField(allow_null=True)
     min_portal_open_cost = serializers.IntegerField(allow_null=True)
@@ -245,18 +195,18 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
 
 
 class BlockColorSerializer(serializers.ModelSerializer):
-    item = SimpleItemSerializer()
-    world = SimpleWorldSerializer()
+    item = URLSimpleItemSerializer()
+    world = URLSimpleWorldSerializer()
 
     is_perm = serializers.BooleanField()
     is_sovereign_only = serializers.BooleanField()
     is_exo_only = serializers.BooleanField()
     days_since_exo = serializers.IntegerField(allow_null=True)
     days_since_transform_exo = serializers.IntegerField(allow_null=True)
-    first_world = SimpleWorldSerializer(allow_null=True)
-    last_exo = SimpleWorldSerializer(allow_null=True)
-    transform_first_world = SimpleWorldSerializer(allow_null=True)
-    transform_last_exo = SimpleWorldSerializer(allow_null=True)
+    first_world = URLSimpleWorldSerializer(allow_null=True)
+    last_exo = URLSimpleWorldSerializer(allow_null=True)
+    transform_first_world = URLSimpleWorldSerializer(allow_null=True)
+    transform_last_exo = URLSimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
@@ -288,10 +238,10 @@ class ItemColorSerializer(serializers.ModelSerializer):
     is_exo_only = serializers.BooleanField()
     days_since_exo = serializers.IntegerField(allow_null=True)
     days_since_transform_exo = serializers.IntegerField(allow_null=True)
-    first_world = SimpleWorldSerializer(allow_null=True)
-    last_exo = SimpleWorldSerializer(allow_null=True)
-    transform_first_world = SimpleWorldSerializer(allow_null=True)
-    transform_last_exo = SimpleWorldSerializer(allow_null=True)
+    first_world = URLSimpleWorldSerializer(allow_null=True)
+    last_exo = URLSimpleWorldSerializer(allow_null=True)
+    transform_first_world = URLSimpleWorldSerializer(allow_null=True)
+    transform_last_exo = URLSimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
@@ -325,7 +275,7 @@ class PossibleColorSerializer(serializers.ModelSerializer):
 
 
 class PossibleItemSerializer(serializers.ModelSerializer):
-    item = SimpleItemSerializer()
+    item = URLSimpleItemSerializer()
 
     class Meta:
         model = WorldBlockColor
@@ -335,17 +285,17 @@ class PossibleItemSerializer(serializers.ModelSerializer):
 
 
 class WorldColorSerializer(serializers.ModelSerializer):
-    world = SimpleWorldSerializer()
+    world = URLSimpleWorldSerializer()
 
     is_perm = serializers.BooleanField()
     is_sovereign_only = serializers.BooleanField()
     is_exo_only = serializers.BooleanField()
     days_since_exo = serializers.IntegerField(allow_null=True)
     days_since_transform_exo = serializers.IntegerField(allow_null=True)
-    first_world = SimpleWorldSerializer(allow_null=True)
-    last_exo = SimpleWorldSerializer(allow_null=True)
-    transform_first_world = SimpleWorldSerializer(allow_null=True)
-    transform_last_exo = SimpleWorldSerializer(allow_null=True)
+    first_world = URLSimpleWorldSerializer(allow_null=True)
+    last_exo = URLSimpleWorldSerializer(allow_null=True)
+    transform_first_world = URLSimpleWorldSerializer(allow_null=True)
+    transform_last_exo = URLSimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
@@ -399,7 +349,7 @@ class WorldPollSerializer(serializers.ModelSerializer):
         lookup_url_kwarg=["world_id", "id"],
         read_only=True,
     )
-    world = SimpleWorldSerializer()
+    world = URLSimpleWorldSerializer()
 
     player_count = serializers.IntegerField(
         source="result.player_count",
@@ -532,27 +482,11 @@ class WorldPollTBSerializer(NullSerializer):
     )
 
 
-class KindOfSimpleWorldSerializer(serializers.ModelSerializer):
+class KindOfSimpleWorldSerializer(SimpleWorldSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="world-detail",
         lookup_field="id",
     )
-    id = serializers.IntegerField()
-    active = serializers.BooleanField()
-    image_url = AzureImageField(source="image", allow_null=True)
-    text_name = serializers.CharField(allow_null=True, required=True)
-    html_name = serializers.CharField(allow_null=True, required=True)
-    tier = serializers.IntegerField(help_text=_("Tier of the world. Starts at 0."))
-    size = serializers.IntegerField()
-    world_type = serializers.ChoiceField(choices=World.WorldType.choices)
-    special_type = serializers.IntegerField(
-        allow_null=True, help_text=_("`1` = Color-Cycling")
-    )
-    is_sovereign = serializers.BooleanField()
-    is_perm = serializers.BooleanField()
-    is_exo = serializers.BooleanField()
-    is_creative = serializers.BooleanField()
-    is_locked = serializers.BooleanField()
 
     class Meta:
         model = World

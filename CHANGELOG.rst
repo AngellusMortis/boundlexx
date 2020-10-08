@@ -1,3 +1,8 @@
+2020-10-08
+----------
+
+* Adds initial pass of v2 endpoints
+
 2020-10-06
 ----------
 

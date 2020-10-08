@@ -5,27 +5,12 @@ from rest_framework import viewsets
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
-from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.v1.serializers import GameFileSerializer, SimpleGameFileSerializer
-from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
+from boundlexx.api.common.serializers import (
+    GameFileSerializer,
+    SimpleGameFileSerializer,
+)
 from boundlexx.ingest.models import GameFile
-
-GAMEFILE_EXAMPLE = {
-    "url": f"{get_base_url()}/api/v1/game-files/1/",
-    "folder": "",
-    "filename": "config.json",
-    "file_type": "JSON",
-    "game_version": "246.6.0",
-    "content": {"steamEnabled": True},
-}
-
-GAMEFILE_LIST_EXAMPLE = {
-    "url": f"{get_base_url()}/api/v1/game-files/1/",
-    "folder": "",
-    "filename": "config.json",
-    "file_type": "JSON",
-    "game_version": "246.6.0",
-}
 
 
 class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
@@ -66,7 +51,6 @@ class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet)
 
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
-    list.example = {"list": {"value": get_list_example(GAMEFILE_LIST_EXAMPLE)}}  # type: ignore # noqa E501
     list.operation_id = "listGameFiles"  # type: ignore # noqa E501
 
     def retrieve(
@@ -82,5 +66,4 @@ class GameFileViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet)
         """
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
-    retrieve.example = {"retrieve": {"value": GAMEFILE_EXAMPLE}}  # type: ignore # noqa E501
     retrieve.operation_id = "retrieveGameFile"  # type: ignore # noqa E501

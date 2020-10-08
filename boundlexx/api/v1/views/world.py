@@ -14,6 +14,8 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_framework_msgpack.renderers import MessagePackRenderer
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
+from boundlexx.api.common.filters import DedupedFilter, WorldFilterSet
+from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
@@ -21,6 +23,7 @@ from boundlexx.api.v1.serializers import (
     KindOfSimpleWorldSerializer,
     SimpleWorldRequestBasketPriceSerializer,
     SimpleWorldShopStandPriceSerializer,
+    URLWorldSerializer,
     WorldBlockColorsViewSerializer,
     WorldDistanceSerializer,
     WorldDumpSerializer,
@@ -28,10 +31,8 @@ from boundlexx.api.v1.serializers import (
     WorldPollResourcesSerializer,
     WorldPollSerializer,
     WorldPollTBSerializer,
-    WorldSerializer,
 )
-from boundlexx.api.v1.views.filters import DedupedFilter, WorldFilterSet
-from boundlexx.api.v1.views.mixins import DescriptiveAutoSchemaMixin, TimeseriesMixin
+from boundlexx.api.v1.views.mixins import TimeseriesMixin
 from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemShopStandPrice,
@@ -62,7 +63,7 @@ class WorldViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
             "itemsellrank_set",
         )
     )
-    serializer_class = WorldSerializer
+    serializer_class = URLWorldSerializer
     lookup_field = "id"
     filter_backends = [
         DjangoFilterBackend,

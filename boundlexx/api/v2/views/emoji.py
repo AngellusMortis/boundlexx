@@ -7,20 +7,13 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter
 from boundlexx.api.common.mixins import DescriptiveAutoSchemaMixin
-from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.v1.serializers import URLEmojiSerializer
+from boundlexx.api.common.serializers import EmojiSerializer
 from boundlexx.boundless.models import Emoji
-
-EMOJI_EXAMPLE = {
-    "url": f"{get_base_url()}/api/v1/emojis/black_joker/",
-    "name": "black_joker",
-    "image_url": "https://cdn.boundlexx.app/local-worlds/emoji/black_joker_7WaYJvl.png",
-}
 
 
 class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
     queryset = Emoji.objects.filter(active=True).prefetch_related("emojialtname_set")
-    serializer_class = URLEmojiSerializer
+    serializer_class = EmojiSerializer
     lookup_field = "name"
     filter_backends = [
         RankedFuzzySearchFilter,
@@ -50,8 +43,6 @@ class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
 
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
-    list.example = {"list": {"value": get_list_example(EMOJI_EXAMPLE)}}  # type: ignore # noqa E501
-
     def retrieve(
         self,
         request,
@@ -62,5 +53,3 @@ class EmojiViewSet(DescriptiveAutoSchemaMixin, viewsets.ReadOnlyModelViewSet):
         Retrieves an emojis from the game Boundless.
         """
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
-
-    retrieve.example = {"retrieve": {"value": EMOJI_EXAMPLE}}  # type: ignore # noqa E501

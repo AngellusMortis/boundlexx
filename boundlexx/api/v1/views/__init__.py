@@ -1,6 +1,5 @@
 from boundlexx.api.v1.views.color import BlockColorViewSet, ColorViewSet
 from boundlexx.api.v1.views.emoji import EmojiViewSet
-from boundlexx.api.v1.views.gamefile import GameFileViewSet
 from boundlexx.api.v1.views.item import (
     BlockViewSet,
     ItemColorsViewSet,
@@ -22,7 +21,6 @@ __all__ = [
     "BlockViewSet",
     "ColorViewSet",
     "EmojiViewSet",
-    "GameFileViewSet",
     "ItemColorsViewSet",
     "ItemResourceCountViewSet",
     "ItemResourceTimeseriesViewSet",

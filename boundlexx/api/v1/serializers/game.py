@@ -1,19 +1,24 @@
-from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from boundlexx.api.v1.serializers.base import (
-    AzureImageField,
-    ItemColorsLinkField,
-    LocalizedNameSerializer,
+from boundlexx.api.common.serializers import (
+    BlockSerializer,
+    ColorSerializer,
+    EmojiSerializer,
+    ItemSerializer,
     LocalizedStringSerializer,
+    SkillGroupSerializer,
+    SkillSerializer,
+)
+from boundlexx.api.v1.serializers.base import (
+    ItemColorsLinkField,
     LocationSerializer,
     NestedHyperlinkedIdentityField,
     ResourceCountLinkField,
-    SimpleItemSerializer,
-    SimpleSkillGroupSerializer,
-    SimpleSkillSerializer,
-    SimpleWorldSerializer,
     SovereignColorsLinkField,
+    URLSimpleItemSerializer,
+    URLSimpleSkillGroupSerializer,
+    URLSimpleSkillSerializer,
+    URLSimpleWorldSerializer,
 )
 from boundlexx.boundless.models import (
     Block,
@@ -30,12 +35,10 @@ from boundlexx.boundless.models import (
     ResourceCount,
     Skill,
     SkillGroup,
-    Subtitle,
 )
-from boundlexx.ingest.models import GameFile
 
 
-class ColorSerializer(serializers.ModelSerializer):
+class URLColorSerializer(ColorSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="color-detail",
         lookup_field="game_id",
@@ -46,10 +49,6 @@ class ColorSerializer(serializers.ModelSerializer):
         lookup_field="game_id",
         lookup_url_kwarg="color__game_id",
         read_only=True,
-    )
-    localization = LocalizedNameSerializer(
-        source="localizedname_set",
-        many=True,
     )
 
     class Meta:
@@ -64,18 +63,7 @@ class ColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class SubtitleSerializer(serializers.ModelSerializer):
-    localization = LocalizedNameSerializer(
-        source="localizedname_set",
-        many=True,
-    )
-
-    class Meta:
-        model = Subtitle
-        fields = ["localization"]
-
-
-class ItemSerializer(serializers.ModelSerializer):
+class URLItemSerializer(ItemSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="item-detail",
         lookup_field="game_id",
@@ -94,17 +82,6 @@ class ItemSerializer(serializers.ModelSerializer):
     )
     colors_url = ItemColorsLinkField()
     sovereign_colors_url = SovereignColorsLinkField()
-    localization = LocalizedNameSerializer(
-        source="localizedname_set",
-        many=True,
-    )
-    item_subtitle = SubtitleSerializer()
-
-    next_shop_stand_update = serializers.DateTimeField(allow_null=True)
-    next_request_basket_update = serializers.DateTimeField(allow_null=True)
-
-    list_type = LocalizedStringSerializer()
-    description = LocalizedStringSerializer()
 
     class Meta:
         model = Item
@@ -141,7 +118,7 @@ class ItemResourceCountSerializer(serializers.ModelSerializer):
         lookup_url_kwarg=["game_id"],
         read_only=True,
     )
-    world = SimpleWorldSerializer(source="world_poll.world")
+    world = URLSimpleWorldSerializer(source="world_poll.world")
 
     class Meta:
         model = ResourceCount
@@ -171,16 +148,13 @@ class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
         ]
 
 
-class SkillSerializer(serializers.ModelSerializer):
+class URLSkillSerializer(SkillSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="skill-detail",
         lookup_field="id",
         read_only=True,
     )
-    group = SimpleSkillGroupSerializer()
-    display_name = LocalizedStringSerializer()
-    description = LocalizedStringSerializer()
-    icon_url = AzureImageField(source="icon", allow_null=True)
+    group = URLSimpleSkillGroupSerializer()
 
     class Meta:
         model = Skill
@@ -202,7 +176,7 @@ class SkillSerializer(serializers.ModelSerializer):
 
 
 class SimpleWorldShopPriceSerializer(serializers.ModelSerializer):
-    item = SimpleItemSerializer()
+    item = URLSimpleItemSerializer()
     location = LocationSerializer()
 
 
@@ -237,7 +211,7 @@ class SimpleWorldRequestBasketPriceSerializer(SimpleWorldShopPriceSerializer):
 
 
 class SimpleItemShopPriceSerializer(serializers.ModelSerializer):
-    world = SimpleWorldSerializer()
+    world = URLSimpleWorldSerializer()
     location = LocationSerializer()
 
 
@@ -271,13 +245,12 @@ class SimpleItemRequestBasketPriceSerializer(SimpleItemShopPriceSerializer):
         ]
 
 
-class SkillGroupSerializer(serializers.ModelSerializer):
+class URLSkillGroupSerializer(SkillGroupSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="skill-group-detail",
         lookup_field="id",
         read_only=True,
     )
-    display_name = LocalizedStringSerializer()
 
     class Meta:
         model = SkillGroup
@@ -290,50 +263,12 @@ class SkillGroupSerializer(serializers.ModelSerializer):
         ]
 
 
-class SimpleGameFileSerializer(serializers.ModelSerializer):
-    file_type = serializers.ChoiceField(
-        source="get_file_type_display",
-        help_text=_("0 = JSON, 1 = MSGPACK, 2 = OTHER"),
-        choices=GameFile.Filetype.choices,
-    )
-    url = serializers.HyperlinkedIdentityField(
-        view_name="game-file-detail",
-        lookup_field="id",
-        read_only=True,
-    )
-
-    class Meta:
-        model = GameFile
-        fields = [
-            "url",
-            "folder",
-            "filename",
-            "file_type",
-            "game_version",
-        ]
-
-
-class GameFileSerializer(SimpleGameFileSerializer):
-    class Meta:
-        model = GameFile
-        fields = [
-            "url",
-            "folder",
-            "filename",
-            "file_type",
-            "game_version",
-            "content",
-        ]
-
-
-class EmojiSerializer(serializers.ModelSerializer):
+class URLEmojiSerializer(EmojiSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="emoji-detail",
         lookup_field="name",
         read_only=True,
     )
-    image_url = AzureImageField(source="image", allow_null=True)
-    names = serializers.ListField(child=serializers.CharField())
 
     class Meta:
         model = Emoji
@@ -344,14 +279,14 @@ class EmojiSerializer(serializers.ModelSerializer):
         ]
 
 
-class BlockSerialzier(serializers.ModelSerializer):
+class URLBlockSerializer(BlockSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="block-detail",
         lookup_field="game_id",
         read_only=True,
     )
 
-    item = SimpleItemSerializer(source="block_item")
+    item = URLSimpleItemSerializer(source="block_item")
 
     class Meta:
         model = Block
@@ -386,7 +321,7 @@ class RecipeGroupSerializer(serializers.ModelSerializer):
         read_only=True,
     )
     display_name = LocalizedStringSerializer()
-    members = SimpleItemSerializer(many=True)
+    members = URLSimpleItemSerializer(many=True)
 
     class Meta:
         model = RecipeGroup
@@ -400,7 +335,7 @@ class RecipeGroupSerializer(serializers.ModelSerializer):
 
 
 class RecipeRequirementSerializer(serializers.ModelSerializer):
-    skill = SimpleSkillSerializer()
+    skill = URLSimpleSkillSerializer()
 
     class Meta:
         model = RecipeRequirement
@@ -412,7 +347,7 @@ class RecipeRequirementSerializer(serializers.ModelSerializer):
 
 class RecipeInputSerializer(serializers.ModelSerializer):
     group = SimpleRecipeGroupSerializer(allow_null=True)
-    item = SimpleItemSerializer(allow_null=True)
+    item = URLSimpleItemSerializer(allow_null=True)
 
     class Meta:
         model = RecipeInput
@@ -443,9 +378,9 @@ class RecipeSerializer(serializers.ModelSerializer):
         lookup_field="id",
         read_only=True,
     )
-    output = SimpleItemSerializer()
+    output = URLSimpleItemSerializer()
     requirements = RecipeRequirementSerializer(many=True)
-    tints = SimpleItemSerializer(many=True)
+    tints = URLSimpleItemSerializer(many=True)
     levels = RecipeLevelSerializer(many=True)
 
     class Meta:

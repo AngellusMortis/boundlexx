@@ -1,3 +1,4 @@
+from boundlexx.api.common.views import GameFileViewSet
 from boundlexx.api.routers import APIDocsRouter
 from boundlexx.api.v1 import views
 
@@ -35,7 +36,7 @@ router.register("colors", views.ColorViewSet, basename="color").register(
 )
 
 router.register("emojis", views.EmojiViewSet, basename="emoji")
-router.register("game-files", views.GameFileViewSet, basename="game-file")
+router.register("game-files", GameFileViewSet, basename="game-file")
 router.register("blocks", views.BlockViewSet, basename="block")
 
 item_viewset = router.register("items", views.ItemViewSet, basename="item")
