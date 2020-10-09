@@ -10,9 +10,6 @@ import storages.backends.azure_storage
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0001_initial'), ('boundless', '0002_create_item_timeseries'), ('boundless', '0003_string_id_creative'), ('boundless', '0004_auto_20200722_2249'), ('boundless', '0005_fill_out_worlds'), ('boundless', '0006_create_worldpoll_timeseries'), ('boundless', '0007_worldpoll_active'), ('boundless', '0008_worldpoll_time'), ('boundless', '0009_testing_updates'), ('boundless', '0010_mayor_id_to_int'), ('boundless', '0011_colorvalue'), ('boundless', '0012_world_updates'), ('boundless', '0013_auto_20200805_2025'), ('boundless', '0014_auto_20200805_2124'), ('boundless', '0015_auto_20200806_1109'), ('boundless', '0016_resourcecount_percentage'), ('boundless', '0017_auto_20200809_2312'), ('boundless', '0018_auto_20200809_2316'), ('boundless', '0019_auto_20200826_2146'), ('boundless', '0020_delete_forumimage'), ('boundless', '0021_auto_20201003_1438'), ('boundless', '0022_auto_20201004_1143'), ('boundless', '0023_worldblockcolor_created_time'), ('boundless', '0024_auto_20201006_0050'), ('boundless', '0025_auto_20201009_1734'), ('boundless', '0026_auto_20201009_1742')]
-
     initial = True
 
     dependencies = [
