@@ -82,7 +82,7 @@ class WorldSerializer(SimpleWorldSerializer):
     is_public_edit = serializers.BooleanField(allow_null=True)
     is_public_claim = serializers.BooleanField(allow_null=True)
     is_finalized = serializers.BooleanField(allow_null=True)
-    number_of_regions = serializers.IntegerField()
+    number_of_regions = serializers.IntegerField(allow_null=True)
     start = serializers.DateTimeField(allow_null=True)
     end = serializers.DateTimeField(allow_null=True)
     surface_liquid = serializers.CharField()
