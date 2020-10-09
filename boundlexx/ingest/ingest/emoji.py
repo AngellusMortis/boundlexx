@@ -33,6 +33,13 @@ def run():
             )
 
             alt_names = emoji_nametable.get(name)
+
+            if alt_names is not None and len(alt_names) == 0:
+                try:
+                    int(emoji.name, 16)
+                except ValueError:
+                    emoji.is_boundless_only = True
+
             emoji.active = alt_names is not None
             emoji.save()
 

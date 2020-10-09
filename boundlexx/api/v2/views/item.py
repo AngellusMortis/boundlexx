@@ -16,9 +16,7 @@ class ItemViewSet(
     queryset = (
         Item.objects.filter(active=True)
         .select_related("item_subtitle", "list_type", "description")
-        .prefetch_related(
-            "localizedname_set",
-        )
+        .prefetch_related("localizedname_set", "item_subtitle__localizedname_set")
     )
     serializer_class = SimpleItemSerializer
     detail_serializer_class = ItemSerializer

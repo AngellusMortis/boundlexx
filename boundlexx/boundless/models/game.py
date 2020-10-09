@@ -436,6 +436,7 @@ class Emoji(models.Model):
     active = models.BooleanField(default=True)
     name = models.CharField(max_length=32, db_index=True)
     image = models.ImageField(storage=select_storage("emoji"))
+    is_boundless_only = models.BooleanField(default=False, db_index=True)
 
     objects = EmojiManager()
 

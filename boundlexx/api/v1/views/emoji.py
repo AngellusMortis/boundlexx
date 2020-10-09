@@ -2,10 +2,11 @@ from typing import List
 
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
-from boundlexx.api.common.filters import DedupedFilter
+from boundlexx.api.common.filters import DedupedFilter, EmojiFilterSet
 from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import URLEmojiSerializer
@@ -23,10 +24,12 @@ class EmojiViewSet(BoundlexxViewSet):
     serializer_class = URLEmojiSerializer
     lookup_field = "name"
     filter_backends = [
+        DjangoFilterBackend,
         RankedFuzzySearchFilter,
         filters.OrderingFilter,
         DedupedFilter,
     ]
+    filterset_class = EmojiFilterSet
     search_fields = ["name", "emojialtname__name"]
     ordering = ["-rank", "name"]
     ordering_fields: List[str] = []

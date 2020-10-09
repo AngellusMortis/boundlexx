@@ -4,7 +4,7 @@ from django.utils.translation import ugettext as _
 from django_filters.rest_framework import FilterSet, filters
 from rest_framework.filters import BaseFilterBackend
 
-from boundlexx.boundless.models import Item, World
+from boundlexx.boundless.models import Emoji, Item, World
 from boundlexx.boundless.utils import get_block_color_item_ids
 
 DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
@@ -64,6 +64,12 @@ class LocalizationFilterSet(BaseFilterSet):
     lang = LangFilter()
 
 
+class EmojiFilterSet(BaseFilterSet):
+    class Meta:
+        model = Emoji
+        fields = ["is_boundless_only"]
+
+
 class ItemFilterSet(LocalizationFilterSet):
     has_colors = filters.BooleanFilter(
         label=_("Filters out items with/without colors"),
@@ -77,9 +83,7 @@ class ItemFilterSet(LocalizationFilterSet):
 
     class Meta:
         model = Item
-        fields = [
-            "string_id",
-        ]
+        fields = ["string_id", "item_subtitle_id"]
 
     def filter_resources(self, queryset, name, value):
         if value:

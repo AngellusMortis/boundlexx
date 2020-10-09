@@ -8,6 +8,7 @@ from boundlexx.boundless.models import Item, Subtitle
 
 
 class SubtitleSerializer(serializers.ModelSerializer):
+    id = serializers.IntegerField()  # noqa: A003
     localization = LocalizedNameSerializer(
         source="localizedname_set",
         many=True,
@@ -15,7 +16,7 @@ class SubtitleSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Subtitle
-        fields = ["localization"]
+        fields = ["id", "localization"]
 
 
 class IDItemSerializer(serializers.ModelSerializer):
@@ -32,6 +33,8 @@ class SimpleItemSerializer(IDItemSerializer):
         many=True,
     )
 
+    item_subtitle = SubtitleSerializer()
+
     class Meta:
         model = Item
         fields = [
@@ -39,12 +42,11 @@ class SimpleItemSerializer(IDItemSerializer):
             "name",
             "string_id",
             "localization",
+            "item_subtitle",
         ]
 
 
 class ItemSerializer(SimpleItemSerializer):
-    item_subtitle = SubtitleSerializer()
-
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
     next_request_basket_update = serializers.DateTimeField(allow_null=True)
 
