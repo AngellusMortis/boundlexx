@@ -4,9 +4,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0005_auto_20200726_0340'), ('boundless', '0006_auto_20200726_1318')]
-
     dependencies = [
         ('boundless', '0004_auto_20200722_2249'),
     ]

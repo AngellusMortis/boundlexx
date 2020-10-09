@@ -1,3 +1,9 @@
+2020-10-09
+----------
+
+* Adds subtitles to v2 Items list endpoint
+* Adds `is_boundless_only` + filter to Emojis
+
 2020-10-08
 ----------
 

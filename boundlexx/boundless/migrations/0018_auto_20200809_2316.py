@@ -2,21 +2,6 @@
 
 from django.db import migrations, models
 
-def update_world_type(apps, schema_editor):
-    World = apps.get_model("boundless", "World")
-
-    for world in World.objects.filter(world_type="UMBRIS"):
-        world.world_type = "DARKMATTER"
-        world.save()
-
-
-def revert_world_type(apps, schema_editor):
-    World = apps.get_model("boundless", "World")
-
-    for world in World.objects.filter(world_type="DARKMATTER"):
-        world.world_type = "UMBRIS"
-        world.save()
-
 
 class Migration(migrations.Migration):
 
@@ -25,7 +10,6 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RunPython(update_world_type, revert_world_type),
         migrations.AlterField(
             model_name='world',
             name='world_type',
