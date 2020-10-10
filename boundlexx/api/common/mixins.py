@@ -48,7 +48,7 @@ class TimeseriesMixin:
             if lookup == "latest":
                 queryset = queryset[:1]
             else:
-                queryset = queryset.order_by("-time")[:1]
+                queryset = queryset.order_by("time")[:1]
 
             if queryset.count() == 1:
                 obj = queryset.first()
