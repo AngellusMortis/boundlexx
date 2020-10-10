@@ -142,7 +142,20 @@ class URLItemResourceCountSerializer(ItemResourceCountSerializer):
         ]
 
 
-class ItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
+class URLItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
+    url = NestedHyperlinkedIdentityField(
+        view_name="item-resource-count-detail",
+        lookup_field=["item.game_id", "world_poll.world.id"],
+        lookup_url_kwarg=["item__game_id", "world_id"],
+        read_only=True,
+    )
+    item_url = NestedHyperlinkedIdentityField(
+        view_name="item-detail",
+        lookup_field=["item.game_id"],
+        lookup_url_kwarg=["game_id"],
+        read_only=True,
+    )
+
     class Meta:
         model = ResourceCount
         fields = [

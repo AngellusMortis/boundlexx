@@ -21,8 +21,6 @@ from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
-    ItemResourceCountTimeSeriesSerializer,
-    ItemResourceCountTimeSeriesTBSerializer,
     PossibleColorSerializer,
     URLItemColorSerializer,
     URLItemRequestBasketPriceSerializer,
@@ -32,7 +30,6 @@ from boundlexx.api.v1.serializers import (
     URLSimpleWorldSerializer,
     URLWorldColorSerializer,
 )
-from boundlexx.api.v1.views.mixins import TimeseriesMixin
 from boundlexx.boundless.models import (
     Item,
     ItemRequestBasketPrice,
@@ -119,19 +116,6 @@ ITEM_RESOURCES_WORLD_LIST_EXAMPLE = {
     "url": f"{get_base_url()}/api/v1/worlds/1/",
     "id": 1,
     "display_name": "Sochaltin I",
-}
-
-
-ITEM_RESOURCE_TIMESERIES_EXAMPLE = {
-    "time": "2020-08-04T09:09:50.136765-04:00",
-    "url": f"{get_base_url()}/api/v1/items/32779/resource-counts/1/",
-    "item_url": f"{get_base_url()}/api/v1/items/32779/",
-    "world": {
-        "url": f"{get_base_url()}/api/v1/worlds/1/",
-        "id": 1,
-        "display_name": "Sochaltin I",
-    },
-    "count": 6051899,
 }
 
 ITEM_SOVEREIGN_COLORS_EXAMPLE = {
@@ -306,49 +290,6 @@ class ItemViewSet(
         "sovereign_colors": {"value": get_list_example(ITEM_SOVEREIGN_COLORS_EXAMPLE)}
     }
     sovereign_colors.operation_id = "listItemSovereignColors"  # noqa E501
-
-
-class ItemResourceTimeseriesViewSet(
-    TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet
-):
-    schema = DescriptiveAutoSchema(tags=["Items"])
-    queryset = ResourceCount.objects.filter(world_poll__world__active=True)
-    serializer_class = ItemResourceCountTimeSeriesSerializer
-    time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
-    number_fields = ["count"]
-    lookup_field = "id"
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        if queryset.count() == 0:
-            raise Http404
-
-        return queryset
-
-    def list(self, request, *args, **kwargs):  # noqa A003
-        """
-        Retrieves the list resource counts for a give item/world combination
-        """
-
-        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
-
-    list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_TIMESERIES_EXAMPLE)}}  # type: ignore # noqa E501
-    list.operation_id = "listItemResourceTimeseries"  # type: ignore # noqa E501
-
-    def retrieve(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):  # pylint: disable=arguments-differ
-        """
-        Retrieves a specific resource counts for a give item/world combination
-        """
-        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
-
-    retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_TIMESERIES_EXAMPLE}}  # type: ignore # noqa E501
-    retrieve.operation_id = "retrieveItemResourceTimeseries"  # type: ignore # noqa E501
 
 
 class ItemResourceWorldListViewSet(

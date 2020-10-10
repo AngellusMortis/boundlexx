@@ -10,7 +10,7 @@ python manage.py migrate
 # handle Python syntax errors during development
 while true; do
     set +e
-    python -Wd manage.py runserver 0.0.0.0:8000
+    python manage.py runserver 0.0.0.0:8000
     set -e
     sleep 5
 done

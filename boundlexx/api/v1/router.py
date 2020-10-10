@@ -33,6 +33,9 @@ and discoverbility is very useful. For Web apps, please see [v2](/api/v2/).
 """
 
 router = APIDocsRouter(API_DESCRIPTION, "v1")
+
+router.register("blocks", views.BlockViewSet, basename="block")
+
 router.register("colors", views.ColorViewSet, basename="color").register(
     "blocks",
     views.BlockColorViewSet,
@@ -42,7 +45,6 @@ router.register("colors", views.ColorViewSet, basename="color").register(
 
 router.register("emojis", views.EmojiViewSet, basename="emoji")
 router.register("game-files", GameFileViewSet, basename="game-file")
-router.register("blocks", views.BlockViewSet, basename="block")
 
 item_viewset = router.register("items", views.ItemViewSet, basename="item")
 item_viewset.register(

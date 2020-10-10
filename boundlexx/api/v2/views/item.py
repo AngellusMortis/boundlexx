@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters
+from rest_framework import filters, mixins, viewsets
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -18,6 +18,7 @@ from boundlexx.api.common.filters import (
     ItemResourceCountFilterSet,
 )
 from boundlexx.api.common.serializers import (
+    IDWorldSerializer,
     ItemColorSerializer,
     ItemRequestBasketPriceSerializer,
     ItemResourceCountSerializer,
@@ -34,6 +35,7 @@ from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemShopStandPrice,
     ResourceCount,
+    World,
     WorldBlockColor,
 )
 
@@ -343,3 +345,35 @@ class ItemColorsViewSet(
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     retrieve.operation_id = "retrieveItemColors"  # type: ignore # noqa E501
+
+
+class ItemResourceWorldListViewSet(
+    NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
+):
+    schema = DescriptiveAutoSchema(tags=["Items"])
+    serializer_class = IDWorldSerializer
+
+    def get_queryset(self):
+        item_id = self.kwargs.get("item__game_id")
+
+        queryset = World.objects.all()
+
+        if item_id is not None:
+            queryset = queryset.filter(
+                worldpoll__resourcecount__item__game_id=item_id
+            ).distinct("id")
+
+        if queryset.count() == 0:
+            raise Http404
+
+        return queryset
+
+    def list(self, request, *args, **kwargs):  # noqa A003
+        """
+        Retrieves the list of worlds that has this resource on item
+        timeseries lookup
+        """
+
+        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
+
+    list.operation_id = "listItemResourceWorlds"  # type: ignore # noqa E501

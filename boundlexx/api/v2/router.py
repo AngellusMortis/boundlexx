@@ -20,6 +20,9 @@ look up.
 """
 
 router = APIDocsRouter(API_DESCRIPTION, "v2")
+
+router.register("blocks", views.BlockViewSet, basename="block")
+
 router.register("colors", views.ColorViewSet, basename="color").register(
     "blocks",
     views.BlockColorViewSet,
@@ -29,7 +32,6 @@ router.register("colors", views.ColorViewSet, basename="color").register(
 
 router.register("emojis", views.EmojiViewSet, basename="emoji")
 router.register("game-files", GameFileViewSet, basename="game-file")
-router.register("blocks", views.BlockViewSet, basename="block")
 
 item_viewset = router.register("items", views.ItemViewSet, basename="item")
 item_viewset.register(
@@ -44,18 +46,18 @@ item_viewset.register(
     basename="item-colors",
     parents_query_lookups=["item__game_id"],
 )
-# item_viewset.register(
-#     "resource-timeseries",
-#     views.ItemResourceWorldListViewSet,
-#     basename="item-resource-world",
-#     parents_query_lookups=["item__game_id"],
-# )
-# item_viewset.register(
-#     r"resource-timeseries/(?P<world_poll__world_id>\d+)",
-#     views.ItemResourceTimeseriesViewSet,
-#     basename="item-resource-timeseries",
-#     parents_query_lookups=["item__game_id"],
-# )
+item_viewset.register(
+    "resource-timeseries",
+    views.ItemResourceWorldListViewSet,
+    basename="item-resource-world",
+    parents_query_lookups=["item__game_id"],
+)
+item_viewset.register(
+    r"resource-timeseries/(?P<world_poll__world_id>\d+)",
+    views.ItemResourceTimeseriesViewSet,
+    basename="item-resource-timeseries",
+    parents_query_lookups=["item__game_id"],
+)
 
 router.register("recipe-groups", views.RecipeGroupViewSet, basename="recipe-group")
 router.register("recipes", views.RecipeViewSet, basename="recipe")
@@ -70,9 +72,9 @@ world_viewset.register(
     basename="world-distance",
     parents_query_lookups=["world_source__id"],
 )
-# world_viewset.register(
-#     "polls",
-#     views.WorldPollViewSet,
-#     basename="world-poll",
-#     parents_query_lookups=["world_id"],
-# )
+world_viewset.register(
+    "polls",
+    views.WorldPollViewSet,
+    basename="world-poll",
+    parents_query_lookups=["world_id"],
+)
