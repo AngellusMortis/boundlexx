@@ -36,7 +36,7 @@ _**[{{ group_name|title }}]**_
 {% endfor %}{% endfor %}
 [/details]
 **-------------------------------------------------------------------**{% endif %}{% if world.special_type == 1 %}
-**Block Colors** : This world is a "Color-Cycling" world. That means the colors change at random.
+**Block Colors** : This world is a "Color-Cycling" world. That means the colors change every 2 minutes at random.
 **-------------------------------------------------------------------**{% else %}{% if color_groups %}
 [details="{% if world.is_sovereign %}Current {% endif %}Blocks Colors"]
 **-------------------------------------------------------------------**{% if not world.is_perm %}{% if world.is_exo %}
