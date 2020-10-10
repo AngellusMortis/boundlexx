@@ -156,6 +156,8 @@ class URLItemResourceCountTimeSeriesSerializer(ItemResourceCountSerializer):
         read_only=True,
     )
 
+    world = URLSimpleWorldSerializer(source="world_poll.world")
+
     class Meta:
         model = ResourceCount
         fields = [

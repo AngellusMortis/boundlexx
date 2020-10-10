@@ -197,6 +197,11 @@ class URLBlockColorSerializer(BlockColorSerializer):
     item = URLSimpleItemSerializer()
     world = URLSimpleWorldSerializer()
 
+    first_world = URLSimpleWorldSerializer(allow_null=True)
+    last_exo = URLSimpleWorldSerializer(allow_null=True)
+    transform_first_world = URLSimpleWorldSerializer(allow_null=True)
+    transform_last_exo = URLSimpleWorldSerializer(allow_null=True)
+
     class Meta:
         model = WorldBlockColor
         fields = [

@@ -9,11 +9,11 @@ from boundlexx.api.v2.views.item import (
 )
 from boundlexx.api.v2.views.recipe import RecipeGroupViewSet, RecipeViewSet
 from boundlexx.api.v2.views.skill import SkillGroupViewSet, SkillViewSet
-from boundlexx.api.v2.views.world import WorldDistanceViewSet, WorldViewSet
 from boundlexx.api.v2.views.timeseries import (
     ItemResourceTimeseriesViewSet,
     WorldPollViewSet,
 )
+from boundlexx.api.v2.views.world import WorldDistanceViewSet, WorldViewSet
 
 __all__ = [
     "BlockColorViewSet",
