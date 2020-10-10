@@ -35,7 +35,7 @@ class TimeseriesMixin:
         kwargs = super().get_parents_query_dict()  # type: ignore
 
         value = kwargs.get(self.lookup_field)  # type: ignore
-        if value == "latest":
+        if value in ["latest", "initial"]:
             kwargs.pop(self.lookup_field)  # type: ignore
 
         return kwargs
@@ -43,8 +43,12 @@ class TimeseriesMixin:
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())  # type: ignore
 
-        if self.kwargs[self.lookup_field] == "latest":  # type: ignore
-            queryset = queryset[:1]
+        lookup = self.kwargs[self.lookup_field]  # type: ignore
+        if lookup in ["latest", "initial"]:
+            if lookup == "latest":
+                queryset = queryset[:1]
+            else:
+                queryset = queryset.order_by("-time")[:1]
 
             if queryset.count() == 1:
                 obj = queryset.first()
