@@ -24,7 +24,11 @@ from config.celery_app import app
 MAX_SINGLE_PURGE = 50
 WARM_CACHE_TASK = "boundlexx.api.tasks.warm_cache"
 PURGE_DJ_CACHE = "boundlexx.api.tasks.purge_django_cache"
-WARM_CACHE_PATHS = ["/api/v1/schema/?format=openapi-json", "/api/v1/worlds/dump/"]
+WARM_CACHE_PATHS = [
+    "/api/v1/schema/?format=openapi-json",
+    "/api/v1/worlds/dump/",
+    "/api/v2/schema/?format=openapi-json",
+]
 
 logger = get_task_logger(__name__)
 
