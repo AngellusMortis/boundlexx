@@ -3,7 +3,7 @@ from rest_framework import serializers
 
 from boundlexx.api.common.serializers.base import AzureImageField, NullSerializer
 from boundlexx.api.common.serializers.skill import IDSkillSerializer
-from boundlexx.boundless.models import World
+from boundlexx.boundless.models import World, WorldDistance
 
 
 class IDWorldSerializer(serializers.ModelSerializer):
@@ -142,4 +142,25 @@ class WorldSerializer(SimpleWorldSerializer):
             "bows",
             "next_request_basket_update",
             "next_shop_stand_update",
+        ]
+
+
+class WorldDistanceSerializer(serializers.ModelSerializer):
+    world_source = IDWorldSerializer()
+    world_dest = IDWorldSerializer()
+    cost = serializers.IntegerField()
+    min_portal_cost = serializers.IntegerField(allow_null=True)
+    min_portal_open_cost = serializers.IntegerField(allow_null=True)
+    min_conduits = serializers.IntegerField(allow_null=True)
+
+    class Meta:
+        model = WorldDistance
+        fields = [
+            "world_source",
+            "world_dest",
+            "distance",
+            "cost",
+            "min_portal_cost",
+            "min_portal_open_cost",
+            "min_conduits",
         ]

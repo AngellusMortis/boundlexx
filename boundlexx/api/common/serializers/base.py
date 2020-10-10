@@ -72,3 +72,12 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
         model = LocalizedName
         list_serializer_class = LangFilterListSerializer
         fields = ["lang", "name"]
+
+
+class LocationSerializer(serializers.DictField):
+    def to_representation(self, value):
+        return {
+            "x": value.x,
+            "y": value.y,
+            "z": value.z,
+        }

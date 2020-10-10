@@ -1,8 +1,17 @@
 from rest_framework import serializers
 
 from boundlexx.api.common.serializers import (
-    NullSerializer,
+    BlockColorSerializer,
+    ItemColorSerializer,
+    PossibleWBCSerializer,
+    ResourcesSerializer,
     SimpleWorldSerializer,
+    WorldBlockColorSerializer,
+    WorldColorSerializer,
+    WorldDistanceSerializer,
+    WorldPollLeaderboardSerializer,
+    WorldPollResourcesSerializer,
+    WorldPollSerializer,
     WorldSerializer,
 )
 from boundlexx.api.v1.serializers.base import (
@@ -15,7 +24,6 @@ from boundlexx.api.v1.serializers.base import (
     URLSimpleWorldSerializer,
 )
 from boundlexx.boundless.models import (
-    LeaderboardRecord,
     ResourceCount,
     World,
     WorldBlockColor,
@@ -97,22 +105,7 @@ class URLWorldSerializer(WorldSerializer):
         ]
 
 
-class LeaderboardSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = LeaderboardRecord
-        fields = ["world_rank", "guild_tag", "mayor_name", "name", "prestige"]
-
-
-class ResourcesSerializer(serializers.ModelSerializer):
-    item = URLSimpleItemSerializer()
-
-    class Meta:
-        model = ResourceCount
-        fields = ["item", "is_embedded", "percentage", "count", "average_per_chunk"]
-
-
-class WorldPollExtraSerializer(serializers.ModelSerializer):
-    world_poll_id = serializers.IntegerField(source="id")
+class URLWorldPollLeaderboardSerializer(WorldPollLeaderboardSerializer):
     world_poll_url = NestedHyperlinkedIdentityField(
         view_name="world-poll-detail",
         lookup_field=["world.id", "id"],
@@ -120,24 +113,34 @@ class WorldPollExtraSerializer(serializers.ModelSerializer):
         read_only=True,
     )
 
-
-class WorldPollLeaderboardSerializer(WorldPollExtraSerializer):
-    leaderboard = LeaderboardSerializer(many=True)
-
     class Meta:
         model = WorldPoll
         fields = ["world_poll_id", "world_poll_url", "leaderboard"]
 
 
-class WorldPollResourcesSerializer(WorldPollExtraSerializer):
-    resources = ResourcesSerializer(many=True)
+class URLResourcesSerializer(ResourcesSerializer):
+    item = URLSimpleItemSerializer()
+
+    class Meta:
+        model = ResourceCount
+        fields = ["item", "is_embedded", "percentage", "count", "average_per_chunk"]
+
+
+class URLWorldPollResourcesSerializer(WorldPollResourcesSerializer):
+    world_poll_url = NestedHyperlinkedIdentityField(
+        view_name="world-poll-detail",
+        lookup_field=["world.id", "id"],
+        lookup_url_kwarg=["world_id", "id"],
+        read_only=True,
+    )
+    resources = URLResourcesSerializer(many=True)
 
     class Meta:
         model = WorldPoll
         fields = ["world_poll_id", "world_poll_url", "resources"]
 
 
-class WorldBlockColorSerializer(serializers.ModelSerializer):
+class URLWorldBlockColorSerializer(WorldBlockColorSerializer):
     item = URLSimpleItemSerializer()
     color = SimpleColorSerializer()
 
@@ -173,13 +176,9 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorldDistanceSerializer(serializers.ModelSerializer):
+class URLWorldDistanceSerializer(WorldDistanceSerializer):
     world_source = URLSimpleWorldSerializer()
     world_dest = URLSimpleWorldSerializer()
-    cost = serializers.IntegerField()
-    min_portal_cost = serializers.IntegerField(allow_null=True)
-    min_portal_open_cost = serializers.IntegerField(allow_null=True)
-    min_conduits = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = WorldDistance
@@ -194,15 +193,10 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
         ]
 
 
-class BlockColorSerializer(serializers.ModelSerializer):
+class URLBlockColorSerializer(BlockColorSerializer):
     item = URLSimpleItemSerializer()
     world = URLSimpleWorldSerializer()
 
-    is_perm = serializers.BooleanField()
-    is_sovereign_only = serializers.BooleanField()
-    is_exo_only = serializers.BooleanField()
-    days_since_exo = serializers.IntegerField(allow_null=True)
-    days_since_transform_exo = serializers.IntegerField(allow_null=True)
     first_world = URLSimpleWorldSerializer(allow_null=True)
     last_exo = URLSimpleWorldSerializer(allow_null=True)
     transform_first_world = URLSimpleWorldSerializer(allow_null=True)
@@ -230,14 +224,8 @@ class BlockColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class ItemColorSerializer(serializers.ModelSerializer):
+class URLItemColorSerializer(ItemColorSerializer):
     color = SimpleColorSerializer()
-
-    is_perm = serializers.BooleanField()
-    is_sovereign_only = serializers.BooleanField()
-    is_exo_only = serializers.BooleanField()
-    days_since_exo = serializers.IntegerField(allow_null=True)
-    days_since_transform_exo = serializers.IntegerField(allow_null=True)
     first_world = URLSimpleWorldSerializer(allow_null=True)
     last_exo = URLSimpleWorldSerializer(allow_null=True)
     transform_first_world = URLSimpleWorldSerializer(allow_null=True)
@@ -264,7 +252,7 @@ class ItemColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class PossibleColorSerializer(serializers.ModelSerializer):
+class PossibleColorSerializer(PossibleWBCSerializer):
     color = SimpleColorSerializer()
 
     class Meta:
@@ -284,14 +272,9 @@ class PossibleItemSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorldColorSerializer(serializers.ModelSerializer):
+class URLWorldColorSerializer(WorldColorSerializer):
     world = URLSimpleWorldSerializer()
 
-    is_perm = serializers.BooleanField()
-    is_sovereign_only = serializers.BooleanField()
-    is_exo_only = serializers.BooleanField()
-    days_since_exo = serializers.IntegerField(allow_null=True)
-    days_since_transform_exo = serializers.IntegerField(allow_null=True)
     first_world = URLSimpleWorldSerializer(allow_null=True)
     last_exo = URLSimpleWorldSerializer(allow_null=True)
     transform_first_world = URLSimpleWorldSerializer(allow_null=True)
@@ -327,10 +310,10 @@ class WorldBlockColorsViewSerializer(
         lookup_field="id",
         read_only=True,
     )
-    block_colors = WorldBlockColorSerializer(many=True, read_only=True)
+    block_colors = URLWorldBlockColorSerializer(many=True, read_only=True)
 
 
-class WorldPollSerializer(serializers.ModelSerializer):
+class URLWorldPollSerializer(WorldPollSerializer):
     url = NestedHyperlinkedIdentityField(
         view_name="world-poll-detail",
         lookup_field=["world.id", "id"],
@@ -351,22 +334,6 @@ class WorldPollSerializer(serializers.ModelSerializer):
     )
     world = URLSimpleWorldSerializer()
 
-    player_count = serializers.IntegerField(
-        source="result.player_count",
-        read_only=True,
-    )
-    beacon_count = serializers.IntegerField(
-        source="result.beacon_count",
-        read_only=True,
-    )
-    plot_count = serializers.IntegerField(
-        source="result.plot_count",
-        read_only=True,
-    )
-    total_prestige = serializers.IntegerField(
-        source="result.total_prestige", read_only=True
-    )
-
     class Meta:
         model = WorldPoll
         fields = [
@@ -381,105 +348,6 @@ class WorldPollSerializer(serializers.ModelSerializer):
             "plot_count",
             "total_prestige",
         ]
-
-
-class ItemResourceCountTimeSeriesTBSerializer(NullSerializer):
-    time_bucket = serializers.DateTimeField(required=False)
-    count_average = serializers.FloatField()
-    count_mode = serializers.IntegerField()
-    count_median = serializers.IntegerField()
-    count_min = serializers.IntegerField()
-    count_max = serializers.IntegerField()
-    count_stddev = serializers.FloatField()
-    count_variance = serializers.FloatField()
-
-
-class WorldPollTBSerializer(NullSerializer):
-    time_bucket = serializers.DateTimeField(required=False)
-
-    player_count_average = serializers.FloatField(
-        source="worldpollresult__player_count_average",
-    )
-    player_count_mode = serializers.IntegerField(
-        source="worldpollresult__player_count_mode"
-    )
-    player_count_median = serializers.IntegerField(
-        source="worldpollresult__player_count_median"
-    )
-    player_count_min = serializers.IntegerField(
-        source="worldpollresult__player_count_min"
-    )
-    player_count_max = serializers.IntegerField(
-        source="worldpollresult__player_count_max"
-    )
-    player_count_stddev = serializers.FloatField(
-        source="worldpollresult__player_count_stddev",
-    )
-    player_count_variance = serializers.FloatField(
-        source="worldpollresult__player_count_variance",
-    )
-
-    beacon_count_average = serializers.FloatField(
-        source="worldpollresult__beacon_count_average",
-    )
-    beacon_count_mode = serializers.IntegerField(
-        source="worldpollresult__beacon_count_mode"
-    )
-    beacon_count_median = serializers.IntegerField(
-        source="worldpollresult__beacon_count_median"
-    )
-    beacon_count_min = serializers.IntegerField(
-        source="worldpollresult__beacon_count_min"
-    )
-    beacon_count_max = serializers.IntegerField(
-        source="worldpollresult__beacon_count_max"
-    )
-    beacon_count_stddev = serializers.FloatField(
-        source="worldpollresult__beacon_count_stddev",
-    )
-    beacon_count_variance = serializers.FloatField(
-        source="worldpollresult__beacon_count_variance",
-    )
-
-    plot_count_average = serializers.FloatField(
-        source="worldpollresult__plot_count_average",
-    )
-    plot_count_mode = serializers.IntegerField(
-        source="worldpollresult__plot_count_mode"
-    )
-    plot_count_median = serializers.IntegerField(
-        source="worldpollresult__plot_count_median"
-    )
-    plot_count_min = serializers.IntegerField(source="worldpollresult__plot_count_min")
-    plot_count_max = serializers.IntegerField(source="worldpollresult__plot_count_max")
-    plot_count_stddev = serializers.FloatField(
-        source="worldpollresult__plot_count_stddev",
-    )
-    plot_count_variance = serializers.FloatField(
-        source="worldpollresult__plot_count_variance",
-    )
-
-    total_prestige_average = serializers.FloatField(
-        source="worldpollresult__total_prestige_average",
-    )
-    total_prestige_mode = serializers.IntegerField(
-        source="worldpollresult__total_prestige_mode"
-    )
-    total_prestige_median = serializers.IntegerField(
-        source="worldpollresult__total_prestige_median"
-    )
-    total_prestige_min = serializers.IntegerField(
-        source="worldpollresult__total_prestige_min"
-    )
-    total_prestige_max = serializers.IntegerField(
-        source="worldpollresult__total_prestige_max"
-    )
-    total_prestige_stddev = serializers.FloatField(
-        source="worldpollresult__total_prestige_stddev",
-    )
-    total_prestige_variance = serializers.FloatField(
-        source="worldpollresult__total_prestige_variance",
-    )
 
 
 class KindOfSimpleWorldSerializer(SimpleWorldSerializer):

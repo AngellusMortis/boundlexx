@@ -1,11 +1,10 @@
 from django_filters.rest_framework import DjangoFilterBackend
 
-from boundlexx.api.common.filters import LocalizationFilterSet
+from boundlexx.api.common.filters import LocalizationFilterSet, RecipeFilterSet
 from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
-from boundlexx.api.v1.serializers import RecipeGroupSerializer, RecipeSerializer
-from boundlexx.api.v1.views.filters import RecipeFilterSet
+from boundlexx.api.v1.serializers import URLRecipeGroupSerializer, URLRecipeSerializer
 from boundlexx.boundless.models import Recipe, RecipeGroup
 
 RECIPE_EXAMPLE = {
@@ -141,14 +140,14 @@ RECIPE_GROUP_EXAMPLE = {
 
 
 class RecipeGroupViewSet(BoundlexxViewSet):
-    schema = DescriptiveAutoSchema(tags=["Skills"])
+    schema = DescriptiveAutoSchema(tags=["Recipes"])
 
     queryset = (
         RecipeGroup.objects.all()
         .select_related("display_name")
         .prefetch_related("members", "display_name__strings")
     )
-    serializer_class = RecipeGroupSerializer
+    serializer_class = URLRecipeGroupSerializer
     lookup_field = "id"
     filter_backends = [
         DjangoFilterBackend,
@@ -192,7 +191,7 @@ class RecipeViewSet(BoundlexxViewSet):
             "requirements__skill",
         )
     )
-    serializer_class = RecipeSerializer
+    serializer_class = URLRecipeSerializer
     lookup_field = "id"
     filter_backends = [
         DjangoFilterBackend,

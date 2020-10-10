@@ -21,18 +21,13 @@ from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
 from boundlexx.api.v1.serializers import (
     KindOfSimpleWorldSerializer,
-    SimpleWorldRequestBasketPriceSerializer,
-    SimpleWorldShopStandPriceSerializer,
+    URLWorldDistanceSerializer,
+    URLWorldRequestBasketPriceSerializer,
     URLWorldSerializer,
+    URLWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
-    WorldDistanceSerializer,
     WorldDumpSerializer,
-    WorldPollLeaderboardSerializer,
-    WorldPollResourcesSerializer,
-    WorldPollSerializer,
-    WorldPollTBSerializer,
 )
-from boundlexx.api.v1.views.mixins import TimeseriesMixin
 from boundlexx.boundless.models import (
     ItemRequestBasketPrice,
     ItemShopStandPrice,
@@ -157,7 +152,7 @@ class WorldViewSet(BoundlexxViewSet):
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=SimpleWorldShopStandPriceSerializer,
+        serializer_class=URLWorldShopStandPriceSerializer,
         url_path="shop-stands",
     )
     def shop_stands(
@@ -192,7 +187,7 @@ class WorldViewSet(BoundlexxViewSet):
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=SimpleWorldRequestBasketPriceSerializer,
+        serializer_class=URLWorldRequestBasketPriceSerializer,
         url_path="request-baskets",
     )
     def request_baskets(
@@ -279,106 +274,6 @@ class WorldViewSet(BoundlexxViewSet):
     dump.operation_id = "dumpWorlds"
 
 
-class WorldPollViewSet(TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet):
-    schema = DescriptiveAutoSchema(tags=["Worlds"])
-    queryset = (
-        WorldPoll.objects.all()
-        .select_related("world")
-        .prefetch_related(
-            "worldpollresult_set",
-            "leaderboardrecord_set",
-            "resourcecount_set",
-            "resourcecount_set__item",
-        )
-    )
-    serializer_class = WorldPollSerializer
-    time_bucket_serializer_class = WorldPollTBSerializer
-    number_fields = [
-        "worldpollresult__player_count",
-        "worldpollresult__beacon_count",
-        "worldpollresult__plot_count",
-        "worldpollresult__total_prestige",
-    ]
-    lookup_field = "id"
-
-    def list(self, request, *args, **kwargs):  # noqa A003
-        """
-        Retrieves the list polls avaiable for give World
-        """
-
-        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
-
-    list.example = {"list": {"value": get_list_example(examples.WORLD_POLL_EXAMPLE)}}  # type: ignore # noqa E501
-
-    def retrieve(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):  # pylint: disable=arguments-differ
-        """
-        Retrieves a specific poll for a given world
-
-        Can pass `latest` in place of `id` to retrieve the newsest one
-        """
-        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
-
-    retrieve.example = {"retrieve": {"value": examples.WORLD_POLL_EXAMPLE}}  # type: ignore # noqa E501
-
-    @action(
-        detail=True,
-        methods=["get"],
-        serializer_class=WorldPollLeaderboardSerializer,
-    )
-    def leaderboard(
-        self,
-        request,
-        world_id=None,
-        id=None,  # pylint: disable=redefined-builtin # noqa A002
-    ):
-        """
-        Retrieves the leaderboard for a given world poll result
-        """
-
-        world_poll = self.get_object()
-
-        serializer = self.get_serializer_class()(
-            world_poll, context={"request": request}
-        )
-
-        return Response(serializer.data)
-
-    leaderboard.example = {
-        "leaderboard": {"value": examples.WORLD_POLL_LEADERBOARD_EXAMPLE}
-    }
-    leaderboard.operation_id = "listWorldPollLeaderboards"
-
-    @action(
-        detail=True,
-        methods=["get"],
-        serializer_class=WorldPollResourcesSerializer,
-    )
-    def resources(
-        self,
-        request,
-        world_id=None,
-        id=None,  # pylint: disable=redefined-builtin # noqa A002
-    ):
-        """
-        Retrieves the count of resources for a given world poll result
-        """
-        world_poll = self.get_object()
-
-        serializer = self.get_serializer_class()(
-            world_poll, context={"request": request}
-        )
-
-        return Response(serializer.data)
-
-    resources.example = {"resources": {"value": examples.WORLD_POLL_RESOURCES_EXAMPLE}}
-    resources.operation_id = "listWorldPollResources"
-
-
 class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
     queryset = (
         WorldDistance.objects.filter(world_source__active=True, world_dest__active=True)
@@ -386,7 +281,7 @@ class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
         .order_by("distance")
     )
     schema = DescriptiveAutoSchema(tags=["Worlds"])
-    serializer_class = WorldDistanceSerializer
+    serializer_class = URLWorldDistanceSerializer
     lookup_field = "world_id"
 
     def get_object(self):

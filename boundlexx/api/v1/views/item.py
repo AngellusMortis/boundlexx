@@ -11,30 +11,26 @@ from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
-from boundlexx.api.common.filters import DedupedFilter, ItemFilterSet
+from boundlexx.api.common.filters import (
+    DedupedFilter,
+    ItemColorFilterSet,
+    ItemFilterSet,
+    ItemResourceCountFilterSet,
+)
 from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
-    ItemColorSerializer,
-    ItemResourceCountSerializer,
-    ItemResourceCountTimeSeriesSerializer,
-    ItemResourceCountTimeSeriesTBSerializer,
     PossibleColorSerializer,
-    SimpleItemRequestBasketPriceSerializer,
-    SimpleItemShopStandPriceSerializer,
-    URLBlockSerializer,
+    URLItemColorSerializer,
+    URLItemRequestBasketPriceSerializer,
+    URLItemResourceCountSerializer,
     URLItemSerializer,
+    URLItemShopStandPriceSerializer,
     URLSimpleWorldSerializer,
-    WorldColorSerializer,
+    URLWorldColorSerializer,
 )
-from boundlexx.api.v1.views.filters import (
-    ItemColorFilterSet,
-    ItemResourceCountFilterSet,
-)
-from boundlexx.api.v1.views.mixins import TimeseriesMixin
 from boundlexx.boundless.models import (
-    Block,
     Item,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
@@ -122,19 +118,6 @@ ITEM_RESOURCES_WORLD_LIST_EXAMPLE = {
     "display_name": "Sochaltin I",
 }
 
-
-ITEM_RESOURCE_TIMESERIES_EXAMPLE = {
-    "time": "2020-08-04T09:09:50.136765-04:00",
-    "url": f"{get_base_url()}/api/v1/items/32779/resource-counts/1/",
-    "item_url": f"{get_base_url()}/api/v1/items/32779/",
-    "world": {
-        "url": f"{get_base_url()}/api/v1/worlds/1/",
-        "id": 1,
-        "display_name": "Sochaltin I",
-    },
-    "count": 6051899,
-}
-
 ITEM_SOVEREIGN_COLORS_EXAMPLE = {
     "color": {"url": f"{get_base_url()}/api/v1/colors/1/", "game_id": 1}
 }
@@ -198,7 +181,7 @@ class ItemViewSet(
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=SimpleItemShopStandPriceSerializer,
+        serializer_class=URLItemShopStandPriceSerializer,
         url_path="shop-stands",
     )
     def shop_stands(
@@ -233,7 +216,7 @@ class ItemViewSet(
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=SimpleItemRequestBasketPriceSerializer,
+        serializer_class=URLItemRequestBasketPriceSerializer,
         url_path="request-baskets",
     )
     def request_baskets(
@@ -309,49 +292,6 @@ class ItemViewSet(
     sovereign_colors.operation_id = "listItemSovereignColors"  # noqa E501
 
 
-class ItemResourceTimeseriesViewSet(
-    TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet
-):
-    schema = DescriptiveAutoSchema(tags=["Items"])
-    queryset = ResourceCount.objects.filter(world_poll__world__active=True)
-    serializer_class = ItemResourceCountTimeSeriesSerializer
-    time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
-    number_fields = ["count"]
-    lookup_field = "id"
-
-    def get_queryset(self):
-        queryset = super().get_queryset()
-
-        if queryset.count() == 0:
-            raise Http404
-
-        return queryset
-
-    def list(self, request, *args, **kwargs):  # noqa A003
-        """
-        Retrieves the list resource counts for a give item/world combination
-        """
-
-        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
-
-    list.example = {"list": {"value": get_list_example(ITEM_RESOURCE_TIMESERIES_EXAMPLE)}}  # type: ignore # noqa E501
-    list.operation_id = "listItemResourceTimeseries"  # type: ignore # noqa E501
-
-    def retrieve(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):  # pylint: disable=arguments-differ
-        """
-        Retrieves a specific resource counts for a give item/world combination
-        """
-        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
-
-    retrieve.example = {"retrieve": {"value": ITEM_RESOURCE_TIMESERIES_EXAMPLE}}  # type: ignore # noqa E501
-    retrieve.operation_id = "retrieveItemResourceTimeseries"  # type: ignore # noqa E501
-
-
 class ItemResourceWorldListViewSet(
     NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
 ):
@@ -394,7 +334,7 @@ class ItemResourceCountViewSet(
         world_poll__active=True, world_poll__world__active=True
     ).select_related("world_poll", "world_poll__world", "item")
 
-    serializer_class = ItemResourceCountSerializer
+    serializer_class = URLItemResourceCountSerializer
     lookup_field = "world_id"
     filter_backends = [
         DjangoFilterBackend,
@@ -410,7 +350,7 @@ class ItemResourceCountViewSet(
     ordering = ["-rank", "world_poll__world_id", "-count"]
     ordering_fields: List[str] = [
         "count",
-        "_average_per_chunk",
+        "average_per_chunk",
         "percentage",
     ]
 
@@ -495,8 +435,8 @@ class ItemColorsViewSet(
     ordering = ["-rank", "color__game_id", "world_id"]
     ordering_fields: List[str] = []
 
-    serializer_class = ItemColorSerializer
-    detail_serializer_class = WorldColorSerializer
+    serializer_class = URLItemColorSerializer
+    detail_serializer_class = URLWorldColorSerializer
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -529,37 +469,3 @@ class ItemColorsViewSet(
 
     retrieve.example = {"list": {"value": get_list_example(ITEM_COLORS_EXAMPLE)}}  # type: ignore # noqa E501
     retrieve.operation_id = "retrieveItemColors"  # type: ignore # noqa E501
-
-
-class BlockViewSet(
-    BoundlexxViewSet,
-):
-    queryset = (
-        Block.objects.filter(block_item__isnull=False)
-        .select_related("block_item")
-        .order_by("game_id")
-    )
-    serializer_class = URLBlockSerializer
-    lookup_field = "game_id"
-
-    def list(self, request, *args, **kwargs):  # noqa A003
-        """
-        Retrieves the list of blocks with their item mapping
-        """
-
-        return super().list(request, *args, **kwargs)  # pylint: disable=no-member
-
-    # list.example = {"list": {"value": get_list_example(ITEM_EXAMPLE)}}  # type: ignore # noqa E501
-
-    def retrieve(
-        self,
-        request,
-        *args,
-        **kwargs,
-    ):  # pylint: disable=arguments-differ
-        """
-        Retrieves a block with its item mapping
-        """
-        return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
-
-    # retrieve.example = {"retrieve": {"value": ITEM_EXAMPLE}}  # type: ignore # noqa E501

@@ -1110,7 +1110,7 @@ class WorldPollManager(models.Manager):
                 item=item,
                 count=amount,
                 percentage=(amount / total) * 100,
-                _average_per_chunk=amount / world_poll.world.size,
+                average_per_chunk=amount / world_poll.world.size,
             )
 
     def create_from_game_dict(self, world_dict, poll_dict, world=None, new_world=False):
@@ -1215,7 +1215,7 @@ class ResourceCount(
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
     count = models.PositiveIntegerField(_("Count"))
     percentage = models.DecimalField(max_digits=5, decimal_places=2)
-    _average_per_chunk = models.DecimalField(
+    average_per_chunk = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
 
@@ -1231,14 +1231,6 @@ class ResourceCount(
     @cached_property
     def is_embedded(self):
         return settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[self.item.game_id]
-
-    @property
-    def average_per_chunk(self):
-        if self._average_per_chunk is None:
-            if self.world_poll.world.size is not None:
-                self._average_per_chunk = self.count / self.world_poll.world.size
-                self.save()
-        return self._average_per_chunk
 
 
 class LeaderboardRecord(
