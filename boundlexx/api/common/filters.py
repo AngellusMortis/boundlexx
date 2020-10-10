@@ -165,6 +165,10 @@ class WorldFilterSet(BaseFilterSet):
         label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
     )
+    is_default = filters.BooleanFilter(
+        label=_("Show colors world spawned with"),
+        method="filter_null",
+    )
     show_inactive = filters.BooleanFilter(
         label=_("Include inactive worlds (no longer in game API)"),
         method="filter_null",
@@ -260,6 +264,7 @@ class WorldBlockColorFilterSet(BaseFilterSet):
         model = WorldBlockColor
         fields = [
             "active",
+            "is_default",
             "item__string_id",
             "item__game_id",
             "world__active",
@@ -328,6 +333,7 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
         model = WorldBlockColor
         fields = [
             "active",
+            "is_default",
             "color__game_id",
             "world__active",
             "world__tier",

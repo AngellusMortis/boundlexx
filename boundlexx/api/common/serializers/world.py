@@ -90,7 +90,7 @@ class WorldSerializer(SimpleWorldSerializer):
     atmosphere_color = serializers.CharField()
     water_color = serializers.CharField()
 
-    bows = BowSerializer()
+    bows = BowSerializer(allow_null=True)
 
     protection_points = serializers.IntegerField(
         allow_null=True,
