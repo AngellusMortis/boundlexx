@@ -25,6 +25,11 @@ possible filters for each endpoint as does this OpenAPI spec. The OpenAPI spec
 may extra filters that do not work on specific endpoints as there is a bit of
 drift between the generation of the API vs. the generation of the docs that
 have not been resolved yet (Sorry!).
+
+**NOTE ABOUT WEB APPLICATIONS**: v1 is not optimized for Web apps. It is also
+**deprecated** for Web applications and all CORS headers will be removed on
+1 January 2021. It can still be used for non Web applications as the usuability
+and discoverbility is very useful. For Web apps, please see [v2](/api/v2/).
 """
 
 router = APIDocsRouter(API_DESCRIPTION, "v1")

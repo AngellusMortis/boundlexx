@@ -4,14 +4,23 @@ from boundlexx.api.common.serializers import (
     BlockSerializer,
     ColorSerializer,
     EmojiSerializer,
+    IDRecipeGroupSerializer,
+    ItemRequestBasketPriceSerializer,
+    ItemResourceCountSerializer,
     ItemSerializer,
-    LocalizedStringSerializer,
+    ItemShopStandPriceSerializer,
+    RecipeGroupSerializer,
+    RecipeInputSerializer,
+    RecipeLevelSerializer,
+    RecipeRequirementSerializer,
+    RecipeSerializer,
     SkillGroupSerializer,
     SkillSerializer,
+    WorldRequestBasketPriceSerializer,
+    WorldShopStandPriceSerializer,
 )
 from boundlexx.api.v1.serializers.base import (
     ItemColorsLinkField,
-    LocationSerializer,
     NestedHyperlinkedIdentityField,
     ResourceCountLinkField,
     SovereignColorsLinkField,
@@ -105,7 +114,7 @@ class URLItemSerializer(ItemSerializer):
         ]
 
 
-class ItemResourceCountSerializer(serializers.ModelSerializer):
+class URLItemResourceCountSerializer(ItemResourceCountSerializer):
     url = NestedHyperlinkedIdentityField(
         view_name="item-resource-count-detail",
         lookup_field=["item.game_id", "world_poll.world.id"],
@@ -175,12 +184,9 @@ class URLSkillSerializer(SkillSerializer):
         ]
 
 
-class SimpleWorldShopPriceSerializer(serializers.ModelSerializer):
+class URLWorldShopStandPriceSerializer(WorldShopStandPriceSerializer):
     item = URLSimpleItemSerializer()
-    location = LocationSerializer()
 
-
-class SimpleWorldShopStandPriceSerializer(SimpleWorldShopPriceSerializer):
     class Meta:
         model = ItemShopStandPrice
         fields = [
@@ -195,7 +201,9 @@ class SimpleWorldShopStandPriceSerializer(SimpleWorldShopPriceSerializer):
         ]
 
 
-class SimpleWorldRequestBasketPriceSerializer(SimpleWorldShopPriceSerializer):
+class URLWorldRequestBasketPriceSerializer(WorldRequestBasketPriceSerializer):
+    item = URLSimpleItemSerializer()
+
     class Meta:
         model = ItemRequestBasketPrice
         fields = [
@@ -210,12 +218,9 @@ class SimpleWorldRequestBasketPriceSerializer(SimpleWorldShopPriceSerializer):
         ]
 
 
-class SimpleItemShopPriceSerializer(serializers.ModelSerializer):
+class URLItemShopStandPriceSerializer(ItemShopStandPriceSerializer):
     world = URLSimpleWorldSerializer()
-    location = LocationSerializer()
 
-
-class SimpleItemShopStandPriceSerializer(SimpleItemShopPriceSerializer):
     class Meta:
         model = ItemShopStandPrice
         fields = [
@@ -230,7 +235,9 @@ class SimpleItemShopStandPriceSerializer(SimpleItemShopPriceSerializer):
         ]
 
 
-class SimpleItemRequestBasketPriceSerializer(SimpleItemShopPriceSerializer):
+class URLItemRequestBasketPriceSerializer(ItemRequestBasketPriceSerializer):
+    world = URLSimpleWorldSerializer()
+
     class Meta:
         model = ItemRequestBasketPrice
         fields = [
@@ -298,7 +305,7 @@ class URLBlockSerializer(BlockSerializer):
         ]
 
 
-class SimpleRecipeGroupSerializer(serializers.ModelSerializer):
+class URLSimpleRecipeGroupSerializer(IDRecipeGroupSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="recipe-group-detail",
         lookup_field="id",
@@ -314,13 +321,12 @@ class SimpleRecipeGroupSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeGroupSerializer(serializers.ModelSerializer):
+class URLRecipeGroupSerializer(RecipeGroupSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="recipe-group-detail",
         lookup_field="id",
         read_only=True,
     )
-    display_name = LocalizedStringSerializer()
     members = URLSimpleItemSerializer(many=True)
 
     class Meta:
@@ -334,7 +340,7 @@ class RecipeGroupSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeRequirementSerializer(serializers.ModelSerializer):
+class URLRecipeRequirementSerializer(RecipeRequirementSerializer):
     skill = URLSimpleSkillSerializer()
 
     class Meta:
@@ -345,8 +351,8 @@ class RecipeRequirementSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeInputSerializer(serializers.ModelSerializer):
-    group = SimpleRecipeGroupSerializer(allow_null=True)
+class URLRecipeInputSerializer(RecipeInputSerializer):
+    group = URLSimpleRecipeGroupSerializer(allow_null=True)
     item = URLSimpleItemSerializer(allow_null=True)
 
     class Meta:
@@ -357,8 +363,8 @@ class RecipeInputSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeLevelSerializer(serializers.ModelSerializer):
-    inputs = RecipeInputSerializer(many=True)
+class URLRecipeLevelSerializer(RecipeLevelSerializer):
+    inputs = URLRecipeInputSerializer(many=True)
 
     class Meta:
         model = RecipeLevel
@@ -372,16 +378,16 @@ class RecipeLevelSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeSerializer(serializers.ModelSerializer):
+class URLRecipeSerializer(RecipeSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="recipe-detail",
         lookup_field="id",
         read_only=True,
     )
     output = URLSimpleItemSerializer()
-    requirements = RecipeRequirementSerializer(many=True)
+    requirements = URLRecipeRequirementSerializer(many=True)
     tints = URLSimpleItemSerializer(many=True)
-    levels = RecipeLevelSerializer(many=True)
+    levels = URLRecipeLevelSerializer(many=True)
 
     class Meta:
         model = Recipe

@@ -1,3 +1,9 @@
+2020-10-10
+----------
+
+* Adds remaining non-timeseries endpoints to v2 API
+* Replaces `_average_per_chunk` filter with proper `average_per_chunk` one
+
 2020-10-09
 ----------
 

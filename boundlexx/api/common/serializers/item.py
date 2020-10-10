@@ -4,7 +4,8 @@ from boundlexx.api.common.serializers.base import (
     LocalizedNameSerializer,
     LocalizedStringSerializer,
 )
-from boundlexx.boundless.models import Item, Subtitle
+from boundlexx.api.common.serializers.world import IDWorldSerializer
+from boundlexx.boundless.models import Item, ResourceCount, Subtitle
 
 
 class SubtitleSerializer(serializers.ModelSerializer):
@@ -68,4 +69,18 @@ class ItemSerializer(SimpleItemSerializer):
             "mint_value",
             "list_type",
             "description",
+        ]
+
+
+class ItemResourceCountSerializer(serializers.ModelSerializer):
+    world = IDWorldSerializer(source="world_poll.world")
+
+    class Meta:
+        model = ResourceCount
+        fields = [
+            "world",
+            "is_embedded",
+            "percentage",
+            "count",
+            "average_per_chunk",
         ]

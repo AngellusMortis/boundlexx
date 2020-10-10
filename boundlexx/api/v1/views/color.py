@@ -8,16 +8,19 @@ from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
-from boundlexx.api.common.filters import DedupedFilter, LocalizationFilterSet
+from boundlexx.api.common.filters import (
+    DedupedFilter,
+    LocalizationFilterSet,
+    WorldBlockColorFilterSet,
+)
 from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
-    BlockColorSerializer,
     PossibleItemSerializer,
+    URLBlockColorSerializer,
     URLColorSerializer,
 )
-from boundlexx.api.v1.views.filters import WorldBlockColorFilterSet
 from boundlexx.boundless.models import Color, WorldBlockColor
 
 COLOR_EXAMPLE = {
@@ -146,7 +149,7 @@ class BlockColorViewSet(
         )
     )
 
-    serializer_class = BlockColorSerializer
+    serializer_class = URLBlockColorSerializer
     lookup_field = "item__game_id"
     filter_backends = [
         DjangoFilterBackend,

@@ -5,15 +5,6 @@ from rest_framework.reverse import reverse
 from boundlexx.boundless.models import Item, SkillGroup, World
 
 
-class LocationSerializer(serializers.DictField):
-    def to_representation(self, value):
-        return {
-            "x": value.x,
-            "y": value.y,
-            "z": value.z,
-        }
-
-
 class NestedHyperlinkedIdentityField(serializers.HyperlinkedIdentityField):
     def get_url(
         self,

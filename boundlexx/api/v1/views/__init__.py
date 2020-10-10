@@ -1,7 +1,7 @@
+from boundlexx.api.v1.views.block import BlockViewSet
 from boundlexx.api.v1.views.color import BlockColorViewSet, ColorViewSet
 from boundlexx.api.v1.views.emoji import EmojiViewSet
 from boundlexx.api.v1.views.item import (
-    BlockViewSet,
     ItemColorsViewSet,
     ItemResourceCountViewSet,
     ItemResourceTimeseriesViewSet,

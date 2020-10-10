@@ -21,11 +21,11 @@ from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
 from boundlexx.api.v1.serializers import (
     KindOfSimpleWorldSerializer,
-    SimpleWorldRequestBasketPriceSerializer,
-    SimpleWorldShopStandPriceSerializer,
+    URLWorldDistanceSerializer,
+    URLWorldRequestBasketPriceSerializer,
     URLWorldSerializer,
+    URLWorldShopStandPriceSerializer,
     WorldBlockColorsViewSerializer,
-    WorldDistanceSerializer,
     WorldDumpSerializer,
     WorldPollLeaderboardSerializer,
     WorldPollResourcesSerializer,
@@ -157,7 +157,7 @@ class WorldViewSet(BoundlexxViewSet):
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=SimpleWorldShopStandPriceSerializer,
+        serializer_class=URLWorldShopStandPriceSerializer,
         url_path="shop-stands",
     )
     def shop_stands(
@@ -192,7 +192,7 @@ class WorldViewSet(BoundlexxViewSet):
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=SimpleWorldRequestBasketPriceSerializer,
+        serializer_class=URLWorldRequestBasketPriceSerializer,
         url_path="request-baskets",
     )
     def request_baskets(
@@ -386,7 +386,7 @@ class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
         .order_by("distance")
     )
     schema = DescriptiveAutoSchema(tags=["Worlds"])
-    serializer_class = WorldDistanceSerializer
+    serializer_class = URLWorldDistanceSerializer
     lookup_field = "world_id"
 
     def get_object(self):

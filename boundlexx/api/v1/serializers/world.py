@@ -1,8 +1,14 @@
 from rest_framework import serializers
 
 from boundlexx.api.common.serializers import (
+    BlockColorSerializer,
+    ItemColorSerializer,
     NullSerializer,
+    PossibleWBCSerializer,
     SimpleWorldSerializer,
+    WorldBlockColorSerializer,
+    WorldColorSerializer,
+    WorldDistanceSerializer,
     WorldSerializer,
 )
 from boundlexx.api.v1.serializers.base import (
@@ -137,7 +143,7 @@ class WorldPollResourcesSerializer(WorldPollExtraSerializer):
         fields = ["world_poll_id", "world_poll_url", "resources"]
 
 
-class WorldBlockColorSerializer(serializers.ModelSerializer):
+class URLWorldBlockColorSerializer(WorldBlockColorSerializer):
     item = URLSimpleItemSerializer()
     color = SimpleColorSerializer()
 
@@ -173,13 +179,9 @@ class WorldBlockColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorldDistanceSerializer(serializers.ModelSerializer):
+class URLWorldDistanceSerializer(WorldDistanceSerializer):
     world_source = URLSimpleWorldSerializer()
     world_dest = URLSimpleWorldSerializer()
-    cost = serializers.IntegerField()
-    min_portal_cost = serializers.IntegerField(allow_null=True)
-    min_portal_open_cost = serializers.IntegerField(allow_null=True)
-    min_conduits = serializers.IntegerField(allow_null=True)
 
     class Meta:
         model = WorldDistance
@@ -194,19 +196,9 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
         ]
 
 
-class BlockColorSerializer(serializers.ModelSerializer):
+class URLBlockColorSerializer(BlockColorSerializer):
     item = URLSimpleItemSerializer()
     world = URLSimpleWorldSerializer()
-
-    is_perm = serializers.BooleanField()
-    is_sovereign_only = serializers.BooleanField()
-    is_exo_only = serializers.BooleanField()
-    days_since_exo = serializers.IntegerField(allow_null=True)
-    days_since_transform_exo = serializers.IntegerField(allow_null=True)
-    first_world = URLSimpleWorldSerializer(allow_null=True)
-    last_exo = URLSimpleWorldSerializer(allow_null=True)
-    transform_first_world = URLSimpleWorldSerializer(allow_null=True)
-    transform_last_exo = URLSimpleWorldSerializer(allow_null=True)
 
     class Meta:
         model = WorldBlockColor
@@ -230,14 +222,8 @@ class BlockColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class ItemColorSerializer(serializers.ModelSerializer):
+class URLItemColorSerializer(ItemColorSerializer):
     color = SimpleColorSerializer()
-
-    is_perm = serializers.BooleanField()
-    is_sovereign_only = serializers.BooleanField()
-    is_exo_only = serializers.BooleanField()
-    days_since_exo = serializers.IntegerField(allow_null=True)
-    days_since_transform_exo = serializers.IntegerField(allow_null=True)
     first_world = URLSimpleWorldSerializer(allow_null=True)
     last_exo = URLSimpleWorldSerializer(allow_null=True)
     transform_first_world = URLSimpleWorldSerializer(allow_null=True)
@@ -264,7 +250,7 @@ class ItemColorSerializer(serializers.ModelSerializer):
         ]
 
 
-class PossibleColorSerializer(serializers.ModelSerializer):
+class PossibleColorSerializer(PossibleWBCSerializer):
     color = SimpleColorSerializer()
 
     class Meta:
@@ -284,14 +270,9 @@ class PossibleItemSerializer(serializers.ModelSerializer):
         ]
 
 
-class WorldColorSerializer(serializers.ModelSerializer):
+class URLWorldColorSerializer(WorldColorSerializer):
     world = URLSimpleWorldSerializer()
 
-    is_perm = serializers.BooleanField()
-    is_sovereign_only = serializers.BooleanField()
-    is_exo_only = serializers.BooleanField()
-    days_since_exo = serializers.IntegerField(allow_null=True)
-    days_since_transform_exo = serializers.IntegerField(allow_null=True)
     first_world = URLSimpleWorldSerializer(allow_null=True)
     last_exo = URLSimpleWorldSerializer(allow_null=True)
     transform_first_world = URLSimpleWorldSerializer(allow_null=True)
@@ -327,7 +308,7 @@ class WorldBlockColorsViewSerializer(
         lookup_field="id",
         read_only=True,
     )
-    block_colors = WorldBlockColorSerializer(many=True, read_only=True)
+    block_colors = URLWorldBlockColorSerializer(many=True, read_only=True)
 
 
 class WorldPollSerializer(serializers.ModelSerializer):
