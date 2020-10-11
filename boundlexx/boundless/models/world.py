@@ -494,6 +494,17 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         return settings.BOUNDLESS_WORLD_LIQUIDS[key][0]
 
     @property
+    def world_class(self):
+        world_class = "Homeworld"
+        if self.is_creative:
+            world_class = "Creative World"
+        elif self.is_sovereign:
+            world_class = "Sovereign World"
+        elif self.is_exo:
+            world_class = "Exoworld"
+        return world_class
+
+    @property
     def core_liquid(self):
         key = "DEFAULT"
         if (
