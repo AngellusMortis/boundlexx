@@ -225,14 +225,14 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         REGION_CREATIVE = "sandbox", _("Sandbox")
 
     class Tier(models.IntegerChoices):
-        TIER_1 = 0, _("Placid (1)")
-        TIER_2 = 1, _("Temperate (2)")
-        TIER_3 = 2, _("Rugged (3)")
-        TIER_4 = 3, _("Inhospitable (4)")
-        TIER_5 = 4, _("Turbulent (5)")
-        TIER_6 = 5, _("Fierce (6)")
-        TIER_7 = 6, _("Savage (7)")
-        TIER_8 = 7, _("Brutal (8)")
+        TIER_1 = 0, _("T1 - Placid")
+        TIER_2 = 1, _("T2 - Temperate")
+        TIER_3 = 2, _("T3 - Rugged")
+        TIER_4 = 3, _("T4 - Inhospitable")
+        TIER_5 = 4, _("T5 - Turbulent")
+        TIER_6 = 5, _("T6 - Fierce")
+        TIER_7 = 6, _("T7 - Savage")
+        TIER_8 = 7, _("T8 - Brutal")
 
     class WorldType(models.TextChoices):
         TYPE_LUSH = "LUSH", _("Lush")
