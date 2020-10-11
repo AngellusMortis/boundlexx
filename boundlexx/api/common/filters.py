@@ -91,7 +91,7 @@ class ItemFilterSet(LocalizationFilterSet):
 
     class Meta:
         model = Item
-        fields = ["string_id", "item_subtitle_id"]
+        fields = ["string_id", "item_subtitle_id", "list_type__string_id"]
 
     def filter_resources(self, queryset, name, value):
         if value:
@@ -164,6 +164,10 @@ class WorldFilterSet(BaseFilterSet):
     is_sovereign = filters.BooleanFilter(
         label=_("Filter out Sovereign/non Sovereign worlds"),
         method="filter_sovereign",
+    )
+    is_default = filters.BooleanFilter(
+        label=_("Show colors world spawned with"),
+        method="filter_null",
     )
     show_inactive = filters.BooleanFilter(
         label=_("Include inactive worlds (no longer in game API)"),
@@ -260,6 +264,7 @@ class WorldBlockColorFilterSet(BaseFilterSet):
         model = WorldBlockColor
         fields = [
             "active",
+            "is_default",
             "item__string_id",
             "item__game_id",
             "world__active",
@@ -328,6 +333,7 @@ class ItemColorFilterSet(WorldBlockColorFilterSet):
         model = WorldBlockColor
         fields = [
             "active",
+            "is_default",
             "color__game_id",
             "world__active",
             "world__tier",

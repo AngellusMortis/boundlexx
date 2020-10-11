@@ -132,11 +132,18 @@ class WorldViewSet(BoundlexxViewSet):
         world = self.get_object()
 
         show_inactive_colors = request.query_params.get("show_inactive_colors", False)
+        is_default = request.query_params.get("is_default", None)
 
         all_block_colors = list(world.worldblockcolor_set.all())
 
         block_colors = []
         for bc in all_block_colors:
+            if is_default is not None:
+                if is_default and not bc.is_default:
+                    continue
+                if not is_default and bc.is_default:
+                    continue
+
             if show_inactive_colors or bc.active:
                 block_colors.append(bc)
 

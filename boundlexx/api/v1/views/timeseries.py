@@ -116,7 +116,8 @@ class WorldPollViewSet(TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet):
         """
         Retrieves a specific poll for a given world
 
-        Can pass `latest` in place of `id` to retrieve the newsest one
+        Can pass `latest` or `initial` in place of `id` to retrieve the
+        newest or first one
         """
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 

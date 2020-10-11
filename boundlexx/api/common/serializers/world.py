@@ -21,6 +21,9 @@ class SimpleWorldSerializer(IDWorldSerializer):
     active = serializers.BooleanField(
         help_text=_("Does this world still exist (returned by game API)?")
     )
+    world_class = serializers.ChoiceField(
+        choices=["Homeworld", "Exoworld", "Sovereign World", "Creative World"]
+    )
     image_url = AzureImageField(source="image", allow_null=True)
     text_name = serializers.CharField(allow_null=True, required=True)
     html_name = serializers.CharField(allow_null=True, required=True)
@@ -48,6 +51,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
             "display_name",
             "text_name",
             "html_name",
+            "world_class",
             "tier",
             "size",
             "world_type",
@@ -90,7 +94,7 @@ class WorldSerializer(SimpleWorldSerializer):
     atmosphere_color = serializers.CharField()
     water_color = serializers.CharField()
 
-    bows = BowSerializer()
+    bows = BowSerializer(allow_null=True)
 
     protection_points = serializers.IntegerField(
         allow_null=True,
@@ -111,6 +115,7 @@ class WorldSerializer(SimpleWorldSerializer):
             "display_name",
             "text_name",
             "html_name",
+            "world_class",
             "address",
             "image_url",
             "forum_url",
