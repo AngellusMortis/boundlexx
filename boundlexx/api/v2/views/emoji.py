@@ -30,7 +30,7 @@ class EmojiViewSet(BoundlexxViewSet):
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
         lookup_name = self.kwargs[self.lookup_field]
-        obj = queryset.objects.filter(
+        obj = queryset.filter(
             Q(name=lookup_name) | Q(emojialtname__name=lookup_name)
         ).first()
 
