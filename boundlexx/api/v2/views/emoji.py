@@ -1,7 +1,7 @@
 from typing import List
 
 from django.db.models import Q
-from django.shortcuts import get_object_or_404
+from django.http import Http404
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
@@ -30,9 +30,12 @@ class EmojiViewSet(BoundlexxViewSet):
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())
         lookup_name = self.kwargs[self.lookup_field]
-        obj = get_object_or_404(
-            queryset, Q(name=lookup_name) | Q(emojialtname__name=lookup_name)
-        )
+        obj = queryset.objects.filter(
+            Q(name=lookup_name) | Q(emojialtname__name=lookup_name)
+        ).first()
+
+        if obj is None:
+            raise Http404()
 
         # May raise a permission denied
         self.check_object_permissions(self.request, obj)
