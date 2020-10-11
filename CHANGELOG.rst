@@ -3,6 +3,7 @@
 
 * Adds remaining endpoints to v2 API
 * Replaces `_average_per_chunk` filter with proper `average_per_chunk` one
+* Adds `list_type` to Items list. Also adds filter for it.
 
 2020-10-09
 ----------

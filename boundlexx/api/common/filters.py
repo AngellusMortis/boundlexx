@@ -91,7 +91,7 @@ class ItemFilterSet(LocalizationFilterSet):
 
     class Meta:
         model = Item
-        fields = ["string_id", "item_subtitle_id"]
+        fields = ["string_id", "item_subtitle_id", "list_type__string_id"]
 
     def filter_resources(self, queryset, name, value):
         if value:

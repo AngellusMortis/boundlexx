@@ -35,6 +35,7 @@ class SimpleItemSerializer(IDItemSerializer):
     )
 
     item_subtitle = SubtitleSerializer()
+    list_type = LocalizedStringSerializer()
 
     class Meta:
         model = Item
@@ -44,6 +45,7 @@ class SimpleItemSerializer(IDItemSerializer):
             "string_id",
             "localization",
             "item_subtitle",
+            "list_type",
         ]
 
 
@@ -51,7 +53,6 @@ class ItemSerializer(SimpleItemSerializer):
     next_shop_stand_update = serializers.DateTimeField(allow_null=True)
     next_request_basket_update = serializers.DateTimeField(allow_null=True)
 
-    list_type = LocalizedStringSerializer()
     description = LocalizedStringSerializer()
 
     mint_value = serializers.FloatField()
