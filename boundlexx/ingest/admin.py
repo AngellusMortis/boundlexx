@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.contrib.postgres import fields
+from django.db import models
 from django_json_widget.widgets import JSONEditorWidget
 
 from boundlexx.ingest.models import GameFile
@@ -29,5 +29,5 @@ class GameFileAdmin(admin.ModelAdmin):
     ]
 
     formfield_overrides = {
-        fields.JSONField: {"widget": JSONEditorWidget},
+        models.JSONField: {"widget": JSONEditorWidget},
     }
