@@ -69,6 +69,7 @@ kombu==4.6.11             # via celery
 msgpack==1.0.0            # via -r /app/requirements/in/base.in, djangorestframework-msgpack
 msrest==0.6.19            # via azure-mgmt-cdn, msrestazure
 msrestazure==0.6.4        # via azure-mgmt-cdn
+numpy==1.19.2             # via -r /app/requirements/in/base.in
 oauthlib==3.1.0           # via requests-oauthlib
 parso==0.7.1              # via jedi
 pexpect==4.8.0            # via ipython
@@ -93,14 +94,14 @@ python-slugify==4.0.1     # via -r /app/requirements/in/base.in
 pytz==2020.1              # via celery, dateparser, django, django-timezone-field, flower, tzlocal
 pyyaml==5.3.1             # via -r /app/requirements/in/base.in
 redis==3.5.3              # via django-redis, python-redis-lock
-regex==2020.9.27          # via dateparser
+regex==2020.10.11         # via dateparser
 requests-oauthlib==1.3.0  # via google-auth-oauthlib, msrest
 requests==2.24.0          # via adal, azure-storage-common, gspread, msrest, pydiscourse, requests-oauthlib, steam
 rsa==4.6                  # via google-auth
 semver==2.10.2            # via -r /app/requirements/in/base.in
 six==1.15.0               # via argon2-cffi, cryptography, google-auth, isodate, msrestazure, protobuf, python-dateutil, steam
 soupsieve==2.0.1          # via beautifulsoup4
-sqlparse==0.3.1           # via django
+sqlparse==0.4.1           # via django
 steam[client]==1.0.2      # via -r /app/requirements/in/base.in
 text-unidecode==1.3       # via python-slugify
 tornado==6.0.4            # via flower
