@@ -1121,7 +1121,8 @@ class WorldPollManager(models.Manager):
                 item=item,
                 count=amount,
                 percentage=(amount / total) * 100,
-                average_per_chunk=amount / world_poll.world.size,
+                average_per_chunk=amount / pow(world_poll.world.size, 2),
+                fixed_average=True,
             )
 
     def create_from_game_dict(self, world_dict, poll_dict, world=None, new_world=False):
@@ -1229,6 +1230,7 @@ class ResourceCount(
     average_per_chunk = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
+    fixed_average = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         unique_together = (

@@ -16,7 +16,7 @@ from boundlexx.api.common.filters import (
 from boundlexx.api.common.serializers import (
     BlockColorSerializer,
     ColorSerializer,
-    PossibleWBCSerializer,
+    PossibleItemWBCSerializer,
 )
 from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
@@ -61,7 +61,7 @@ class ColorViewSet(BoundlexxViewSet):
     @action(
         detail=True,
         methods=["get"],
-        serializer_class=PossibleWBCSerializer,
+        serializer_class=PossibleItemWBCSerializer,
         url_path="sovereign-blocks",
     )
     def sovereign_blocks(

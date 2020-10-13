@@ -57,6 +57,7 @@ from boundlexx.api.common.serializers.timeseries import (
 from boundlexx.api.common.serializers.wbc import (
     BlockColorSerializer,
     ItemColorSerializer,
+    PossibleItemWBCSerializer,
     PossibleWBCSerializer,
     WorldBlockColorSerializer,
     WorldColorSerializer,
@@ -99,6 +100,7 @@ __all__ = [
     "LocalizedStringTextSerializer",
     "LocationSerializer",
     "NullSerializer",
+    "PossibleItemWBCSerializer",
     "PossibleWBCSerializer",
     "RecipeGroupSerializer",
     "RecipeInputSerializer",

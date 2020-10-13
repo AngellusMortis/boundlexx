@@ -76,6 +76,14 @@ class PossibleWBCSerializer(BaseWBCSerialzier):
         ]
 
 
+class PossibleItemWBCSerializer(BaseWBCSerialzier):
+    class Meta:
+        model = WorldBlockColor
+        fields = [
+            "item",
+        ]
+
+
 class WorldBlockColorSerializer(BaseWBCSerialzier):
     class Meta:
         model = WorldBlockColor
