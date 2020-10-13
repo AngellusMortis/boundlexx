@@ -595,13 +595,6 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         return get_next_rank_update(self.itembuyrank_set.all())
 
     @property
-    def tier_name(self):
-        if self.tier is None:
-            return None
-
-        return self.get_tier_display()[:-4]
-
-    @property
     def display_size(self):
         size = str(self.size)
 
