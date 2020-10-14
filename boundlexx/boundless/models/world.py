@@ -1196,7 +1196,7 @@ class WorldPoll(ExportModelOperationsMixin("world_poll"), models.Model):  # type
 class WorldPollResult(
     ExportModelOperationsMixin("world_poll_result"), models.Model  # type: ignore # noqa E501
 ):
-    time = models.DateTimeField(auto_now=True, primary_key=True)
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     player_count = models.PositiveSmallIntegerField(_("Player Count"))
     beacon_count = models.PositiveIntegerField(_("Beacon Count"))
@@ -1215,7 +1215,7 @@ class WorldPollResult(
 class ResourceCount(
     ExportModelOperationsMixin("resource_count"), models.Model  # type: ignore
 ):
-    time = models.DateTimeField(auto_now=True, primary_key=True)
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
     count = models.PositiveIntegerField(_("Count"))
@@ -1242,7 +1242,7 @@ class ResourceCount(
 class LeaderboardRecord(
     ExportModelOperationsMixin("leaderboard_record"), models.Model  # type: ignore # noqa E501
 ):
-    time = models.DateTimeField(auto_now=True, primary_key=True)
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     world_rank = models.PositiveSmallIntegerField(_("World Rank"))
     guild_tag = models.CharField(_("Guild Tag"), max_length=7)
