@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
 from django.core.cache import cache
 from django.db import models
+from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
@@ -1215,7 +1216,7 @@ class WorldPollResult(
 class ResourceCount(
     ExportModelOperationsMixin("resource_count"), models.Model  # type: ignore
 ):
-    time = models.DateTimeField(auto_now_add=True, primary_key=True)
+    time = models.DateTimeField(default=timezone.now, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
     count = models.PositiveIntegerField(_("Count"))

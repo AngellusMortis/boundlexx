@@ -4,10 +4,23 @@ from boundlexx.boundless.models import ResourceCount, World
 
 
 def _fix_resource(resource):
-    resource.time = resource.world_poll.time
-    resource.average_per_chunk = resource.count / pow(resource.world_poll.world.size, 2)
-    resource.fixed_average = True
-    resource.save()
+    kwargs = {
+        "time": resource.world_poll.time,
+        "world_poll": resource.world_poll,
+        "item": resource.item,
+        "count": resource.count,
+        "percentage": resource.percentage,
+        "average_per_chunk": resource.count / pow(resource.world_poll.world.size, 2),
+        "fixed_average": True,
+    }
+
+    resource.delete()
+
+    ResourceCount.objects.filter(
+        world_poll=kwargs["world_poll"], item=kwargs["item"]
+    ).delete()
+
+    ResourceCount.objects.create(**kwargs)
 
 
 def _all(reverse):
@@ -37,7 +50,7 @@ def _initial():
             if wp is None:
                 continue
 
-            for resource in wp.resources.all():
+            for resource in wp.resources.filter(fixed_average=False):
                 _fix_resource(resource)
 
 
