@@ -454,23 +454,14 @@ class WorldNotification(NotificationBase):
         return forum_image.shortcut_url
 
     def forum(self, world, resources, extra=None):  # pylint: disable=arguments-differ
-        world_class = "Homeworld"
-
-        if world.is_exo:
-            world_class = "Exoworld"
-        elif world.is_creative:
-            world_class = "Creative World"
-        elif world.is_sovereign:
-            world_class = "Sovereign World"
-
         special_type = ""
         if world.special_type:
             special_type = f"{world.get_special_type_display()} "
 
         title = (
             f"[{world.display_name}] "
-            f"--[T{world.tier + 1} - {world.tier_name} "
-            f"{world.get_world_type_display()} {special_type}{world_class}]-- "
+            f"--[{world.get_tier_display()} {world.get_world_type_display()} "
+            f"{special_type}{world.world_class}]-- "
             f"[{'Active' if world.active else 'Inactive'}]"
         )
 
