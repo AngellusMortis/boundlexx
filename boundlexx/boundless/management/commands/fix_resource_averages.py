@@ -25,13 +25,17 @@ def _fix_resource(resource):
 
 def _all(reverse):
     resources = ResourceCount.objects.filter(fixed_average=False).select_related(
-        "world_poll", "world_poll__world"
+        "world_poll", "item", "world_poll__world"
     )
 
     if reverse:
-        resources = resources.order_by("time")
+        resources = resources.order_by("world_poll_id", "item_id", "time").distinct(
+            "world_poll_id", "item_id"
+        )
     else:
-        resources = resources.order_by("-time")
+        resources = resources.order_by("world_poll_id", "item_id", "-time").distinct(
+            "world_poll_id", "item_id"
+        )
 
     with click.progressbar(
         resources.iterator(), length=resources.count(), show_percent=True, show_pos=True
