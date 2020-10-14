@@ -4,10 +4,6 @@ from boundlexx.boundless.models import ResourceCount, World
 
 
 def _fix_resource(resource):
-    if resource.fixed_average:
-        resource.delete()
-        return
-
     kwargs = {
         "time": resource.world_poll.time,
         "world_poll": resource.world_poll,
@@ -54,7 +50,7 @@ def _initial():
             if wp is None:
                 continue
 
-            for resource in wp.resources.all():
+            for resource in wp.resources.filter(fixed_average=False):
                 _fix_resource(resource)
 
 
