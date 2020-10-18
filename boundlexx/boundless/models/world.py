@@ -772,13 +772,16 @@ class WorldBlockColorManager(models.Manager):
         if wbc is None:
             create = True
         elif wbc.color != color:
-            if user is None or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS:
-                if default:
+            if default:
+                if (
+                    user is None
+                    or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS
+                ):
                     wbc.color = color
-                else:
-                    wbc.active = False
-                    create = True
-                wbc.save()
+            else:
+                wbc.active = False
+                create = True
+            wbc.save()
 
         return create
 
