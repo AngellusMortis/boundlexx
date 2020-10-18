@@ -1,6 +1,7 @@
 import json
 import logging
 import traceback
+from distutils.util import strtobool
 
 from rest_framework import views
 from rest_framework.authentication import TokenAuthentication
@@ -133,14 +134,25 @@ class WorldControlSimpleDataView(views.APIView):
             if "world_id" in request.data:
                 world_id = int(request.data["world_id"])
 
-            # force eval permission data to verify it
-            perms = {
-                "can_visit": bool(request.data["global_perms"]["can_visit"]),
-                "can_edit": bool(request.data["global_perms"]["can_edit"]),
-                "can_claim": bool(request.data["global_perms"]["can_claim"]),
-            }
+            perms = {}
 
-            finalized = bool(request.data["finalized"])
+            if "global_perms" in request.data:
+                if "can_visit" in request.data["global_perms"]:
+                    perms["can_visit"] = strtobool(
+                        request.data["global_perms"]["can_visit"]
+                    )
+                if "can_edit" in request.data["global_perms"]:
+                    perms["can_edit"] = strtobool(
+                        request.data["global_perms"]["can_edit"]
+                    )
+                if "can_claim" in request.data["global_perms"]:
+                    perms["can_claim"] = strtobool(
+                        request.data["global_perms"]["can_claim"]
+                    )
+
+            finalized = None
+            if "finalized" in request.data:
+                finalized = strtobool(request.data["finalized"])
 
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
@@ -176,10 +188,14 @@ class WorldControlSimpleDataView(views.APIView):
         if world is None:
             return Response(status=425), None
 
-        world.is_public = data[1]["can_visit"]
-        world.is_public_edit = data[1]["can_edit"]
-        world.is_public_claim = data[1]["can_claim"]
-        world.is_finalized = data[2]
+        if "can_visit" in data[1]:
+            world.is_public = data[1]["can_visit"]
+        if "can_edit" in data[1]:
+            world.is_public_edit = data[1]["can_edit"]
+        if "can_claim" in data[1]:
+            world.is_public_claim = data[1]["can_claim"]
+        if data[2] is not None:
+            world.is_finalized = data[2]
         world.save()
 
         return None, world
