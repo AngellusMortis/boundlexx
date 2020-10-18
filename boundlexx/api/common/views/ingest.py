@@ -1,7 +1,6 @@
 import json
 import logging
 import traceback
-from distutils.util import strtobool
 
 from rest_framework import views
 from rest_framework.authentication import TokenAuthentication
