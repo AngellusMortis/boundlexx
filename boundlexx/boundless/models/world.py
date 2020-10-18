@@ -173,7 +173,9 @@ class WorldManager(models.Manager):
 
         return world, created
 
-    def get_or_create_forum_world(self, forum_id, world_info, is_sovereign=False):
+    def get_or_create_forum_world(  # pylint: disable=too-many-branches
+        self, forum_id, world_info, is_sovereign=False
+    ):
         do_refresh = False
 
         world, created = self._get_forum_world(forum_id, world_info, is_sovereign)
@@ -194,6 +196,13 @@ class WorldManager(models.Manager):
             world.end = world_info["end"]
         if "server" in world_info and world.region is None:
             world.region = world_info["server"]
+
+        if "visit" in world_info and world.is_public is None:
+            world.is_public = world_info["visit"]
+        if "edit" in world_info:
+            world.is_public_edit = world_info["edit"]
+        if "claim" in world_info:
+            world.is_public_claim = world_info["claim"]
 
         new_data = False
         if "image" in world_info and (world.image is None or not world.image.name):

@@ -1,8 +1,9 @@
 import re
 import time
 from datetime import timedelta, timezone
+from distutils.util import strtobool
 from io import BytesIO
-from typing import Optional
+from typing import List, Optional, Union
 
 import dateparser
 import requests
@@ -26,6 +27,19 @@ FORUM_EXO_WORLD_CATEGORY = "exoworlds/31"
 FORUM_PERM_WORLD_CATEGORY = "worlds/33"
 FORUM_SOVEREIGN_WORLD_CATEGORY = "sovereign/39"
 DEFAULT_IMAGE = "https://forum.playboundless.com/uploads/default/original/3X/6/8/683d21dfac3159456b0074eb6fa1898be6ec9e97.png"  # noqa: E501
+PERM_REGEX = re.compile(r".*alt=\"(Yes|No)\".* (Visit|Edit|Claim)")
+ALLOWED_KEYS = (
+    "name",
+    "id",
+    "type",
+    "tier",
+    "start",
+    "end",
+    "server",
+    "visit",
+    "edit",
+    "claim",
+)
 
 
 def _get_topics(category: str):
@@ -235,6 +249,22 @@ def _get_world_image(raw_html, name):
     return image
 
 
+def _parse_permissions(perm_string):
+    perms = perm_string.split(" : ")[1].split(" | ")
+
+    global_perms: List[List[Union[str, bool]]] = []
+
+    for perm in perms:
+        match = PERM_REGEX.match(perm)
+
+        if match:
+            global_perms.append(
+                [match.group(2).lower(), bool(strtobool(match.group(1).lower()))]
+            )
+
+    return global_perms
+
+
 def _parse_line(line, raw_line):
     parsed_line = None
 
@@ -271,11 +301,17 @@ def _parse_line(line, raw_line):
 
 
 def _parse_world_info(raw_html):
+    raw_html_lines = str(raw_html).split("\n")
     lines = raw_html.get_text().split("\n")
 
     parsed_lines = []
-    for raw_line in lines:
+    for index, raw_line in enumerate(lines):
         line = raw_line.strip().lower()
+
+        if "permissions" in line:
+            perms = _parse_permissions(raw_html_lines[index])
+            parsed_lines += perms
+            continue
 
         # nothing else to parse
         if "blocks color" in line:
@@ -287,7 +323,7 @@ def _parse_world_info(raw_html):
 
     parsed_data = {}
     for line in parsed_lines:
-        if line[0] in ("name", "id", "type", "tier", "start", "end", "server"):
+        if line[0] in ALLOWED_KEYS:
             parsed_data[line[0]] = line[1]
 
     return parsed_data
@@ -319,8 +355,13 @@ def _normalize_world_info(world_info):  # pylint: disable=too-many-branches
             world_info["start"] = end.replace(tzinfo=timezone.utc)
 
     if "tier" in world_info:
-        # new format
+        # NAME (#)
         match = re.match(r"\w+ \((\d+)\)", world_info["tier"])
+        if match:
+            world_info["tier"] = match.group(1)
+
+        # T# - NAME
+        match = re.match(r"t(\d+) - \w+", world_info["tier"])
         if match:
             world_info["tier"] = match.group(1)
         world_info["tier"] = int(world_info["tier"]) - 1
@@ -368,12 +409,17 @@ def _parse_forum_topic(topic: int, is_perm: bool, is_sovereign: bool = False):
     if image is not None:
         world_info["image"] = image
 
+    # perm has no end
     if is_perm:
         expected_fields = 7
         if "end" in world_info:
             del world_info["end"]
     else:
         expected_fields = 8
+
+    # Sovereign has perms
+    if is_sovereign:
+        expected_fields += 3
 
     if len(world_info) < expected_fields:
         logger.warning(

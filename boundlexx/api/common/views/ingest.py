@@ -138,21 +138,21 @@ class WorldControlSimpleDataView(views.APIView):
 
             if "global_perms" in request.data:
                 if "can_visit" in request.data["global_perms"]:
-                    perms["can_visit"] = strtobool(
-                        request.data["global_perms"]["can_visit"]
+                    perms["can_visit"] = bool(
+                        strtobool(request.data["global_perms"]["can_visit"])
                     )
                 if "can_edit" in request.data["global_perms"]:
-                    perms["can_edit"] = strtobool(
-                        request.data["global_perms"]["can_edit"]
+                    perms["can_edit"] = bool(
+                        strtobool(request.data["global_perms"]["can_edit"])
                     )
                 if "can_claim" in request.data["global_perms"]:
-                    perms["can_claim"] = strtobool(
-                        request.data["global_perms"]["can_claim"]
+                    perms["can_claim"] = bool(
+                        strtobool(request.data["global_perms"]["can_claim"])
                     )
 
             finalized = None
             if "finalized" in request.data:
-                finalized = strtobool(request.data["finalized"])
+                finalized = bool(strtobool(request.data["finalized"]))
 
         except Exception:  # pylint: disable=broad-except
             logger.warning(traceback.format_exc())
