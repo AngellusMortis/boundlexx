@@ -397,6 +397,10 @@ def _parse_forum_topic(topic: int, is_perm: bool, is_sovereign: bool = False):
     world_info.update(_parse_world_info(raw_html))
     world_info = _normalize_world_info(world_info)
 
+    if is_sovereign and "name" not in world_info:
+        logger.warning("Sovereign post malformed: %s", topic)
+        return None, None
+
     if title_name is not None and world_info["name"] != title_name:
         logger.warning(
             "Different between world name in title and forum post: %s vs. %s",
