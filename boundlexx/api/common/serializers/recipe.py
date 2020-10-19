@@ -55,6 +55,7 @@ class RecipeInputSerializer(serializers.ModelSerializer):
         fields = [
             "group",
             "item",
+            "count",
         ]
 
 
