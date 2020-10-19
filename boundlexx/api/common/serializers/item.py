@@ -36,6 +36,8 @@ class SimpleItemSerializer(IDItemSerializer):
 
     item_subtitle = SubtitleSerializer()
     list_type = LocalizedStringSerializer()
+    has_colors = serializers.BooleanField()
+    is_resource = serializers.BooleanField()
 
     class Meta:
         model = Item
@@ -46,6 +48,8 @@ class SimpleItemSerializer(IDItemSerializer):
             "localization",
             "item_subtitle",
             "list_type",
+            "has_colors",
+            "is_resource",
         ]
 
 
@@ -70,6 +74,8 @@ class ItemSerializer(SimpleItemSerializer):
             "mint_value",
             "list_type",
             "description",
+            "has_colors",
+            "is_resource",
         ]
 
 

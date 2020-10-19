@@ -2,6 +2,7 @@
 ----------
 
 * Adds missing `count` to Recipe API
+* Adds `has_colors` and `is_resource` to Items API
 
 2020-10-11
 ----------

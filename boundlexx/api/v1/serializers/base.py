@@ -220,6 +220,8 @@ class URLSimpleItemSerializer(serializers.ModelSerializer):
             "game_id",
             "name",
             "string_id",
+            "has_colors",
+            "is_resource",
         ]
 
 
