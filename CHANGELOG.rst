@@ -1,3 +1,8 @@
+2020-10-19
+----------
+
+* Adds missing `count` to Recipe API
+
 2020-10-11
 ----------
 

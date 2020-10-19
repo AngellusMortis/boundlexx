@@ -375,6 +375,7 @@ class URLRecipeInputSerializer(RecipeInputSerializer):
         fields = [
             "group",
             "item",
+            "count",
         ]
 
 
