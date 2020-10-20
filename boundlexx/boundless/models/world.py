@@ -21,6 +21,7 @@ from boundlexx.boundless.utils import (
     calculate_extra_names,
     convert_linear_rgb_to_hex,
     get_next_rank_update,
+    html_name,
 )
 from boundlexx.notifications.models import (
     ExoworldNotification,
@@ -1147,6 +1148,7 @@ class WorldPollManager(models.Manager):
 
         self._create_resource_counts(world_poll, poll_dict["resources"])
 
+        colors = Color.objects.all()
         for rank, leader in enumerate(poll_dict["leaderboard"]):
             rank += 1
 
@@ -1158,6 +1160,8 @@ class WorldPollManager(models.Manager):
                 "mayor_name": leader["mayor"]["name"],
                 "mayor_type": leader["mayor"]["type"],
                 "name": leader["name"],
+                "text_name": html_name(leader["name"], strip=True, colors=colors),
+                "html_name": html_name(leader["name"], colors=colors),
                 "prestige": leader["prestige"],
             }
 
@@ -1267,6 +1271,8 @@ class LeaderboardRecord(
     mayor_name = models.CharField(max_length=64)
     mayor_type = models.PositiveSmallIntegerField()
     name = models.CharField(max_length=64)
+    text_name = models.CharField(max_length=64, blank=True, null=True)
+    html_name = models.CharField(max_length=1024, blank=True, null=True)
     prestige = models.PositiveIntegerField()
 
     class Meta:

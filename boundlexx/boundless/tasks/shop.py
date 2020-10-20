@@ -11,6 +11,7 @@ from django.utils import timezone
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models import (
+    Color,
     Item,
     ItemBuyRank,
     ItemRank,
@@ -112,10 +113,14 @@ def _create_item_prices(shops, price_klass, world_name, item):
         key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
     )
 
+    colors = Color.objects.all()
+
     total = 0
     state_hash = hashlib.sha512()
     for shop in shops:
-        item_price = price_klass.objects.create_from_shop_item(world_name, item, shop)
+        item_price = price_klass.objects.create_from_shop_item(
+            world_name, item, shop, colors=colors
+        )
 
         state_hash.update(item_price.state_hash)
         total += 1
