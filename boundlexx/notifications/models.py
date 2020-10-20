@@ -266,7 +266,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
         else:
             HomeworldNotification.objects.send_notification(world, world_poll.resources)
 
-        if world.owner is None or (
+        if world.owner is not None or (
             world.image.name
             and world.forum_id
             and world.worldblockcolor_set.count() > 0
