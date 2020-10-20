@@ -1,3 +1,10 @@
+2020-10-19
+----------
+
+* Adds missing `count` to Recipe API
+* Adds `has_colors` and `is_resource` to Items API
+* Adds `is_public`, `is_public_edit`, `is_public_claim` to Worlds list API
+
 2020-10-11
 ----------
 

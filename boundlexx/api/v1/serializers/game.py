@@ -111,6 +111,8 @@ class URLItemSerializer(ItemSerializer):
             "mint_value",
             "list_type",
             "description",
+            "has_colors",
+            "is_resource",
         ]
 
 
@@ -375,6 +377,7 @@ class URLRecipeInputSerializer(RecipeInputSerializer):
         fields = [
             "group",
             "item",
+            "count",
         ]
 
 

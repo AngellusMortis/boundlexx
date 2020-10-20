@@ -36,6 +36,8 @@ class SimpleItemSerializer(IDItemSerializer):
 
     item_subtitle = SubtitleSerializer()
     list_type = LocalizedStringSerializer()
+    has_colors = serializers.BooleanField()
+    is_resource = serializers.BooleanField()
 
     class Meta:
         model = Item
@@ -46,6 +48,8 @@ class SimpleItemSerializer(IDItemSerializer):
             "localization",
             "item_subtitle",
             "list_type",
+            "has_colors",
+            "is_resource",
         ]
 
 
@@ -70,11 +74,14 @@ class ItemSerializer(SimpleItemSerializer):
             "mint_value",
             "list_type",
             "description",
+            "has_colors",
+            "is_resource",
         ]
 
 
 class ItemResourceCountSerializer(serializers.ModelSerializer):
     world = IDWorldSerializer(source="world_poll.world")
+    average_per_chunk = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         model = ResourceCount

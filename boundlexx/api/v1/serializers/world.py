@@ -375,4 +375,7 @@ class KindOfSimpleWorldSerializer(SimpleWorldSerializer):
             "is_exo",
             "is_creative",
             "is_locked",
+            "is_public",
+            "is_public_edit",
+            "is_public_claim",
         ]

@@ -10,15 +10,20 @@ from django_prometheus.models import ExportModelOperationsMixin
 from boundlexx.boundless.client import Location, ShopItem
 from boundlexx.boundless.models.game import Item
 from boundlexx.boundless.models.world import World
+from boundlexx.boundless.utils import html_name
 
 
 class ItemShopPriceManager(models.Manager):
     def create_from_shop_item(
-        self, world: str, item: Item, shop_item: ShopItem
+        self, world: str, item: Item, shop_item: ShopItem, colors=None
     ) -> ItemShopPrice:
         return self.create(
             item_id=item.id,
             beacon_name=shop_item.beacon_name,
+            beacon_text_name=html_name(
+                shop_item.beacon_name, strip=True, colors=colors
+            ),
+            beacon_html_name=html_name(shop_item.beacon_name, colors=colors),
             guild_tag=shop_item.guild_tag,
             item_count=shop_item.item_count,
             shop_activity=shop_item.shop_activity,
@@ -41,6 +46,8 @@ class ItemShopPrice(models.Model):
     item_count = models.IntegerField()
 
     beacon_name = models.CharField(max_length=64, db_index=True)
+    beacon_text_name = models.CharField(max_length=64, null=True, blank=True)
+    beacon_html_name = models.CharField(max_length=1024, null=True, blank=True)
     guild_tag = models.CharField(max_length=8)
     shop_activity = models.IntegerField()
     active = models.BooleanField(db_index=True, default=True)

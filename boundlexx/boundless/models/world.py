@@ -21,6 +21,7 @@ from boundlexx.boundless.utils import (
     calculate_extra_names,
     convert_linear_rgb_to_hex,
     get_next_rank_update,
+    html_name,
 )
 from boundlexx.notifications.models import (
     ExoworldNotification,
@@ -173,7 +174,9 @@ class WorldManager(models.Manager):
 
         return world, created
 
-    def get_or_create_forum_world(self, forum_id, world_info, is_sovereign=False):
+    def get_or_create_forum_world(  # pylint: disable=too-many-branches
+        self, forum_id, world_info, is_sovereign=False
+    ):
         do_refresh = False
 
         world, created = self._get_forum_world(forum_id, world_info, is_sovereign)
@@ -195,6 +198,13 @@ class WorldManager(models.Manager):
         if "server" in world_info and world.region is None:
             world.region = world_info["server"]
 
+        if "visit" in world_info and world.is_public is None:
+            world.is_public = world_info["visit"]
+        if "edit" in world_info:
+            world.is_public_edit = world_info["edit"]
+        if "claim" in world_info:
+            world.is_public_claim = world_info["claim"]
+
         new_data = False
         if "image" in world_info and (world.image is None or not world.image.name):
             world.image = world_info["image"]
@@ -209,7 +219,7 @@ class WorldManager(models.Manager):
         if do_refresh:
             world.refresh_from_db()
 
-        if new_data:
+        if new_data and world.owner is None:
             ExoworldNotification.objects.send_update_notification(world)
 
         return world, created
@@ -772,13 +782,16 @@ class WorldBlockColorManager(models.Manager):
         if wbc is None:
             create = True
         elif wbc.color != color:
-            if user is None or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS:
-                if default:
+            if default:
+                if (
+                    user is None
+                    or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS
+                ):
                     wbc.color = color
-                else:
-                    wbc.active = False
-                    create = True
-                wbc.save()
+            else:
+                wbc.active = False
+                create = True
+            wbc.save()
 
         return create
 
@@ -1135,6 +1148,7 @@ class WorldPollManager(models.Manager):
 
         self._create_resource_counts(world_poll, poll_dict["resources"])
 
+        colors = Color.objects.all()
         for rank, leader in enumerate(poll_dict["leaderboard"]):
             rank += 1
 
@@ -1146,6 +1160,8 @@ class WorldPollManager(models.Manager):
                 "mayor_name": leader["mayor"]["name"],
                 "mayor_type": leader["mayor"]["type"],
                 "name": leader["name"],
+                "text_name": html_name(leader["name"], strip=True, colors=colors),
+                "html_name": html_name(leader["name"], colors=colors),
                 "prestige": leader["prestige"],
             }
 
@@ -1167,6 +1183,10 @@ class WorldPollManager(models.Manager):
             )
 
             calculate_distances.delay([world.id])
+
+        if world.is_public and (
+            new_world or (not world.notification_sent and world.owner is not None)
+        ):
             ExoworldNotification.objects.send_new_notification(world_poll)
 
         return world_poll
@@ -1251,6 +1271,8 @@ class LeaderboardRecord(
     mayor_name = models.CharField(max_length=64)
     mayor_type = models.PositiveSmallIntegerField()
     name = models.CharField(max_length=64)
+    text_name = models.CharField(max_length=64, blank=True, null=True)
+    html_name = models.CharField(max_length=1024, blank=True, null=True)
     prestige = models.PositiveIntegerField()
 
     class Meta:

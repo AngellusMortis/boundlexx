@@ -10,7 +10,7 @@ from boundlexx.boundless.tasks.forums import (
     ingest_sovereign_world_data,
 )
 from boundlexx.boundless.tasks.sheets import ingest_world_data
-from boundlexx.boundless.tasks.shop import try_update_prices
+from boundlexx.boundless.tasks.shop import update_prices, update_prices_split
 from boundlexx.boundless.tasks.worlds import (
     calculate_distances,
     discover_all_worlds,
@@ -42,7 +42,8 @@ __all__ = [
     "recalculate_colors",
     "search_new_worlds",
     "search_new_worlds",
-    "try_update_prices",
+    "update_prices",
+    "update_prices_split",
 ]
 
 NON_EXO = Q(world__end__isnull=True) | Q(world__owner__isnull=False)
@@ -152,4 +153,3 @@ def add_world_control_data(world_id, world_control_data, user_id):
 
     if block_colors_created > 0:
         recalculate_colors.delay([world_id])
-        # ExoworldNotification.objects.send_update_notification(world)
