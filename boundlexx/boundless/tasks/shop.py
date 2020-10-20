@@ -2,11 +2,6 @@ import hashlib
 from collections import namedtuple
 from typing import Dict, List
 
-from celery.utils.log import get_task_logger
-from django.core.cache import cache
-from django.db.models import Q
-from django.utils import timezone
-
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models import (
@@ -18,7 +13,12 @@ from boundlexx.boundless.models import (
     ItemShopStandPrice,
     World,
 )
+from celery.utils.log import get_task_logger
 from config.celery_app import app
+from django.conf import settings
+from django.core.cache import cache
+from django.db.models import Q
+from django.utils import timezone
 
 logger = get_task_logger(__name__)
 
@@ -29,42 +29,65 @@ UpdateOption = namedtuple(
 
 
 UPDATE_PRICES_LOCK = "boundless:update_prices"
-LAST_UPDATE_PRICES = "boundless:update_prices_last"
 
 
 @app.task
-def try_update_prices():
-    lock = cache.lock(UPDATE_PRICES_LOCK)
+def update_prices(world_ids=None):
+    if world_ids is None:
+        worlds = (
+            World.objects.filter(active=True, is_creative=False, api_url__isnull=False)
+            .filter(
+                Q(end__isnull=True)
+                | Q(
+                    is_locked=False,
+                    end__isnull=False,
+                    end__gt=timezone.now(),
+                    owner__isnull=False,
+                    is_public=True,
+                )
+            )
+            .exclude(api_url="")
+        )
+    else:
+        worlds = World.objects.filter(id__in=world_ids).order_by("id")
 
-    do_run = True
-    if lock.locked():
-        last_run = cache.get(LAST_UPDATE_PRICES)
-        if last_run is None:
-            logger.warning("update_prices task has not ran recently, breaking lock")
-            lock.reset()
-        else:
-            do_run = False
-            logger.warning("Could not update prices, task already running")
-
-    if do_run:
-        logger.info("Starting update_prices task")
-        update_prices.delay()
+    _update_prices_multi(worlds)
 
 
 @app.task
-def update_prices():
-    lock = cache.lock(UPDATE_PRICES_LOCK)
+def update_prices_split(world_ids):
+    worlds = World.objects.filter(id__in=world_ids).order_by("id")
+
+    first = worlds.first()
+
+    if first is None:
+        return
+
+    count = worlds.count()
+
+    _update_prices_multi(worlds, f"{first.id}:{count}")
+
+
+def _update_prices_multi(worlds, name=None):
+    lock_name = UPDATE_PRICES_LOCK
+
+    if name is not None:
+        lock_name = f"{lock_name}:{name}"
+
+    lock = cache.lock(lock_name, expire=120, auto_renewal=False)
 
     acquired = lock.acquire(blocking=True, timeout=1)
 
-    if acquired:
-        cache.set(LAST_UPDATE_PRICES, timezone.now(), timeout=28800)
+    if not acquired:
+        return
+
+    try:
+        _update_prices(worlds)
+    finally:
         try:
-            _update_prices()
-        finally:
             lock.release()
-    else:
-        raise Exception("Could not update prices, task already running")
+        except Exception as ex:  # pylint: disable=broad-except
+            logger.warning("Could not release lock: %s", ex)
 
 
 def _get_ranks(item, rank_klass, all_worlds):
@@ -144,25 +167,36 @@ def _log_worlds(all_worlds):
     logger.info("All worlds: %s", worlds)
 
 
-def _update_prices():
+def _split_update_prices(worlds):
+    max_worlds = settings.BOUNDLESS_MAX_WORLDS_PER_POLL
+    worlds = list(worlds)
+
+    num_runs = len(worlds) // max_worlds + 1
+    logger.info("Spliting polling into %s runs", num_runs)
+    run = 1
+    while len(worlds) > max_worlds:
+        worlds_ids = [w.id for w in worlds[:max_worlds]]
+        logger.info("Run %s: %s", run, worlds_ids)
+        update_prices_split.delay(worlds_ids)
+        worlds = worlds[max_worlds:]
+        run += 1
+
+    if len(worlds) > 0:
+        worlds_ids = [w.id for w in worlds]
+        logger.info("Run %s: %s", run, worlds_ids)
+        update_prices_split.delay(worlds_ids)
+
+
+def _update_prices(worlds):
+    total = len(worlds)
+    if total > settings.BOUNDLESS_MAX_WORLDS_PER_POLL:
+        _split_update_prices(worlds)
+        return
+
     items = Item.objects.filter(active=True)
     logger.info("Updating the prices for %s items", len(items))
 
-    all_worlds = list(
-        World.objects.filter(active=True, is_creative=False, api_url__isnull=False)
-        .filter(
-            Q(end__isnull=True)
-            | Q(
-                is_locked=False,
-                end__isnull=False,
-                end__gt=timezone.now(),
-                owner__isnull=False,
-                is_public=True,
-            )
-        )
-        .exclude(api_url="")
-    )
-    _log_worlds(all_worlds)
+    _log_worlds(worlds)
 
     errors_total = 0
 
@@ -173,7 +207,7 @@ def _update_prices():
                 ItemBuyRank,
                 "shop_buy",
                 ItemRequestBasketPrice,
-                all_worlds,
+                worlds,
             )
         except HTTP_ERRORS as ex:
             errors_total += 1
@@ -182,7 +216,7 @@ def _update_prices():
 
         try:
             sell_updated = _update_item_prices(
-                item, ItemSellRank, "shop_sell", ItemShopStandPrice, all_worlds
+                item, ItemSellRank, "shop_sell", ItemShopStandPrice, worlds
             )
         except HTTP_ERRORS as ex:
             errors_total += 1
