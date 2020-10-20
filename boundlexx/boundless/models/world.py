@@ -218,7 +218,7 @@ class WorldManager(models.Manager):
         if do_refresh:
             world.refresh_from_db()
 
-        if new_data:
+        if new_data and world.owner is None:
             ExoworldNotification.objects.send_update_notification(world)
 
         return world, created
@@ -1179,6 +1179,12 @@ class WorldPollManager(models.Manager):
             )
 
             calculate_distances.delay([world.id])
+
+        if (
+            world.is_public
+            and new_world
+            or (not world.notification_sent and world.owner is None)
+        ):
             ExoworldNotification.objects.send_new_notification(world_poll)
 
         return world_poll

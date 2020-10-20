@@ -152,4 +152,3 @@ def add_world_control_data(world_id, world_control_data, user_id):
 
     if block_colors_created > 0:
         recalculate_colors.delay([world_id])
-        # ExoworldNotification.objects.send_update_notification(world)
