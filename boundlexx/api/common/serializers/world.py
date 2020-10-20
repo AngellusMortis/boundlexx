@@ -41,6 +41,9 @@ class SimpleWorldSerializer(IDWorldSerializer):
     is_exo = serializers.BooleanField()
     is_creative = serializers.BooleanField()
     is_locked = serializers.BooleanField()
+    is_public = serializers.BooleanField()
+    is_public_edit = serializers.BooleanField()
+    is_public_claim = serializers.BooleanField()
 
     class Meta:
         model = World
@@ -62,6 +65,9 @@ class SimpleWorldSerializer(IDWorldSerializer):
             "is_exo",
             "is_creative",
             "is_locked",
+            "is_public",
+            "is_public_edit",
+            "is_public_claim",
         ]
 
 

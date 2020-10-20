@@ -81,6 +81,7 @@ class ItemSerializer(SimpleItemSerializer):
 
 class ItemResourceCountSerializer(serializers.ModelSerializer):
     world = IDWorldSerializer(source="world_poll.world")
+    average_per_chunk = serializers.DecimalField(max_digits=10, decimal_places=2)
 
     class Meta:
         model = ResourceCount
