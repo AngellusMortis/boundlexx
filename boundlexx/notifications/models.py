@@ -455,7 +455,7 @@ class WorldNotification(NotificationBase):
 
     def forum(self, world, resources, extra=None):  # pylint: disable=arguments-differ
         special_type = ""
-        if world.special_type:
+        if world.special_type is not None and world.special_type > 0:
             special_type = f"{world.get_special_type_display()} "
 
         title = (
@@ -503,7 +503,7 @@ class WorldNotification(NotificationBase):
             ]
         }
 
-        if world.special_type is not None:
+        if world.special_type is not None and world.special_type > 0:
             main_embed["fields"][0][
                 "value"
             ] += f"**Special Type**: {world.get_special_type_display()}\n"
