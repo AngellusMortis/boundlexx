@@ -169,13 +169,18 @@ def _log_worlds(all_worlds):
 
 
 def _split_update_prices(worlds):
-    max_worlds = settings.BOUNDLESS_MAX_WORLDS_PER_POLL
-    worlds = list(worlds)
+    max_sov_worlds = settings.BOUNDLESS_MAX_SOV_WORLDS_PER_PRICE_POLL
+    max_perm_worlds = settings.BOUNDLESS_MAX_PERM_WORLDS_PER_PRICE_POLL
 
-    num_runs = len(worlds) // max_worlds + 1
-    logger.info("Spliting polling into %s runs", num_runs)
+    worlds = list(worlds)
     run = 1
-    while len(worlds) > max_worlds:
+    while len(worlds) > max_sov_worlds or (
+        len(worlds) > 1 and worlds[0].is_perm and len(worlds) > max_perm_worlds
+    ):
+        max_worlds = max_sov_worlds
+        if worlds[0].is_perm:
+            max_worlds = max_perm_worlds
+
         worlds_ids = [w.id for w in worlds[:max_worlds]]
         logger.info("Run %s: %s", run, worlds_ids)
         update_prices_split.delay(worlds_ids)
@@ -190,9 +195,11 @@ def _split_update_prices(worlds):
 
 def _update_prices(worlds):
     total = len(worlds)
-    if total > settings.BOUNDLESS_MAX_WORLDS_PER_POLL:
+    if total > settings.BOUNDLESS_MAX_SOV_WORLDS_PER_PRICE_POLL:
         _split_update_prices(worlds)
         return
+
+    worlds = list(worlds)
 
     items = Item.objects.filter(active=True)
     logger.info("Updating the prices for %s items", len(items))
