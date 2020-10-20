@@ -1180,10 +1180,8 @@ class WorldPollManager(models.Manager):
 
             calculate_distances.delay([world.id])
 
-        if (
-            world.is_public
-            and new_world
-            or (not world.notification_sent and world.owner is None)
+        if world.is_public and (
+            new_world or (not world.notification_sent and world.owner is not None)
         ):
             ExoworldNotification.objects.send_new_notification(world_poll)
 
