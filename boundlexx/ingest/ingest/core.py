@@ -1,4 +1,5 @@
 import djclick as click
+from django.conf import settings
 
 from boundlexx.boundless.models import (
     Color,
@@ -12,7 +13,6 @@ from boundlexx.boundless.models import (
 )
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
-from django.conf import settings
 
 
 def _create_generic(name, index_list, klass):
