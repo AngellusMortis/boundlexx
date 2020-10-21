@@ -76,7 +76,7 @@ def _update_prices_multi(worlds, name=None):
     if name is not None:
         lock_name = f"{lock_name}:{name}"
 
-    lock = cache.lock(lock_name, expire=3600, auto_renewal=False)
+    lock = cache.lock(lock_name, expire=21600, auto_renewal=False)
 
     acquired = lock.acquire(blocking=True, timeout=1)
 
