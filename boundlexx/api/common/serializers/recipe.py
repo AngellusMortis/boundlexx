@@ -29,6 +29,7 @@ class RecipeGroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = RecipeGroup
         fields = [
+            "id",
             "name",
             "display_name",
             "members",
