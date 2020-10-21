@@ -11,6 +11,8 @@ class BaseItemShopSerializer(serializers.ModelSerializer):
     item = IDItemSerializer()
     location = LocationSerializer()
     time = serializers.DateTimeField()
+    beacon_text_name = serializers.CharField(allow_null=True)
+    beacon_html_name = serializers.CharField(allow_null=True)
 
 
 class WorldShopStandPriceSerializer(BaseItemShopSerializer):
@@ -23,6 +25,8 @@ class WorldShopStandPriceSerializer(BaseItemShopSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
@@ -38,6 +42,8 @@ class WorldRequestBasketPriceSerializer(BaseItemShopSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
@@ -53,6 +59,8 @@ class ItemShopStandPriceSerializer(BaseItemShopSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
@@ -68,6 +76,8 @@ class ItemRequestBasketPriceSerializer(BaseItemShopSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]

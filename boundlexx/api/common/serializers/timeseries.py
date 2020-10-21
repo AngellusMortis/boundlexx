@@ -154,9 +154,20 @@ class WorldPollTBSerializer(NullSerializer):
 
 
 class LeaderboardSerializer(serializers.ModelSerializer):
+    text_name = serializers.CharField(allow_null=True)
+    html_name = serializers.CharField(allow_null=True)
+
     class Meta:
         model = LeaderboardRecord
-        fields = ["world_rank", "guild_tag", "mayor_name", "name", "prestige"]
+        fields = [
+            "world_rank",
+            "guild_tag",
+            "mayor_name",
+            "name",
+            "text_name",
+            "html_name",
+            "prestige",
+        ]
 
 
 class ResourcesSerializer(serializers.ModelSerializer):

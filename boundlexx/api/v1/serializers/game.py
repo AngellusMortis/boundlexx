@@ -214,6 +214,8 @@ class URLWorldShopStandPriceSerializer(WorldShopStandPriceSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
@@ -231,6 +233,8 @@ class URLWorldRequestBasketPriceSerializer(WorldRequestBasketPriceSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
@@ -248,6 +252,8 @@ class URLItemShopStandPriceSerializer(ItemShopStandPriceSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
@@ -265,6 +271,8 @@ class URLItemRequestBasketPriceSerializer(ItemRequestBasketPriceSerializer):
             "item_count",
             "price",
             "beacon_name",
+            "beacon_text_name",
+            "beacon_html_name",
             "guild_tag",
             "shop_activity",
         ]
