@@ -360,7 +360,7 @@ class ItemResourceWorldListViewSet(
     def get_queryset(self):
         item_id = self.kwargs.get("item__game_id")
 
-        queryset = World.objects.all()
+        queryset = World.objects.filter(is_public=True)
 
         if item_id is not None:
             queryset = queryset.filter(

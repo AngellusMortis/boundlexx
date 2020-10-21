@@ -35,7 +35,7 @@ from boundlexx.api.v1.serializers.world import (
     URLWorldSerializer,
     WorldBlockColorsViewSerializer,
 )
-from boundlexx.boundless.models import World, WorldPoll
+from boundlexx.boundless.models import WorldPoll
 
 __all__ = [
     "KindOfSimpleWorldSerializer",
@@ -66,7 +66,6 @@ __all__ = [
     "URLWorldSerializer",
     "URLWorldShopStandPriceSerializer",
     "WorldBlockColorsViewSerializer",
-    "WorldDumpSerializer",
     "WorldPollDetailSerializer",
 ]
 
@@ -87,44 +86,4 @@ class WorldPollDetailSerializer(WorldPollSerializer):
             "total_prestige",
             "leaderboard",
             "resources",
-        ]
-
-
-class WorldDumpSerializer(URLWorldSerializer):
-    block_colors = URLWorldBlockColorSerializer(many=True, source="active_colors")
-    latest_poll = WorldPollDetailSerializer(many=True)
-
-    class Meta:
-        model = World
-        fields = [
-            "id",
-            "active",
-            "name",
-            "display_name",
-            "address",
-            "image_url",
-            "forum_url",
-            "assignment",
-            "region",
-            "tier",
-            "size",
-            "world_type",
-            "protection_points",
-            "protection_skill",
-            "time_offset",
-            "is_sovereign",
-            "is_perm",
-            "is_exo",
-            "is_creative",
-            "is_locked",
-            "is_public",
-            "number_of_regions",
-            "start",
-            "end",
-            "atmosphere_color",
-            "water_color",
-            "surface_liquid",
-            "core_liquid",
-            "block_colors",
-            "latest_poll",
         ]
