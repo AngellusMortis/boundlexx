@@ -9,7 +9,7 @@ from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.postgres.indexes import GinIndex
 from django.core.cache import cache
-from django.db import models
+from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
@@ -65,72 +65,72 @@ class WorldManager(models.Manager):
     def get_or_create_from_game_dict(self, world_dict):
         created = False
 
-        world = self.filter(id=world_dict["id"]).first()
+        with transaction.atomic():
+            world = self.filter(id=world_dict["id"]).select_for_update().first()
+            start = None
+            end = None
+            if "lifetime" in world_dict:
+                start = datetime.utcfromtimestamp(world_dict["lifetime"][0]).replace(
+                    tzinfo=pytz.utc
+                )
+                end = datetime.utcfromtimestamp(world_dict["lifetime"][1]).replace(
+                    tzinfo=pytz.utc
+                )
 
-        start = None
-        end = None
-        if "lifetime" in world_dict:
-            start = datetime.utcfromtimestamp(world_dict["lifetime"][0]).replace(
-                tzinfo=pytz.utc
+            if world is None and end is not None:
+                world = self.get_and_replace_expired_exo(
+                    world_dict["id"], world_dict["displayName"], end
+                )
+
+            if world is None:
+                world = World.objects.create(
+                    id=world_dict["id"],
+                    display_name=world_dict["displayName"],
+                )
+                created = True
+
+            created = created or world.address is None
+            default_public = world_dict.get("owner", None) is None or world_dict.get(
+                "creative", False
             )
-            end = datetime.utcfromtimestamp(world_dict["lifetime"][1]).replace(
-                tzinfo=pytz.utc
+
+            world = calculate_extra_names(world, world_dict["displayName"])
+            world.name = world_dict["name"]
+            world.region = world_dict["region"]
+            world.tier = world_dict["tier"]
+            world.size = world_dict["worldSize"]
+            world.world_type = settings.BOUNDLESS_WORLD_TYPE_MAPPING.get(
+                world_dict["worldType"]
             )
+            world.time_offset = datetime.utcfromtimestamp(
+                world_dict["timeOffset"]
+            ).replace(tzinfo=pytz.utc)
+            world.atmosphere_color_r = world_dict["atmosphereColor"][0]
+            world.atmosphere_color_g = world_dict["atmosphereColor"][1]
+            world.atmosphere_color_b = world_dict["atmosphereColor"][2]
+            world.water_color_r = world_dict["waterColor"][0]
+            world.water_color_g = world_dict["waterColor"][1]
+            world.water_color_b = world_dict["waterColor"][2]
+            world.address = world_dict.get("addr")
+            world.ip_address = world_dict.get("ipAddr")
+            world.api_url = world_dict.get("apiURL")
+            world.websocket_url = world_dict.get("websocketURL")
+            world.special_type = world_dict.get("specialWorldType")
+            world.is_creative = world_dict.get("creative", False)
+            world.owner = world_dict.get("owner", None)
+            world.assignment_id = world_dict.get("assignment", None)
+            world.is_locked = world_dict.get("locked", False)
+            world.is_public = world_dict.get("public", default_public)
+            world.number_of_regions = world_dict["numRegions"]
+            world.active = True
 
-        if world is None and end is not None:
-            world = self.get_and_replace_expired_exo(
-                world_dict["id"], world_dict["displayName"], end
-            )
+            if start is not None:
+                world.start = start
 
-        if world is None:
-            world = World.objects.create(
-                id=world_dict["id"],
-                display_name=world_dict["displayName"],
-            )
-            created = True
+            if end is not None:
+                world.end = end
 
-        created = created or world.address is None
-        default_public = world_dict.get("owner", None) is None or world_dict.get(
-            "creative", False
-        )
-
-        world = calculate_extra_names(world, world_dict["displayName"])
-        world.name = world_dict["name"]
-        world.region = world_dict["region"]
-        world.tier = world_dict["tier"]
-        world.size = world_dict["worldSize"]
-        world.world_type = settings.BOUNDLESS_WORLD_TYPE_MAPPING.get(
-            world_dict["worldType"]
-        )
-        world.time_offset = datetime.utcfromtimestamp(world_dict["timeOffset"]).replace(
-            tzinfo=pytz.utc
-        )
-        world.atmosphere_color_r = world_dict["atmosphereColor"][0]
-        world.atmosphere_color_g = world_dict["atmosphereColor"][1]
-        world.atmosphere_color_b = world_dict["atmosphereColor"][2]
-        world.water_color_r = world_dict["waterColor"][0]
-        world.water_color_g = world_dict["waterColor"][1]
-        world.water_color_b = world_dict["waterColor"][2]
-        world.address = world_dict.get("addr")
-        world.ip_address = world_dict.get("ipAddr")
-        world.api_url = world_dict.get("apiURL")
-        world.websocket_url = world_dict.get("websocketURL")
-        world.special_type = world_dict.get("specialWorldType")
-        world.is_creative = world_dict.get("creative", False)
-        world.owner = world_dict.get("owner", None)
-        world.assignment_id = world_dict.get("assignment", None)
-        world.is_locked = world_dict.get("locked", False)
-        world.is_public = world_dict.get("public", default_public)
-        world.number_of_regions = world_dict["numRegions"]
-        world.active = True
-
-        if start is not None:
-            world.start = start
-
-        if end is not None:
-            world.end = end
-
-        world.save()
+            world.save()
 
         return world, created
 
@@ -1184,8 +1184,10 @@ class WorldPollManager(models.Manager):
 
             calculate_distances.delay([world.id])
 
-        if world.is_public and (
-            new_world or (world.is_sovereign and not world.notification_sent)
+        if (
+            world.is_public
+            and not world.notification_sent
+            and (new_world or world.is_sovereign)
         ):
             ExoworldNotification.objects.send_new_notification(world_poll)
 

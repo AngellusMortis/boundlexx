@@ -23,6 +23,7 @@ from boundlexx.api.utils import get_base_url
 from boundlexx.notifications.tasks import (
     create_forum_post,
     send_discord_webhook,
+    set_notification_sent,
     update_forum_post,
 )
 from boundlexx.notifications.utils import get_forum_client
@@ -250,17 +251,6 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
         world = world_poll.world
 
-        if world.is_sovereign or (
-            world.image.name
-            and world.forum_id
-            and world.worldblockcolor_set.count() > 0
-        ):
-            world.notification_sent = True
-        else:
-            world.notification_sent = False
-
-            world.save()
-
         if world.is_exo:
             if world.active:
                 ExoworldNotification.objects.send_notification(
@@ -277,6 +267,15 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
         else:
             HomeworldNotification.objects.send_notification(world, world_poll.resources)
 
+        if world.is_sovereign or (
+            world.image.name
+            and world.forum_id
+            and world.worldblockcolor_set.count() > 0
+        ):
+            set_notification_sent.delay(world.id, True)
+        else:
+            set_notification_sent.delay(world.id, False)
+
     def send_update_notification(self, world):
         send_update = (
             world.address is not None
@@ -288,10 +287,15 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             )
         )
 
+        logger.info(
+            "Update notification for %s. notification sent status: %s",
+            world,
+            world.notification_sent,
+        )
+
         if world.is_sovereign:
             send_update = False
-            world.notification_sent = True
-            world.save()
+            set_notification_sent.delay(world.id, True)
 
         if send_update:
             # no sovereign/creative worlds
@@ -302,8 +306,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             elif world.is_perm:
                 HomeworldNotification.objects.send_notification(world)
 
-            world.notification_sent = True
-            world.save()
+            set_notification_sent.delay(world.id, True)
 
 
 class WorldNotification(NotificationBase):

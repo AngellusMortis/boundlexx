@@ -32,7 +32,7 @@ logger = getLogger(__file__)
 
 
 class WorldViewSet(BoundlexxViewSet):
-    queryset = World.objects.all()
+    queryset = World.objects.filter(is_public=True)
     serializer_class = SimpleWorldSerializer
     detail_serializer_class = WorldSerializer
     lookup_field = "id"

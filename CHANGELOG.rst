@@ -1,3 +1,8 @@
+2020-10-21
+----------
+
+* Removes all data from Worlds from v1 and v2 for worlds that are not `is_public`
+
 2020-10-20
 ----------
 

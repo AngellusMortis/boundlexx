@@ -448,6 +448,36 @@ BOUNDLESS_FORUM_BAD_TOPICS = [
     51239,
     51064,
 ]
+BOUNDLESS_BLACKLISTED_ITEMS = [
+    10649,  # dormant meteorite
+    33102,  # coin
+    11077,  # LED1
+    11081,  # SPECIAL_BLINK_LED2
+    11085,  # SPECIAL_BLINK_LED3
+    11089,  # SPECIAL_BLINK_LED4
+    11093,  # SPECIAL_BLINK_LED5
+    11097,  # SPECIAL_BLINK_LED6
+    11101,  # SPECIAL_BLINK_LED7
+    11105,  # SPECIAL_BLINK_LED8
+    11109,  # SPECIAL_BLINK_LED9
+    11113,  # SPECIAL_BLINK_LED10
+    11117,  # SPECIAL_BLINK_LED11
+    11121,  # SPECIAL_BLINK_LED12
+    11125,  # SPECIAL_BLINK_LED13
+    11129,  # SPECIAL_BLINK_LED14
+    11133,  # SPECIAL_BLINK_LED15
+    11620,  # clay tilled
+    11624,  # peaty tilled
+    11628,  # silty tilled
+    13560,  # marble frieze1
+    13580,  # marble frieze2
+    13600,  # marble frieze3
+]
+BOUNDLESS_NO_SELL = [
+    13,  # verdant grass block item
+    3085,  # barbed grass block item
+    6157,  # gnarled grass block item
+]
 BOUNDLESS_TESTING_FEATURES = env.bool("BOUNDLESS_TESTING_FEATURES", default=False)
 BOUNDLESS_FORUM_BASE_URL = "https://forum.playboundless.com"
 BOUNDLESS_FORUM_POST_USER = env("BOUNDLESS_FORUM_POST_USER")
