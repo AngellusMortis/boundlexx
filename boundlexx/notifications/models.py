@@ -248,7 +248,7 @@ class PolymorphicNotificationManager(PolymorphicManager):
 
 class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
-        from boundlexx.boundless.models import World
+        from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
 
         world = World.objects.filter(id=world_poll.world_id).select_for_update().first()
         with transaction.atomic():
