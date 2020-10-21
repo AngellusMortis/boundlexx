@@ -10,7 +10,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import intcomma, naturaltime
-from django.db import models
+from django.db import models, transaction
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
@@ -248,34 +248,53 @@ class PolymorphicNotificationManager(PolymorphicManager):
 
 class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
-        world = world_poll.world
+        from boundlexx.boundless.models import World
 
-        if world.is_sovereign or (
-            world.image.name
-            and world.forum_id
-            and world.worldblockcolor_set.count() > 0
-        ):
-            world.notification_sent = True
-        else:
-            world.notification_sent = False
+        world = World.objects.filter(id=world_poll.world_id).select_for_update().first()
+        with transaction.atomic():
+            if world is None:
+                return
 
-            world.save()
+            logger.info(
+                "Sending notification for %s. notification sent status: %s",
+                world,
+                world.notification_sent,
+            )
+            if world.is_sovereign or (
+                world.image.name
+                and world.forum_id
+                and world.worldblockcolor_set.count() > 0
+            ):
+                world.notification_sent = True
+            else:
+                world.notification_sent = False
 
-        if world.is_exo:
-            if world.active:
-                ExoworldNotification.objects.send_notification(
+                world.save()
+
+            if world.is_exo:
+                if world.active:
+                    ExoworldNotification.objects.send_notification(
+                        world, world_poll.resources
+                    )
+            elif world.is_creative:
+                CreativeWorldNotification.objects.send_notification(
                     world, world_poll.resources
                 )
-        elif world.is_creative:
-            CreativeWorldNotification.objects.send_notification(
-                world, world_poll.resources
-            )
-        elif world.is_sovereign:
-            SovereignWorldNotification.objects.send_notification(
-                world, world_poll.resources
-            )
-        else:
-            HomeworldNotification.objects.send_notification(world, world_poll.resources)
+            elif world.is_sovereign:
+                SovereignWorldNotification.objects.send_notification(
+                    world, world_poll.resources
+                )
+            else:
+                HomeworldNotification.objects.send_notification(
+                    world, world_poll.resources
+                )
+
+        world.refresh_from_db()
+        logger.info(
+            "Sent notification for %s. notification sent status: %s",
+            world,
+            world.notification_sent,
+        )
 
     def send_update_notification(self, world):
         send_update = (
@@ -286,6 +305,12 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
                 or timezone.now() > world.start + timedelta(days=1)
                 or not world.is_exo
             )
+        )
+
+        logger.info(
+            "Update notification for %s. notification sent status: %s",
+            world,
+            world.notification_sent,
         )
 
         if world.is_sovereign:
