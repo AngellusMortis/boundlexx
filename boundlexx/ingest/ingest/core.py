@@ -12,6 +12,7 @@ from boundlexx.boundless.models import (
 )
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
+from django.conf import settings
 
 
 def _create_generic(name, index_list, klass):
@@ -52,10 +53,15 @@ def _create_items(items_list, subtitles):
             item_obj.item_subtitle = subtitles[item["subtitle_id"]]
             item_obj.mint_value = compiled_items[string_item_id]["coinValue"]
             item_obj.max_stack = compiled_items[string_item_id]["maxStackSize"]
+            item_obj.can_be_sold = item_obj.game_id not in settings.BOUNDLESS_NO_SELL
 
             # items that cannot be dropped or minted are not normally obtainable
             can_drop = compiled_items[string_item_id]["canDrop"]
-            is_active = can_drop and item_obj.mint_value is not None
+            is_active = (
+                can_drop
+                and item_obj.mint_value is not None
+                and item_obj.game_id not in settings.BOUNDLESS_BLACKLISTED_ITEMS
+            )
 
             if not was_created and (not is_active and item_obj.active):
                 items_disabled += 1

@@ -206,7 +206,7 @@ def _update_prices(worlds):
 
     worlds = list(worlds)
 
-    items = Item.objects.filter(active=True)
+    items = Item.objects.filter(active=True, can_be_sold=True)
     logger.info("Updating the prices for %s items", len(items))
 
     _log_worlds(worlds)
