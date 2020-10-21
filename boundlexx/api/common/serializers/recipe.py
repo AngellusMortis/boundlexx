@@ -22,7 +22,7 @@ class IDRecipeGroupSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeGroupSerializer(serializers.ModelSerializer):
+class RecipeGroupSerializer(IDRecipeGroupSerializer):
     display_name = LocalizedStringSerializer()
     members = IDItemSerializer(many=True)
 
