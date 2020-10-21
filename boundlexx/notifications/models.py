@@ -10,7 +10,7 @@ import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import intcomma, naturaltime
-from django.db import models, transaction
+from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.template.loader import render_to_string
@@ -23,6 +23,7 @@ from boundlexx.api.utils import get_base_url
 from boundlexx.notifications.tasks import (
     create_forum_post,
     send_discord_webhook,
+    set_notification_sent,
     update_forum_post,
 )
 from boundlexx.notifications.utils import get_forum_client
@@ -248,67 +249,32 @@ class PolymorphicNotificationManager(PolymorphicManager):
 
 class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
-        from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
+        world = world_poll.world
 
-        with transaction.atomic():
-            world = (
-                World.objects.filter(id=world_poll.world_id).select_for_update().first()
-            )
-            if world is None:
-                return
-
-            logger.info(
-                "Sending notification for %s. notification sent status: %s",
-                world,
-                world.notification_sent,
-            )
-            if world.is_sovereign or (
-                world.image.name
-                and world.forum_id
-                and world.worldblockcolor_set.count() > 0
-            ):
-                world.notification_sent = True
-            else:
-                world.notification_sent = False
-
-                world.save()
-
-            logger.info(
-                "Updated notification for %s. notification sent status: %s",
-                world,
-                world.notification_sent,
-            )
-            world.refresh_from_db()
-            logger.info(
-                "Updated2 notification for %s. notification sent status: %s",
-                world,
-                world.notification_sent,
-            )
-
-            if world.is_exo:
-                if world.active:
-                    ExoworldNotification.objects.send_notification(
-                        world, world_poll.resources
-                    )
-            elif world.is_creative:
-                CreativeWorldNotification.objects.send_notification(
+        if world.is_exo:
+            if world.active:
+                ExoworldNotification.objects.send_notification(
                     world, world_poll.resources
                 )
-            elif world.is_sovereign:
-                SovereignWorldNotification.objects.send_notification(
-                    world, world_poll.resources
-                )
-            else:
-                HomeworldNotification.objects.send_notification(
-                    world, world_poll.resources
-                )
+        elif world.is_creative:
+            CreativeWorldNotification.objects.send_notification(
+                world, world_poll.resources
+            )
+        elif world.is_sovereign:
+            SovereignWorldNotification.objects.send_notification(
+                world, world_poll.resources
+            )
+        else:
+            HomeworldNotification.objects.send_notification(world, world_poll.resources)
 
-        world.refresh_from_db()
-        logger.info(
-            "Sent notification for %s. notification sent status: %s",
-            world,
-            world.notification_sent,
-        )
+        if world.is_sovereign or (
+            world.image.name
+            and world.forum_id
+            and world.worldblockcolor_set.count() > 0
+        ):
+            set_notification_sent.delay(world.id, True)
+        else:
+            set_notification_sent.delay(world.id, False)
 
     def send_update_notification(self, world):
         send_update = (
@@ -329,8 +295,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
 
         if world.is_sovereign:
             send_update = False
-            world.notification_sent = True
-            world.save()
+            set_notification_sent.delay(world.id, True)
 
         if send_update:
             # no sovereign/creative worlds
@@ -341,8 +306,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             elif world.is_perm:
                 HomeworldNotification.objects.send_notification(world)
 
-            world.notification_sent = True
-            world.save()
+            set_notification_sent.delay(world.id, True)
 
 
 class WorldNotification(NotificationBase):

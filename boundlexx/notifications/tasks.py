@@ -4,6 +4,7 @@ import time
 import requests
 from celery.utils.log import get_task_logger
 from django.core.cache import cache
+from django.db import transaction
 
 from boundlexx.notifications.utils import get_forum_client
 from config.celery_app import app
@@ -136,3 +137,27 @@ def update_forum_post(topic_id, title, content):
             )
             last_call = time.monotonic()
         cache.set(cache_key, last_call, timeout=FORUM_DELAY)
+
+
+@app.task
+def set_notification_sent(world_id, sent):
+    from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
+
+    with transaction.atomic():
+        world = World.objects.filter(id=world_id).select_for_update().first()
+
+        if world is not None:
+            world.notification_sent = sent
+            world.save()
+            logger.info(
+                "Setting notification sent for %s, status: %s",
+                world,
+                world.notification_sent,
+            )
+
+            world.refresh_from_db()
+            logger.info(
+                "Notification sent after refresh for %s, status: %s",
+                world,
+                world.notification_sent,
+            )
