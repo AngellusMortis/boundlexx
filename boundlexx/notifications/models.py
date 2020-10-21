@@ -273,6 +273,18 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
 
                 world.save()
 
+            logger.info(
+                "Updated notification for %s. notification sent status: %s",
+                world,
+                world.notification_sent,
+            )
+            world.refresh_from_db()
+            logger.info(
+                "Updated2 notification for %s. notification sent status: %s",
+                world,
+                world.notification_sent,
+            )
+
             if world.is_exo:
                 if world.active:
                     ExoworldNotification.objects.send_notification(
