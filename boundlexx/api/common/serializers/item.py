@@ -60,6 +60,7 @@ class ItemSerializer(SimpleItemSerializer):
     description = LocalizedStringSerializer()
 
     mint_value = serializers.FloatField()
+    max_stack = serializers.IntegerField()
 
     class Meta:
         model = Item
@@ -72,6 +73,7 @@ class ItemSerializer(SimpleItemSerializer):
             "localization",
             "item_subtitle",
             "mint_value",
+            "max_stack",
             "list_type",
             "description",
             "has_colors",
