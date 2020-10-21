@@ -137,7 +137,7 @@ class BlockColorViewSet(
 ):
     schema = DescriptiveAutoSchema()
     queryset = (
-        WorldBlockColor.objects.filter(world__is_creative=False)
+        WorldBlockColor.objects.filter(world__is_creative=False, world__is_public=True)
         .select_related(
             "item",
             "world",

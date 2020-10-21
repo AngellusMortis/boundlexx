@@ -37,7 +37,10 @@ class ItemResourceTimeseriesViewSet(
     TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet
 ):
     schema = DescriptiveAutoSchema(tags=["Items", "Timeseries"])
-    queryset = ResourceCount.objects.filter(world_poll__world__active=True)
+    queryset = ResourceCount.objects.filter(
+        world_poll__world__active=True,
+        world_poll__world__is_public=True,
+    )
     serializer_class = URLItemResourceCountTimeSeriesSerializer
     time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
     number_fields = ["count"]
