@@ -250,6 +250,17 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
     def send_new_notification(self, world_poll):
         world = world_poll.world
 
+        if world.is_sovereign or (
+            world.image.name
+            and world.forum_id
+            and world.worldblockcolor_set.count() > 0
+        ):
+            world.notification_sent = True
+        else:
+            world.notification_sent = False
+
+            world.save()
+
         if world.is_exo:
             if world.active:
                 ExoworldNotification.objects.send_notification(
@@ -266,17 +277,6 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
         else:
             HomeworldNotification.objects.send_notification(world, world_poll.resources)
 
-        if world.owner is not None or (
-            world.image.name
-            and world.forum_id
-            and world.worldblockcolor_set.count() > 0
-        ):
-            world.notification_sent = True
-        else:
-            world.notification_sent = False
-
-            world.save()
-
     def send_update_notification(self, world):
         send_update = (
             world.address is not None
@@ -287,6 +287,11 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
                 or not world.is_exo
             )
         )
+
+        if world.is_sovereign:
+            send_update = False
+            world.notification_sent = True
+            world.save()
 
         if send_update:
             # no sovereign/creative worlds
@@ -455,7 +460,7 @@ class WorldNotification(NotificationBase):
 
     def forum(self, world, resources, extra=None):  # pylint: disable=arguments-differ
         special_type = ""
-        if world.special_type:
+        if world.special_type is not None and world.special_type > 0:
             special_type = f"{world.get_special_type_display()} "
 
         title = (
@@ -503,7 +508,7 @@ class WorldNotification(NotificationBase):
             ]
         }
 
-        if world.special_type is not None:
+        if world.special_type is not None and world.special_type > 0:
             main_embed["fields"][0][
                 "value"
             ] += f"**Special Type**: {world.get_special_type_display()}\n"

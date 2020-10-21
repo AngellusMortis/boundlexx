@@ -22,13 +22,14 @@ class IDRecipeGroupSerializer(serializers.ModelSerializer):
         ]
 
 
-class RecipeGroupSerializer(serializers.ModelSerializer):
+class RecipeGroupSerializer(IDRecipeGroupSerializer):
     display_name = LocalizedStringSerializer()
     members = IDItemSerializer(many=True)
 
     class Meta:
         model = RecipeGroup
         fields = [
+            "id",
             "name",
             "display_name",
             "members",

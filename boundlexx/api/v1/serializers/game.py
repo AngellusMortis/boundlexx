@@ -109,6 +109,7 @@ class URLItemSerializer(ItemSerializer):
             "localization",
             "item_subtitle",
             "mint_value",
+            "max_stack",
             "list_type",
             "description",
             "has_colors",

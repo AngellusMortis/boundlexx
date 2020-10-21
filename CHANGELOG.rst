@@ -1,3 +1,9 @@
+2020-10-20
+----------
+
+* Adds parallelization to Shop Price polling
+* Adds `text_name`/`html_name` for Leaderboard and Shop prices
+
 2020-10-19
 ----------
 

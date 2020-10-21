@@ -214,6 +214,7 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     string_id = models.CharField(_("String ID"), max_length=64, db_index=True)
     name = models.CharField(_("Name"), max_length=64)
     mint_value = models.FloatField(_("Chrysominter Value"), null=True, blank=True)
+    max_stack = models.IntegerField(default=100)
     list_type = models.ForeignKey(
         LocalizedString,
         on_delete=models.CASCADE,

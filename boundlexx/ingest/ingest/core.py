@@ -51,6 +51,7 @@ def _create_items(items_list, subtitles):
             item_obj.name = compiled_items[string_item_id]["name"]
             item_obj.item_subtitle = subtitles[item["subtitle_id"]]
             item_obj.mint_value = compiled_items[string_item_id]["coinValue"]
+            item_obj.max_stack = compiled_items[string_item_id]["maxStackSize"]
 
             # items that cannot be dropped or minted are not normally obtainable
             can_drop = compiled_items[string_item_id]["canDrop"]
