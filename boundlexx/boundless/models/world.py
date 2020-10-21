@@ -65,8 +65,8 @@ class WorldManager(models.Manager):
     def get_or_create_from_game_dict(self, world_dict):
         created = False
 
-        world = self.filter(id=world_dict["id"]).select_for_update().first()
         with transaction.atomic():
+            world = self.filter(id=world_dict["id"]).select_for_update().first()
             start = None
             end = None
             if "lifetime" in world_dict:
