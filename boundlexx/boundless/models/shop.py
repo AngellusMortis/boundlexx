@@ -109,6 +109,7 @@ class ItemRank(models.Model):
 
     class Meta:
         abstract = True
+        unique_together = ("item", "world")
 
     def __str__(self):
         return f"Rank: {self.rank} for {self.item} @ {self.world}"
