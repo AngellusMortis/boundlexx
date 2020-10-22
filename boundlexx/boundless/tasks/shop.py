@@ -50,7 +50,7 @@ def _update_queued_worlds(worlds):
                 in_progress_ids.add(world.id)
                 actual_worlds.append(world)
 
-        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids)
+        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
 
     return actual_worlds
 
@@ -62,7 +62,7 @@ def _remove_queued_worlds(worlds):
         for world in worlds:
             in_progress_ids.discard(world.id)
 
-        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids)
+        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
 
 
 @app.task
