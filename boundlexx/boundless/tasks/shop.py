@@ -31,10 +31,44 @@ UpdateOption = namedtuple(
 
 
 UPDATE_PRICES_LOCK = "boundless:update_prices"
+WORLDS_QUEUED_LOCK = "boundless:prices:update_worlds"
+WORLDS_QUEUED_CACHE = "boundless:prices:worlds"
+
+
+def _get_queued_worlds():
+    with cache.lock(WORLDS_QUEUED_LOCK, expire=10, auto_renewal=False):
+        return list(cache.get(WORLDS_QUEUED_CACHE, set()))
+
+
+def _update_queued_worlds(worlds):
+    actual_worlds = []
+    with cache.lock(WORLDS_QUEUED_LOCK, expire=10, auto_renewal=False):
+        in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
+
+        for world in worlds:
+            if world.id not in in_progress_ids:
+                in_progress_ids.add(world.id)
+                actual_worlds.append(world)
+
+        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids)
+
+    return actual_worlds
+
+
+def _remove_queued_worlds(worlds):
+    with cache.lock(WORLDS_QUEUED_LOCK, expire=10, auto_renewal=False):
+        in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
+
+        for world in worlds:
+            in_progress_ids.discard(world.id)
+
+        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids)
 
 
 @app.task
 def update_prices(world_ids=None):
+    queued_ids = _get_queued_worlds()
+
     if world_ids is None:
         worlds = (
             World.objects.filter(active=True, is_creative=False, api_url__isnull=False)
@@ -49,6 +83,7 @@ def update_prices(world_ids=None):
                 )
             )
             .exclude(api_url="")
+            .exclude(id__in=queued_ids)
         )
     else:
         worlds = World.objects.filter(id__in=world_ids).order_by("id")
@@ -76,7 +111,7 @@ def _update_prices_multi(worlds, name=None):
     if name is not None:
         lock_name = f"{lock_name}:{name}"
 
-    lock = cache.lock(lock_name, expire=21600, auto_renewal=False)
+    lock = cache.lock(lock_name, expire=120, auto_renewal=False)
 
     acquired = lock.acquire(blocking=True, timeout=1)
 
@@ -204,8 +239,7 @@ def _update_prices(worlds):
         _split_update_prices(worlds)
         return
 
-    worlds = list(worlds)
-
+    worlds = _update_queued_worlds(worlds)
     items = Item.objects.filter(active=True, can_be_sold=True)
     logger.info("Updating the prices for %s items", len(items))
 
@@ -213,43 +247,46 @@ def _update_prices(worlds):
 
     errors_total = 0
 
-    for item in items:
-        try:
-            buy_updated = _update_item_prices(
-                item,
-                ItemBuyRank,
-                "shop_buy",
-                ItemRequestBasketPrice,
-                worlds,
-            )
-        except HTTP_ERRORS as ex:
-            errors_total += 1
-            buy_updated = -2
-            logger.error("%s while uploading buy prices of %s", ex, item)
-
-        try:
-            sell_updated = _update_item_prices(
-                item, ItemSellRank, "shop_sell", ItemShopStandPrice, worlds
-            )
-        except HTTP_ERRORS as ex:
-            errors_total += 1
-            sell_updated = -2
-            logger.error("%s while uploading sell prices of %s", ex, item)
-
-        if buy_updated >= -1 or sell_updated >= -1:
-            if buy_updated == -1 and sell_updated == -1:
-                logger.info("Skipped %s", item)
-            else:
-
-                def status(v):
-                    return v if v >= 0 else "skipped" if v == -1 else "error"
-
-                logger.info(
-                    "Updated %s (Baskets: %s, Stands: %s)",
+    try:
+        for item in items:
+            try:
+                buy_updated = _update_item_prices(
                     item,
-                    status(buy_updated),
-                    status(sell_updated),
+                    ItemBuyRank,
+                    "shop_buy",
+                    ItemRequestBasketPrice,
+                    worlds,
                 )
+            except HTTP_ERRORS as ex:
+                errors_total += 1
+                buy_updated = -2
+                logger.error("%s while updating buy prices of %s", ex, item)
 
-        if errors_total > 10:
-            raise Exception("Aborting due to large number of HTTP errors")
+            try:
+                sell_updated = _update_item_prices(
+                    item, ItemSellRank, "shop_sell", ItemShopStandPrice, worlds
+                )
+            except HTTP_ERRORS as ex:
+                errors_total += 1
+                sell_updated = -2
+                logger.error("%s while updating sell prices of %s", ex, item)
+
+            if buy_updated >= -1 or sell_updated >= -1:
+                if buy_updated == -1 and sell_updated == -1:
+                    logger.info("Skipped %s", item)
+                else:
+
+                    def status(v):
+                        return v if v >= 0 else "skipped" if v == -1 else "error"
+
+                    logger.info(
+                        "Updated %s (Baskets: %s, Stands: %s)",
+                        item,
+                        status(buy_updated),
+                        status(sell_updated),
+                    )
+
+            if errors_total > 10:
+                raise Exception("Aborting due to large number of HTTP errors")
+    finally:
+        _remove_queued_worlds(worlds)
