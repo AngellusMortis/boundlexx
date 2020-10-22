@@ -31,7 +31,7 @@ class ItemShopPriceManager(models.Manager):
             location_x=shop_item.location.x,
             location_y=shop_item.location.y,
             location_z=shop_item.location.z,
-            world=World.objects.get(name=world),
+            world=World.objects.get(name=world, active=True),
         )
 
 
