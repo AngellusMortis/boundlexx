@@ -331,7 +331,9 @@ class ItemResourceCountViewSet(
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(
-        world_poll__active=True, world_poll__world__active=True
+        world_poll__active=True,
+        world_poll__world__active=True,
+        world_poll__world__is_public=True,
     ).select_related("world_poll", "world_poll__world", "item")
 
     serializer_class = URLItemResourceCountSerializer
@@ -413,7 +415,7 @@ class ItemColorsViewSet(
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = (
-        WorldBlockColor.objects.filter(world__is_creative=False)
+        WorldBlockColor.objects.filter(world__is_creative=False, world__is_public=True)
         .select_related(
             "color",
             "world",
