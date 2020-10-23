@@ -36,13 +36,13 @@ WORLDS_QUEUED_CACHE = "boundless:prices:worlds"
 
 
 def _get_queued_worlds():
-    with cache.lock(WORLDS_QUEUED_LOCK, expire=10, auto_renewal=False):
+    with cache.lock(WORLDS_QUEUED_LOCK):
         return list(cache.get(WORLDS_QUEUED_CACHE, set()))
 
 
 def _update_queued_worlds(worlds):
     actual_worlds = []
-    with cache.lock(WORLDS_QUEUED_LOCK, expire=10, auto_renewal=False):
+    with cache.lock(WORLDS_QUEUED_LOCK):
         in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
 
         for world in worlds:
@@ -55,12 +55,12 @@ def _update_queued_worlds(worlds):
     return actual_worlds
 
 
-def _remove_queued_worlds(worlds):
-    with cache.lock(WORLDS_QUEUED_LOCK, expire=10, auto_renewal=False):
+def _remove_queued_worlds(world_ids):
+    with cache.lock(WORLDS_QUEUED_LOCK):
         in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
 
-        for world in worlds:
-            in_progress_ids.discard(world.id)
+        for world_id in world_ids:
+            in_progress_ids.discard(world_id)
 
         cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
 
@@ -240,6 +240,7 @@ def _update_prices(worlds):
         return
 
     worlds = _update_queued_worlds(worlds)
+    ids_to_remove = [w.id for w in worlds]
     items = Item.objects.filter(active=True, can_be_sold=True)
     logger.info("Updating the prices for %s items", len(items))
 
@@ -288,5 +289,7 @@ def _update_prices(worlds):
 
             if errors_total > 10:
                 raise Exception("Aborting due to large number of HTTP errors")
-    finally:
-        _remove_queued_worlds(worlds)
+    except Exception:  # pylint: disable=broad-except
+        _remove_queued_worlds(ids_to_remove)
+        raise
+    _remove_queued_worlds(ids_to_remove)
