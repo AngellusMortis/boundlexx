@@ -57,6 +57,7 @@ def _update_queued_worlds(worlds):
 
 def _remove_queued_worlds(world_ids):
     with cache.lock(WORLDS_QUEUED_LOCK):
+        logger.info("Removing queued worlds: %s", world_ids)
         in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
 
         for world_id in world_ids:
@@ -289,7 +290,5 @@ def _update_prices(worlds):
 
             if errors_total > 10:
                 raise Exception("Aborting due to large number of HTTP errors")
-    except Exception:  # pylint: disable=broad-except
+    finally:
         _remove_queued_worlds(ids_to_remove)
-        raise
-    _remove_queued_worlds(ids_to_remove)

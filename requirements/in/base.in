@@ -39,6 +39,7 @@ gspread
 ipython
 msgpack
 numpy
+openpyxl
 pillow
 psycopg2 --no-binary psycopg2
 pydiscourse
