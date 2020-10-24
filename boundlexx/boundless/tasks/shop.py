@@ -36,12 +36,15 @@ WORLDS_QUEUED_CACHE = "boundless:prices:worlds"
 
 
 def _get_queued_worlds():
+    logger.info("Getting queued worlds lock (get)...")
     with cache.lock(WORLDS_QUEUED_LOCK):
         return list(cache.get(WORLDS_QUEUED_CACHE, set()))
+        logger.info("Releasing queued worlds lock (get)...")
 
 
 def _update_queued_worlds(worlds):
     actual_worlds = []
+    logger.info("Getting queued worlds lock (update)...")
     with cache.lock(WORLDS_QUEUED_LOCK):
         in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
 
@@ -51,11 +54,13 @@ def _update_queued_worlds(worlds):
                 actual_worlds.append(world)
 
         cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
+        logger.info("Releasing queued worlds lock (update)...")
 
     return actual_worlds
 
 
 def _remove_queued_worlds(world_ids):
+    logger.info("Getting queued worlds lock (remove)...")
     with cache.lock(WORLDS_QUEUED_LOCK):
         logger.info("Removing queued worlds: %s", world_ids)
         in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
@@ -64,6 +69,7 @@ def _remove_queued_worlds(world_ids):
             in_progress_ids.discard(world_id)
 
         cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
+        logger.info("Releasing queued worlds lock (remove)...")
 
 
 @app.task
@@ -241,6 +247,11 @@ def _update_prices(worlds):
         return
 
     worlds = _update_queued_worlds(worlds)
+
+    if len(worlds) == 0:
+        logger.info("No worlds to update")
+        return
+
     ids_to_remove = [w.id for w in worlds]
     items = Item.objects.filter(active=True, can_be_sold=True)
     logger.info("Updating the prices for %s items", len(items))
