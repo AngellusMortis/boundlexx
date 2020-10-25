@@ -38,8 +38,9 @@ WORLDS_QUEUED_CACHE = "boundless:prices:worlds"
 def _get_queued_worlds():
     logger.info("Getting queued worlds lock (get)...")
     with cache.lock(WORLDS_QUEUED_LOCK):
-        return list(cache.get(WORLDS_QUEUED_CACHE, set()))
+        queued_worlds = list(cache.get(WORLDS_QUEUED_CACHE, set()))
         logger.info("Releasing queued worlds lock (get)...")
+    return queued_worlds
 
 
 def _update_queued_worlds(worlds):
@@ -271,18 +272,30 @@ def _update_prices(worlds):
                     worlds,
                 )
             except HTTP_ERRORS as ex:
-                errors_total += 1
-                buy_updated = -2
-                logger.error("%s while updating buy prices of %s", ex, item)
+                # 403 with an API key can actually be a rate limit...
+                if not (
+                    hasattr(ex, "response")
+                    and ex.response is not None  # type: ignore
+                    and ex.response.status_code == 403  # type: ignore
+                ):
+                    errors_total += 1
+                    buy_updated = -2
+                    logger.error("%s while updating buy prices of %s", ex, item)
 
             try:
                 sell_updated = _update_item_prices(
                     item, ItemSellRank, "shop_sell", ItemShopStandPrice, worlds
                 )
             except HTTP_ERRORS as ex:
-                errors_total += 1
-                sell_updated = -2
-                logger.error("%s while updating sell prices of %s", ex, item)
+                # 403 with an API key can actually be a rate limit...
+                if not (
+                    hasattr(ex, "response")
+                    and ex.response is not None  # type: ignore
+                    and ex.response.status_code == 403  # type: ignore
+                ):
+                    errors_total += 1
+                    buy_updated = -2
+                    logger.error("%s while updating sell prices of %s", ex, item)
 
             if buy_updated >= -1 or sell_updated >= -1:
                 if buy_updated == -1 and sell_updated == -1:
