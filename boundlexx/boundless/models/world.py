@@ -62,7 +62,9 @@ class WorldManager(models.Manager):
             return world
         return None
 
-    def get_or_create_from_game_dict(self, world_dict):
+    def get_or_create_from_game_dict(  # pylint: disable=too-many-statements
+        self, world_dict
+    ):
         created = False
 
         with transaction.atomic():
@@ -123,6 +125,13 @@ class WorldManager(models.Manager):
             world.is_public = world_dict.get("public", default_public)
             world.number_of_regions = world_dict["numRegions"]
             world.active = True
+
+            if world.is_perm:
+                world.is_public_edit = True
+                world.is_public_claim = True
+            elif world.is_exo:
+                world.is_public_edit = True
+                world.is_public_claim = False
 
             if start is not None:
                 world.start = start

@@ -181,15 +181,16 @@ class WorldControlSimpleDataView(views.APIView):
         if world is None:
             return Response(status=425), None
 
-        if "can_visit" in data[1]:
-            world.is_public = data[1]["can_visit"]
-        if "can_edit" in data[1]:
-            world.is_public_edit = data[1]["can_edit"]
-        if "can_claim" in data[1]:
-            world.is_public_claim = data[1]["can_claim"]
-        if data[2] is not None:
-            world.is_finalized = data[2]
-        world.save()
+        if world.is_sovereign:
+            if "can_visit" in data[1]:
+                world.is_public = data[1]["can_visit"]
+            if "can_edit" in data[1]:
+                world.is_public_edit = data[1]["can_edit"]
+            if "can_claim" in data[1]:
+                world.is_public_claim = data[1]["can_claim"]
+            if data[2] is not None:
+                world.is_finalized = data[2]
+            world.save()
 
         return None, world
 

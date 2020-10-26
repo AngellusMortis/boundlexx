@@ -1,3 +1,8 @@
+2020-10-26
+----------
+
+* Adds better handling for permissions on Homeworld/Exoworlds
+
 2020-10-21
 ----------
 
