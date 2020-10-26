@@ -376,7 +376,7 @@ REST_FRAMEWORK = {
     ],
     "DEFAULT_THROTTLE_RATES": {
         "user": "1/minute",
-        "anon": "5/second",
+        "anon": f"{int(env('API_RATE_LIMIT', default=10))}/second",
     },
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.AnonRateThrottle",
