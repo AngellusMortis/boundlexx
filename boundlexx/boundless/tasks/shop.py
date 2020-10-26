@@ -278,6 +278,7 @@ def _check_split(worlds):
 
 
 def _update_prices(worlds):
+    worlds = list(worlds)
     did_split = _check_split(worlds)
 
     if did_split:
