@@ -260,7 +260,7 @@ def _log_result(item, buy_updated, sell_updated):
             )
 
 
-def _update_prices(worlds):
+def _check_split(worlds):
     total = len(worlds)
 
     first_world = worlds[0]
@@ -268,11 +268,20 @@ def _update_prices(worlds):
     if first_world.is_perm:
         if total > settings.BOUNDLESS_MAX_PERM_WORLDS_PER_PRICE_POLL:
             _split_update_prices(worlds)
-            return
+            return True
     elif first_world.is_sovereign:
         if total > settings.BOUNDLESS_MAX_SOV_WORLDS_PER_PRICE_POLL:
             _split_update_prices(worlds)
-            return
+            return True
+
+    return False
+
+
+def _update_prices(worlds):
+    did_split = _check_split(worlds)
+
+    if did_split:
+        return
 
     worlds = _update_queued_worlds(worlds)
 
