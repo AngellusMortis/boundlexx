@@ -2,6 +2,7 @@
 ----------
 
 * Adds better handling for permissions on Homeworld/Exoworlds
+* Removes Creative Worlds from Resource count endpoints
 
 2020-10-21
 ----------

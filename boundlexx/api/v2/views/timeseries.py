@@ -24,6 +24,7 @@ class ItemResourceTimeseriesViewSet(
     queryset = ResourceCount.objects.filter(
         world_poll__world__active=True,
         world_poll__world__is_public=True,
+        world_poll__world__is_creative=False,
     )
     serializer_class = ItemResourceCountTimeSeriesSerializer
     time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
