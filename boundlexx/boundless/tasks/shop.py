@@ -1,4 +1,5 @@
 import hashlib
+from ast import literal_eval
 from collections import namedtuple
 from typing import Dict, List
 
@@ -7,6 +8,7 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
+from django_celery_results.models import TaskResult
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
@@ -33,6 +35,7 @@ UpdateOption = namedtuple(
 UPDATE_PRICES_LOCK = "boundless:update_prices"
 WORLDS_QUEUED_LOCK = "boundless:prices:update_worlds"
 WORLDS_QUEUED_CACHE = "boundless:prices:worlds"
+UPDATE_PRICES_TASK = "boundlexx.boundless.tasks.shop.update_prices_split"
 
 
 def _get_queued_worlds():
@@ -339,3 +342,26 @@ def _update_prices(worlds):
                 raise Exception("Aborting due to large number of HTTP errors")
     finally:
         _remove_queued_worlds(ids_to_remove)
+
+
+@app.task
+def clean_up_queued_worlds():
+    logger.info("Getting queued worlds lock (clean)...")
+    with cache.lock(WORLDS_QUEUED_LOCK):
+        cached_queued_worlds = cache.get(WORLDS_QUEUED_CACHE, set())
+        in_progress_tasks = TaskResult.objects.filter(
+            task_name=UPDATE_PRICES_TASK, status="STARTED"
+        )
+        logger.info("Releasing queued worlds lock (clean)...")
+
+    actual_queued_worlds = set()
+    for task in in_progress_tasks:
+        world_ids: List[int] = literal_eval(task.task_args)[0]
+        for world_id in world_ids:
+            if world_id in actual_queued_worlds:
+                logger.warning("Duplicate world ID found!")
+            actual_queued_worlds.add(world_id)
+
+    old_queued_worlds = cached_queued_worlds - actual_queued_worlds
+
+    _remove_queued_worlds(list(old_queued_worlds))
