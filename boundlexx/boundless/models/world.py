@@ -1181,6 +1181,9 @@ class WorldPollManager(models.Manager):
                 args["name"] = (
                     args["name"].encode("latin1", errors="replace").decode("latin1")
                 )
+                args["text_name"] = html_name(args["name"], strip=True, colors=colors)
+                args["html_name"] = html_name(args["name"], colors=colors)
+
                 LeaderboardRecord.objects.create(**args)
 
         world_poll.refresh_from_db()
