@@ -151,8 +151,10 @@ class WorldViewSet(BoundlexxViewSet):
 
         world = self.get_object()
 
-        queryset = ItemShopStandPrice.objects.filter(world=world, active=True).order_by(
-            "item_id"
+        queryset = (
+            ItemShopStandPrice.objects.filter(world=world, active=True)
+            .select_related("item")
+            .order_by("item_id", "price")
         )
 
         page = self.paginate_queryset(queryset)
@@ -183,9 +185,11 @@ class WorldViewSet(BoundlexxViewSet):
 
         world = self.get_object()
 
-        queryset = ItemRequestBasketPrice.objects.filter(
-            world=world, active=True
-        ).order_by("item_id")
+        queryset = (
+            ItemRequestBasketPrice.objects.filter(world=world, active=True)
+            .select_related("item")
+            .order_by("item_id", "-price")
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:

@@ -195,8 +195,10 @@ class ItemViewSet(
 
         item = self.get_object()
 
-        queryset = ItemShopStandPrice.objects.filter(item=item, active=True).order_by(
-            "world_id"
+        queryset = (
+            ItemShopStandPrice.objects.filter(item=item, active=True)
+            .select_related("world")
+            .order_by("price")
         )
 
         page = self.paginate_queryset(queryset)
@@ -230,9 +232,11 @@ class ItemViewSet(
 
         item = self.get_object()
 
-        queryset = ItemRequestBasketPrice.objects.filter(
-            item=item, active=True
-        ).order_by("world_id")
+        queryset = (
+            ItemRequestBasketPrice.objects.filter(item=item, active=True)
+            .select_related("world")
+            .order_by("-price")
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:

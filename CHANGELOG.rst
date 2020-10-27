@@ -1,3 +1,8 @@
+2020-10-27
+----------
+
+* Adjusts default filters for shop API endpoints
+
 2020-10-26
 ----------
 
