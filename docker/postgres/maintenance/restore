@@ -25,12 +25,12 @@ if [[ -z ${1+x} ]]; then
     exit 1
 fi
 backup_filename="${BACKUP_DIR_PATH}/${1}"
-if [[ ! -f "${backup_filename}" ]]; then
+if [[ ! -f "${backup_filename}.gz" ]]; then
     message_error "No backup with the specified filename found. Check out the 'backups' maintenance script output to see if there is one and try again."
     exit 1
 fi
 
-message_welcome "Restoring the '${POSTGRES_DB}' database from the '${backup_filename}' backup..."
+message_welcome "Restoring the '${POSTGRES_DB}' database from the '${backup_filename}.gz' backup..."
 
 if [[ "${POSTGRES_USER}" == "postgres" ]]; then
     message_error "Restoring as 'postgres' user is not supported. Assign 'POSTGRES_USER' env with another one and try again."
@@ -43,13 +43,17 @@ export PGUSER="${POSTGRES_USER}"
 export PGPASSWORD="${POSTGRES_PASSWORD}"
 export PGDATABASE="${POSTGRES_DB}"
 
-message_info "Dropping the database..."
-dropdb "${PGDATABASE}"
-
-message_info "Creating a new database..."
-createdb --owner="${POSTGRES_USER}"
-
 message_info "Applying the backup to the new database..."
-gunzip -c "${backup_filename}" | psql "${POSTGRES_DB}"
+if [[ ! -f "${backup_filename}" ]]; then
+    message_info "Extracting compressed file..."
+    gunzip -k "${backup_filename}.gz"
+fi
+message_info "Restoring world table..."
+pg_restore --disable-triggers -d boundlexx -O -x -a -t boundless_world "${backup_filename}"
+pg_restore -d boundlexx -O -x -a -L <(pg_restore -l "${backup_filename}" | grep -ivE 'TABLE DATA public boundless_world') -d
 
-message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}' backup."
+message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}.gz' backup."
+if [[ ! -f "${backup_filename}" ]]; then
+    message_info "Removing uncompressed file"
+    rm "${backup_filename}"
+fi

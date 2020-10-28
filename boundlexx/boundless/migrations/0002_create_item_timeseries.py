@@ -60,12 +60,12 @@ class Migration(migrations.Migration):
             'ALTER TABLE "boundless_itemshopstandprice" DROP CONSTRAINT "boundless_itemshopstandprice_pkey"', reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
-            "SELECT create_hypertable('boundless_itemshopstandprice', 'time', 'item_id', 4, chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
+            "SELECT create_hypertable('boundless_itemshopstandprice', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => true)", reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
             'ALTER TABLE "boundless_itemrequestbasketprice" DROP CONSTRAINT "boundless_itemrequestbasketprice_pkey"', reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
-            "SELECT create_hypertable('boundless_itemrequestbasketprice', 'time', 'item_id', 4, chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
+            "SELECT create_hypertable('boundless_itemrequestbasketprice', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => true)", reverse_sql=migrations.RunSQL.noop
         ),
     ]
