@@ -102,6 +102,7 @@ class URLWorldSerializer(WorldSerializer):
             "surface_liquid",
             "core_liquid",
             "bows",
+            "atlas_image_url",
         ]
 
 

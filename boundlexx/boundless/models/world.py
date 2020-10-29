@@ -383,6 +383,10 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     text_name = models.TextField(blank=True, null=True)
     sort_name = models.TextField(blank=True, null=True, db_index=True)
 
+    atlas_image = models.ImageField(
+        blank=True, null=True, storage=select_storage("atlas")
+    )
+
     def __str__(self):
         return self.display_name
 

@@ -99,6 +99,7 @@ class WorldSerializer(SimpleWorldSerializer):
     core_liquid = serializers.CharField()
     atmosphere_color = serializers.CharField()
     water_color = serializers.CharField()
+    atlas_image_url = AzureImageField(source="atlas_image", allow_null=True)
 
     bows = BowSerializer(allow_null=True)
 
@@ -153,6 +154,7 @@ class WorldSerializer(SimpleWorldSerializer):
             "bows",
             "next_request_basket_update",
             "next_shop_stand_update",
+            "atlas_image_url",
         ]
 
 
