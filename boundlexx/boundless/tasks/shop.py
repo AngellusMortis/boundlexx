@@ -340,7 +340,7 @@ def _update_prices(worlds):
                     )
                     worlds.remove(world)
                 # 403 with an API key can actually be a rate limit...
-                elif not (response_code == 403):
+                elif not response_code == 403:
                     errors_total += 1
                     buy_updated = -2
                     logger.error("%s while updating buy prices of %s", ex, item)
