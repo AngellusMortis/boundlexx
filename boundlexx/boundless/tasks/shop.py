@@ -302,8 +302,6 @@ def _remove_world(ex, worlds):
             "World not found, but could not find world ID",
         )
     else:
-        world = [w for w in worlds if w.id == int(match.group(1))][0]
-
         logger.warning(
             "World (%s) not found, removing from list of worlds to query",
             world,
