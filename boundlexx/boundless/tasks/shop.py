@@ -102,6 +102,10 @@ def update_prices(world_ids=None):
     else:
         worlds = World.objects.filter(id__in=world_ids).order_by("id")
 
+    if worlds.count() == 0:
+        logger.info("No worlds to update")
+        return
+
     _update_prices_multi(worlds)
 
 
@@ -303,6 +307,8 @@ def _update_prices(worlds):
 
     try:
         for item in items:
+            buy_updated, sell_updated = -1, -1
+
             try:
                 buy_updated = _update_item_prices(
                     item,
@@ -334,7 +340,7 @@ def _update_prices(worlds):
                     and ex.response.status_code == 403  # type: ignore
                 ):
                     errors_total += 1
-                    buy_updated = -2
+                    sell_updated = -2
                     logger.error("%s while updating sell prices of %s", ex, item)
 
             _log_result(item, buy_updated, sell_updated)

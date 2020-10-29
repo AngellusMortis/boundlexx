@@ -10,7 +10,7 @@ from boundlexx.boundless.tasks.forums import (
     ingest_sovereign_world_data,
 )
 from boundlexx.boundless.tasks.sheets import ingest_world_data
-from boundlexx.boundless.tasks.shop import update_prices, update_prices_split
+from boundlexx.boundless.tasks.shop import update_prices, update_prices_split, clean_up_queued_worlds
 from boundlexx.boundless.tasks.worlds import (
     calculate_distances,
     discover_all_worlds,
@@ -29,6 +29,7 @@ User = get_user_model()
 __all__ = [
     "add_world_control_data",
     "calculate_distances",
+    "clean_up_queued_worlds",
     "discover_all_worlds",
     "ingest_exo_world_data",
     "ingest_perm_world_data",
@@ -42,8 +43,8 @@ __all__ = [
     "recalculate_colors",
     "search_new_worlds",
     "search_new_worlds",
-    "update_prices",
     "update_prices_split",
+    "update_prices",
 ]
 
 NON_EXO = Q(world__end__isnull=True) | Q(world__owner__isnull=False)
