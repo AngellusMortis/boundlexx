@@ -293,9 +293,9 @@ def _check_split(worlds):
 
 def _remove_world(ex, worlds):
     world = None
-    match = re.match(r"playboundless\.com/(\d+)/api", str(ex))
+    match = re.findall(r"playboundless\.com/(\d+)/api", str(ex))
     if match is not None:
-        world = [w for w in worlds if w.id == int(match.group(1))][0]
+        world = [w for w in worlds if w.id == int(match[0])][0]
 
     if world is None:
         logger.warning(
