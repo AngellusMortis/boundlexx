@@ -299,7 +299,7 @@ def _remove_world(ex, worlds):
 
     if world is None:
         logger.warning(
-            "World not found, but could not find world ID",
+            "World not found, but could not find world ID in string '%s'", str(ex)
         )
     else:
         logger.warning(
