@@ -291,15 +291,15 @@ def _check_split(worlds):
     return False
 
 
-def _remove_world(ex, worlds):
+def _remove_world(message, worlds):
     world = None
-    match = re.findall(r"playboundless\.com/(\d+)/api", str(ex))
+    match = re.findall(r"playboundless\.com/(\d+)/api", message)
     if match is not None:
         world = [w for w in worlds if w.id == int(match[0])][0]
 
     if world is None:
         logger.warning(
-            "World not found, but could not find world ID in string '%s'", str(ex)
+            "World not found, but could not find world ID in string '%s'", message
         )
     else:
         logger.warning(
@@ -351,7 +351,7 @@ def _update_prices(worlds):
                     response_code = ex.response.status_code  # type: ignore
 
                 if response_code == 404:
-                    worlds = _remove_world(ex, worlds)
+                    worlds = _remove_world(str(ex), worlds)
 
                 # 403 with an API key can actually be a rate limit...
                 elif not response_code == 403:
