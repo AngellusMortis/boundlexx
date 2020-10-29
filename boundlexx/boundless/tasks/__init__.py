@@ -10,7 +10,11 @@ from boundlexx.boundless.tasks.forums import (
     ingest_sovereign_world_data,
 )
 from boundlexx.boundless.tasks.sheets import ingest_world_data
-from boundlexx.boundless.tasks.shop import update_prices, update_prices_split, clean_up_queued_worlds
+from boundlexx.boundless.tasks.shop import (
+    clean_up_queued_worlds,
+    update_prices,
+    update_prices_split,
+)
 from boundlexx.boundless.tasks.worlds import (
     calculate_distances,
     discover_all_worlds,
