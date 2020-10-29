@@ -1,6 +1,8 @@
 import hashlib
+import re
 from ast import literal_eval
 from collections import namedtuple
+from datetime import timedelta
 from typing import Dict, List
 
 from celery.utils.log import get_task_logger
@@ -85,7 +87,12 @@ def update_prices(world_ids=None):
 
     if world_ids is None:
         worlds = (
-            World.objects.filter(active=True, is_creative=False, api_url__isnull=False)
+            World.objects.filter(
+                active=True,
+                is_creative=False,
+                api_url__isnull=False,
+                is_public=True,
+            )
             .filter(
                 Q(end__isnull=True)
                 | Q(
@@ -93,7 +100,7 @@ def update_prices(world_ids=None):
                     end__isnull=False,
                     end__gt=timezone.now(),
                     owner__isnull=False,
-                    is_public=True,
+                    start__lte=timezone.now() - timedelta(hours=12),
                 )
             )
             .exclude(api_url="")
@@ -318,12 +325,22 @@ def _update_prices(worlds):
                     worlds,
                 )
             except HTTP_ERRORS as ex:
+                response_code = None
+
+                if hasattr(ex, "response") and ex.response is not None:  # type: ignore
+                    response_code = ex.response.status_code  # type: ignore
+
+                match = re.match(r"playboundless\.com/(\d+)/api", str(ex))
+                if response_code == 404 and match is not None:
+                    world = [w for w in worlds if w.id == int(match.group(1))][0]
+
+                    logger.warning(
+                        "World (%s) not found, removing from list of worlds to query",
+                        world,
+                    )
+                    worlds.remove(world)
                 # 403 with an API key can actually be a rate limit...
-                if not (
-                    hasattr(ex, "response")
-                    and ex.response is not None  # type: ignore
-                    and ex.response.status_code == 403  # type: ignore
-                ):
+                elif not (response_code == 403):
                     errors_total += 1
                     buy_updated = -2
                     logger.error("%s while updating buy prices of %s", ex, item)
