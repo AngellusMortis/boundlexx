@@ -79,9 +79,9 @@ class LocationSerializer(NullSerializer):
     y = serializers.IntegerField()
     z = serializers.IntegerField()
 
-    def to_representation(self, value):
+    def to_representation(self, instance):
         return {
-            "x": value.x,
-            "y": value.y,
-            "z": value.z,
+            "x": instance.x,
+            "y": instance.y,
+            "z": instance.z,
         }
