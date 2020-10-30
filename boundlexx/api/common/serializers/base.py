@@ -74,7 +74,11 @@ class LocalizedNameSerializer(serializers.ModelSerializer):
         fields = ["lang", "name"]
 
 
-class LocationSerializer(serializers.DictField):
+class LocationSerializer(NullSerializer):
+    x = serializers.IntegerField()
+    y = serializers.IntegerField()
+    z = serializers.IntegerField()
+
     def to_representation(self, value):
         return {
             "x": value.x,

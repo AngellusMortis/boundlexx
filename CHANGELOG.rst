@@ -1,3 +1,8 @@
+2020-10-30
+----------
+
+* Fixes location seiralizer for Shop API endpoints
+
 2020-10-29
 ----------
 

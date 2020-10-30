@@ -55,6 +55,7 @@ services:
         - docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_postgres
         - boundlexx_postgres
     image: boundlexx_postgres
+    shm_size: 1g
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
       - local_postgres_data_backups:/backups
