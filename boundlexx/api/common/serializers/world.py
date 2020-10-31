@@ -44,6 +44,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
     is_public = serializers.BooleanField()
     is_public_edit = serializers.BooleanField()
     is_public_claim = serializers.BooleanField()
+    atlas_image_url = AzureImageField(source="atlas_image", allow_null=True)
 
     class Meta:
         model = World
@@ -68,6 +69,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
             "is_public",
             "is_public_edit",
             "is_public_claim",
+            "atlas_image_url",
         ]
 
 
@@ -99,7 +101,6 @@ class WorldSerializer(SimpleWorldSerializer):
     core_liquid = serializers.CharField()
     atmosphere_color = serializers.CharField()
     water_color = serializers.CharField()
-    atlas_image_url = AzureImageField(source="atlas_image", allow_null=True)
 
     bows = BowSerializer(allow_null=True)
 

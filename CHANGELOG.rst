@@ -1,3 +1,8 @@
+2020-10-31
+----------
+
+* Adds `atlas_image_url` to `listWorlds`
+
 2020-10-30
 ----------
 

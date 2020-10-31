@@ -379,4 +379,5 @@ class KindOfSimpleWorldSerializer(SimpleWorldSerializer):
             "is_public",
             "is_public_edit",
             "is_public_claim",
+            "atlas_image_url",
         ]
