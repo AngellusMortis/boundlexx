@@ -1,3 +1,4 @@
+from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from boundlexx.api.common.serializers.base import (
@@ -5,7 +6,7 @@ from boundlexx.api.common.serializers.base import (
     LocalizedStringSerializer,
 )
 from boundlexx.api.common.serializers.world import IDWorldSerializer
-from boundlexx.boundless.models import Item, ResourceCount, Subtitle
+from boundlexx.boundless.models import Item, ResourceCount, ResourceData, Subtitle
 
 
 class SubtitleSerializer(serializers.ModelSerializer):
@@ -25,6 +26,97 @@ class IDItemSerializer(serializers.ModelSerializer):
         model = Item
         fields = [
             "game_id",
+        ]
+
+
+class ResourceDataSerializer(serializers.ModelSerializer):
+    is_embedded = serializers.BooleanField()
+    exo_only = serializers.BooleanField()
+
+    max_tier = serializers.IntegerField(
+        help_text=_("Max tier of world to be found on. Starts at 0."),
+    )
+
+    min_tier = serializers.IntegerField(
+        help_text=_("Min tier of world to be found on. Starts at 0."),
+    )
+
+    best_max_tier = serializers.IntegerField(
+        help_text=_("Max tier of world to be found on. Starts at 0."),
+    )
+
+    best_min_tier = serializers.IntegerField(
+        help_text=_("Min tier of world to be found on. Starts at 0."),
+    )
+
+    shape = serializers.IntegerField()
+    size_max = serializers.IntegerField()
+    size_min = serializers.IntegerField()
+    altitude_max = serializers.IntegerField()
+    altitude_min = serializers.IntegerField()
+    distance_max = serializers.IntegerField(allow_null=True)
+    distance_min = serializers.IntegerField(allow_null=True)
+    cave_weighting = serializers.FloatField()
+    size_skew_to_min = serializers.FloatField()
+    blocks_above_max = serializers.IntegerField()
+    blocks_above_min = serializers.IntegerField()
+    liquid_above_max = serializers.IntegerField()
+    liquid_above_min = serializers.IntegerField()
+    noise_frequency = serializers.FloatField(allow_null=True)
+    noise_threshold = serializers.FloatField(allow_null=True)
+    liquid_favorite = IDItemSerializer(allow_null=True)
+    three_d_weighting = serializers.FloatField()
+    surface_favorite = IDItemSerializer(allow_null=True)
+    surface_weighting = serializers.FloatField()
+    altitude_best_lower = serializers.IntegerField()
+    altitude_best_upper = serializers.IntegerField()
+    distance_best_lower = IDItemSerializer(allow_null=True)
+    distance_best_upper = IDItemSerializer(allow_null=True)
+    blocks_above_best_lower = serializers.IntegerField()
+    blocks_above_best_upper = serializers.IntegerField()
+    liquid_above_best_upper = serializers.IntegerField()
+    liquid_above_best_lower = serializers.IntegerField()
+    liquid_second_favorite = IDItemSerializer(allow_null=True)
+    surface_second_favorite = IDItemSerializer(allow_null=True)
+
+    class Meta:
+        model = ResourceData
+        fields = [
+            "is_embedded",
+            "exo_only",
+            "max_tier",
+            "min_tier",
+            "best_max_tier",
+            "best_min_tier",
+            "shape",
+            "size_max",
+            "size_min",
+            "altitude_max",
+            "altitude_min",
+            "distance_max",
+            "distance_min",
+            "cave_weighting",
+            "size_skew_to_min",
+            "blocks_above_max",
+            "blocks_above_min",
+            "liquid_above_max",
+            "liquid_above_min",
+            "noise_frequency",
+            "noise_threshold",
+            "liquid_favorite",
+            "three_d_weighting",
+            "surface_favorite",
+            "surface_weighting",
+            "altitude_best_lower",
+            "altitude_best_upper",
+            "distance_best_lower",
+            "distance_best_upper",
+            "blocks_above_best_lower",
+            "blocks_above_best_upper",
+            "liquid_above_best_upper",
+            "liquid_above_best_lower",
+            "liquid_second_favorite",
+            "surface_second_favorite",
         ]
 
 
@@ -61,6 +153,11 @@ class ItemSerializer(SimpleItemSerializer):
 
     mint_value = serializers.FloatField()
     max_stack = serializers.IntegerField()
+    prestige = serializers.IntegerField()
+    mine_xp = serializers.IntegerField()
+    build_xp = serializers.IntegerField()
+    is_liquid = serializers.BooleanField()
+    resource_data = ResourceDataSerializer(allow_null=True)
 
     class Meta:
         model = Item
@@ -74,10 +171,15 @@ class ItemSerializer(SimpleItemSerializer):
             "item_subtitle",
             "mint_value",
             "max_stack",
+            "prestige",
+            "mine_xp",
+            "build_xp",
             "list_type",
             "description",
             "has_colors",
             "is_resource",
+            "is_liquid",
+            "resource_data",
         ]
 
 

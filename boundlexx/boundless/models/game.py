@@ -3,7 +3,6 @@ from __future__ import annotations
 import re
 from typing import Dict
 
-from django.conf import settings
 from django.contrib.postgres.indexes import GinIndex
 from django.core.cache import cache
 from django.db import models
@@ -214,7 +213,7 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     string_id = models.CharField(_("String ID"), max_length=64, db_index=True)
     name = models.CharField(_("Name"), max_length=64)
     mint_value = models.FloatField(_("Chrysominter Value"), null=True, blank=True)
-    max_stack = models.IntegerField(default=100)
+    max_stack = models.PositiveSmallIntegerField(default=100)
     can_be_sold = models.BooleanField(db_index=True, default=True)
     list_type = models.ForeignKey(
         LocalizedString,
@@ -230,6 +229,11 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
         blank=True,
         null=True,
     )
+    is_resource = models.BooleanField(default=False, db_index=True)
+    prestige = models.PositiveSmallIntegerField(default=0)
+    mine_xp = models.PositiveSmallIntegerField(default=0)
+    build_xp = models.PositiveSmallIntegerField(default=0)
+    is_liquid = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         indexes = [
@@ -253,10 +257,6 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
         return self.itemrequestbasketprice_set.filter(active=True)
 
     @property
-    def is_resource(self):
-        return self.game_id in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
-
-    @property
     def has_colors(self):
         return self.game_id in get_block_color_item_ids()
 
@@ -269,6 +269,117 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
         return get_next_rank_update(self.itembuyrank_set.all())
 
 
+class ResourceData(models.Model):
+    class Tier(models.IntegerChoices):
+        TIER_1 = 0, _("T1 - Placid")
+        TIER_2 = 1, _("T2 - Temperate")
+        TIER_3 = 2, _("T3 - Rugged")
+        TIER_4 = 3, _("T4 - Inhospitable")
+        TIER_5 = 4, _("T5 - Turbulent")
+        TIER_6 = 5, _("T6 - Fierce")
+        TIER_7 = 6, _("T7 - Savage")
+        TIER_8 = 7, _("T8 - Brutal")
+
+    item = models.OneToOneField(
+        Item, on_delete=models.CASCADE, related_name="resource_data"
+    )
+
+    is_embedded = models.BooleanField()
+    exo_only = models.BooleanField(default=False)
+
+    max_tier = models.PositiveSmallIntegerField(
+        _("Max Tier"),
+        choices=Tier.choices,
+        help_text=_("Max tier of world to be found on. Starts at 0."),
+    )
+
+    min_tier = models.PositiveSmallIntegerField(
+        _("Min Tier"),
+        choices=Tier.choices,
+        help_text=_("Min tier of world to be found on. Starts at 0."),
+    )
+
+    best_max_tier = models.PositiveSmallIntegerField(
+        _("Max Tier"),
+        choices=Tier.choices,
+        help_text=_("Max tier of world to be found on. Starts at 0."),
+    )
+
+    best_min_tier = models.PositiveSmallIntegerField(
+        _("Min Tier"),
+        choices=Tier.choices,
+        help_text=_("Min tier of world to be found on. Starts at 0."),
+    )
+
+    shape = models.PositiveSmallIntegerField()
+    size_max = models.PositiveSmallIntegerField()
+    size_min = models.PositiveSmallIntegerField()
+    altitude_max = models.PositiveSmallIntegerField()
+    altitude_min = models.PositiveSmallIntegerField()
+    distance_max = models.PositiveSmallIntegerField(blank=True, null=True)
+    distance_min = models.PositiveSmallIntegerField(blank=True, null=True)
+    cave_weighting = models.FloatField()
+    size_skew_to_min = models.FloatField()
+    blocks_above_max = models.PositiveSmallIntegerField()
+    blocks_above_min = models.PositiveSmallIntegerField()
+    liquid_above_max = models.PositiveSmallIntegerField()
+    liquid_above_min = models.PositiveSmallIntegerField()
+    noise_frequency = models.FloatField(blank=True, null=True)
+    noise_threshold = models.FloatField(blank=True, null=True)
+    liquid_favorite = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
+    three_d_weighting = models.FloatField()
+    surface_favorite = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
+    surface_weighting = models.FloatField()
+    altitude_best_lower = models.PositiveSmallIntegerField()
+    altitude_best_upper = models.PositiveSmallIntegerField()
+    distance_best_lower = models.PositiveSmallIntegerField(blank=True, null=True)
+    distance_best_upper = models.PositiveSmallIntegerField(blank=True, null=True)
+    blocks_above_best_lower = models.PositiveSmallIntegerField()
+    blocks_above_best_upper = models.PositiveSmallIntegerField()
+    liquid_above_best_upper = models.PositiveSmallIntegerField()
+    liquid_above_best_lower = models.PositiveSmallIntegerField()
+    liquid_second_favorite = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
+    surface_second_favorite = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
+
+
+class ResourceDataBestWorld(models.Model):
+    class WorldType(models.TextChoices):
+        TYPE_LUSH = "LUSH", _("Lush")
+        TYPE_METAL = "METAL", _("Metal")
+        TYPE_COAL = "COAL", _("Coal")
+        TYPE_CORROSIVE = "CORROSIVE", _("Corrosive")
+        TYPE_SHOCK = "SHOCK", _("Shock")
+        TYPE_BLAST = "BLAST", _("Blast")
+        TYPE_TOXIC = "TOXIC", _("Toxic")
+        TYPE_CHILL = "CHILL", _("Chill")
+        TYPE_BURN = "BURN", _("Burn")
+        TYPE_UMBRIS = "DARKMATTER", _("Umbris")
+        TYPE_RIFT = "RIFT", _("Rift")
+        TYPE_BLINK = "BLINK", _("Blink")
+
+    data = models.ForeignKey(
+        ResourceData,
+        on_delete=models.CASCADE,
+        blank=True,
+        null=True,
+        related_name="best_worlds",
+    )
+
+    world_type = models.CharField(
+        _("World Type"),
+        choices=WorldType.choices,
+        max_length=10,
+    )
+
+
 class AltItem(GameObj):
     name = models.CharField(_("String ID"), max_length=64)
     base_item = models.ForeignKey(
@@ -277,6 +388,13 @@ class AltItem(GameObj):
 
 
 class Block(GameObj):
+    name = models.CharField(_("Name"), max_length=64, unique=True)
+    block_item = models.ForeignKey(
+        Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
+    )
+
+
+class Liquid(GameObj):
     name = models.CharField(_("Name"), max_length=64, unique=True)
     block_item = models.ForeignKey(
         Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"

@@ -1,7 +1,78 @@
 import djclick as click
 
-from boundlexx.boundless.models import AltItem, Block, Item, LocalizedString
+from boundlexx.boundless.models import AltItem, Block, Item, Liquid, LocalizedString
 from boundlexx.ingest.models import GameFile
+
+
+def _blocks(compiled_blocks, items):
+    click.echo("Generating block mappings...")
+    blocks_created = 0
+    with click.progressbar(compiled_blocks["BlockTypesData"]) as pbar:
+        for block_data in pbar:
+            if block_data is None:
+                continue
+
+            item = None
+            item_id = (
+                block_data["inventoryRemap"]
+                or block_data["rootType"]
+                or block_data["id"]
+            )
+            if item_id != 0:
+                item = items.get(item_id)
+
+            if item is None:
+                item = Item.objects.filter(
+                    string_id=f"ITEM_TYPE_{block_data['name']}"
+                ).first()
+
+            if item is not None:
+                item.prestige = block_data.get("prestige", 0)
+                item.mine_xp = block_data.get("mineXP", 0)
+                item.build_xp = block_data.get("buildXP", 0)
+                item.save()
+
+            _, created = Block.objects.get_or_create(
+                game_id=block_data["id"], name=block_data["name"], block_item=item
+            )
+
+            if created:
+                blocks_created += 1
+
+
+def _liquids(compiled_blocks, items):
+    click.echo("Generating liquid mappings...")
+    liquids_created = 0
+    with click.progressbar(compiled_blocks["LiquidTypesData"].values()) as pbar:
+        for liquid_data in pbar:
+            if liquid_data is None:
+                continue
+
+            item = None
+            item_id = liquid_data["itemType"]
+            if item_id != 0:
+                item = items.get(item_id)
+
+            if item is None:
+                item = Item.objects.filter(
+                    string_id=f"ITEM_TYPE_{liquid_data['name']}"
+                ).first()
+
+            if item is not None:
+                item.is_liquid = True
+                item.prestige = liquid_data.get("prestige", 0)
+                item.mine_xp = liquid_data.get("mineXP", 0)
+                item.build_xp = liquid_data.get("buildXP", 0)
+                item.save()
+
+            _, created = Liquid.objects.get_or_create(
+                game_id=liquid_data["id"], name=liquid_data["name"], block_item=item
+            )
+
+            if created:
+                liquids_created += 1
+
+    click.echo(f"{liquids_created} Liquid(s) created")
 
 
 def run():
@@ -47,35 +118,9 @@ def run():
 
                 items[alt_item.game_id] = item
 
-    click.echo("Generating block mappings...")
     compiled_blocks = GameFile.objects.get(
         folder="assets/archetypes", filename="compiledblocks.msgpack"
     ).content
-    blocks_created = 0
-    with click.progressbar(compiled_blocks["BlockTypesData"]) as pbar:
-        for block_data in pbar:
-            if block_data is None:
-                continue
 
-            item = None
-            item_id = (
-                block_data["inventoryRemap"]
-                or block_data["rootType"]
-                or block_data["id"]
-            )
-            if item_id != 0:
-                item = items.get(item_id)
-
-            if item is None:
-                item = Item.objects.filter(
-                    string_id=f"ITEM_TYPE_{block_data['name']}"
-                ).first()
-
-            _, created = Block.objects.get_or_create(
-                game_id=block_data["id"], name=block_data["name"], block_item=item
-            )
-
-            if created:
-                blocks_created += 1
-
-    click.echo(f"{blocks_created} Block(s) created")
+    _blocks(compiled_blocks, items)
+    _liquids(compiled_blocks, items)

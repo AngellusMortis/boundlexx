@@ -564,67 +564,67 @@ BOUNDLESS_TRANSFORMATION_GROUPS = {
     13: [3085, 6157],  # Verdant Grass
 }
 
-BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = {
-    32800: True,  # Rough Amethyst
-    32803: True,  # Rough Diamond
-    32804: True,  # Rough Emerald
-    32809: True,  # Rough Topaz
-    32807: True,  # Rough Ruby
-    32808: True,  # Rough Sapphire
-    32806: True,  # Rough Rift
-    32801: True,  # Rough Blink
-    32785: True,  # Copper Ore
-    32787: True,  # Iron Ore
-    32788: True,  # Silver Ore
-    32786: True,  # Gold Ore
-    32789: True,  # Titanium Ore
-    32779: True,  # Soft Coal
-    32777: True,  # Medium Coal
-    32778: True,  # Hard Coal
-    33081: True,  # Small Fossil
-    33082: True,  # Medium Fossil
-    33083: True,  # Large Fossil
-    33080: True,  # Ancient Tech Remnant
-    33078: True,  # Ancient Tech Component
-    33079: True,  # Ancient Tech Device
-    32802: True,  # Rough Umbris
-    32805: True,  # Rough Oortstone
-    10775: False,  # Trumpet Root
-    10774: False,  # Travller's Perch
-    10776: False,  # Rosetta Nox
-    10777: False,  # Desert Sword
-    10778: False,  # Spineback Plant
-    10779: False,  # Twisted Aloba
-    10780: False,  # Stardrop Plant
-    10781: False,  # Oortian's Staff
-    10782: False,  # Basic Boulder
-    10783: False,  # Beanstalk Boulder
-    10784: False,  # Boulder Tower
-    10785: False,  # Boulder Ring
-    10786: False,  # Boulder Chip
-    10787: False,  # Tapered Boulder
-    10788: False,  # Mottled Tar Spot Fungus
-    10789: False,  # Clustered Tongue Fungus
-    10790: False,  # Branch Funnel Fungus
-    10791: False,  # Tinted-Burst Fungus
-    10792: False,  # Weeping Waxcap Fungus
-    10793: False,  # Glow Cap Fungus
-    11632: False,  # Oortian Rice
-    11633: False,  # Oorum Wheat
-    11634: False,  # Ancient Oat
-    11642: False,  # Starberry Vine
-    11636: False,  # Waxy Tuber Plant
-    11644: False,  # Juicy Starberry Vine
-    11641: False,  # Kranut Plant
-    11635: False,  # Tuber Plant
-    11643: False,  # Glossy Starberry Vine
-    11637: False,  # Exotic Tuber Plant
-    11645: False,  # Combustion Fraction
-    11646: False,  # Kindling Mass
-    11647: False,  # Goo
-    33561: False,  # Pertrolim
-    33562: False,  # Primordial Resin
-}
+BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING = [
+    13620,  # Rough Amethyst
+    13624,  # Rough Diamond
+    13628,  # Rough Emerald
+    13632,  # Rough Topaz
+    13636,  # Rough Ruby
+    13640,  # Rough Sapphire
+    13644,  # Rough Rift
+    13648,  # Rough Blink
+    13652,  # Copper Ore
+    13656,  # Iron Ore
+    13660,  # Silver Ore
+    13664,  # Gold Ore
+    13668,  # Titanium Ore
+    13672,  # Soft Coal
+    13676,  # Medium Coal
+    13680,  # Hard Coal
+    13684,  # Small Fossil
+    13688,  # Medium Fossil
+    13692,  # Large Fossil
+    13696,  # Ancient Tech Remnant
+    13700,  # Ancient Tech Component
+    13704,  # Ancient Tech Device
+    13708,  # Rough Umbris
+    13712,  # Rough Oortstone
+    10775,  # Trumpet Root
+    10774,  # Travller's Perch
+    10776,  # Rosetta Nox
+    10777,  # Desert Sword
+    10778,  # Spineback Plant
+    10779,  # Twisted Aloba
+    10780,  # Stardrop Plant
+    10781,  # Oortian's Staff
+    10782,  # Basic Boulder
+    10783,  # Beanstalk Boulder
+    10784,  # Boulder Tower
+    10785,  # Boulder Ring
+    10786,  # Boulder Chip
+    10787,  # Tapered Boulder
+    10788,  # Mottled Tar Spot Fungus
+    10789,  # Clustered Tongue Fungus
+    10790,  # Branch Funnel Fungus
+    10791,  # Tinted-Burst Fungus
+    10792,  # Weeping Waxcap Fungus
+    10793,  # Glow Cap Fungus
+    11632,  # Oortian Rice
+    11633,  # Oorum Wheat
+    11634,  # Ancient Oat
+    11642,  # Starberry Vine
+    11636,  # Waxy Tuber Plant
+    11644,  # Juicy Starberry Vine
+    11641,  # Kranut Plant
+    11635,  # Tuber Plant
+    11643,  # Glossy Starberry Vine
+    11637,  # Exotic Tuber Plant
+    11645,  # Combustion Fraction
+    11646,  # Kindling Mass
+    11647,  # Goo
+    33561,  # Pertrolim
+    33562,  # Primordial Resin
+]
 
 BOUNDLESS_WORLD_POLL_GROUP_ORDER = {
     "": [9555],

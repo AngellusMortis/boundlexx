@@ -110,10 +110,14 @@ class URLItemSerializer(ItemSerializer):
             "item_subtitle",
             "mint_value",
             "max_stack",
+            "prestige",
+            "mine_xp",
+            "build_xp",
             "list_type",
             "description",
             "has_colors",
             "is_resource",
+            "is_liquid",
         ]
 
 

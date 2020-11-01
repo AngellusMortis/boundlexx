@@ -2,6 +2,8 @@
 ---------
 
 * Adds affiliation attrbution/disclaimer.
+* Changes resources to properly pull from game files.
+* Adds `prestige`, `mine_xp`, `build_xp`, `is_liquid` and `resource_data` to `retrieveItem` API.
 
 2020-10-31
 ----------

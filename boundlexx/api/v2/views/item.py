@@ -223,7 +223,7 @@ class ItemResourceCountViewSet(
         world_poll__world__active=True,
         world_poll__world__is_public=True,
         world_poll__world__is_creative=False,
-    ).select_related("world_poll", "world_poll__world", "item")
+    ).select_related("world_poll", "world_poll__world", "item", "item__resource_data")
 
     serializer_class = ItemResourceCountSerializer
     lookup_field = "world_id"

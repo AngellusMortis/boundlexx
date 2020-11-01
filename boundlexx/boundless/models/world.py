@@ -1108,7 +1108,7 @@ class WorldCreatureColor(
 
 class WorldPollManager(models.Manager):
     def _create_resource_counts(self, world_poll, resources_list):
-        resource_order = list(settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING.keys())
+        resource_order = settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
 
         resources = []
         embedded_total = 0
@@ -1119,19 +1119,22 @@ class WorldPollManager(models.Manager):
                 continue
 
             item_id = resource_order[index]
-            resources.append((item_id, amount))
+            item = Item.objects.select_related("resource_data").get(game_id=item_id)
 
-            if settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[item_id]:
+            is_embedded = False
+            if hasattr(item, "resource_data"):
+                is_embedded = item.resource_data.is_embedded
+            resources.append((item, amount, is_embedded))
+
+            if is_embedded:
                 embedded_total += amount
             else:
                 surface_total += amount
 
         for item_data in resources:
-            item_id, amount = item_data[0], item_data[1]
+            item, amount, is_embedded = item_data[0], item_data[1], item_data[2]
 
-            item = Item.objects.get(game_id=item_id)
-
-            if settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[item_id]:
+            if is_embedded:
                 total = embedded_total
             else:
                 total = surface_total
@@ -1142,7 +1145,6 @@ class WorldPollManager(models.Manager):
                 count=amount,
                 percentage=(amount / total) * 100,
                 average_per_chunk=amount / pow(world_poll.world.size, 2),
-                fixed_average=True,
             )
 
     def create_from_game_dict(self, world_dict, poll_dict, world=None, new_world=False):
@@ -1262,7 +1264,6 @@ class ResourceCount(
     average_per_chunk = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
-    fixed_average = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         unique_together = (
@@ -1275,7 +1276,9 @@ class ResourceCount(
 
     @cached_property
     def is_embedded(self):
-        return settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[self.item.game_id]
+        if hasattr(self.item, "resource_data"):
+            return self.item.resource_data.is_embedded  # pylint: disable=no-member
+        return False
 
 
 class LeaderboardRecord(
