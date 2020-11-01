@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import Http404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -48,10 +49,12 @@ class ItemResourceTimeseriesViewSet(
     lookup_field = "id"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        item_id = self.kwargs.get("id")
 
-        if queryset.count() == 0:
+        if item_id not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
             raise Http404
+
+        queryset = super().get_queryset()
 
         return queryset
 

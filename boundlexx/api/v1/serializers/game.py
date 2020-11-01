@@ -117,6 +117,7 @@ class URLItemSerializer(ItemSerializer):
             "description",
             "has_colors",
             "is_resource",
+            "is_block",
             "is_liquid",
         ]
 

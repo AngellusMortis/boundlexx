@@ -27,6 +27,7 @@ def _blocks(compiled_blocks, items):
                 ).first()
 
             if item is not None:
+                item.is_block = True
                 item.prestige = block_data.get("prestige", 0)
                 item.mine_xp = block_data.get("mineXP", 0)
                 item.build_xp = block_data.get("buildXP", 0)

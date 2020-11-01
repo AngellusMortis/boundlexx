@@ -157,6 +157,7 @@ class ItemSerializer(SimpleItemSerializer):
     mine_xp = serializers.IntegerField()
     build_xp = serializers.IntegerField()
     is_liquid = serializers.BooleanField()
+    is_block = serializers.BooleanField()
     resource_data = ResourceDataSerializer(allow_null=True)
 
     class Meta:
@@ -178,6 +179,7 @@ class ItemSerializer(SimpleItemSerializer):
             "description",
             "has_colors",
             "is_resource",
+            "is_block",
             "is_liquid",
             "resource_data",
         ]

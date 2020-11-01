@@ -233,6 +233,7 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     prestige = models.PositiveSmallIntegerField(default=0)
     mine_xp = models.PositiveSmallIntegerField(default=0)
     build_xp = models.PositiveSmallIntegerField(default=0)
+    is_block = models.BooleanField(default=False, db_index=True)
     is_liquid = models.BooleanField(default=False, db_index=True)
 
     class Meta:

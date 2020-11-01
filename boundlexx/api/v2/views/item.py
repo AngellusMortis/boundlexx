@@ -367,15 +367,15 @@ class ItemResourceWorldListViewSet(
     def get_queryset(self):
         item_id = self.kwargs.get("item__game_id")
 
+        if item_id not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
+            raise Http404
+
         queryset = World.objects.filter(is_public=True)
 
         if item_id is not None:
             queryset = queryset.filter(
                 worldpoll__resourcecount__item__game_id=item_id
             ).distinct("id")
-
-        if queryset.count() == 0:
-            raise Http404
 
         return queryset
 

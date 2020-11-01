@@ -3,7 +3,8 @@
 
 * Adds affiliation attrbution/disclaimer.
 * Changes resources to properly pull from game files.
-* Adds `prestige`, `mine_xp`, `build_xp`, `is_liquid` and `resource_data` to `retrieveItem` API.
+* Adds `prestige`, `mine_xp`, `build_xp`, `is_liquid`, `is_block`, and `resource_data` to `retrieveItem` API.
+* Fixes time to generate API Schemas
 
 2020-10-31
 ----------
