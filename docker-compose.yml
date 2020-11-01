@@ -2,7 +2,6 @@ version: "3.4"
 
 volumes:
   local_postgres_data: {}
-  local_postgres_data_backups: {}
 
 services:
   django: &django
@@ -58,7 +57,6 @@ services:
     shm_size: 1g
     volumes:
       - local_postgres_data:/var/lib/postgresql/data
-      - local_postgres_data_backups:/backups
     env_file:
       - ./.env
 

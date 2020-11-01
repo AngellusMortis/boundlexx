@@ -1284,7 +1284,7 @@ class LeaderboardRecord(
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     world_rank = models.PositiveSmallIntegerField(_("World Rank"))
-    guild_tag = models.CharField(_("Guild Tag"), max_length=7)
+    guild_tag = models.CharField(_("Guild Tag"), max_length=16)
     mayor_id = models.PositiveIntegerField()
     mayor_name = models.CharField(max_length=64)
     mayor_type = models.PositiveSmallIntegerField()

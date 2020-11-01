@@ -1,3 +1,8 @@
+2020-11-1
+---------
+
+* Adds affiliation attrbution/disclaimer.
+
 2020-10-31
 ----------
 

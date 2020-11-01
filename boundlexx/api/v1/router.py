@@ -3,7 +3,10 @@ from boundlexx.api.routers import APIDocsRouter
 from boundlexx.api.v1 import views
 
 API_DESCRIPTION = """
-Boundless Lexicon API. Everything about the game Boundless
+Boundless Lexicon API. Everything about the game Boundless.
+
+Disclaimer: Boundlexx is an unoffical API for the game Boundless. There is no
+affiliation with Wonderstuck Games.
 
 This API is designed to be _relatively_ user friendly so you can always go to
 any API URL and you should get a nice browsable API view for the endpoint. It

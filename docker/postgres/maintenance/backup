@@ -44,8 +44,8 @@ message_info "Backing up hypertables..."
 psql -c "COPY (SELECT * FROM boundless_itemshopstandprice) TO '${backup_folder_base}/shopstand.csv' DELIMITER ',' CSV HEADER;"
 psql -c "COPY (SELECT * FROM boundless_itemrequestbasketprice) TO '${backup_folder_base}/requestbasket.csv' DELIMITER ',' CSV HEADER;"
 psql -c "COPY (SELECT * FROM boundless_worldpollresult) TO '${backup_folder_base}/worldpoll.csv' DELIMITER ',' CSV HEADER;"
-psql -c "COPY (SELECT * FROM boundless_resourcecount) TO '${backup_folder_base}/resourcecount.csv' DELIMITER ',' CSV HEADER;"
 psql -c "COPY (SELECT * FROM boundless_leaderboardrecord) TO '${backup_folder_base}/leaderboard.csv' DELIMITER ',' CSV HEADER;"
+psql -c "COPY (SELECT * FROM boundless_resourcecount ORDER BY world_poll_id, item_id) TO '${backup_folder_base}/resourcecount.csv' DELIMITER ',' CSV HEADER;"
 
 message_info "Compressing..."
 tar -cvf "${backup_filename}.tar.gz" *

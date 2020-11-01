@@ -58,33 +58,33 @@ timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
     --db-name "${POSTGRES_DB}" --table boundless_itemshopstandprice \
     --file "${backup_filename}/shopstand.csv" \
-    --workers 2 --reporting-period 30s --truncate \
+    --workers 8 --reporting-period 30s --truncate \
     --copy-options "CSV HEADER"
 timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
     --db-name "${POSTGRES_DB}" --table boundless_itemrequestbasketprice \
     --file "${backup_filename}/requestbasket.csv" \
-    --workers 2 --reporting-period 30s --truncate \
+    --workers 8 --reporting-period 30s --truncate \
     --copy-options "CSV HEADER"
 timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
     --db-name "${POSTGRES_DB}" --table boundless_worldpollresult \
     --file "${backup_filename}/worldpoll.csv" \
-    --workers 2 --reporting-period 30s --truncate \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"w
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_leaderboardrecord \
+    --file "${backup_filename}/leaderboard.csv" \
+    --workers 8 --reporting-period 30s --truncate \
     --copy-options "CSV HEADER"
 timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
     --db-name "${POSTGRES_DB}" --table boundless_resourcecount \
     --file "${backup_filename}/resourcecount.csv" \
-    --workers 2 --reporting-period 30s --truncate \
+    --workers 8 --reporting-period 30s --truncate \
     --copy-options "CSV HEADER"
-timescaledb-parallel-copy \
-    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
-    --db-name "${POSTGRES_DB}" --table boundless_leaderboardrecord \
-    --file "${backup_filename}/leaderboard.csv" \
-    --workers 2 --reporting-period 30s --truncate \
-    --copy-options "CSV HEADER"
-
+[
 message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}.tar.gz' backup."
 if [[ -d "${backup_filename}" ]]; then
     message_info "Removing uncompressed files..."
