@@ -37,9 +37,13 @@ def _get_liquid(game_id):
 
 
 def _create_world_types(resource_data, created, data):
-    world_types = resource_data["bestWorld"]["types"]
+    world_types = []
+
+    for world_type in resource_data["bestWorld"]["types"]:
+        world_types.append(world_type.replace("_EXO", ""))
+
     if not created:
-        new_world_types = set(resource_data["bestWorld"]["types"])
+        new_world_types = set(world_types)
         actual_world_types = {
             r.world_type for r in ResourceDataBestWorld.objects.filter(data=data)
         }
@@ -130,8 +134,8 @@ def run():
                 "distance_best_upper": resource_profile.get("distanceBestUpper"),
                 "blocks_above_best_lower": resource_profile["blocksAboveBestLower"],
                 "blocks_above_best_upper": resource_profile["blocksAboveBestUpper"],
-                "liquid_above_best_upper": resource_profile["liquidAboveBestLower"],
-                "liquid_above_best_lower": resource_profile["liquidAboveBestUpper"],
+                "liquid_above_best_upper": resource_profile["liquidAboveBestUpper"],
+                "liquid_above_best_lower": resource_profile["liquidAboveBestLower"],
                 "liquid_second_favorite": _get_liquid(
                     resource_profile["liquidSecondFavourite"]
                 ),

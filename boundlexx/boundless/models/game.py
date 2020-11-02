@@ -350,6 +350,14 @@ class ResourceData(models.Model):
         Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
     )
 
+    @property
+    def best_world_types(self):
+        types = []
+        for world_type in self.best_worlds.all():
+            types.append(world_type.world_type)
+
+        return types
+
 
 class ResourceDataBestWorld(models.Model):
     class WorldType(models.TextChoices):

@@ -6,7 +6,13 @@ from boundlexx.api.common.serializers.base import (
     LocalizedStringSerializer,
 )
 from boundlexx.api.common.serializers.world import IDWorldSerializer
-from boundlexx.boundless.models import Item, ResourceCount, ResourceData, Subtitle
+from boundlexx.boundless.models import (
+    Item,
+    ResourceCount,
+    ResourceData,
+    ResourceDataBestWorld,
+    Subtitle,
+)
 
 
 class SubtitleSerializer(serializers.ModelSerializer):
@@ -49,6 +55,10 @@ class ResourceDataSerializer(serializers.ModelSerializer):
         help_text=_("Min tier of world to be found on. Starts at 0."),
     )
 
+    best_world_types = serializers.ListField(
+        child=serializers.ChoiceField(choices=ResourceDataBestWorld.WorldType)
+    )
+
     shape = serializers.IntegerField()
     size_max = serializers.IntegerField()
     size_min = serializers.IntegerField()
@@ -70,8 +80,8 @@ class ResourceDataSerializer(serializers.ModelSerializer):
     surface_weighting = serializers.FloatField()
     altitude_best_lower = serializers.IntegerField()
     altitude_best_upper = serializers.IntegerField()
-    distance_best_lower = IDItemSerializer(allow_null=True)
-    distance_best_upper = IDItemSerializer(allow_null=True)
+    distance_best_lower = serializers.IntegerField(allow_null=True)
+    distance_best_upper = serializers.IntegerField(allow_null=True)
     blocks_above_best_lower = serializers.IntegerField()
     blocks_above_best_upper = serializers.IntegerField()
     liquid_above_best_upper = serializers.IntegerField()
@@ -86,6 +96,7 @@ class ResourceDataSerializer(serializers.ModelSerializer):
             "exo_only",
             "max_tier",
             "min_tier",
+            "best_world_types",
             "best_max_tier",
             "best_min_tier",
             "shape",
