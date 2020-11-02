@@ -1,5 +1,5 @@
 ## Base Shared image between dev and production
-FROM python:3.9-slim-buster as base
+FROM python:3.8-slim-buster as base
 
 ARG DJANGO_UID=1000
 
