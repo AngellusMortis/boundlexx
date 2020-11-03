@@ -22,7 +22,7 @@ def command(force):
         beacons.iterator(), length=beacons.count(), show_percent=True, show_pos=True
     ) as pbar:
         for beacon in pbar:
-            if beacon.text_name is None:
+            if beacon.name is not None and beacon.text_name is None:
                 beacon.text_name = html_name(beacon.name, strip=True, colors=colors)
                 beacon.html_name = html_name(beacon.name, colors=colors)
                 beacon.save()
