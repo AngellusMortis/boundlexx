@@ -207,6 +207,8 @@ class BeaconSerializer(serializers.ModelSerializer):
     num_plots = serializers.IntegerField(allow_null=True, source="scan.num_plots")
     num_columns = serializers.IntegerField(allow_null=True, source="scan.num_columns")
     name = serializers.CharField(allow_null=True, source="scan.name")
+    text_name = serializers.CharField(allow_null=True, source="scan.text_name")
+    html_name = serializers.CharField(allow_null=True, source="scan.html_name")
     plots_columns = BeaconPlotColumnSerializer(many=True, source="beaconplotcolumn_set")
 
     class Meta:
@@ -220,5 +222,7 @@ class BeaconSerializer(serializers.ModelSerializer):
             "num_plots",
             "num_columns",
             "name",
+            "text_name",
+            "html_name",
             "plots_columns",
         ]

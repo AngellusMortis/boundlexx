@@ -10,7 +10,14 @@ import djclick as click
 import requests
 from django.core.files.base import ContentFile
 
-from boundlexx.boundless.models import Beacon, BeaconPlotColumn, BeaconScan, World
+from boundlexx.boundless.models import (
+    Beacon,
+    BeaconPlotColumn,
+    BeaconScan,
+    Color,
+    World,
+)
+from boundlexx.boundless.utils import html_name
 
 BASE_DIR = "/tmp/maps"
 
@@ -39,6 +46,7 @@ def _process_beacons(world, root, name):  # pylint: disable=too-many-locals
     num_beacons, world_size = unpack_from("<HH", buffer, offset)
     offset += 4
 
+    colors = Color.objects.all()
     beacons = []
     for _ in range(num_beacons):
         skipped = unpack_from("<H", buffer, offset)[0]
@@ -79,6 +87,8 @@ def _process_beacons(world, root, name):  # pylint: disable=too-many-locals
                 beacon=beacon,
                 mayor_name=mayor_name,
                 name=name,
+                text_name=html_name(name, strip=True, colors=colors),
+                html_name=html_name(name, colors=colors),
                 prestige=prestige,
                 compactness=compactness,
                 num_plots=num_plots,
