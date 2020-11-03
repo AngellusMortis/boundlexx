@@ -15,7 +15,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import BoundlessClient, Location
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
     calculate_extra_names,
@@ -1304,3 +1304,68 @@ class LeaderboardRecord(
         )
 
         ordering = ["world_rank"]
+
+
+class Beacon(models.Model):
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
+    active = models.BooleanField(db_index=True, default=True)
+
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
+    is_campfire = models.BooleanField()
+    location_x = models.IntegerField()
+    location_y = models.IntegerField()
+    location_z = models.IntegerField()
+
+    _location = None
+
+    class Meta:
+        unique_together = (
+            "time",
+            "world",
+            "location_x",
+            "location_y",
+            "location_z",
+        )
+
+    @property
+    def location(self) -> Location:
+        if self._location is None:
+            self._location = Location(self.location_x, self.location_y, self.location_z)
+        return self._location
+
+    def scan(self):
+        for scan in self.beaconscan_set.all():
+            return scan
+        return None
+
+
+class BeaconScan(models.Model):
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
+
+    beacon = models.ForeignKey("Beacon", on_delete=models.CASCADE)
+    mayor_name = models.CharField(max_length=64)
+    prestige = models.PositiveIntegerField(blank=True, null=True)
+    compactness = models.SmallIntegerField(blank=True, null=True)
+    num_plots = models.PositiveIntegerField(blank=True, null=True)
+    num_columns = models.PositiveIntegerField(blank=True, null=True)
+    name = models.CharField(max_length=64, blank=True, null=True)
+
+    class Meta:
+        unique_together = (
+            "time",
+            "beacon",
+        )
+
+
+class BeaconPlotColumn(models.Model):
+    beacon = models.ForeignKey("Beacon", on_delete=models.CASCADE)
+    plot_x = models.IntegerField()
+    plot_z = models.IntegerField()
+    count = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = (
+            "beacon",
+            "plot_x",
+            "plot_z",
+        )

@@ -17,5 +17,8 @@ def command(world_id, image_url):
     image = ContentFile(response.content)
     image.name = f"{world.id}.png"
 
+    if world.image is not None and world.image.name:
+        world.image.delete()
+
     world.image = image
     world.save()

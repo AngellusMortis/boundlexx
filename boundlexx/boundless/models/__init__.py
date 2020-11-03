@@ -38,6 +38,9 @@ from boundlexx.boundless.models.shop import (
     ItemShopStandPrice,
 )
 from boundlexx.boundless.models.world import (
+    Beacon,
+    BeaconPlotColumn,
+    BeaconScan,
     LeaderboardRecord,
     ResourceCount,
     World,
@@ -50,6 +53,9 @@ from boundlexx.boundless.models.world import (
 
 __all__ = [
     "AltItem",
+    "Beacon",
+    "BeaconPlotColumn",
+    "BeaconScan",
     "Block",
     "Color",
     "ColorValue",

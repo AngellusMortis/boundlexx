@@ -63,6 +63,7 @@ from boundlexx.api.common.serializers.wbc import (
     WorldColorSerializer,
 )
 from boundlexx.api.common.serializers.world import (
+    BeaconSerializer,
     BowSerializer,
     IDWorldSerializer,
     SimpleWorldSerializer,
@@ -73,6 +74,7 @@ from boundlexx.boundless.models import World
 
 __all__ = [
     "AzureImageField",
+    "BeaconSerializer",
     "BlockColorSerializer",
     "BlockSerializer",
     "BowSerializer",

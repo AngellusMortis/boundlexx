@@ -1,9 +1,13 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from boundlexx.api.common.serializers.base import AzureImageField, NullSerializer
+from boundlexx.api.common.serializers.base import (
+    AzureImageField,
+    LocationSerializer,
+    NullSerializer,
+)
 from boundlexx.api.common.serializers.skill import IDSkillSerializer
-from boundlexx.boundless.models import World, WorldDistance
+from boundlexx.boundless.models import Beacon, BeaconPlotColumn, World, WorldDistance
 
 
 class IDWorldSerializer(serializers.ModelSerializer):
@@ -177,4 +181,44 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
             "min_portal_cost",
             "min_portal_open_cost",
             "min_conduits",
+        ]
+
+
+class BeaconPlotColumnSerializer(serializers.ModelSerializer):
+    plot_x = serializers.IntegerField()
+    plot_z = serializers.IntegerField()
+    count = serializers.IntegerField()
+
+    class Meta:
+        model = BeaconPlotColumn
+        fields = [
+            "plot_x",
+            "plot_z",
+            "count",
+        ]
+
+
+class BeaconSerializer(serializers.ModelSerializer):
+    is_campfire = serializers.BooleanField()
+    location = LocationSerializer()
+    mayor_name = serializers.CharField(source="scan.mayor_name")
+    prestige = serializers.IntegerField(allow_null=True, source="scan.prestige")
+    compactness = serializers.IntegerField(allow_null=True, source="scan.compactness")
+    num_plots = serializers.IntegerField(allow_null=True, source="scan.num_plots")
+    num_columns = serializers.IntegerField(allow_null=True, source="scan.num_columns")
+    name = serializers.CharField(allow_null=True, source="scan.name")
+    plots_columns = BeaconPlotColumnSerializer(many=True, source="beaconplotcolumn_set")
+
+    class Meta:
+        model = Beacon
+        fields = [
+            "is_campfire",
+            "location",
+            "mayor_name",
+            "prestige",
+            "compactness",
+            "num_plots",
+            "num_columns",
+            "name",
+            "plots_columns",
         ]
