@@ -204,14 +204,17 @@ def html_name(string, strip=False, colors=None):
             except Emoji.DoesNotExist:
                 pass
             else:
-                if strip:
-                    final_string = final_string.replace(format_string, inner, 1)
-                else:
-                    html_emoji = (
-                        f'<img src="{emoji.image.url}" class="emoji"'
-                        f' alt="emoji {user_name}" title="{user_name}">'
-                    )
-                    final_string = final_string.replace(format_string, html_emoji, 1)
+                if emoji is not None:
+                    if strip:
+                        final_string = final_string.replace(format_string, inner, 1)
+                    else:
+                        html_emoji = (
+                            f'<img src="{emoji.image.url}" class="emoji"'
+                            f' alt="emoji {user_name}" title="{user_name}">'
+                        )
+                        final_string = final_string.replace(
+                            format_string, html_emoji, 1
+                        )
 
     return mark_safe(final_string)  # nosec
 
