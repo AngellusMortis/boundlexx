@@ -35,7 +35,7 @@ def _process_image(world, root, name):
 
 
 def _process_beacons(world, root, name):  # pylint: disable=too-many-locals
-    Beacon.objects.filter(world=world).update(active=False)
+    Beacon.objects.filter(world=world).delete()
 
     with gzip.open(os.path.join(root, name)) as beacons_file:
         buffer = beacons_file.read()
