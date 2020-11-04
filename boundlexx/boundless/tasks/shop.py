@@ -229,7 +229,7 @@ def _update_item_prices(
 def _log_worlds(all_worlds):
     worlds = []
     for world in all_worlds:
-        worlds.append((world.name, world.api_url))
+        worlds.append((world.id, world.display_name, world.api_url))
 
     logger.info("All worlds: %s", worlds)
 
