@@ -569,7 +569,7 @@ class Emoji(models.Model):
         ANIMAL = "ANIMAL", _("Animals & Nature")
         FOOD = "FOOD", _("Food & Drink")
         TRAVEL = "TRAVEL", _("Travel & Places")
-        ACTIVITES = "ACTIVITES", _("Activies")
+        ACTIVITIES = "ACTIVITIES", _("Activities")
         OBJECTS = "OBJECTS", _("Objects")
         SYMBOLS = "SYMBOLS", _("Symbols")
         FLAGS = "FLAGS", _("Flags")

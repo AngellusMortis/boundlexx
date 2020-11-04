@@ -14,7 +14,7 @@ GROUP_TO_CATEGORY = {
     "animals-nature": "ANIMAL",
     "food-drink": "FOOD",
     "travel-places": "TRAVEL",
-    "activities": "ACTIVITES",
+    "activities": "ACTIVITIES",
     "objects": "OBJECTS",
     "symbols": "SYMBOLS",
     "flags": "FLAGS",
