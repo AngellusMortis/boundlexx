@@ -21,14 +21,18 @@ GROUP_TO_CATEGORY = {
 }
 
 
-def run():
+def _get_emoji_list():
     click.echo("Getting emoji category list...")
     response = requests.get(
         f"https://emoji-api.com/emojis?&access_key={settings.EMOJI_API_KEY}"
     )
     response.raise_for_status()
 
-    emoji_list = response.json()
+    return response.json()
+
+
+def run():
+    emoji_list = _get_emoji_list()
 
     emoji_layer_data = GameFile.objects.get(
         folder="assets/gui/emoji", filename="hash_emojis.json"
