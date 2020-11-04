@@ -69,5 +69,5 @@ _**[{{ group_name|title }}]**_
 [/details]{% endif %}
 **-------------------------------------------------------------------**
 {% if update_link %}
-<sup>[Update Link](https://www.boundlexx.app/tools/forum/?world_id={{ world.id }})</sup>
+<sup>[Update Link]({{ update_link }})</sup>
 {% endif %}
