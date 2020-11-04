@@ -396,6 +396,8 @@ CACHE_DURATION = 60 * 60 * 24
 ROBOTS_USE_SITEMAP = False
 
 
+EMOJI_API_KEY = env("EMOJI_API_KEY")
+
 # base URL for discovery server
 BOUNDLESS_API_URL_BASE = env(
     "BOUNDLESS_API_URL_BASE", default="http://host.docker.internal:8950"

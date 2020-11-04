@@ -75,7 +75,7 @@ class LocalizationFilterSet(BaseFilterSet):
 class EmojiFilterSet(BaseFilterSet):
     class Meta:
         model = Emoji
-        fields = ["is_boundless_only"]
+        fields = ["category"]
 
 
 class ItemFilterSet(LocalizationFilterSet):

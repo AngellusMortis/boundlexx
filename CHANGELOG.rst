@@ -1,3 +1,8 @@
+2020-11-4
+---------
+
+* Adds full categorization of Emojis
+
 2020-11-1
 ---------
 

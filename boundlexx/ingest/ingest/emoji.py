@@ -1,12 +1,35 @@
 import djclick as click
+import requests
+from django.conf import settings
 
 from boundlexx.boundless.models import Emoji, EmojiAltName
 from boundlexx.ingest.ingest.icon import get_django_image, get_emoji
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
 
+GROUP_TO_CATEGORY = {
+    "smileys-emotion": "SMILEY",
+    "people-body": "PEOPLE",
+    "component": "COMPONENT",
+    "animals-nature": "ANIMAL",
+    "food-drink": "FOOD",
+    "travel-places": "TRAVEL",
+    "activities": "ACTIVITES",
+    "objects": "OBJECTS",
+    "symbols": "SYMBOLS",
+    "flags": "FLAGS",
+}
+
 
 def run():
+    click.echo("Getting emoji category list...")
+    response = requests.get(
+        f"https://emoji-api.com/emojis?&access_key={settings.EMOJI_API_KEY}"
+    )
+    response.raise_for_status()
+
+    emoji_list = response.json()
+
     emoji_layer_data = GameFile.objects.get(
         folder="assets/gui/emoji", filename="hash_emojis.json"
     ).content
@@ -16,6 +39,7 @@ def run():
     ).content
 
     emoji_created = 0
+    click.echo("Importing emojis...")
     with click.progressbar(
         range(len(emoji_layer_data) // 2), show_pos=True, show_percent=True
     ) as pbar:
@@ -37,7 +61,16 @@ def run():
             try:
                 int(emoji.name, 16)
             except ValueError:
-                emoji.is_boundless_only = True
+                emoji.category = "BOUNDLESS"
+            else:
+                lookup = emoji.name.upper()
+
+                for emoji_dict in emoji_list:
+                    if lookup in emoji_dict["codePoint"].split(" "):
+                        emoji.category = GROUP_TO_CATEGORY[emoji_dict["group"]]
+
+            if emoji.category is None:
+                emoji.category = Emoji.EmojiCategory.UNCATEGORIZED
 
             emoji.active = alt_names is not None
             emoji.save()

@@ -562,10 +562,30 @@ class EmojiManager(models.Manager):
 
 
 class Emoji(models.Model):
+    class EmojiCategory(models.TextChoices):
+        SMILEY = "SMILEY", _("Smiley & Emotion")
+        PEOPLE = "PEOPLE", _("People & Body")
+        COMPONENT = "COMPONENT", _("Component")
+        ANIMAL = "ANIMAL", _("Animals & Nature")
+        FOOD = "FOOD", _("Food & Drink")
+        TRAVEL = "TRAVEL", _("Travel & Places")
+        ACTIVITES = "ACTIVITES", _("Activies")
+        OBJECTS = "OBJECTS", _("Objects")
+        SYMBOLS = "SYMBOLS", _("Symbols")
+        FLAGS = "FLAGS", _("Flags")
+        BOUNDLESS = "BOUNDLESS", _("Boundless")
+        UNCATEGORIZED = "UNCATEGORIZED", _("Uncategorized")
+
     active = models.BooleanField(default=True)
     name = models.CharField(max_length=32, db_index=True)
     image = models.ImageField(storage=select_storage("emoji"))
-    is_boundless_only = models.BooleanField(default=False, db_index=True)
+    category = models.CharField(
+        max_length=16,
+        choices=EmojiCategory.choices,
+        null=True,
+        blank=True,
+        db_index=True,
+    )
 
     objects = EmojiManager()
 
