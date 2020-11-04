@@ -22,6 +22,10 @@ GROUP_TO_CATEGORY = {
 
 
 def _get_emoji_list():
+    if settings.EMOJI_API_KEY is None:
+        click.echo("WARNING: EMOJI_API_KEY missing")
+        return []
+
     click.echo("Getting emoji category list...")
     response = requests.get(
         f"https://emoji-api.com/emojis?&access_key={settings.EMOJI_API_KEY}"
