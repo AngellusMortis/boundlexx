@@ -188,6 +188,12 @@ class ForumFormatPostSerialzier(NullSerializer):
         ),
         label="Portal Directions",
     )
+    update_link = serializers.BooleanField(
+        required=False,
+        default=True,
+        help_text=("Add update link to easily update the template?"),
+        label="Add Update Link",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

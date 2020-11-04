@@ -67,3 +67,7 @@ _**[{{ group_name|title }}]**_
 <tr><td>{{ forloop.counter }}</td><td>{{ resource.item.english }}</td><td>{{ resource.count|intcomma }}</td><td>{{ resource.percentage }}%</td><td>{{ resource.average_per_chunk }}</td>{% endfor %}
 </table>
 [/details]{% endif %}
+**-------------------------------------------------------------------**
+{% if update_link %}
+<sup>[Update Link](https://www.boundlexx.app/tools/forum/?world_id={{ world.id }})</sup>
+{% endif %}

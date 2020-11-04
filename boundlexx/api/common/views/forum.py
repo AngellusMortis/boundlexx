@@ -56,6 +56,8 @@ class ForumFormatAPIView(APIView):
             else:
                 extra = {}
 
+            extra.update({"update_link": post.data["update_link"]})
+
             title, body = get_response(post.world, extra)
             return Response({"title": title, "body": body})
         return Response(post.errors, status=400)
