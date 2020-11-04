@@ -153,7 +153,7 @@ def _update_prices_multi(worlds, name=None):
 
 
 def _get_ranks(item, rank_klass, all_worlds):
-    ranks: Dict[str, ItemRank] = {}
+    ranks: Dict[int, ItemRank] = {}
     worlds: List[SimpleWorld] = []
 
     now = timezone.now()
@@ -161,13 +161,13 @@ def _get_ranks(item, rank_klass, all_worlds):
     for world in all_worlds:
         rank, _ = rank_klass.objects.get_or_create(item=item, world=world)
         if rank.next_update < now:
-            ranks[world.name] = rank
-            worlds.append(SimpleWorld(world.name, world.api_url))
+            ranks[world.id] = rank
+            worlds.append(SimpleWorld(world.id, world.api_url))
 
     return ranks, worlds
 
 
-def _create_item_prices(shops, price_klass, world_name, item):
+def _create_item_prices(shops, price_klass, world: SimpleWorld, item):
     shops = sorted(
         shops,
         key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
@@ -179,7 +179,7 @@ def _create_item_prices(shops, price_klass, world_name, item):
     state_hash = hashlib.sha512()
     for shop in shops:
         item_price = price_klass.objects.create_from_shop_item(
-            world_name, item, shop, colors=colors
+            world, item, shop, colors=colors
         )
 
         state_hash.update(item_price.state_hash)
@@ -188,7 +188,9 @@ def _create_item_prices(shops, price_klass, world_name, item):
     return total, state_hash
 
 
-def _update_item_prices(item, rank_klass, client_method, price_klass, all_worlds):
+def _update_item_prices(
+    item, rank_klass, client_method: str, price_klass, all_worlds: List[SimpleWorld]
+):
 
     client = BoundlessClient()
     ranks, worlds = _get_ranks(item, rank_klass, all_worlds)
@@ -197,21 +199,20 @@ def _update_item_prices(item, rank_klass, client_method, price_klass, all_worlds
         return -1
 
     total = 0
-    shops = getattr(client, client_method)(item.game_id, worlds=worlds)
 
-    # set all existing price records to inactive
-    price_klass.objects.filter(
-        item=item, active=True, world__name__in=list(ranks.keys())
-    ).update(active=False)
+    for world in worlds:
+        shops = getattr(client, client_method)(item.game_id, world=world)
 
-    for world_name, shops in shops.items():
-        item_total, state_hash = _create_item_prices(
-            shops, price_klass, world_name, item
+        # set all existing price records to inactive
+        price_klass.objects.filter(item=item, active=True, world__id=world.id).update(
+            active=False
         )
+
+        item_total, state_hash = _create_item_prices(shops, price_klass, world, item)
         total += item_total
 
         digest = str(state_hash.hexdigest())
-        rank = ranks[world_name]
+        rank = ranks[world.id]
         if rank.state_hash != "":
             if rank.state_hash == digest:
                 rank.decrease_rank()

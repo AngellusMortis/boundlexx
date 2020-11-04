@@ -3,6 +3,7 @@
 
 * Adds full categorization of Emojis
 * Adds update link to forum template generator
+* Refactors Boundless Client
 
 2020-11-1
 ---------

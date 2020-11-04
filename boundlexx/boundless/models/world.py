@@ -15,7 +15,7 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from boundlexx.boundless.client import BoundlessClient, Location
+from boundlexx.boundless.client import BoundlessClient, Location, World as SimpleWorld
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
     calculate_extra_names,
@@ -550,7 +550,10 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
                 if client is None:
                     client = BoundlessClient()
 
-                distance = client.get_world_distance(self.id, world.id)
+                distance = client.get_world_distance(
+                    SimpleWorld(self.id, self.api_url),
+                    SimpleWorld(world.id, world.api_url),
+                )
                 # value is returned as a float, no idea how cost formula works
                 # with non-whole numbers
                 if (

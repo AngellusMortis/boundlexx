@@ -10,6 +10,7 @@ from django.utils import timezone
 from requests.exceptions import HTTPError
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
+from boundlexx.boundless.client import World as ClientWorld
 from boundlexx.boundless.models import World, WorldDistance, WorldPoll
 from boundlexx.notifications.models import ExoworldExpiredNotification
 from config.celery_app import app
@@ -56,7 +57,7 @@ def search_new_worlds(ids_to_scan=None):
         if ids_to_scan is None:
             return
 
-    logger.info("Starting scan for exo worlds (%s)", ids_to_scan)
+    logger.info("Starting scan for new worlds (%s)", ids_to_scan)
 
     _, worlds = _scan_worlds(ids_to_scan)
 
@@ -105,6 +106,9 @@ def _scan_worlds(ids_to_scan):
     worlds_found = 0
     world_objs = []
     for world_dict in worlds:
+        poll_token = world_dict["pollData"]
+        world_data = world_dict["worldData"]
+
         try:
             world, created = World.objects.get_or_create_from_game_dict(
                 world_dict["worldData"]
@@ -119,8 +123,12 @@ def _scan_worlds(ids_to_scan):
 
             if not world.is_locked:
                 try:
-                    world_data, poll_dict = client.get_world_poll(
-                        world_dict["pollData"], world_dict["worldData"]
+                    poll_dict = client.get_world_poll(
+                        ClientWorld(
+                            world_data["id"],
+                            world_data["apiURL"],
+                        ),
+                        poll_token=poll_token,
                     )
                 except HTTPError as ex:
                     if world.is_sovereign and ex.response.status_code == 400:
@@ -149,7 +157,7 @@ def get_worlds(ids_to_scan, client=None):
     worlds: List[dict] = []
 
     for world_id in ids_to_scan:
-        world_data = client.get_world_data(world_id)
+        world_data = client.get_world_data(ClientWorld(world_id, None))
 
         if world_data is not None:
             worlds.append(world_data)
@@ -274,6 +282,23 @@ def _mark_world_inactive(world):
         ExoworldExpiredNotification.objects.send_notification(world, resources)
 
 
+def _poll_world(client, world):
+    world_dict = client.get_world_data(ClientWorld(world.id, world.api_url))
+    poll_data = None
+    world_data = None
+    if world_dict is not None:
+        world_data = world_dict["worldData"]
+
+        if not world_data.get("locked"):
+            poll_token = world_dict["pollData"]
+            poll_data = client.get_world_poll(
+                ClientWorld(world.id, world.api_url),
+                poll_token=poll_token,
+            )
+
+    return world_data, poll_data
+
+
 def _poll_worlds(worlds):
     total = len(worlds)
     if total > settings.BOUNDLESS_MAX_WORLDS_PER_POLL:
@@ -290,7 +315,7 @@ def _poll_worlds(worlds):
         logger.info("Polling world %s (%s/%s)", world.display_name, index + 1, total)
 
         try:
-            world_data, poll_data = client.get_world_poll_by_id(world.id)
+            world_data, poll_data = _poll_world(client, world)
         except HTTP_ERRORS as ex:
             if (
                 world.is_sovereign
