@@ -16,6 +16,7 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import BoundlessClient, Location
+from boundlexx.boundless.client import Settlment as SimpleSettlement
 from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
@@ -1375,3 +1376,61 @@ class BeaconPlotColumn(models.Model):
             "plot_x",
             "plot_z",
         )
+
+
+class SettlementManager(models.Manager):
+    def create_from_game_obj(self, world, settlement: SimpleSettlement, colors=None):
+        return self.create(
+            world=world,
+            location_x=settlement.location.x,
+            location_z=settlement.location.z,
+            prestige=settlement.prestige,
+            name=settlement.name,
+            text_name=html_name(settlement.name, strip=True, colors=colors),
+            html_name=html_name(settlement.name, colors=colors),
+        )
+
+
+class Settlement(models.Model):
+    class RankLevels(models.IntegerChoices):
+        OUTPOST = 0, _("Outpost")
+        HAMLET = 1, _("Hamlet")
+        VILLAGE = 2, _("Village")
+        TOWN = 3, _("Town")
+        CITY = 4, _("City")
+        GREAT_CITY = 5, _("Great City")
+
+    RANK_LEVEL_MAP: Dict[int, int] = {
+        0: 10000,
+        1: 50000,
+        2: 250000,
+        3: 1250000,
+        4: 6500000,
+        5: 32000000,
+    }
+
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
+    location_x = models.IntegerField()
+    location_z = models.IntegerField()
+    prestige = models.PositiveIntegerField(db_index=True)
+    name = models.CharField(max_length=64)
+    text_name = models.CharField(max_length=64)
+    html_name = models.CharField(max_length=1024)
+
+    _location = None
+    objects = SettlementManager()
+
+    @property
+    def location(self) -> Location:
+        if self._location is None:
+            self._location = Location(self.location_x, None, self.location_z)
+        return self._location
+
+    @property
+    def level(self):
+        ranks = list(Settlement.RANK_LEVEL_MAP.items())
+        ranks = sorted(ranks, key=lambda i: i[1], reverse=True)
+        for index, rank in ranks:
+            if self.prestige > rank:
+                return index
+        return None

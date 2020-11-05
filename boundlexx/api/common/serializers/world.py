@@ -226,3 +226,28 @@ class BeaconSerializer(serializers.ModelSerializer):
             "html_name",
             "plots_columns",
         ]
+
+
+class SettlementSerializer(serializers.ModelSerializer):
+    location = LocationSerializer()
+    prestige = serializers.IntegerField()
+    level = serializers.IntegerField(
+        help_text=_(
+            "`0` = Output, `1` = Hamlet, `2` = Village, "
+            "`3` = Town, `4` = City, `5` = Great City"
+        )
+    )
+    name = serializers.CharField()
+    text_name = serializers.CharField()
+    html_name = serializers.CharField()
+
+    class Meta:
+        model = Beacon
+        fields = [
+            "location",
+            "prestige",
+            "level",
+            "name",
+            "text_name",
+            "html_name",
+        ]

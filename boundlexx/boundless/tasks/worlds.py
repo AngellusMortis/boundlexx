@@ -10,8 +10,14 @@ from django.utils import timezone
 from requests.exceptions import HTTPError
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
-from boundlexx.boundless.client import World as ClientWorld
-from boundlexx.boundless.models import World, WorldDistance, WorldPoll
+from boundlexx.boundless.client import World as SimpleWorld
+from boundlexx.boundless.models import (
+    Color,
+    Settlement,
+    World,
+    WorldDistance,
+    WorldPoll,
+)
 from boundlexx.notifications.models import ExoworldExpiredNotification
 from config.celery_app import app
 
@@ -124,7 +130,7 @@ def _scan_worlds(ids_to_scan):
             if not world.is_locked:
                 try:
                     poll_dict = client.get_world_poll(
-                        ClientWorld(
+                        SimpleWorld(
                             world_data["id"],
                             world_data["apiURL"],
                         ),
@@ -157,7 +163,7 @@ def get_worlds(ids_to_scan, client=None):
     worlds: List[dict] = []
 
     for world_id in ids_to_scan:
-        world_data = client.get_world_data(ClientWorld(world_id, None))
+        world_data = client.get_world_data(SimpleWorld(world_id, None))
 
         if world_data is not None:
             worlds.append(world_data)
@@ -283,7 +289,7 @@ def _mark_world_inactive(world):
 
 
 def _poll_world(client, world):
-    world_dict = client.get_world_data(ClientWorld(world.id, world.api_url))
+    world_dict = client.get_world_data(SimpleWorld(world.id, world.api_url))
     poll_data = None
     world_data = None
     if world_dict is not None:
@@ -292,7 +298,7 @@ def _poll_world(client, world):
         if not world_data.get("locked"):
             poll_token = world_dict["pollData"]
             poll_data = client.get_world_poll(
-                ClientWorld(world.id, world.api_url),
+                SimpleWorld(world.id, world.api_url),
                 poll_token=poll_token,
             )
 
@@ -397,3 +403,28 @@ def calculate_distances(world_ids=None):
             world_dest = World.objects.get(id=world_id)
 
             world.get_distance_to_world(world_dest, client=client)
+
+
+@app.task
+def poll_settlements(world_ids=None):
+    if world_ids is None:
+        worlds = (
+            World.objects.filter(api_url__isnull=False)
+            .filter(Q(active=True) | Q(end__isnull=False, end__gt=timezone.now()))
+            .order_by("id")
+        )
+    else:
+        worlds = World.objects.filter(id__in=world_ids)
+
+    client = BoundlessClient()
+    colors = Color.objects.all()
+
+    for world in worlds:
+        settlements = client.get_world_settlements(SimpleWorld(world.id, world.api_url))
+
+        Settlement.objects.filter(world=world).delete()
+
+        for settlement in settlements:
+            Settlement.objects.create_from_game_obj(world, settlement, colors=colors)
+
+        logger.info("Found %s settlements for %s", len(settlements), world)

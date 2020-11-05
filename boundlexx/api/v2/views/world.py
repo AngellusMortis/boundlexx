@@ -13,6 +13,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 from boundlexx.api.common.filters import DedupedFilter, WorldFilterSet
 from boundlexx.api.common.serializers import (
     BeaconSerializer,
+    SettlementSerializer,
     SimpleWorldSerializer,
     WorldBlockColorSerializer,
     WorldDistanceSerializer,
@@ -26,6 +27,7 @@ from boundlexx.boundless.models import (
     Beacon,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
+    Settlement,
     World,
     WorldDistance,
 )
@@ -237,6 +239,38 @@ class WorldViewSet(BoundlexxViewSet):
         return Response(serializer.data)
 
     beacons.operation_id = "listWorldBeacons"
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=SettlementSerializer,
+        url_path="settlements",
+    )
+    def settlements(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Settlements for given world
+        """
+
+        world = self.get_object()
+
+        queryset = Settlement.objects.filter(world=world).order_by(
+            "-prestige", "location_x", "location_z"
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    settlements.operation_id = "listWorldSettlements"
 
 
 class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
