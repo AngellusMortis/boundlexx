@@ -410,7 +410,10 @@ def poll_settlements(world_ids=None):
     if world_ids is None:
         worlds = (
             World.objects.filter(
-                api_url__isnull=False, is_public=True, is_creative=False
+                api_url__isnull=False,
+                is_public=True,
+                is_creative=False,
+                is_locked=False,
             )
             .filter(Q(active=True) | Q(end__isnull=False, end__gt=timezone.now()))
             .order_by("id")
