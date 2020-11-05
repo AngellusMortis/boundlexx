@@ -409,7 +409,9 @@ def calculate_distances(world_ids=None):
 def poll_settlements(world_ids=None):
     if world_ids is None:
         worlds = (
-            World.objects.filter(api_url__isnull=False)
+            World.objects.filter(
+                api_url__isnull=False, is_public=True, is_creative=False
+            )
             .filter(Q(active=True) | Q(end__isnull=False, end__gt=timezone.now()))
             .order_by("id")
         )

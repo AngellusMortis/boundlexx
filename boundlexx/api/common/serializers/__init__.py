@@ -183,7 +183,7 @@ class ForumFormatPostSerialzier(NullSerializer):
     )
     portal_directions = serializers.CharField(
         required=False,
-        max_length=100,
+        max_length=2000,
         help_text=(
             "Directions to help players find the portal to your world."
             "Required for Sovereign worlds."
