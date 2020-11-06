@@ -426,8 +426,22 @@ def poll_settlements(world_ids=None):
     client = BoundlessClient()
     colors = Color.objects.all()
 
+    errors_total = 0
     for world in worlds:
-        settlements = client.get_world_settlements(SimpleWorld(world.id, world.api_url))
+        try:
+            settlements = client.get_world_settlements(
+                SimpleWorld(world.id, world.api_url)
+            )
+        except HTTP_ERRORS as ex:
+            errors_total += 1
+            logger.error("%s while polling world %s", ex, world)
+            time.sleep(5)
+
+            if errors_total > 5:
+                raise Exception(  # pylint: disable=raise-missing-from
+                    "Aborting due to large number of HTTP errors"
+                )
+            continue
 
         Settlement.objects.filter(world=world).delete()
 
