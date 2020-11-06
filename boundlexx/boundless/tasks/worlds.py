@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import time
 from typing import List
 
 from celery.utils.log import get_task_logger
