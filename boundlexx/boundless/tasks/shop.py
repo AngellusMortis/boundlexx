@@ -1,16 +1,10 @@
 import hashlib
 import re
+import time
 from ast import literal_eval
 from collections import namedtuple
 from datetime import timedelta
 from typing import Dict, List
-
-from celery.utils.log import get_task_logger
-from django.conf import settings
-from django.core.cache import cache
-from django.db.models import Q
-from django.utils import timezone
-from django_celery_results.models import TaskResult
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
@@ -24,7 +18,13 @@ from boundlexx.boundless.models import (
     ItemShopStandPrice,
     World,
 )
+from celery.utils.log import get_task_logger
 from config.celery_app import app
+from django.conf import settings
+from django.core.cache import cache
+from django.db.models import Q
+from django.utils import timezone
+from django_celery_results.models import TaskResult
 
 logger = get_task_logger(__name__)
 
@@ -359,6 +359,7 @@ def _update_prices(worlds):
                     errors_total += 1
                     buy_updated = -2
                     logger.error("%s while updating buy prices of %s", ex, item)
+                    time.sleep(5)
 
             try:
                 sell_updated = _update_item_prices(
@@ -374,6 +375,7 @@ def _update_prices(worlds):
                     errors_total += 1
                     sell_updated = -2
                     logger.error("%s while updating sell prices of %s", ex, item)
+                    time.sleep(5)
 
             _log_result(item, buy_updated, sell_updated)
             if errors_total > 10:

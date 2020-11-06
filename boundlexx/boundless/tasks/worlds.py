@@ -333,6 +333,7 @@ def _poll_worlds(worlds):
             else:
                 errors_total += 1
                 logger.error("%s while polling world %s", ex, world)
+                time.sleep(5)
 
                 if errors_total > 5:
                     raise Exception(  # pylint: disable=raise-missing-from
