@@ -437,7 +437,7 @@ def poll_settlements(world_ids=None):
             logger.error("%s while polling world %s", ex, world)
             time.sleep(5)
 
-            if errors_total > 5:
+            if errors_total > 10:
                 raise Exception(  # pylint: disable=raise-missing-from
                     "Aborting due to large number of HTTP errors"
                 )
