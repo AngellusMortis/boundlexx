@@ -379,7 +379,7 @@ def _update_prices(worlds):
                     time.sleep(5)
 
             _log_result(item, buy_updated, sell_updated)
-            if errors_total > 10:
+            if errors_total > 20:
                 raise Exception("Aborting due to large number of HTTP errors")
     finally:
         _remove_queued_worlds(ids_to_remove)
