@@ -13,6 +13,7 @@ from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
 from django_celery_results.models import TaskResult
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
@@ -205,6 +206,14 @@ def _update_item_prices(
     for world in worlds:
         try:
             shops = getattr(client, client_method)(item.game_id, world=world)
+        except RequestsConnectionError as ex:
+            if "RemoteDisconnected" in str(ex):
+                logger.warning(
+                    "RemoteDisconnected for item %s on world %s", item, world
+                )
+                continue
+            else:
+                raise
         except RemoteDisconnected:
             logger.warning("RemoteDisconnected for item %s on world %s", item, world)
             continue
@@ -364,7 +373,9 @@ def _update_prices(worlds):
                 elif not response_code == 403:
                     errors_total += 1
                     buy_updated = -2
-                    logger.error("%s while updating buy prices of %s", ex, item)
+                    logger.error(
+                        "%s, %s while updating buy prices of %s", ex.__class__, ex, item
+                    )
                     time.sleep(5)
 
             try:
@@ -380,7 +391,12 @@ def _update_prices(worlds):
                 ):
                     errors_total += 1
                     sell_updated = -2
-                    logger.error("%s while updating sell prices of %s", ex, item)
+                    logger.error(
+                        "%s, %s while updating sell prices of %s",
+                        ex.__class__,
+                        ex,
+                        item,
+                    )
                     time.sleep(5)
 
             _log_result(item, buy_updated, sell_updated)
