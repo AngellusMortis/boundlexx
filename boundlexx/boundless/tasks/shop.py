@@ -195,9 +195,9 @@ def _get_shops(client, client_method, item, world):
     try:
         return getattr(client, client_method)(item.game_id, world=world)
     except RequestsConnectionError as ex:
-        if "RemoteDisconnected" in str(ex):
-            logger.warning("RemoteDisconnected for item %s on world %s", item, world)
-        raise
+        if "RemoteDisconnected" not in str(ex):
+            raise
+        logger.warning("RemoteDisconnected for item %s on world %s", item, world)
     except RemoteDisconnected:
         logger.warning("RemoteDisconnected for item %s on world %s", item, world)
 
