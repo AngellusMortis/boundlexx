@@ -191,6 +191,19 @@ def _create_item_prices(shops, price_klass, world: SimpleWorld, item):
     return total, state_hash
 
 
+def _get_shops(client, client_method, item, world):
+    try:
+        return getattr(client, client_method)(item.game_id, world=world)
+    except RequestsConnectionError as ex:
+        if "RemoteDisconnected" in str(ex):
+            logger.warning("RemoteDisconnected for item %s on world %s", item, world)
+        raise
+    except RemoteDisconnected:
+        logger.warning("RemoteDisconnected for item %s on world %s", item, world)
+
+    return None
+
+
 def _update_item_prices(
     item, rank_klass, client_method: str, price_klass, all_worlds: List[SimpleWorld]
 ):
@@ -204,18 +217,9 @@ def _update_item_prices(
     total = 0
 
     for world in worlds:
-        try:
-            shops = getattr(client, client_method)(item.game_id, world=world)
-        except RequestsConnectionError as ex:
-            if "RemoteDisconnected" in str(ex):
-                logger.warning(
-                    "RemoteDisconnected for item %s on world %s", item, world
-                )
-                continue
-            else:
-                raise
-        except RemoteDisconnected:
-            logger.warning("RemoteDisconnected for item %s on world %s", item, world)
+        shops = _get_shops(client, client_method, item, world)
+
+        if shops is None:
             continue
 
         # set all existing price records to inactive
