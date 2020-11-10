@@ -66,7 +66,12 @@ def run():
                     skills_created += 1
                 else:
                     for attr_name, attr_value in attrs.items():
-                        setattr(skill, attr_name, attr_value)
+                        if attr_name == "icon":
+                            if skill.icon is not None and skill.icon.name:
+                                skill.icon.delete()
+                            skill.icon = attr_value
+                        else:
+                            setattr(skill, attr_name, attr_value)
                     skill.save()
         print_result("skill groups", skill_groups_created)
         print_result("skills", skills_created)

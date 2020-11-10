@@ -9,7 +9,7 @@ from io import BytesIO
 from django.conf import settings
 from django.core.files.base import ContentFile
 from django.utils.functional import SimpleLazyObject
-from PIL import Image
+from PIL import Image, ImageFilter
 
 from boundlexx.ingest.models import GameFile
 
@@ -21,6 +21,12 @@ atlas = SimpleLazyObject(
     lambda: Image.open(
         os.path.join(settings.BOUNDLESS_LOCATION, "assets/gui/atlas.png")
     )
+)
+
+emoji_layer_data = SimpleLazyObject(
+    lambda: GameFile.objects.get(
+        folder="assets/gui/emoji", filename="hash_emojis.json"
+    ).content
 )
 
 
@@ -43,11 +49,11 @@ def _process_file(sprite_data):
 
     lower_name = sprite_data["name"].lower()
     if channel:
-        sprite_img = sprite_img.getchannel(channel).convert("1", dither=0)
+        sprite_img = sprite_img.getchannel(channel)
 
     # If there's no channel specified, for a BW image that means RED
     elif "emoji" in lower_name or "distance_maps_bw" in lower_name:
-        sprite_img = sprite_img.getchannel(0).convert("1", dither=0)
+        sprite_img = sprite_img.getchannel(0)
 
     # Copy the sprite image into the output
     # If there's offset, use it, otherwise centre (no idea if correct)
@@ -68,9 +74,11 @@ def _process_file(sprite_data):
     scale = sprite_data.get("scale")
     if scale:
         factor = int(1 / scale)
-        out_img = out_img.resize((size[0] * factor, size[1] * factor))
+        out_img = out_img.resize(
+            (size[0] * factor, size[1] * factor), resample=Image.LANCZOS
+        )
 
-    return out_img
+    return out_img.filter(ImageFilter.SMOOTH_MORE)
 
 
 _cache = {}
@@ -83,17 +91,42 @@ def _get_image_from_cache(name):
     return _cache[name]
 
 
-def get_image(name):
-    image = None
+def _get_sprite_data(name):
     for sprite_data in atlas_data["sprites"]:
         if sprite_data["name"].lower() == name.lower():
-            image = _process_file(sprite_data)
-            break
-
-    return image
+            return sprite_data
+    return None
 
 
-def get_emoji(name, layers):
+def get_image(name, sprite_data=None):
+    if sprite_data is None:
+        sprite_data = _get_sprite_data(name)
+
+    if sprite_data is None:
+        return None
+
+    return _process_file(sprite_data).convert("1", dither=0)
+
+
+def _get_layers(emoji_name):
+    for index in range(len(emoji_layer_data) // 2):
+        name, layers = (
+            emoji_layer_data[2 * index],
+            emoji_layer_data[(2 * index) + 1],
+        )
+
+        if emoji_name == name:
+            return layers
+    return None
+
+
+def get_emoji(name, layers=None):
+    if layers is None:
+        layers = _get_layers(name)
+
+    if layers is None:
+        return None
+
     # Created later on the first layer
     out_image = None
 

@@ -3,7 +3,7 @@ import requests
 from django.conf import settings
 
 from boundlexx.boundless.models import Emoji, EmojiAltName
-from boundlexx.ingest.ingest.icon import get_django_image, get_emoji
+from boundlexx.ingest.ingest.icon import emoji_layer_data, get_django_image, get_emoji
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
 
@@ -38,10 +38,6 @@ def _get_emoji_list():
 def run():
     emoji_list = _get_emoji_list()
 
-    emoji_layer_data = GameFile.objects.get(
-        folder="assets/gui/emoji", filename="hash_emojis.json"
-    ).content
-
     emoji_nametable = GameFile.objects.get(
         folder="assets/gui/emoji", filename="emoji.json"
     ).content
@@ -58,11 +54,17 @@ def run():
             )
 
             image = get_emoji(name, layers)
+            emoji_image = get_django_image(image, f"{name}.png")
 
             emoji, created = Emoji.objects.get_or_create(
                 name=name,
-                defaults={"image": get_django_image(image, f"{name}.png")},
+                defaults={"image": emoji_image},
             )
+
+            if not created:
+                if emoji.image is not None and emoji.image.name:
+                    emoji.image.delete()
+                emoji.image = emoji_image
 
             alt_names = emoji_nametable.get(name)
 
