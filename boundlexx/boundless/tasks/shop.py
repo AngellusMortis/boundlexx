@@ -4,6 +4,7 @@ import time
 from ast import literal_eval
 from collections import namedtuple
 from datetime import timedelta
+from http.client import RemoteDisconnected
 from typing import Dict, List
 
 from celery.utils.log import get_task_logger
@@ -202,7 +203,11 @@ def _update_item_prices(
     total = 0
 
     for world in worlds:
-        shops = getattr(client, client_method)(item.game_id, world=world)
+        try:
+            shops = getattr(client, client_method)(item.game_id, world=world)
+        except RemoteDisconnected:
+            logger.warning("RemoteDisconnected for item %s on world %s", item, world)
+            continue
 
         # set all existing price records to inactive
         price_klass.objects.filter(item=item, active=True, world__id=world.id).update(
