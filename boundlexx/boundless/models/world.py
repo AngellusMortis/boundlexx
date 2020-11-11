@@ -390,7 +390,7 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     )
 
     def __str__(self):
-        return self.display_name
+        return f"{self.display_name} (ID: {self.id})"
 
     @property
     def is_perm(self):

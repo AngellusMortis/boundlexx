@@ -57,6 +57,7 @@ RUN chmod +x /format.sh
 USER django
 ENV CELERY_WORKER_QUEUES "default,distance,cache,notify,poll,shop,control"
 ENV CELERY_WORKER_NAME "celery"
+ENV CELERY_DEBUG_LEVEL "INFO"
 
 WORKDIR /app
 

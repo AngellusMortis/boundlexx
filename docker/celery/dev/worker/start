@@ -3,4 +3,4 @@
 set -o errexit
 set -o nounset
 
-celery -A config.celery_app worker -E -l DEBUG -Q $CELERY_WORKER_QUEUES -n $CELERY_WORKER_NAME
+celery -A config.celery_app worker -E -l $CELERY_DEBUG_LEVEL -Q $CELERY_WORKER_QUEUES -n $CELERY_WORKER_NAME

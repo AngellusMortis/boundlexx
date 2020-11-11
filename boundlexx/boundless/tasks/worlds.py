@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import time
 from typing import List
 
 from celery.utils.log import get_task_logger
@@ -10,7 +9,7 @@ from django.db.models import Q
 from django.utils import timezone
 from requests.exceptions import HTTPError
 
-from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
+from boundlexx.boundless.client import BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models import (
     Color,
@@ -19,6 +18,7 @@ from boundlexx.boundless.models import (
     WorldDistance,
     WorldPoll,
 )
+from boundlexx.boundless.utils import GameErrorHandler
 from boundlexx.notifications.models import ExoworldExpiredNotification
 from config.celery_app import app
 
@@ -306,6 +306,23 @@ def _poll_world(client, world):
     return world_data, poll_data
 
 
+def _handle_rd(world, *args, **kwargs):
+    logger.warning("RemoteDisconnected while polling world %s", world)
+    return False
+
+
+def _handle_http(world, response, *args, **kwargs):
+    if world.is_sovereign and response.status_code == 400:
+        logger.warning("Could not do poll world %s", world)
+        return False
+    return True
+
+
+def _handle_error(world, exception, *args, **kwargs):
+    logger.error("%s while polling world %s", exception, world)
+    return True
+
+
 def _poll_worlds(worlds):
     total = len(worlds)
     if total > settings.BOUNDLESS_MAX_WORLDS_PER_POLL:
@@ -314,34 +331,23 @@ def _poll_worlds(worlds):
 
     client = BoundlessClient()
     logger.info("Boundless user: %s", client.user["boundless"]["username"])
-    errors_total = 0
 
+    error_handler = GameErrorHandler(
+        rd_callback=_handle_rd,
+        http_callback=_handle_error,
+        error_callback=_handle_error,
+    )
+    poll_world = error_handler(_poll_world)
     for index, world in enumerate(worlds):
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
 
         logger.info("Polling world %s (%s/%s)", world.display_name, index + 1, total)
+        response = poll_world(client=client, world=world)
 
-        try:
-            world_data, poll_data = _poll_world(client, world)
-        except HTTP_ERRORS as ex:
-            if (
-                world.is_sovereign
-                and hasattr(ex, "response")
-                and ex.response is not None  # type: ignore
-                and ex.response.status_code == 400  # type: ignore
-            ):
-                logger.warning("Could not do poll world %s", world.display_name)
-            else:
-                errors_total += 1
-                logger.error("%s while polling world %s", ex, world)
-                time.sleep(5)
-
-                if errors_total > 5:
-                    raise Exception(  # pylint: disable=raise-missing-from
-                        "Aborting due to large number of HTTP errors"
-                    )
+        if response.has_error:
             continue
 
+        world_data, poll_data = response.response
         if world_data is None:
             _mark_world_inactive(world)
             continue
@@ -426,23 +432,23 @@ def poll_settlements(world_ids=None):
     client = BoundlessClient()
     colors = Color.objects.all()
 
-    errors_total = 0
-    for world in worlds:
-        try:
-            settlements = client.get_world_settlements(
-                SimpleWorld(world.id, world.api_url)
-            )
-        except HTTP_ERRORS as ex:
-            errors_total += 1
-            logger.error("%s while polling world %s", ex, world)
-            time.sleep(5)
+    error_handler = GameErrorHandler(
+        rd_callback=_handle_rd,
+        http_callback=_handle_error,
+        error_callback=_handle_error,
+    )
 
-            if errors_total > 10:
-                raise Exception(  # pylint: disable=raise-missing-from
-                    "Aborting due to large number of HTTP errors"
-                )
+    @error_handler
+    def _poll_settlements(client, world):
+        return client.get_world_settlements(SimpleWorld(world.id, world.api_url))
+
+    for world in worlds:
+        response = _poll_settlements(client=client, world=world)
+
+        if response.has_error:  # pylint: disable=no-member
             continue
 
+        settlements = response.response  # pylint: disable=no-member
         Settlement.objects.filter(world=world).delete()
 
         for settlement in settlements:
