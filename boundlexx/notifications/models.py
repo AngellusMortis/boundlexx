@@ -462,7 +462,9 @@ class WorldNotification(NotificationBase):
         return forum_image.shortcut_url
 
     def _get_resources(self, world):
-        from boundlexx.boundless.models import WorldPoll
+        from boundlexx.boundless.models import (  # pylint: disable=cyclic-import
+            WorldPoll,
+        )
 
         wp = WorldPoll.objects.filter(world=world).order_by("time").first()
         if wp is not None:

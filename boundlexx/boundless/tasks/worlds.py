@@ -306,7 +306,7 @@ def _poll_world(client, world):
     return world_data, poll_data
 
 
-def _handle_rd(world=None, *args, **kwargs):
+def _handle_rd(*args, world=None, **kwargs):
     if world is None:
         return True
 
@@ -314,7 +314,7 @@ def _handle_rd(world=None, *args, **kwargs):
     return False
 
 
-def _handle_http(world=None, response=None, *args, **kwargs):
+def _handle_http(*args, world=None, response=None, **kwargs):
     if world is None or response is None:
         return True
 
@@ -324,7 +324,7 @@ def _handle_http(world=None, response=None, *args, **kwargs):
     return True
 
 
-def _handle_error(world=None, exception=None, *args, **kwargs):
+def _handle_error(*args, world=None, exception=None, **kwargs):
     if world is None or exception is None:
         return True
 
