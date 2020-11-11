@@ -306,19 +306,28 @@ def _poll_world(client, world):
     return world_data, poll_data
 
 
-def _handle_rd(world, *args, **kwargs):
+def _handle_rd(world=None, *args, **kwargs):
+    if world is None:
+        return True
+
     logger.warning("RemoteDisconnected while polling world %s", world)
     return False
 
 
-def _handle_http(world, response, *args, **kwargs):
+def _handle_http(world=None, response=None, *args, **kwargs):
+    if world is None or response is None:
+        return True
+
     if world.is_sovereign and response.status_code == 400:
         logger.warning("Could not do poll world %s", world)
         return False
     return True
 
 
-def _handle_error(world, exception, *args, **kwargs):
+def _handle_error(world=None, exception=None, *args, **kwargs):
+    if world is None or exception is None:
+        return True
+
     logger.error("%s while polling world %s", exception, world)
     return True
 

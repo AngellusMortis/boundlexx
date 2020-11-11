@@ -461,7 +461,21 @@ class WorldNotification(NotificationBase):
 
         return forum_image.shortcut_url
 
-    def forum(self, world, resources, extra=None):  # pylint: disable=arguments-differ
+    def _get_resources(self, world):
+        from boundlexx.boundless.models import WorldPoll
+
+        wp = WorldPoll.objects.filter(world=world).order_by("time").first()
+        if wp is not None:
+            return wp.resources
+        return None
+
+    def forum(
+        self, world, resources=None, extra=None
+    ):  # pylint: disable=arguments-differ
+
+        if resources is None:
+            self._get_resources(world)
+
         special_type = ""
         if world.special_type is not None and world.special_type > 0:
             special_type = f"{world.get_special_type_display()} "
