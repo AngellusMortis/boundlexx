@@ -299,7 +299,7 @@ def _poll_world(client, world):
         if not world_data.get("locked"):
             poll_token = world_dict["pollData"]
             poll_data = client.get_world_poll(
-                SimpleWorld(world.id, world.api_url),
+                SimpleWorld(world.id, world_data["apiURL"]),
                 poll_token=poll_token,
             )
 
