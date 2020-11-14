@@ -31,57 +31,19 @@ from boundlexx.notifications.utils import get_forum_client
 User = get_user_model()
 logger = logging.getLogger(__file__)
 
-FORUM_LOOKUP_IMAGES = {
-    "atmosphere": {
-        "Normal": "upload://zQPL2iTQyNRjnveK1pbaFUcg4i4.png",
-        "Potent": "upload://linnMQpEPnT5pRqJIWFHTMdeLPx.png",
-        "Caustic": "upload://2x7uv24VIfWgkNDTqFVx5Gk2gIR.png",
-        "Volatile": "upload://d5YyGKl5Yen386685JSv4ImOL5u.png",
-    },
-    "world_image": "upload://eS8DcCKkoJlt7y92Nt2TevbKjgb.png",
-    "tier": "upload://zQPL2iTQyNRjnveK1pbaFUcg4i4.png",
-    "name": "upload://bzts4NY6U0qkkIqMKTj0KkZC84J.png",
-    "type": {
-        "METAL": "upload://c3dr1zplLt6oZDgzlZomOZueAlo.png",
-        "LUSH": "upload://f354Yvp4oXkXaxyg7xjm2zmGmaE.png",
-        "COAL": "upload://g5p1MqEsw28PO6r9urF7qgtJzPv.png",
-        "BURN": "upload://22vHpbbakPNllMvweQdPYDtWehI.png",
-        "BLAST": "upload://fnB3eiyIpVaBQt352s6OWrro79T.png",
-        "CHILL": "upload://ocqxUujgpad17Qd5EMzyLLot9sI.png",
-        "SHOCK": "upload://pIXkMl6LS39GAvrN2VoosVefLQn.png",
-        "TOXIC": "upload://u0a11C8AsRwGmTtTnKsTxPBhIcD.png",
-        "CORROSIVE": "upload://gDaVjwVAXO0HoeXAxMuzxf7KNjK.png",
-        "DARKMATTER": "upload://bdqxtxS4nyezAXOA9WDFq8uFDnh.png",
-        "RIFT": "upload://bMQ6ivM8A7OQ5gOX6UeOO5scLn3.png",
-        "BLINK": "upload://xpjPdoHtk5xxkvCf7pS6NPlX7jf.png",
-    },
-    "liquid": "upload://58uDj8uNmp52zqscy8PBW6k4alj.png",
-    "server": "upload://zIT1kP3jGkZWWDAPCVcPknxsCSB.png",
-    "lifetime": "upload://sKrov0t6oQapS2LKHlx7WkGYyx8.png",
-    "blinksec": "upload://3rARAhHkZrnva4hiOeZRhXoSZO4.png",
-    "warpcost": "upload://9dzMQi3rgBh0OJyl88r7mSNedwR.png",
-    "exo_color": "upload://ya3ST9IB6OehJNYg6jY559ku9PH.png",
-    "exo_color_new": "upload://lr0si60hUaEwkOP3UIsJFR7l0Lw.png",
-    "by_recipe": "upload://xFrZpq1fBHP9zGCYGSZMyX3SfLo.png",
-    "timelapse": "upload://oHqrS83ax0p0hsCLuR2mJnaoW6K.png",
-    "owner": "upload://8UfHjxV1950IdfuKNcDumg9equG.png",
-    "permissions": "upload://zbesXUQO9RZUEP7TNiHA24EVT9w.png",
-    "portal": "upload://2GR4nUcRGOaMMDzj452JuqxVMWr.png",
-    "perm_color": "upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png",
-    "no": "upload://lUw9F65kR3NVYsTkOSLN9EvSRcO.png",
-    "yes": "upload://jLQDuByRq1uNMUafarQRF6ZrAu1.png",
-}
-
 
 class ForumImage(models.Model):
     class ImageType(models.IntegerChoices):
         COLOR = 0, _("Color")
         WORLD = 1, _("World")
+        TYPE = 2, _("World Type")
+        ATMOSPHERE = 3, _("Atmosphere")
+        MISC = 4, _("Misc.")
 
     image_type = models.PositiveSmallIntegerField(
         choices=ImageType.choices, db_index=True
     )
-    lookup_id = models.PositiveSmallIntegerField(db_index=True)
+    lookup_id = models.CharField(db_index=True, max_length=64)
     url = models.TextField(db_index=True)
     shortcut_url = models.CharField(max_length=64)
 
@@ -384,7 +346,6 @@ class WorldNotification(NotificationBase):
             "world": world,
             "color_groups": color_groups,
             "default_color_groups": default_color_groups,
-            "icons": FORUM_LOOKUP_IMAGES,
         }
         if resources is not None and not world.is_creative:
             embedded_resources = []
@@ -420,17 +381,17 @@ class WorldNotification(NotificationBase):
         from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
 
         worlds = World.objects.filter(id__in=ids)
-        world_images = {}
+        world_images: Dict[str, str] = {}
 
         for world in worlds:
-            world_images[world.id] = world.image.url
+            world_images[str(world.id)] = world.image.url
 
         return world_images
 
     def _get_forum_image_dict(self, image_type, use_forum_links=True):
         image_dict = {}
 
-        world_images: Optional[Dict[int, str]] = None
+        world_images: Optional[Dict[str, str]] = None
 
         forum_images = list(ForumImage.objects.filter(image_type=image_type))
 
@@ -523,6 +484,15 @@ class WorldNotification(NotificationBase):
             ),
             "world_images": self._get_forum_image_dict(
                 ForumImage.ImageType.WORLD, use_forum_links=use_forum_links
+            ),
+            "world_type_images": self._get_forum_image_dict(
+                ForumImage.ImageType.TYPE, use_forum_links=use_forum_links
+            ),
+            "atmosphere_images": self._get_forum_image_dict(
+                ForumImage.ImageType.ATMOSPHERE, use_forum_links=use_forum_links
+            ),
+            "misc_images": self._get_forum_image_dict(
+                ForumImage.ImageType.MISC, use_forum_links=use_forum_links
             ),
         }
 
