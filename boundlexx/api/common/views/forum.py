@@ -6,13 +6,14 @@ from django.shortcuts import render
 from django.views.generic import FormView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
 from boundlexx.api.common.serializers import (
     ForumFormatPostSerialzier,
     ForumFormatSerialzier,
 )
 from boundlexx.api.forms import ForumFormatForm
+from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.notifications.models import WorldNotification
 
 
@@ -32,7 +33,9 @@ def get_response(world, extra):
     return title, body
 
 
-class ForumFormatAPIView(APIView):
+class ForumFormatAPIView(GenericViewSet):
+    schema = DescriptiveAutoSchema(tags=["Misc."])
+
     permission_classes = [AllowAny]
     serializer_class = ForumFormatPostSerialzier
     response_serializer = ForumFormatSerialzier
@@ -53,6 +56,7 @@ class ForumFormatAPIView(APIView):
                     "directions": post.data.get("portal_directions"),
                     "username": post.data["username"],
                     "will_renew": post.data["will_renew"],
+                    "forum_links": post.data["forum_links"],
                 }
             else:
                 extra = {}

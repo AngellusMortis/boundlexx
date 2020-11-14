@@ -196,6 +196,12 @@ class ForumFormatPostSerialzier(NullSerializer):
         help_text=("Add update link to easily update the template?"),
         label="Add Update Link",
     )
+    forum_links = serializers.BooleanField(
+        required=False,
+        default=True,
+        help_text=("Use Boundless Forum links for images?"),
+        label="Boundless Forum Links",
+    )
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

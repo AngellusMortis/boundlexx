@@ -21,6 +21,16 @@ class APIDocsRouter(ExtendedSimpleRouter):
     def get_urls(self):
         urls = super().get_urls()
 
+        common_urls = [
+            path(
+                "forum/",
+                ForumFormatAPIView.as_view({"post": "post"}),
+                name="forum-format",
+            ),
+        ]
+
+        urls = urls + common_urls
+
         schema_view = get_schema_view(
             title="Boundlexx",
             description=self.description,
@@ -45,7 +55,6 @@ class APIDocsRouter(ExtendedSimpleRouter):
 
         urls = [
             path("", DocsView.as_view(), name="api-docs"),
-            path("forum/", ForumFormatAPIView.as_view(), name="forum-format"),
             path("schema/", schema_view, name="api-schema"),
         ] + urls
 

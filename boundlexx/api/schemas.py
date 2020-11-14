@@ -16,13 +16,17 @@ class DescriptiveAutoSchema(AutoSchema):
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
 
+        if not hasattr(self.view, "action"):
+            return operation
+
         action = getattr(self.view, self.view.action)
         if hasattr(action, "operation_id"):
             operation_id = action.operation_id
         else:
+            base = self.view.basename or ""
+
             operation_id = (
-                f"{self.view.action.lower()}"
-                f"{self.view.basename.title().replace('-', '')}"
+                f"{self.view.action.lower()}" f"{base.title().replace('-', '')}"
             )
             if self.view.action.lower() == "list":
                 operation_id += "s"

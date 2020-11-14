@@ -416,11 +416,35 @@ class WorldNotification(NotificationBase):
 
         return self._markdown_replace(message)
 
-    def _get_forum_image_dict(self, image_type):
+    def _get_world_images(self, ids):
+        from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
+
+        worlds = World.objects.filter(id__in=ids)
+        world_images = {}
+
+        for world in worlds:
+            world_images[world.id] = world.image.url
+
+        return world_images
+
+    def _get_forum_image_dict(self, image_type, use_forum_links=True):
         image_dict = {}
 
-        for image in ForumImage.objects.filter(image_type=image_type):
-            image_dict[image.lookup_id] = image.shortcut_url
+        world_images: Optional[Dict[int, str]] = None
+
+        forum_images = list(ForumImage.objects.filter(image_type=image_type))
+
+        for image in forum_images:
+            if use_forum_links:
+                image_dict[image.lookup_id] = image.shortcut_url
+            elif image_type == ForumImage.ImageType.WORLD:
+                if world_images is None:
+                    world_images = self._get_world_images(
+                        [f.lookup_id for f in forum_images]
+                    )
+                image_dict[image.lookup_id] = world_images[image.lookup_id]
+            else:
+                image_dict[image.lookup_id] = image.url
 
         return image_dict
 
@@ -478,6 +502,10 @@ class WorldNotification(NotificationBase):
         if resources is None:
             self._get_resources(world)
 
+        use_forum_links = True
+        if extra is not None:
+            use_forum_links = extra.get("forum_links", True)
+
         special_type = ""
         if world.special_type is not None and world.special_type > 0:
             special_type = f"{world.get_special_type_display()} "
@@ -490,8 +518,12 @@ class WorldNotification(NotificationBase):
         )
 
         extra_context = {
-            "color_images": self._get_forum_image_dict(ForumImage.ImageType.COLOR),
-            "world_images": self._get_forum_image_dict(ForumImage.ImageType.WORLD),
+            "color_images": self._get_forum_image_dict(
+                ForumImage.ImageType.COLOR, use_forum_links=use_forum_links
+            ),
+            "world_images": self._get_forum_image_dict(
+                ForumImage.ImageType.WORLD, use_forum_links=use_forum_links
+            ),
         }
 
         if (
@@ -499,7 +531,12 @@ class WorldNotification(NotificationBase):
             and world.image.name
             and world.id not in extra_context["world_images"]
         ):
-            extra_context["world_images"][world.id] = self._upload_world_image(world)
+            if use_forum_links:
+                extra_context["world_images"][world.id] = self._upload_world_image(
+                    world
+                )
+            else:
+                extra_context["world_images"][world.id] = world.image.url
 
         if extra is not None:
             extra_context.update(extra)
