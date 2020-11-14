@@ -26,7 +26,7 @@
 [details="Default Blocks Colors"]
 **-------------------------------------------------------------------**
 ![|25x25]({{ misc_images.exo_color_new }}) **:** _New Color to this date_
-[![|25x25]({{ world_images|key:1 }})]() **:** _Obtained on Homeworld (clickable)_
+[![|25x25]({{ world_images|key:"1" }})]() **:** _Obtained on Homeworld (clickable)_
 **-------------------------------------------------------------------**
 
 {% for group_name, color_group in default_color_groups.items %}{% if group_name %}
@@ -42,7 +42,7 @@ _**[{{ group_name|title }}]**_
 **-------------------------------------------------------------------**{% if not world.is_perm %}{% if world.is_exo %}
 ![|25x25]({{ misc_images.exo_color_new }}) **:** _New Color to this date_
 ![|25x25]({{ misc_images.by_recipe }}) **:** _Can be obtained by **Recipe/Transmutation**_{% endif %}
-[![|25x25]({{ world_images|key:1 }})]() **:** _Obtained on Homeworld (clickable)_{% if world.is_exo %}
+[![|25x25]({{ world_images|key:"1" }})]() **:** _Obtained on Homeworld (clickable)_{% if world.is_exo %}
 ![|20x20]({{ misc_images.timelapse }})**_[>= 0]()_** **:** _Exo Exclusive **last occurrence** in **Days**_{% endif %}{% endif %}
 **-------------------------------------------------------------------**
 

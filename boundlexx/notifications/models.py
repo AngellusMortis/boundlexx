@@ -499,7 +499,7 @@ class WorldNotification(NotificationBase):
         if (
             world.image is not None
             and world.image.name
-            and world.id not in extra_context["world_images"]
+            and str(world.id) not in extra_context["world_images"]
         ):
             if use_forum_links:
                 extra_context["world_images"][world.id] = self._upload_world_image(
