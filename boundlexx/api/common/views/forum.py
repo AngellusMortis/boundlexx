@@ -100,6 +100,8 @@ class ForumFormatAPIView(GenericViewSet):
             return Response({"title": title, "body": body})
         return Response(post.errors, status=400)
 
+    post.operation_id = "createForumTemplate"  # type: ignore # noqa E501
+
 
 class ForumFormatView(FormView):
     template_name = "boundlexx/forum_format.html"
