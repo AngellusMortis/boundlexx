@@ -43,6 +43,7 @@ _**[{{ group_name|title }}]**_
 ![|25x25]({{ misc_images.exo_color_new }}) **:** _New Color to this date_
 ![|25x25]({{ misc_images.by_recipe }}) **:** _Can be obtained by **Recipe/Transmutation**_{% endif %}
 [![|25x25]({{ world_images|key:"1" }})]() **:** _Obtained on Homeworld (clickable)_{% if world.is_exo %}
+![|25x25]({{ misc_images.perm_color }}) **:** _Sovereign Selectable Color_
 ![|20x20]({{ misc_images.timelapse }})**_[>= 0]()_** **:** _Exo Exclusive **last occurrence** in **Days**_{% endif %}{% endif %}
 **-------------------------------------------------------------------**
 

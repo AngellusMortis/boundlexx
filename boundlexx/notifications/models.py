@@ -651,7 +651,7 @@ class WorldNotification(NotificationBase):
                 if world.is_exo:
                     if color.is_new_exo:
                         extra.append("**NEW**")
-                    elif not color.is_perm:
+                    elif color.is_new:
                         if color.transform_first_world is not None:
                             extra.append("**TRANS**")
                         if color.transform_last_exo is not None:
