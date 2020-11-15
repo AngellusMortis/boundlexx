@@ -49,10 +49,13 @@ if [[ ! -d "${backup_filename}" ]]; then
     mkdir -p "${backup_filename}"
     tar -xvf "${backup_filename}.tar.gz" -C "${backup_filename}"
 fi
+
 message_info "Dropping un-flushable data..."
 psql -c "TRUNCATE django_content_type,auth_permission,django_migrations,django_site CASCADE"
+
 message_info "Restoring non-hypertables tables..."
 pg_restore --disable-triggers -d ${POSTGRES_DB} -O -x -a "${backup_filename}/main.sql.tar"
+
 message_info "Restoring hypertables..."
 timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
@@ -90,7 +93,7 @@ timescaledb-parallel-copy \
     --file "${backup_filename}/resourcecount.csv" \
     --workers 8 --reporting-period 30s --truncate \
     --copy-options "CSV HEADER"
-[
+
 message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}.tar.gz' backup."
 if [[ -d "${backup_filename}" ]]; then
     message_info "Removing uncompressed files..."
