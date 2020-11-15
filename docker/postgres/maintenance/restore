@@ -80,6 +80,12 @@ timescaledb-parallel-copy \
     --copy-options "CSV HEADER"
 timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_beaconscan \
+    --file "${backup_filename}/beaconscan.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
     --db-name "${POSTGRES_DB}" --table boundless_resourcecount \
     --file "${backup_filename}/resourcecount.csv" \
     --workers 8 --reporting-period 30s --truncate \
