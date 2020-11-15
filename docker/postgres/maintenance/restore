@@ -71,7 +71,7 @@ timescaledb-parallel-copy \
     --db-name "${POSTGRES_DB}" --table boundless_worldpollresult \
     --file "${backup_filename}/worldpoll.csv" \
     --workers 8 --reporting-period 30s --truncate \
-    --copy-options "CSV HEADER"w
+    --copy-options "CSV HEADER"
 timescaledb-parallel-copy \
     --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
     --db-name "${POSTGRES_DB}" --table boundless_leaderboardrecord \
