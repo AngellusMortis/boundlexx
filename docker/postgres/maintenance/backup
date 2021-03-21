@@ -31,8 +31,28 @@ export PGUSER="${POSTGRES_USER}"
 export PGPASSWORD="${POSTGRES_PASSWORD}"
 export PGDATABASE="${POSTGRES_DB}"
 
-backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S').sql.gz"
-pg_dump | gzip > "${BACKUP_DIR_PATH}/${backup_filename}"
+backup_filename="${BACKUP_FILE_PREFIX}_$(date +'%Y_%m_%dT%H_%M_%S')"
+backup_folder_base="${BACKUP_DIR_PATH}/${backup_filename}"
+mkdir -p "${backup_folder_base}"
+chown postgres:postgres "${backup_folder_base}"
+pushd "${backup_folder_base}"
 
+message_info "Backing up non-hypertables..."
+pg_dump -Ft -n public -T boundless_itemshopstandprice -T boundless_itemrequestbasketprice -T boundless_worldpollresult -T boundless_resourcecount -T boundless_leaderboardrecord -T boundless_beaconscan ${PGDATABASE} -f "main.sql.tar"
+
+message_info "Backing up hypertables..."
+psql -c "COPY (SELECT * FROM boundless_itemshopstandprice) TO '${backup_folder_base}/shopstand.csv' DELIMITER ',' CSV HEADER;"
+psql -c "COPY (SELECT * FROM boundless_itemrequestbasketprice) TO '${backup_folder_base}/requestbasket.csv' DELIMITER ',' CSV HEADER;"
+psql -c "COPY (SELECT * FROM boundless_worldpollresult) TO '${backup_folder_base}/worldpoll.csv' DELIMITER ',' CSV HEADER;"
+psql -c "COPY (SELECT * FROM boundless_leaderboardrecord) TO '${backup_folder_base}/leaderboard.csv' DELIMITER ',' CSV HEADER;"
+psql -c "COPY (SELECT * FROM boundless_resourcecount ORDER BY world_poll_id, item_id) TO '${backup_folder_base}/resourcecount.csv' DELIMITER ',' CSV HEADER;"
+psql -c "COPY (SELECT * FROM boundless_beaconscan) TO '${backup_folder_base}/beaconscan.csv' DELIMITER ',' CSV HEADER;"
+
+message_info "Compressing..."
+tar -cvf "${backup_filename}.tar.gz" *
+mv "${backup_filename}.tar.gz" "${BACKUP_DIR_PATH}/${backup_filename}.tar.gz"
+
+popd
+rm -rf "${backup_folder_base}"
 
 message_success "'${POSTGRES_DB}' database backup '${backup_filename}' has been created and placed in '${BACKUP_DIR_PATH}'."

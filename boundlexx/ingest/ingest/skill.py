@@ -6,6 +6,16 @@ from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
 
 
+def _set_skill_attrs(skill, attrs):
+    for attr_name, attr_value in attrs.items():
+        if attr_name == "icon":
+            if skill.icon is not None and skill.icon.name:
+                skill.icon.delete()
+            skill.icon = attr_value
+        else:
+            setattr(skill, attr_name, attr_value)
+
+
 def run():
     skilltrees = GameFile.objects.get(
         folder="assets/archetypes", filename="skilltrees.msgpack"
@@ -65,8 +75,7 @@ def run():
                 if created:
                     skills_created += 1
                 else:
-                    for attr_name, attr_value in attrs.items():
-                        setattr(skill, attr_name, attr_value)
+                    _set_skill_attrs(skill, attrs)
                     skill.save()
         print_result("skill groups", skill_groups_created)
         print_result("skills", skills_created)

@@ -6,13 +6,13 @@ from boundlexx.boundless.models import Emoji
 
 class EmojiSerializer(serializers.ModelSerializer):
     names = serializers.ListField(child=serializers.CharField())
-    is_boundless_only = serializers.BooleanField()
+    category = serializers.ChoiceField(choices=Emoji.EmojiCategory)
     image_url = AzureImageField(source="image", allow_null=True)
 
     class Meta:
         model = Emoji
         fields = [
             "names",
-            "is_boundless_only",
+            "category",
             "image_url",
         ]

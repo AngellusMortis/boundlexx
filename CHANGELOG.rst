@@ -1,3 +1,45 @@
+2020-11-4
+---------
+
+* Adds full categorization of Emojis
+* Adds update link to forum template generator
+* Refactors Boundless Client
+
+2020-11-1
+---------
+
+* Adds affiliation attrbution/disclaimer.
+* Changes resources to properly pull from game files.
+* Adds `prestige`, `mine_xp`, `build_xp`, `is_liquid`, `is_block`, and `resource_data` to `retrieveItem` API.
+* Fixes time to generate API Schemas
+* Adds beacons endpoint on the Worlds API
+
+2020-10-31
+----------
+
+* Adds `atlas_image_url` to `listWorlds`
+
+2020-10-30
+----------
+
+* Fixes location seiralizer for Shop API endpoints
+
+2020-10-29
+----------
+
+* Adds atlas images for worlds
+
+2020-10-27
+----------
+
+* Adjusts default filters for shop API endpoints
+
+2020-10-26
+----------
+
+* Adds better handling for permissions on Homeworld/Exoworlds
+* Removes Creative Worlds from Resource count endpoints
+
 2020-10-21
 ----------
 

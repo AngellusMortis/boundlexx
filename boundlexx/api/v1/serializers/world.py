@@ -102,6 +102,7 @@ class URLWorldSerializer(WorldSerializer):
             "surface_liquid",
             "core_liquid",
             "bows",
+            "atlas_image_url",
         ]
 
 
@@ -378,4 +379,5 @@ class KindOfSimpleWorldSerializer(SimpleWorldSerializer):
             "is_public",
             "is_public_edit",
             "is_public_claim",
+            "atlas_image_url",
         ]

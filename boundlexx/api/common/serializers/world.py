@@ -1,9 +1,13 @@
 from django.utils.translation import ugettext as _
 from rest_framework import serializers
 
-from boundlexx.api.common.serializers.base import AzureImageField, NullSerializer
+from boundlexx.api.common.serializers.base import (
+    AzureImageField,
+    LocationSerializer,
+    NullSerializer,
+)
 from boundlexx.api.common.serializers.skill import IDSkillSerializer
-from boundlexx.boundless.models import World, WorldDistance
+from boundlexx.boundless.models import Beacon, BeaconPlotColumn, World, WorldDistance
 
 
 class IDWorldSerializer(serializers.ModelSerializer):
@@ -44,6 +48,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
     is_public = serializers.BooleanField()
     is_public_edit = serializers.BooleanField()
     is_public_claim = serializers.BooleanField()
+    atlas_image_url = AzureImageField(source="atlas_image", allow_null=True)
 
     class Meta:
         model = World
@@ -68,6 +73,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
             "is_public",
             "is_public_edit",
             "is_public_claim",
+            "atlas_image_url",
         ]
 
 
@@ -153,6 +159,7 @@ class WorldSerializer(SimpleWorldSerializer):
             "bows",
             "next_request_basket_update",
             "next_shop_stand_update",
+            "atlas_image_url",
         ]
 
 
@@ -174,4 +181,73 @@ class WorldDistanceSerializer(serializers.ModelSerializer):
             "min_portal_cost",
             "min_portal_open_cost",
             "min_conduits",
+        ]
+
+
+class BeaconPlotColumnSerializer(serializers.ModelSerializer):
+    plot_x = serializers.IntegerField()
+    plot_z = serializers.IntegerField()
+    count = serializers.IntegerField()
+
+    class Meta:
+        model = BeaconPlotColumn
+        fields = [
+            "plot_x",
+            "plot_z",
+            "count",
+        ]
+
+
+class BeaconSerializer(serializers.ModelSerializer):
+    is_campfire = serializers.BooleanField()
+    location = LocationSerializer()
+    mayor_name = serializers.CharField(source="scan.mayor_name")
+    prestige = serializers.IntegerField(allow_null=True, source="scan.prestige")
+    compactness = serializers.IntegerField(allow_null=True, source="scan.compactness")
+    num_plots = serializers.IntegerField(allow_null=True, source="scan.num_plots")
+    num_columns = serializers.IntegerField(allow_null=True, source="scan.num_columns")
+    name = serializers.CharField(allow_null=True, source="scan.name")
+    text_name = serializers.CharField(allow_null=True, source="scan.text_name")
+    html_name = serializers.CharField(allow_null=True, source="scan.html_name")
+    plots_columns = BeaconPlotColumnSerializer(many=True, source="beaconplotcolumn_set")
+
+    class Meta:
+        model = Beacon
+        fields = [
+            "is_campfire",
+            "location",
+            "mayor_name",
+            "prestige",
+            "compactness",
+            "num_plots",
+            "num_columns",
+            "name",
+            "text_name",
+            "html_name",
+            "plots_columns",
+        ]
+
+
+class SettlementSerializer(serializers.ModelSerializer):
+    location = LocationSerializer()
+    prestige = serializers.IntegerField()
+    level = serializers.IntegerField(
+        help_text=_(
+            "`0` = Output, `1` = Hamlet, `2` = Village, "
+            "`3` = Town, `4` = City, `5` = Great City"
+        )
+    )
+    name = serializers.CharField()
+    text_name = serializers.CharField()
+    html_name = serializers.CharField()
+
+    class Meta:
+        model = Beacon
+        fields = [
+            "location",
+            "prestige",
+            "level",
+            "name",
+            "text_name",
+            "html_name",
         ]

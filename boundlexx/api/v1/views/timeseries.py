@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.http import Http404
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -40,17 +41,20 @@ class ItemResourceTimeseriesViewSet(
     queryset = ResourceCount.objects.filter(
         world_poll__world__active=True,
         world_poll__world__is_public=True,
-    )
+        world_poll__world__is_creative=False,
+    ).select_related("world_poll", "world_poll__world", "item", "item__resource_data")
     serializer_class = URLItemResourceCountTimeSeriesSerializer
     time_bucket_serializer_class = ItemResourceCountTimeSeriesTBSerializer
     number_fields = ["count"]
     lookup_field = "id"
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        item_id = self.kwargs.get("id")
 
-        if queryset.count() == 0:
+        if item_id not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
             raise Http404
+
+        queryset = super().get_queryset()
 
         return queryset
 

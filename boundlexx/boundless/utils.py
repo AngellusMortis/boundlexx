@@ -1,12 +1,21 @@
 import re
 import struct
+import time
+from collections import namedtuple
 from datetime import timedelta
+from http.client import RemoteDisconnected
+from typing import Callable, Optional
 
 from django.core.cache import cache
 from django.utils.safestring import mark_safe
+from requests.exceptions import ConnectionError as RequestsConnectionError
+
+from boundlexx.boundless.client import HTTP_ERRORS
 
 ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
 FORMATTING_REGEX = r":([^:]*):"
+ERROR_THRESHOLD = 5
+DEFAULT_DELAY = 5
 
 
 def convert_linear_to_s(linear):
@@ -204,14 +213,17 @@ def html_name(string, strip=False, colors=None):
             except Emoji.DoesNotExist:
                 pass
             else:
-                if strip:
-                    final_string = final_string.replace(format_string, inner, 1)
-                else:
-                    html_emoji = (
-                        f'<img src="{emoji.image.url}" class="emoji"'
-                        f' alt="emoji {user_name}" title="{user_name}">'
-                    )
-                    final_string = final_string.replace(format_string, html_emoji, 1)
+                if emoji is not None:
+                    if strip:
+                        final_string = final_string.replace(format_string, inner, 1)
+                    else:
+                        html_emoji = (
+                            f'<img src="{emoji.image.url}" class="emoji"'
+                            f' alt="emoji {user_name}" title="{user_name}">'
+                        )
+                        final_string = final_string.replace(
+                            format_string, html_emoji, 1
+                        )
 
     return mark_safe(final_string)  # nosec
 
@@ -233,3 +245,72 @@ def calculate_extra_names(world, new_name, colors=None):
         world.html_name = html_name(world.display_name, colors=colors)
 
     return world
+
+
+ErrorHandlerResponse = namedtuple("ErrorHandlerResponse", ("response", "has_error"))
+
+
+class GameErrorHandler:
+    errors: int
+    delay: int
+    error_threshold: int
+    rd_callback: Optional[Callable]
+    http_callback: Optional[Callable]
+    error_callback: Optional[Callable]
+
+    def __init__(  # pylint: disable=too-many-arguments
+        self,
+        error_threshold: int = ERROR_THRESHOLD,
+        delay: int = DEFAULT_DELAY,
+        rd_callback: Optional[Callable] = None,
+        http_callback: Optional[Callable] = None,
+        error_callback: Optional[Callable] = None,
+    ):
+        self.errors = 0
+        self.error_threshold = error_threshold
+        self.delay = delay
+        self.rd_callback = rd_callback
+        self.http_callback = http_callback
+        self.error_callback = error_callback
+
+    def _call_callback(self, callback, *args, **kwargs):
+        if callback is not None:
+            return callback(*args, **kwargs)
+        return True
+
+    def __call__(self, f):
+        def error_handler(*args, **kwargs):
+            response = None
+            has_error = False
+
+            try:
+                response = f(*args, **kwargs)
+            except HTTP_ERRORS as ex:
+                has_error = True
+                count = True
+
+                if (
+                    isinstance(ex, RequestsConnectionError)
+                    and "RemoteDisconnected" in str(ex)
+                ) or isinstance(ex, RemoteDisconnected):
+                    count = self._call_callback(self.rd_callback, *args, **kwargs)
+                elif (
+                    hasattr(ex, "response") and ex.response is not None  # type: ignore
+                ):
+                    kwargs["response"] = ex.response  # type: ignore
+                    count = self._call_callback(self.http_callback, *args, **kwargs)
+                else:
+                    kwargs["exception"] = ex
+                    count = self._call_callback(self.error_callback, *args, **kwargs)
+
+                if count:
+                    self.errors += 1
+                    if self.delay > 0:
+                        time.sleep(self.delay)
+            finally:
+                if self.errors > self.error_threshold:
+                    raise Exception("Aborting due to large number of HTTP errors")
+
+            return ErrorHandlerResponse(response, has_error)
+
+        return error_handler

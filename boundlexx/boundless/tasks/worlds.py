@@ -9,8 +9,16 @@ from django.db.models import Q
 from django.utils import timezone
 from requests.exceptions import HTTPError
 
-from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
-from boundlexx.boundless.models import World, WorldDistance, WorldPoll
+from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import World as SimpleWorld
+from boundlexx.boundless.models import (
+    Color,
+    Settlement,
+    World,
+    WorldDistance,
+    WorldPoll,
+)
+from boundlexx.boundless.utils import GameErrorHandler
 from boundlexx.notifications.models import ExoworldExpiredNotification
 from config.celery_app import app
 
@@ -56,7 +64,7 @@ def search_new_worlds(ids_to_scan=None):
         if ids_to_scan is None:
             return
 
-    logger.info("Starting scan for exo worlds (%s)", ids_to_scan)
+    logger.info("Starting scan for new worlds (%s)", ids_to_scan)
 
     _, worlds = _scan_worlds(ids_to_scan)
 
@@ -105,6 +113,9 @@ def _scan_worlds(ids_to_scan):
     worlds_found = 0
     world_objs = []
     for world_dict in worlds:
+        poll_token = world_dict["pollData"]
+        world_data = world_dict["worldData"]
+
         try:
             world, created = World.objects.get_or_create_from_game_dict(
                 world_dict["worldData"]
@@ -119,8 +130,12 @@ def _scan_worlds(ids_to_scan):
 
             if not world.is_locked:
                 try:
-                    world_data, poll_dict = client.get_world_poll(
-                        world_dict["pollData"], world_dict["worldData"]
+                    poll_dict = client.get_world_poll(
+                        SimpleWorld(
+                            world_data["id"],
+                            world_data["apiURL"],
+                        ),
+                        poll_token=poll_token,
                     )
                 except HTTPError as ex:
                     if world.is_sovereign and ex.response.status_code == 400:
@@ -149,7 +164,7 @@ def get_worlds(ids_to_scan, client=None):
     worlds: List[dict] = []
 
     for world_id in ids_to_scan:
-        world_data = client.get_world_data(world_id)
+        world_data = client.get_world_data(SimpleWorld(world_id, None))
 
         if world_data is not None:
             worlds.append(world_data)
@@ -274,6 +289,49 @@ def _mark_world_inactive(world):
         ExoworldExpiredNotification.objects.send_notification(world, resources)
 
 
+def _poll_world(client, world):
+    world_dict = client.get_world_data(SimpleWorld(world.id, world.api_url))
+    poll_data = None
+    world_data = None
+    if world_dict is not None:
+        world_data = world_dict["worldData"]
+
+        if not world_data.get("locked"):
+            poll_token = world_dict["pollData"]
+            poll_data = client.get_world_poll(
+                SimpleWorld(world.id, world_data["apiURL"]),
+                poll_token=poll_token,
+            )
+
+    return world_data, poll_data
+
+
+def _handle_rd(*args, world=None, **kwargs):
+    if world is None:
+        return True
+
+    logger.warning("RemoteDisconnected while polling world %s", world)
+    return False
+
+
+def _handle_http(*args, world=None, response=None, **kwargs):
+    if world is None or response is None:
+        return True
+
+    if world.is_sovereign and response.status_code == 400:
+        logger.warning("Could not do poll world %s", world)
+        return False
+    return True
+
+
+def _handle_error(*args, world=None, exception=None, **kwargs):
+    if world is None or exception is None:
+        return True
+
+    logger.error("%s while polling world %s", exception, world)
+    return True
+
+
 def _poll_worlds(worlds):
     total = len(worlds)
     if total > settings.BOUNDLESS_MAX_WORLDS_PER_POLL:
@@ -282,33 +340,23 @@ def _poll_worlds(worlds):
 
     client = BoundlessClient()
     logger.info("Boundless user: %s", client.user["boundless"]["username"])
-    errors_total = 0
 
+    error_handler = GameErrorHandler(
+        rd_callback=_handle_rd,
+        http_callback=_handle_error,
+        error_callback=_handle_error,
+    )
+    poll_world = error_handler(_poll_world)
     for index, world in enumerate(worlds):
         WorldPoll.objects.filter(world=world, active=True).update(active=False)
 
         logger.info("Polling world %s (%s/%s)", world.display_name, index + 1, total)
+        response = poll_world(client=client, world=world)
 
-        try:
-            world_data, poll_data = client.get_world_poll_by_id(world.id)
-        except HTTP_ERRORS as ex:
-            if (
-                world.is_sovereign
-                and hasattr(ex, "response")
-                and ex.response is not None  # type: ignore
-                and ex.response.status_code == 400  # type: ignore
-            ):
-                logger.warning("Could not do poll world %s", world.display_name)
-            else:
-                errors_total += 1
-                logger.error("%s while polling world %s", ex, world)
-
-                if errors_total > 5:
-                    raise Exception(  # pylint: disable=raise-missing-from
-                        "Aborting due to large number of HTTP errors"
-                    )
+        if response.has_error:
             continue
 
+        world_data, poll_data = response.response
         if world_data is None:
             _mark_world_inactive(world)
             continue
@@ -372,3 +420,47 @@ def calculate_distances(world_ids=None):
             world_dest = World.objects.get(id=world_id)
 
             world.get_distance_to_world(world_dest, client=client)
+
+
+@app.task
+def poll_settlements(world_ids=None):
+    if world_ids is None:
+        worlds = (
+            World.objects.filter(
+                api_url__isnull=False,
+                is_public=True,
+                is_creative=False,
+                is_locked=False,
+            )
+            .filter(Q(active=True) | Q(end__isnull=False, end__gt=timezone.now()))
+            .order_by("id")
+        )
+    else:
+        worlds = World.objects.filter(id__in=world_ids)
+
+    client = BoundlessClient()
+    colors = Color.objects.all()
+
+    error_handler = GameErrorHandler(
+        rd_callback=_handle_rd,
+        http_callback=_handle_error,
+        error_callback=_handle_error,
+    )
+
+    @error_handler
+    def _poll_settlements(client, world):
+        return client.get_world_settlements(SimpleWorld(world.id, world.api_url))
+
+    for world in worlds:
+        response = _poll_settlements(client=client, world=world)
+
+        if response.has_error:  # pylint: disable=no-member
+            continue
+
+        settlements = response.response  # pylint: disable=no-member
+        Settlement.objects.filter(world=world).delete()
+
+        for settlement in settlements:
+            Settlement.objects.create_from_game_obj(world, settlement, colors=colors)
+
+        logger.info("Found %s settlements for %s", len(settlements), world)

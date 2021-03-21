@@ -63,8 +63,10 @@ from boundlexx.api.common.serializers.wbc import (
     WorldColorSerializer,
 )
 from boundlexx.api.common.serializers.world import (
+    BeaconSerializer,
     BowSerializer,
     IDWorldSerializer,
+    SettlementSerializer,
     SimpleWorldSerializer,
     WorldDistanceSerializer,
     WorldSerializer,
@@ -73,6 +75,7 @@ from boundlexx.boundless.models import World
 
 __all__ = [
     "AzureImageField",
+    "BeaconSerializer",
     "BlockColorSerializer",
     "BlockSerializer",
     "BowSerializer",
@@ -108,6 +111,7 @@ __all__ = [
     "RecipeRequirementSerializer",
     "RecipeSerializer",
     "ResourcesSerializer",
+    "SettlementSerializer",
     "SimpleGameFileSerializer",
     "SimpleItemSerializer",
     "SimpleWorldSerializer",
@@ -179,12 +183,24 @@ class ForumFormatPostSerialzier(NullSerializer):
     )
     portal_directions = serializers.CharField(
         required=False,
-        max_length=100,
+        max_length=2000,
         help_text=(
             "Directions to help players find the portal to your world."
             "Required for Sovereign worlds."
         ),
         label="Portal Directions",
+    )
+    update_link = serializers.BooleanField(
+        required=False,
+        default=True,
+        help_text=("Add update link to easily update the template?"),
+        label="Add Update Link",
+    )
+    forum_links = serializers.BooleanField(
+        required=False,
+        default=True,
+        help_text=("Use Boundless Forum links for images?"),
+        label="Boundless Forum Links",
     )
 
     def __init__(self, *args, **kwargs):

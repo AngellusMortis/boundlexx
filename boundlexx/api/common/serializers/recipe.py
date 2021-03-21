@@ -88,7 +88,7 @@ class RecipeSerializer(serializers.ModelSerializer):
         required=False, choices=Recipe.MachineLevelType.choices
     )
     required_event = serializers.ChoiceField(
-        required=False, choices=Recipe.EventType.choices
+        required=False, choices=Recipe.EventType.choices, allow_blank=True
     )
     required_backer_tier = serializers.IntegerField(allow_null=True)
 

@@ -4,11 +4,14 @@ from typing import Sequence, Type
 from django.conf import settings
 from django.contrib import admin
 from django.contrib.admin.options import InlineModelAdmin
+from django.http import HttpResponse
 from django.templatetags.tz import localtime
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.formats import localize
 from django.utils.safestring import mark_safe
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 
 from boundlexx.boundless.models import (
     Color,
@@ -677,3 +680,156 @@ class RecipeAdmin(GameObjAdmin):
     exclude = ["requirements", "levels"]
 
     inlines = [RecipeRequirementsInline, RecipeLevelInline]
+    actions = ["export_to_xlsx"]
+
+    def _get_levels(self, recipe):
+        every = [
+            recipe.output.english,
+            recipe.can_hand_craft,
+            recipe.machine,
+            recipe.heat if recipe.machine == "FURNACE" else recipe.power,
+            recipe.group_name,
+            ",".join(i.english for i in recipe.tints.all()),
+            ",".join(f"{r.skill.name} Lvl{r.level}" for r in recipe.requirements.all()),
+            recipe.get_required_event_display(),
+            recipe.required_backer_tier,
+        ]
+
+        single_row = every[:]
+        bulk_row = every[:]
+        mass_row = every[:]
+
+        single_only = False
+
+        for level in recipe.levels.all():
+            if recipe.machine == "FURNACE":
+                if level.level == 0:
+                    extra_row = [
+                        level.wear,
+                        level.duration,
+                        level.output_quantity,
+                        recipe.craft_xp * level.output_quantity,
+                    ]
+                else:
+                    continue
+            else:
+                extra_row = [
+                    level.wear,
+                    level.spark,
+                    level.duration,
+                    level.output_quantity,
+                    recipe.craft_xp * level.output_quantity,
+                ]
+
+            if level.inputs.count() == 0:
+                single_only = True
+
+            for input_item in level.inputs.all():
+                if input_item.group is None:
+                    extra_row += [input_item.item.english, input_item.count]
+                else:
+                    extra_row += [input_item.group.name, input_item.count]
+
+            if level.level == 0:
+                single_row += extra_row
+            elif level.level == 1:
+                bulk_row += extra_row
+            else:
+                mass_row += extra_row
+
+        return single_only, [single_row, bulk_row, mass_row]
+
+    def export_to_xlsx(self, request, queryset):
+        queryset = queryset.prefetch_related(
+            "tints",
+            "tints__localizedname_set",
+            "requirements",
+            "requirements__skill",
+            "levels",
+            "levels__inputs",
+            "levels__inputs__group",
+            "levels__inputs__item",
+            "levels__inputs__item__localizedname_set",
+        )
+        groups = RecipeGroup.objects.all().prefetch_related(
+            "members",
+            "members__localizedname_set",
+        )
+
+        workbook = Workbook()
+        workbook.active.title = "Single"
+        workbook.create_sheet("Bulk")
+        workbook.create_sheet("Mass")
+        workbook.create_sheet("Furnace")
+        workbook.create_sheet("Groups")
+
+        group_sheet = workbook["Groups"]
+        group_sheet.append(["Name", "Members"])
+
+        for group in groups:
+            group_sheet.append([group.name] + [i.english for i in group.members.all()])
+
+        single = workbook["Single"]
+        bulk = workbook["Bulk"]
+        mass = workbook["Mass"]
+        furnace = workbook["Furnace"]
+
+        headers = [
+            "Output",
+            "Hand Craft?",
+            "Machine",
+            "Power",
+            "Group",
+            "Tint From",
+            "Requirements",
+            "Required Event",
+            "Required Backer",
+            "Machine Wear",
+            "Spark",
+            "Duration (s)",
+            "Output Quantity",
+            "XP",
+            "Inputs",
+        ]
+        single.append(headers)
+        bulk.append(headers)
+        mass.append(headers)
+        furnace.append(
+            [
+                "Output",
+                "Hand Craft?",
+                "Machine",
+                "Heat",
+                "Group",
+                "Tint From",
+                "Requirements",
+                "Required Event",
+                "Required Backer",
+                "Machine Wear",
+                "Duration (s)",
+                "Output Quantity",
+                "XP",
+                "Inputs",
+            ]
+        )
+        for recipe in queryset:
+            single_only, rows = self._get_levels(recipe)
+
+            if recipe.machine == "FURNACE":
+                furnace.append(rows[0])
+                continue
+
+            if rows[0][12] == rows[1][12]:
+                single_only = True
+
+            single.append(rows[0])
+            if not single_only:
+                bulk.append(rows[1])
+                mass.append(rows[2])
+
+        return HttpResponse(
+            save_virtual_workbook(workbook),
+            content_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",  # noqa: E501
+        )
+
+    export_to_xlsx.short_description = "Export to Excel"  # type: ignore

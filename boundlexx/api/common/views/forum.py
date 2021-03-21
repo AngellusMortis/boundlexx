@@ -1,17 +1,19 @@
 from typing import Any, List
+from urllib.parse import urlencode
 
 from django.http import HttpResponse
 from django.shortcuts import render
 from django.views.generic import FormView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework.viewsets import GenericViewSet
 
 from boundlexx.api.common.serializers import (
     ForumFormatPostSerialzier,
     ForumFormatSerialzier,
 )
 from boundlexx.api.forms import ForumFormatForm
+from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.notifications.models import WorldNotification
 
 
@@ -31,7 +33,9 @@ def get_response(world, extra):
     return title, body
 
 
-class ForumFormatAPIView(APIView):
+class ForumFormatAPIView(GenericViewSet):
+    schema = DescriptiveAutoSchema(tags=["Misc."])
+
     permission_classes = [AllowAny]
     serializer_class = ForumFormatPostSerialzier
     response_serializer = ForumFormatSerialzier
@@ -52,13 +56,51 @@ class ForumFormatAPIView(APIView):
                     "directions": post.data.get("portal_directions"),
                     "username": post.data["username"],
                     "will_renew": post.data["will_renew"],
+                    "forum_links": post.data["forum_links"],
                 }
             else:
                 extra = {}
 
+            if post.data["update_link"]:
+                params = {
+                    "world_id": post.world.id,
+                    "update_link": "true",
+                }
+
+                if post.world.is_sovereign:
+                    if post.data["can_visit"] is not None:
+                        params["can_visit"] = str(post.data["can_visit"]).lower()
+
+                    if post.data["can_edit"] is not None:
+                        params["can_edit"] = str(post.data["can_visit"]).lower()
+
+                    if post.data["can_claim"] is not None:
+                        params["can_claim"] = str(post.data["can_claim"]).lower()
+
+                    if post.data["compactness"] is not None:
+                        params["compactness"] = str(post.data["can_visit"]).lower()
+
+                    if post.data["portal_directions"] is not None:
+                        params["portal_directions"] = post.data["portal_directions"]
+
+                    if post.data["username"] is not None:
+                        params["username"] = post.data["username"]
+
+                    if post.data["will_renew"] is not None:
+                        params["will_renew"] = str(post.data["will_renew"]).lower()
+
+                extra.update(
+                    {
+                        "update_link": "https://www.boundlexx.app/tools/forum/?"
+                        + urlencode(params)
+                    }
+                )
+
             title, body = get_response(post.world, extra)
             return Response({"title": title, "body": body})
         return Response(post.errors, status=400)
+
+    post.operation_id = "createForumTemplate"  # type: ignore # noqa E501
 
 
 class ForumFormatView(FormView):

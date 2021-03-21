@@ -19,6 +19,12 @@ BASE = "boundlexx.ingest.ingest"
     help="Item localiazation group. Second pass to add localization strings to items",
 )
 @click.option(
+    "-o",
+    "--resources",
+    is_flag=True,
+    help="Resources group",
+)
+@click.option(
     "-s",
     "--skill",
     is_flag=True,

@@ -15,7 +15,9 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.client import BoundlessClient, Location
+from boundlexx.boundless.client import Settlment as SimpleSettlement
+from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
     calculate_extra_names,
@@ -62,7 +64,9 @@ class WorldManager(models.Manager):
             return world
         return None
 
-    def get_or_create_from_game_dict(self, world_dict):
+    def get_or_create_from_game_dict(  # pylint: disable=too-many-statements
+        self, world_dict
+    ):
         created = False
 
         with transaction.atomic():
@@ -123,6 +127,13 @@ class WorldManager(models.Manager):
             world.is_public = world_dict.get("public", default_public)
             world.number_of_regions = world_dict["numRegions"]
             world.active = True
+
+            if world.is_perm:
+                world.is_public_edit = True
+                world.is_public_claim = True
+            elif world.is_exo:
+                world.is_public_edit = True
+                world.is_public_claim = False
 
             if start is not None:
                 world.start = start
@@ -374,8 +385,12 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     text_name = models.TextField(blank=True, null=True)
     sort_name = models.TextField(blank=True, null=True, db_index=True)
 
+    atlas_image = models.ImageField(
+        blank=True, null=True, storage=select_storage("atlas")
+    )
+
     def __str__(self):
-        return self.display_name
+        return f"{self.display_name} (ID: {self.id})"
 
     @property
     def is_perm(self):
@@ -537,7 +552,10 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
                 if client is None:
                     client = BoundlessClient()
 
-                distance = client.get_world_distance(self.id, world.id)
+                distance = client.get_world_distance(
+                    SimpleWorld(self.id, self.api_url),
+                    SimpleWorld(world.id, world.api_url),
+                )
                 # value is returned as a float, no idea how cost formula works
                 # with non-whole numbers
                 if (
@@ -1095,7 +1113,7 @@ class WorldCreatureColor(
 
 class WorldPollManager(models.Manager):
     def _create_resource_counts(self, world_poll, resources_list):
-        resource_order = list(settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING.keys())
+        resource_order = settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
 
         resources = []
         embedded_total = 0
@@ -1106,19 +1124,22 @@ class WorldPollManager(models.Manager):
                 continue
 
             item_id = resource_order[index]
-            resources.append((item_id, amount))
+            item = Item.objects.select_related("resource_data").get(game_id=item_id)
 
-            if settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[item_id]:
+            is_embedded = False
+            if hasattr(item, "resource_data"):
+                is_embedded = item.resource_data.is_embedded
+            resources.append((item, amount, is_embedded))
+
+            if is_embedded:
                 embedded_total += amount
             else:
                 surface_total += amount
 
         for item_data in resources:
-            item_id, amount = item_data[0], item_data[1]
+            item, amount, is_embedded = item_data[0], item_data[1], item_data[2]
 
-            item = Item.objects.get(game_id=item_id)
-
-            if settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[item_id]:
+            if is_embedded:
                 total = embedded_total
             else:
                 total = surface_total
@@ -1129,7 +1150,6 @@ class WorldPollManager(models.Manager):
                 count=amount,
                 percentage=(amount / total) * 100,
                 average_per_chunk=amount / pow(world_poll.world.size, 2),
-                fixed_average=True,
             )
 
     def create_from_game_dict(self, world_dict, poll_dict, world=None, new_world=False):
@@ -1172,6 +1192,9 @@ class WorldPollManager(models.Manager):
                 args["name"] = (
                     args["name"].encode("latin1", errors="replace").decode("latin1")
                 )
+                args["text_name"] = html_name(args["name"], strip=True, colors=colors)
+                args["html_name"] = html_name(args["name"], colors=colors)
+
                 LeaderboardRecord.objects.create(**args)
 
         world_poll.refresh_from_db()
@@ -1246,7 +1269,6 @@ class ResourceCount(
     average_per_chunk = models.DecimalField(
         max_digits=10, decimal_places=2, blank=True, null=True
     )
-    fixed_average = models.BooleanField(default=False, db_index=True)
 
     class Meta:
         unique_together = (
@@ -1259,7 +1281,9 @@ class ResourceCount(
 
     @cached_property
     def is_embedded(self):
-        return settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING[self.item.game_id]
+        if hasattr(self.item, "resource_data"):
+            return self.item.resource_data.is_embedded  # pylint: disable=no-member
+        return False
 
 
 class LeaderboardRecord(
@@ -1268,7 +1292,7 @@ class LeaderboardRecord(
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     world_rank = models.PositiveSmallIntegerField(_("World Rank"))
-    guild_tag = models.CharField(_("Guild Tag"), max_length=7)
+    guild_tag = models.CharField(_("Guild Tag"), max_length=16)
     mayor_id = models.PositiveIntegerField()
     mayor_name = models.CharField(max_length=64)
     mayor_type = models.PositiveSmallIntegerField()
@@ -1285,3 +1309,128 @@ class LeaderboardRecord(
         )
 
         ordering = ["world_rank"]
+
+
+class Beacon(models.Model):
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
+    active = models.BooleanField(db_index=True, default=True)
+
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
+    is_campfire = models.BooleanField()
+    location_x = models.IntegerField()
+    location_y = models.IntegerField()
+    location_z = models.IntegerField()
+
+    _location = None
+
+    class Meta:
+        unique_together = (
+            "time",
+            "world",
+            "location_x",
+            "location_y",
+            "location_z",
+        )
+
+    @property
+    def location(self) -> Location:
+        if self._location is None:
+            self._location = Location(self.location_x, self.location_y, self.location_z)
+        return self._location
+
+    def scan(self):
+        for scan in self.beaconscan_set.all():
+            return scan
+        return None
+
+
+class BeaconScan(models.Model):
+    time = models.DateTimeField(auto_now_add=True, primary_key=True)
+
+    beacon = models.ForeignKey("Beacon", on_delete=models.CASCADE)
+    mayor_name = models.CharField(max_length=64)
+    prestige = models.PositiveIntegerField(blank=True, null=True)
+    compactness = models.SmallIntegerField(blank=True, null=True)
+    num_plots = models.PositiveIntegerField(blank=True, null=True)
+    num_columns = models.PositiveIntegerField(blank=True, null=True)
+    name = models.CharField(max_length=64, blank=True, null=True)
+    text_name = models.CharField(max_length=64, blank=True, null=True)
+    html_name = models.CharField(max_length=1024, blank=True, null=True)
+
+    class Meta:
+        unique_together = (
+            "time",
+            "beacon",
+        )
+
+
+class BeaconPlotColumn(models.Model):
+    beacon = models.ForeignKey("Beacon", on_delete=models.CASCADE)
+    plot_x = models.IntegerField()
+    plot_z = models.IntegerField()
+    count = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = (
+            "beacon",
+            "plot_x",
+            "plot_z",
+        )
+
+
+class SettlementManager(models.Manager):
+    def create_from_game_obj(self, world, settlement: SimpleSettlement, colors=None):
+        return self.create(
+            world=world,
+            location_x=settlement.location.x,
+            location_z=settlement.location.z,
+            prestige=settlement.prestige,
+            name=settlement.name,
+            text_name=html_name(settlement.name, strip=True, colors=colors),
+            html_name=html_name(settlement.name, colors=colors),
+        )
+
+
+class Settlement(models.Model):
+    class RankLevels(models.IntegerChoices):
+        OUTPOST = 0, _("Outpost")
+        HAMLET = 1, _("Hamlet")
+        VILLAGE = 2, _("Village")
+        TOWN = 3, _("Town")
+        CITY = 4, _("City")
+        GREAT_CITY = 5, _("Great City")
+
+    RANK_LEVEL_MAP: Dict[int, int] = {
+        0: 10000,
+        1: 50000,
+        2: 250000,
+        3: 1250000,
+        4: 6500000,
+        5: 32000000,
+    }
+
+    world = models.ForeignKey("World", on_delete=models.CASCADE)
+    location_x = models.IntegerField()
+    location_z = models.IntegerField()
+    prestige = models.PositiveIntegerField(db_index=True)
+    name = models.CharField(max_length=64)
+    text_name = models.CharField(max_length=64)
+    html_name = models.CharField(max_length=1024)
+
+    _location = None
+    objects = SettlementManager()
+
+    @property
+    def location(self) -> Location:
+        if self._location is None:
+            self._location = Location(self.location_x, None, self.location_z)
+        return self._location
+
+    @property
+    def level(self):
+        ranks = list(Settlement.RANK_LEVEL_MAP.items())
+        ranks = sorted(ranks, key=lambda i: i[1], reverse=True)
+        for index, rank in ranks:
+            if self.prestige > rank:
+                return index
+        return None

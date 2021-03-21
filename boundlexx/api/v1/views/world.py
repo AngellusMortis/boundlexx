@@ -12,6 +12,7 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, WorldFilterSet
+from boundlexx.api.common.serializers import BeaconSerializer, SettlementSerializer
 from boundlexx.api.common.viewsets import BoundlexxViewSet
 from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
@@ -25,8 +26,10 @@ from boundlexx.api.v1.serializers import (
     WorldBlockColorsViewSerializer,
 )
 from boundlexx.boundless.models import (
+    Beacon,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
+    Settlement,
     World,
     WorldDistance,
 )
@@ -167,8 +170,10 @@ class WorldViewSet(BoundlexxViewSet):
 
         world = self.get_object()
 
-        queryset = ItemShopStandPrice.objects.filter(world=world, active=True).order_by(
-            "item_id"
+        queryset = (
+            ItemShopStandPrice.objects.filter(world=world, active=True)
+            .select_related("item")
+            .order_by("item_id", "price")
         )
 
         page = self.paginate_queryset(queryset)
@@ -202,9 +207,11 @@ class WorldViewSet(BoundlexxViewSet):
 
         world = self.get_object()
 
-        queryset = ItemRequestBasketPrice.objects.filter(
-            world=world, active=True
-        ).order_by("item_id")
+        queryset = (
+            ItemRequestBasketPrice.objects.filter(world=world, active=True)
+            .select_related("item")
+            .order_by("item_id", "-price")
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -221,6 +228,72 @@ class WorldViewSet(BoundlexxViewSet):
         }
     }
     request_baskets.operation_id = "listWorldRequestBaskets"
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=BeaconSerializer,
+        url_path="beacons",
+    )
+    def beacons(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Beacons for given world
+        """
+
+        world = self.get_object()
+
+        queryset = (
+            Beacon.objects.filter(world=world, active=True)
+            .prefetch_related("beaconscan_set", "beaconplotcolumn_set")
+            .order_by("location_x", "location_y", "location_z")
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    beacons.operation_id = "listWorldBeacons"
+
+    @action(
+        detail=True,
+        methods=["get"],
+        serializer_class=SettlementSerializer,
+        url_path="settlements",
+    )
+    def settlements(
+        self,
+        request,
+        id=None,  # pylint: disable=redefined-builtin # noqa A002
+    ):
+        """
+        Gets current Settlements for given world
+        """
+
+        world = self.get_object()
+
+        queryset = Settlement.objects.filter(world=world).order_by(
+            "-prestige", "location_x", "location_z"
+        )
+
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(queryset, many=True)
+
+        return Response(serializer.data)
+
+    settlements.operation_id = "listWorldSettlements"
 
 
 class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):

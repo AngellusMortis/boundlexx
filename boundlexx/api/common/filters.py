@@ -75,7 +75,7 @@ class LocalizationFilterSet(BaseFilterSet):
 class EmojiFilterSet(BaseFilterSet):
     class Meta:
         model = Emoji
-        fields = ["is_boundless_only"]
+        fields = ["category"]
 
 
 class ItemFilterSet(LocalizationFilterSet):
@@ -84,26 +84,14 @@ class ItemFilterSet(LocalizationFilterSet):
         method="filter_colors",
     )
 
-    is_resource = filters.BooleanFilter(
-        label=_("Filters out items that are/are not resources"),
-        method="filter_resources",
-    )
-
     class Meta:
         model = Item
-        fields = ["string_id", "item_subtitle_id", "list_type__string_id"]
-
-    def filter_resources(self, queryset, name, value):
-        if value:
-            queryset = queryset.filter(
-                game_id__in=settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
-            )
-        elif value is False:
-            queryset = queryset.exclude(
-                game_id__in=settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING
-            )
-
-        return queryset
+        fields = [
+            "string_id",
+            "item_subtitle_id",
+            "list_type__string_id",
+            "is_resource",
+        ]
 
     def filter_colors(self, queryset, name, value):
         if value:

@@ -65,18 +65,18 @@ class Migration(migrations.Migration):
             'ALTER TABLE "boundless_worldpollresult" DROP CONSTRAINT "boundless_worldpollresult_pkey"', reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
-            "SELECT create_hypertable('boundless_worldpollresult', 'time', 'world_poll_id', 4, chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
+            "SELECT create_hypertable('boundless_worldpollresult', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
             'ALTER TABLE "boundless_resourcecount" DROP CONSTRAINT "boundless_resourcecount_pkey"', reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
-            "SELECT create_hypertable('boundless_resourcecount', 'time', 'world_poll_id', 4, chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
+            "SELECT create_hypertable('boundless_resourcecount', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
             'ALTER TABLE "boundless_leaderboardrecord" DROP CONSTRAINT "boundless_leaderboardrecord_pkey"', reverse_sql=migrations.RunSQL.noop
         ),
         migrations.RunSQL(
-            "SELECT create_hypertable('boundless_leaderboardrecord', 'time', 'world_poll_id', 4, chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
+            "SELECT create_hypertable('boundless_leaderboardrecord', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)", reverse_sql=migrations.RunSQL.noop
         ),
     ]

@@ -5,3 +5,4 @@ from django.core.cache import cache
 @click.command()
 def command():
     cache.reset_all()
+    cache.delete("boundless:prices:worlds")

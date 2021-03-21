@@ -13,7 +13,7 @@
     <script src="//unpkg.com/swagger-ui-dist@3/swagger-ui-bundle.js"></script>
     <script>
     const ui = SwaggerUIBundle({
-        url: "{% url url %}",
+        url: "{% url url %}?format=openapi-json",
         dom_id: '#swagger-ui',
         deepLinking: true,
         showExtensions: true,

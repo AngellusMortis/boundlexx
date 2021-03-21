@@ -8,6 +8,7 @@ from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.client import Location, ShopItem
+from boundlexx.boundless.client import World as SimpleWorld
 from boundlexx.boundless.models.game import Item
 from boundlexx.boundless.models.world import World
 from boundlexx.boundless.utils import html_name
@@ -15,7 +16,7 @@ from boundlexx.boundless.utils import html_name
 
 class ItemShopPriceManager(models.Manager):
     def create_from_shop_item(
-        self, world: str, item: Item, shop_item: ShopItem, colors=None
+        self, world: SimpleWorld, item: Item, shop_item: ShopItem, colors=None
     ) -> ItemShopPrice:
         return self.create(
             item_id=item.id,
@@ -31,7 +32,7 @@ class ItemShopPriceManager(models.Manager):
             location_x=shop_item.location.x,
             location_y=shop_item.location.y,
             location_z=shop_item.location.z,
-            world=World.objects.get(name=world),
+            world=World.objects.get(id=world.id, active=True),
         )
 
 
@@ -143,10 +144,12 @@ class ItemRank(models.Model):
         # inactive (11-19) goes 30, 40, 50, 60, 70, 80, 90, 100, 110, 120
         elif self.rank <= 20:
             delay = delay + offset * (self.rank - 11)
-        # dead (20-30) goes 150, 180, 210, 240, 270, 300, 330, 360 * 3
+        # dead (20-30) goes 180, 240, 300, 360, 420, 480, 540, 720 * 3
         else:
             delay = min(
-                delay + offset * (self.rank - 11) + offset * (self.rank - 20) * 2,
+                delay
+                + offset * (self.rank - 11)
+                + offset * (self.rank - 20) * settings.BOUNDLESS_DEAD_ITEM_MULTIPLIER,
                 settings.BOUNDLESS_MAX_ITEM_DELAY,
             )
 

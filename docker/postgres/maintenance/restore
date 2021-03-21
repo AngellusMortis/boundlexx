@@ -25,12 +25,12 @@ if [[ -z ${1+x} ]]; then
     exit 1
 fi
 backup_filename="${BACKUP_DIR_PATH}/${1}"
-if [[ ! -f "${backup_filename}" ]]; then
+if [[ ! -f "${backup_filename}.tar.gz" ]]; then
     message_error "No backup with the specified filename found. Check out the 'backups' maintenance script output to see if there is one and try again."
     exit 1
 fi
 
-message_welcome "Restoring the '${POSTGRES_DB}' database from the '${backup_filename}' backup..."
+message_welcome "Restoring the '${POSTGRES_DB}' database from the '${backup_filename}.gz' backup..."
 
 if [[ "${POSTGRES_USER}" == "postgres" ]]; then
     message_error "Restoring as 'postgres' user is not supported. Assign 'POSTGRES_USER' env with another one and try again."
@@ -43,13 +43,59 @@ export PGUSER="${POSTGRES_USER}"
 export PGPASSWORD="${POSTGRES_PASSWORD}"
 export PGDATABASE="${POSTGRES_DB}"
 
-message_info "Dropping the database..."
-dropdb "${PGDATABASE}"
-
-message_info "Creating a new database..."
-createdb --owner="${POSTGRES_USER}"
-
 message_info "Applying the backup to the new database..."
-gunzip -c "${backup_filename}" | psql "${POSTGRES_DB}"
+if [[ ! -d "${backup_filename}" ]]; then
+    message_info "Extracting compressed file..."
+    mkdir -p "${backup_filename}"
+    tar -xvf "${backup_filename}.tar.gz" -C "${backup_filename}"
+fi
 
-message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}' backup."
+message_info "Dropping un-flushable data..."
+psql -c "TRUNCATE django_content_type,auth_permission,django_migrations,django_site CASCADE"
+
+message_info "Restoring non-hypertables tables..."
+pg_restore --disable-triggers -d ${POSTGRES_DB} -O -x -a "${backup_filename}/main.sql.tar"
+
+message_info "Restoring hypertables..."
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_itemshopstandprice \
+    --file "${backup_filename}/shopstand.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_itemrequestbasketprice \
+    --file "${backup_filename}/requestbasket.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_worldpollresult \
+    --file "${backup_filename}/worldpoll.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_leaderboardrecord \
+    --file "${backup_filename}/leaderboard.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_beaconscan \
+    --file "${backup_filename}/beaconscan.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+timescaledb-parallel-copy \
+    --connection "host=localhost user=${POSTGRES_USER} sslmode=disable" \
+    --db-name "${POSTGRES_DB}" --table boundless_resourcecount \
+    --file "${backup_filename}/resourcecount.csv" \
+    --workers 8 --reporting-period 30s --truncate \
+    --copy-options "CSV HEADER"
+
+message_success "The '${POSTGRES_DB}' database has been restored from the '${backup_filename}.tar.gz' backup."
+if [[ -d "${backup_filename}" ]]; then
+    message_info "Removing uncompressed files..."
+    rm -rf "${backup_filename}"
+fi

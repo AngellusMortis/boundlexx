@@ -121,8 +121,10 @@ class ItemViewSet(
 
         item = self.get_object()
 
-        queryset = ItemShopStandPrice.objects.filter(item=item, active=True).order_by(
-            "world_id"
+        queryset = (
+            ItemShopStandPrice.objects.filter(item=item, active=True)
+            .select_related("world")
+            .order_by("price")
         )
 
         page = self.paginate_queryset(queryset)
@@ -153,9 +155,11 @@ class ItemViewSet(
 
         item = self.get_object()
 
-        queryset = ItemRequestBasketPrice.objects.filter(
-            item=item, active=True
-        ).order_by("world_id")
+        queryset = (
+            ItemRequestBasketPrice.objects.filter(item=item, active=True)
+            .select_related("world")
+            .order_by("-price")
+        )
 
         page = self.paginate_queryset(queryset)
         if page is not None:
@@ -218,7 +222,8 @@ class ItemResourceCountViewSet(
         world_poll__active=True,
         world_poll__world__active=True,
         world_poll__world__is_public=True,
-    ).select_related("world_poll", "world_poll__world", "item")
+        world_poll__world__is_creative=False,
+    ).select_related("world_poll", "world_poll__world", "item", "item__resource_data")
 
     serializer_class = ItemResourceCountSerializer
     lookup_field = "world_id"
@@ -362,15 +367,15 @@ class ItemResourceWorldListViewSet(
     def get_queryset(self):
         item_id = self.kwargs.get("item__game_id")
 
+        if item_id not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
+            raise Http404
+
         queryset = World.objects.filter(is_public=True)
 
         if item_id is not None:
             queryset = queryset.filter(
                 worldpoll__resourcecount__item__game_id=item_id
             ).distinct("id")
-
-        if queryset.count() == 0:
-            raise Http404
 
         return queryset
 

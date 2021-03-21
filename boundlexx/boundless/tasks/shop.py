@@ -1,5 +1,10 @@
 import hashlib
+import re
+import time
+from ast import literal_eval
 from collections import namedtuple
+from datetime import timedelta
+from http.client import RemoteDisconnected
 from typing import Dict, List
 
 from celery.utils.log import get_task_logger
@@ -7,6 +12,8 @@ from django.conf import settings
 from django.core.cache import cache
 from django.db.models import Q
 from django.utils import timezone
+from django_celery_results.models import TaskResult
+from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
 from boundlexx.boundless.client import World as SimpleWorld
@@ -31,13 +38,64 @@ UpdateOption = namedtuple(
 
 
 UPDATE_PRICES_LOCK = "boundless:update_prices"
+WORLDS_QUEUED_LOCK = "boundless:prices:update_worlds"
+WORLDS_QUEUED_CACHE = "boundless:prices:worlds"
+UPDATE_PRICES_TASK = "boundlexx.boundless.tasks.shop.update_prices_split"
+
+
+def _get_queued_worlds():
+    logger.info("Getting queued worlds lock (get)...")
+    with cache.lock(WORLDS_QUEUED_LOCK):
+        queued_worlds = list(cache.get(WORLDS_QUEUED_CACHE, set()))
+        logger.info("Releasing queued worlds lock (get)...")
+    return queued_worlds
+
+
+def _update_queued_worlds(worlds):
+    actual_worlds = []
+    logger.info("Getting queued worlds lock (update)...")
+    with cache.lock(WORLDS_QUEUED_LOCK):
+        in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
+
+        for world in worlds:
+            if world.id not in in_progress_ids:
+                in_progress_ids.add(world.id)
+                actual_worlds.append(world)
+
+        logger.info("Added queued worlds: %s", [w.id for w in actual_worlds])
+        logger.info("Set queued worlds (update): %s", in_progress_ids)
+        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
+        logger.info("Releasing queued worlds lock (update)...")
+
+    return actual_worlds
+
+
+def _remove_queued_worlds(world_ids):
+    logger.info("Getting queued worlds lock (remove)...")
+    with cache.lock(WORLDS_QUEUED_LOCK):
+        logger.info("Removing queued worlds: %s", world_ids)
+        in_progress_ids = cache.get(WORLDS_QUEUED_CACHE, set())
+
+        for world_id in world_ids:
+            in_progress_ids.discard(world_id)
+
+        logger.info("Set queued worlds (remove): %s", in_progress_ids)
+        cache.set(WORLDS_QUEUED_CACHE, in_progress_ids, timeout=21600)
+        logger.info("Releasing queued worlds lock (remove)...")
 
 
 @app.task
 def update_prices(world_ids=None):
+    queued_ids = _get_queued_worlds()
+
     if world_ids is None:
         worlds = (
-            World.objects.filter(active=True, is_creative=False, api_url__isnull=False)
+            World.objects.filter(
+                active=True,
+                is_creative=False,
+                api_url__isnull=False,
+                is_public=True,
+            )
             .filter(
                 Q(end__isnull=True)
                 | Q(
@@ -45,13 +103,18 @@ def update_prices(world_ids=None):
                     end__isnull=False,
                     end__gt=timezone.now(),
                     owner__isnull=False,
-                    is_public=True,
+                    start__lte=timezone.now() - timedelta(hours=12),
                 )
             )
             .exclude(api_url="")
+            .exclude(id__in=queued_ids)
         )
     else:
         worlds = World.objects.filter(id__in=world_ids).order_by("id")
+
+    if worlds.count() == 0:
+        logger.info("No worlds to update")
+        return
 
     _update_prices_multi(worlds)
 
@@ -76,7 +139,7 @@ def _update_prices_multi(worlds, name=None):
     if name is not None:
         lock_name = f"{lock_name}:{name}"
 
-    lock = cache.lock(lock_name, expire=21600, auto_renewal=False)
+    lock = cache.lock(lock_name, expire=120, auto_renewal=False)
 
     acquired = lock.acquire(blocking=True, timeout=1)
 
@@ -93,7 +156,7 @@ def _update_prices_multi(worlds, name=None):
 
 
 def _get_ranks(item, rank_klass, all_worlds):
-    ranks: Dict[str, ItemRank] = {}
+    ranks: Dict[int, ItemRank] = {}
     worlds: List[SimpleWorld] = []
 
     now = timezone.now()
@@ -101,13 +164,13 @@ def _get_ranks(item, rank_klass, all_worlds):
     for world in all_worlds:
         rank, _ = rank_klass.objects.get_or_create(item=item, world=world)
         if rank.next_update < now:
-            ranks[world.name] = rank
-            worlds.append(SimpleWorld(world.name, world.api_url))
+            ranks[world.id] = rank
+            worlds.append(SimpleWorld(world.id, world.api_url))
 
     return ranks, worlds
 
 
-def _create_item_prices(shops, price_klass, world_name, item):
+def _create_item_prices(shops, price_klass, world: SimpleWorld, item):
     shops = sorted(
         shops,
         key=lambda s: f"{s.location.x},{s.location.y},{s.location.z}",
@@ -119,7 +182,7 @@ def _create_item_prices(shops, price_klass, world_name, item):
     state_hash = hashlib.sha512()
     for shop in shops:
         item_price = price_klass.objects.create_from_shop_item(
-            world_name, item, shop, colors=colors
+            world, item, shop, colors=colors
         )
 
         state_hash.update(item_price.state_hash)
@@ -128,7 +191,22 @@ def _create_item_prices(shops, price_klass, world_name, item):
     return total, state_hash
 
 
-def _update_item_prices(item, rank_klass, client_method, price_klass, all_worlds):
+def _get_shops(client, client_method, item, world):
+    try:
+        return getattr(client, client_method)(item.game_id, world=world)
+    except RequestsConnectionError as ex:
+        if "RemoteDisconnected" not in str(ex):
+            raise
+        logger.warning("RemoteDisconnected for item %s on world %s", item, world)
+    except RemoteDisconnected:
+        logger.warning("RemoteDisconnected for item %s on world %s", item, world)
+
+    return None
+
+
+def _update_item_prices(
+    item, rank_klass, client_method: str, price_klass, all_worlds: List[SimpleWorld]
+):
 
     client = BoundlessClient()
     ranks, worlds = _get_ranks(item, rank_klass, all_worlds)
@@ -137,21 +215,23 @@ def _update_item_prices(item, rank_klass, client_method, price_klass, all_worlds
         return -1
 
     total = 0
-    shops = getattr(client, client_method)(item.game_id, worlds=worlds)
 
-    # set all existing price records to inactive
-    price_klass.objects.filter(
-        item=item, active=True, world__name__in=list(ranks.keys())
-    ).update(active=False)
+    for world in worlds:
+        shops = _get_shops(client, client_method, item, world)
 
-    for world_name, shops in shops.items():
-        item_total, state_hash = _create_item_prices(
-            shops, price_klass, world_name, item
+        if shops is None:
+            continue
+
+        # set all existing price records to inactive
+        price_klass.objects.filter(item=item, active=True, world__id=world.id).update(
+            active=False
         )
+
+        item_total, state_hash = _create_item_prices(shops, price_klass, world, item)
         total += item_total
 
         digest = str(state_hash.hexdigest())
-        rank = ranks[world_name]
+        rank = ranks[world.id]
         if rank.state_hash != "":
             if rank.state_hash == digest:
                 rank.decrease_rank()
@@ -168,7 +248,7 @@ def _update_item_prices(item, rank_klass, client_method, price_klass, all_worlds
 def _log_worlds(all_worlds):
     worlds = []
     for world in all_worlds:
-        worlds.append((world.name, world.api_url))
+        worlds.append((world.id, world.display_name, world.api_url))
 
     logger.info("All worlds: %s", worlds)
 
@@ -198,14 +278,73 @@ def _split_update_prices(worlds):
         update_prices_split.delay(worlds_ids)
 
 
-def _update_prices(worlds):
+def _log_result(item, buy_updated, sell_updated):
+    def status(v):
+        return v if v >= 0 else "skipped" if v == -1 else "error"
+
+    if buy_updated >= -1 or sell_updated >= -1:
+        if buy_updated == -1 and sell_updated == -1:
+            logger.info("Skipped %s", item)
+        else:
+            logger.info(
+                "Updated %s (Baskets: %s, Stands: %s)",
+                item,
+                status(buy_updated),
+                status(sell_updated),
+            )
+
+
+def _check_split(worlds):
     total = len(worlds)
-    if total > settings.BOUNDLESS_MAX_SOV_WORLDS_PER_PRICE_POLL:
-        _split_update_prices(worlds)
+
+    first_world = worlds[0]
+
+    if first_world.is_perm:
+        if total > settings.BOUNDLESS_MAX_PERM_WORLDS_PER_PRICE_POLL:
+            _split_update_prices(worlds)
+            return True
+    elif first_world.is_sovereign:
+        if total > settings.BOUNDLESS_MAX_SOV_WORLDS_PER_PRICE_POLL:
+            _split_update_prices(worlds)
+            return True
+
+    return False
+
+
+def _remove_world(message, worlds):
+    world = None
+    match = re.findall(r"playboundless\.com/(\d+)/api", message)
+    if match is not None:
+        world = [w for w in worlds if w.id == int(match[0])][0]
+
+    if world is None:
+        logger.warning(
+            "World not found, but could not find world ID in string '%s'", message
+        )
+    else:
+        logger.warning(
+            "World (%s) not found, removing from list of worlds to query",
+            world,
+        )
+        worlds.remove(world)
+
+    return worlds
+
+
+def _update_prices(worlds):
+    worlds = list(worlds)
+    did_split = _check_split(worlds)
+
+    if did_split:
         return
 
-    worlds = list(worlds)
+    worlds = _update_queued_worlds(worlds)
 
+    if len(worlds) == 0:
+        logger.info("No worlds to update")
+        return
+
+    ids_to_remove = [w.id for w in worlds]
     items = Item.objects.filter(active=True, can_be_sold=True)
     logger.info("Updating the prices for %s items", len(items))
 
@@ -213,43 +352,82 @@ def _update_prices(worlds):
 
     errors_total = 0
 
-    for item in items:
-        try:
-            buy_updated = _update_item_prices(
-                item,
-                ItemBuyRank,
-                "shop_buy",
-                ItemRequestBasketPrice,
-                worlds,
-            )
-        except HTTP_ERRORS as ex:
-            errors_total += 1
-            buy_updated = -2
-            logger.error("%s while uploading buy prices of %s", ex, item)
+    try:
+        for item in items:
+            buy_updated, sell_updated = -1, -1
 
-        try:
-            sell_updated = _update_item_prices(
-                item, ItemSellRank, "shop_sell", ItemShopStandPrice, worlds
-            )
-        except HTTP_ERRORS as ex:
-            errors_total += 1
-            sell_updated = -2
-            logger.error("%s while uploading sell prices of %s", ex, item)
-
-        if buy_updated >= -1 or sell_updated >= -1:
-            if buy_updated == -1 and sell_updated == -1:
-                logger.info("Skipped %s", item)
-            else:
-
-                def status(v):
-                    return v if v >= 0 else "skipped" if v == -1 else "error"
-
-                logger.info(
-                    "Updated %s (Baskets: %s, Stands: %s)",
+            try:
+                buy_updated = _update_item_prices(
                     item,
-                    status(buy_updated),
-                    status(sell_updated),
+                    ItemBuyRank,
+                    "shop_buy",
+                    ItemRequestBasketPrice,
+                    worlds,
                 )
+            except HTTP_ERRORS as ex:
+                response_code = None
 
-        if errors_total > 10:
-            raise Exception("Aborting due to large number of HTTP errors")
+                if hasattr(ex, "response") and ex.response is not None:  # type: ignore
+                    response_code = ex.response.status_code  # type: ignore
+
+                if response_code == 404:
+                    worlds = _remove_world(str(ex), worlds)
+
+                # 403 with an API key can actually be a rate limit...
+                elif not response_code == 403:
+                    errors_total += 1
+                    buy_updated = -2
+                    logger.error(
+                        "%s, %s while updating buy prices of %s", ex.__class__, ex, item
+                    )
+                    time.sleep(5)
+
+            try:
+                sell_updated = _update_item_prices(
+                    item, ItemSellRank, "shop_sell", ItemShopStandPrice, worlds
+                )
+            except HTTP_ERRORS as ex:
+                # 403 with an API key can actually be a rate limit...
+                if not (
+                    hasattr(ex, "response")
+                    and ex.response is not None  # type: ignore
+                    and ex.response.status_code == 403  # type: ignore
+                ):
+                    errors_total += 1
+                    sell_updated = -2
+                    logger.error(
+                        "%s, %s while updating sell prices of %s",
+                        ex.__class__,
+                        ex,
+                        item,
+                    )
+                    time.sleep(5)
+
+            _log_result(item, buy_updated, sell_updated)
+            if errors_total > 20:
+                raise Exception("Aborting due to large number of HTTP errors")
+    finally:
+        _remove_queued_worlds(ids_to_remove)
+
+
+@app.task
+def clean_up_queued_worlds():
+    logger.info("Getting queued worlds lock (clean)...")
+    with cache.lock(WORLDS_QUEUED_LOCK):
+        cached_queued_worlds = cache.get(WORLDS_QUEUED_CACHE, set())
+        in_progress_tasks = TaskResult.objects.filter(
+            task_name=UPDATE_PRICES_TASK, status="STARTED"
+        )
+        logger.info("Releasing queued worlds lock (clean)...")
+
+    actual_queued_worlds = set()
+    for task in in_progress_tasks:
+        world_ids: List[int] = literal_eval(task.task_args)[0]
+        for world_id in world_ids:
+            if world_id in actual_queued_worlds:
+                logger.warning("Duplicate world ID found!")
+            actual_queued_worlds.add(world_id)
+
+    old_queued_worlds = cached_queued_worlds - actual_queued_worlds
+
+    _remove_queued_worlds(list(old_queued_worlds))

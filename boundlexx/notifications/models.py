@@ -31,57 +31,19 @@ from boundlexx.notifications.utils import get_forum_client
 User = get_user_model()
 logger = logging.getLogger(__file__)
 
-FORUM_LOOKUP_IMAGES = {
-    "atmosphere": {
-        "Normal": "upload://zQPL2iTQyNRjnveK1pbaFUcg4i4.png",
-        "Potent": "upload://linnMQpEPnT5pRqJIWFHTMdeLPx.png",
-        "Caustic": "upload://2x7uv24VIfWgkNDTqFVx5Gk2gIR.png",
-        "Volatile": "upload://d5YyGKl5Yen386685JSv4ImOL5u.png",
-    },
-    "world_image": "upload://eS8DcCKkoJlt7y92Nt2TevbKjgb.png",
-    "tier": "upload://zQPL2iTQyNRjnveK1pbaFUcg4i4.png",
-    "name": "upload://bzts4NY6U0qkkIqMKTj0KkZC84J.png",
-    "type": {
-        "METAL": "upload://c3dr1zplLt6oZDgzlZomOZueAlo.png",
-        "LUSH": "upload://f354Yvp4oXkXaxyg7xjm2zmGmaE.png",
-        "COAL": "upload://g5p1MqEsw28PO6r9urF7qgtJzPv.png",
-        "BURN": "upload://22vHpbbakPNllMvweQdPYDtWehI.png",
-        "BLAST": "upload://fnB3eiyIpVaBQt352s6OWrro79T.png",
-        "CHILL": "upload://ocqxUujgpad17Qd5EMzyLLot9sI.png",
-        "SHOCK": "upload://pIXkMl6LS39GAvrN2VoosVefLQn.png",
-        "TOXIC": "upload://u0a11C8AsRwGmTtTnKsTxPBhIcD.png",
-        "CORROSIVE": "upload://gDaVjwVAXO0HoeXAxMuzxf7KNjK.png",
-        "DARKMATTER": "upload://bdqxtxS4nyezAXOA9WDFq8uFDnh.png",
-        "RIFT": "upload://bMQ6ivM8A7OQ5gOX6UeOO5scLn3.png",
-        "BLINK": "upload://xpjPdoHtk5xxkvCf7pS6NPlX7jf.png",
-    },
-    "liquid": "upload://58uDj8uNmp52zqscy8PBW6k4alj.png",
-    "server": "upload://zIT1kP3jGkZWWDAPCVcPknxsCSB.png",
-    "lifetime": "upload://sKrov0t6oQapS2LKHlx7WkGYyx8.png",
-    "blinksec": "upload://3rARAhHkZrnva4hiOeZRhXoSZO4.png",
-    "warpcost": "upload://9dzMQi3rgBh0OJyl88r7mSNedwR.png",
-    "exo_color": "upload://ya3ST9IB6OehJNYg6jY559ku9PH.png",
-    "exo_color_new": "upload://lr0si60hUaEwkOP3UIsJFR7l0Lw.png",
-    "by_recipe": "upload://xFrZpq1fBHP9zGCYGSZMyX3SfLo.png",
-    "timelapse": "upload://oHqrS83ax0p0hsCLuR2mJnaoW6K.png",
-    "owner": "upload://8UfHjxV1950IdfuKNcDumg9equG.png",
-    "permissions": "upload://zbesXUQO9RZUEP7TNiHA24EVT9w.png",
-    "portal": "upload://2GR4nUcRGOaMMDzj452JuqxVMWr.png",
-    "perm_color": "upload://hRlPcEQgOBNrB5q38AT7n1cPleB.png",
-    "no": "upload://lUw9F65kR3NVYsTkOSLN9EvSRcO.png",
-    "yes": "upload://jLQDuByRq1uNMUafarQRF6ZrAu1.png",
-}
-
 
 class ForumImage(models.Model):
     class ImageType(models.IntegerChoices):
         COLOR = 0, _("Color")
         WORLD = 1, _("World")
+        TYPE = 2, _("World Type")
+        ATMOSPHERE = 3, _("Atmosphere")
+        MISC = 4, _("Misc.")
 
     image_type = models.PositiveSmallIntegerField(
         choices=ImageType.choices, db_index=True
     )
-    lookup_id = models.PositiveSmallIntegerField(db_index=True)
+    lookup_id = models.CharField(db_index=True, max_length=64)
     url = models.TextField(db_index=True)
     shortcut_url = models.CharField(max_length=64)
 
@@ -384,7 +346,6 @@ class WorldNotification(NotificationBase):
             "world": world,
             "color_groups": color_groups,
             "default_color_groups": default_color_groups,
-            "icons": FORUM_LOOKUP_IMAGES,
         }
         if resources is not None and not world.is_creative:
             embedded_resources = []
@@ -416,11 +377,35 @@ class WorldNotification(NotificationBase):
 
         return self._markdown_replace(message)
 
-    def _get_forum_image_dict(self, image_type):
+    def _get_world_images(self, ids):
+        from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
+
+        worlds = World.objects.filter(id__in=ids)
+        world_images: Dict[str, str] = {}
+
+        for world in worlds:
+            world_images[str(world.id)] = world.image.url
+
+        return world_images
+
+    def _get_forum_image_dict(self, image_type, use_forum_links=True):
         image_dict = {}
 
-        for image in ForumImage.objects.filter(image_type=image_type):
-            image_dict[image.lookup_id] = image.shortcut_url
+        world_images: Optional[Dict[str, str]] = None
+
+        forum_images = list(ForumImage.objects.filter(image_type=image_type))
+
+        for image in forum_images:
+            if use_forum_links:
+                image_dict[image.lookup_id] = image.shortcut_url
+            elif image_type == ForumImage.ImageType.WORLD:
+                if world_images is None:
+                    world_images = self._get_world_images(
+                        [f.lookup_id for f in forum_images]
+                    )
+                image_dict[image.lookup_id] = world_images[image.lookup_id]
+            else:
+                image_dict[image.lookup_id] = image.url
 
         return image_dict
 
@@ -461,7 +446,27 @@ class WorldNotification(NotificationBase):
 
         return forum_image.shortcut_url
 
-    def forum(self, world, resources, extra=None):  # pylint: disable=arguments-differ
+    def _get_resources(self, world):
+        from boundlexx.boundless.models import (  # pylint: disable=cyclic-import
+            WorldPoll,
+        )
+
+        wp = WorldPoll.objects.filter(world=world).order_by("time").first()
+        if wp is not None:
+            return wp.resources
+        return None
+
+    def forum(
+        self, world, resources=None, extra=None
+    ):  # pylint: disable=arguments-differ
+
+        if resources is None:
+            self._get_resources(world)
+
+        use_forum_links = True
+        if extra is not None:
+            use_forum_links = extra.get("forum_links", True)
+
         special_type = ""
         if world.special_type is not None and world.special_type > 0:
             special_type = f"{world.get_special_type_display()} "
@@ -474,16 +479,34 @@ class WorldNotification(NotificationBase):
         )
 
         extra_context = {
-            "color_images": self._get_forum_image_dict(ForumImage.ImageType.COLOR),
-            "world_images": self._get_forum_image_dict(ForumImage.ImageType.WORLD),
+            "color_images": self._get_forum_image_dict(
+                ForumImage.ImageType.COLOR, use_forum_links=use_forum_links
+            ),
+            "world_images": self._get_forum_image_dict(
+                ForumImage.ImageType.WORLD, use_forum_links=use_forum_links
+            ),
+            "world_type_images": self._get_forum_image_dict(
+                ForumImage.ImageType.TYPE, use_forum_links=use_forum_links
+            ),
+            "atmosphere_images": self._get_forum_image_dict(
+                ForumImage.ImageType.ATMOSPHERE, use_forum_links=use_forum_links
+            ),
+            "misc_images": self._get_forum_image_dict(
+                ForumImage.ImageType.MISC, use_forum_links=use_forum_links
+            ),
         }
 
         if (
             world.image is not None
             and world.image.name
-            and world.id not in extra_context["world_images"]
+            and str(world.id) not in extra_context["world_images"]
         ):
-            extra_context["world_images"][world.id] = self._upload_world_image(world)
+            if use_forum_links:
+                extra_context["world_images"][world.id] = self._upload_world_image(
+                    world
+                )
+            else:
+                extra_context["world_images"][world.id] = world.image.url
 
         if extra is not None:
             extra_context.update(extra)
@@ -628,7 +651,7 @@ class WorldNotification(NotificationBase):
                 if world.is_exo:
                     if color.is_new_exo:
                         extra.append("**NEW**")
-                    elif not color.is_perm:
+                    elif color.is_new:
                         if color.transform_first_world is not None:
                             extra.append("**TRANS**")
                         if color.transform_last_exo is not None:
