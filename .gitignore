@@ -6,6 +6,8 @@ docker-compose.override.yml
 .live.env
 .steam/*
 !.steam/.gitkeep
+postgres
+game
 
 ### Python template
 # Byte-compiled / optimized / DLL files
