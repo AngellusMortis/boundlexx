@@ -56,6 +56,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
             "id",
             "active",
             "image_url",
+            "name",
             "display_name",
             "text_name",
             "html_name",

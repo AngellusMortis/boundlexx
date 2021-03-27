@@ -82,7 +82,7 @@ def run():
 
     data_created = 0
     click.echo("Creating Resource Data...")
-    # TODO: 0 = Live universe, 1 = Multiverse?
+    # 0 = Live universe, 1 = Multiverse?
     with click.progressbar(resourcetiers[0].items()) as pbar:
         for block_name, resource_data in pbar:
             block = Block.objects.select_related("block_item").get(name=block_name)
