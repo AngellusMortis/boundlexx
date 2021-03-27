@@ -64,6 +64,7 @@ class SimpleWorldSerializer(IDWorldSerializer):
             "size",
             "world_type",
             "region",
+            "address",
             "special_type",
             "is_sovereign",
             "is_perm",
