@@ -39,7 +39,7 @@ def _get_liquid(game_id):
 def _create_world_types(resource_data, created, data):
     world_types = []
 
-    for world_type in resource_data["bestWorld"]["types"]:
+    for world_type in resource_data["bestType"]["types"]:
         world_types.append(world_type.replace("_EXO", ""))
 
     if not created:
@@ -82,7 +82,8 @@ def run():
 
     data_created = 0
     click.echo("Creating Resource Data...")
-    with click.progressbar(resourcetiers.items()) as pbar:
+    # TODO: 0 = Live universe, 1 = Multiverse?
+    with click.progressbar(resourcetiers[0].items()) as pbar:
         for block_name, resource_data in pbar:
             block = Block.objects.select_related("block_item").get(name=block_name)
 
@@ -107,8 +108,8 @@ def run():
                 "exo_only": resource_data.get("exoOnly", False),
                 "max_tier": resource_data["maxTier"],
                 "min_tier": resource_data["minTier"],
-                "best_max_tier": resource_data["bestWorld"]["maxTier"],
-                "best_min_tier": resource_data["bestWorld"]["minTier"],
+                "best_max_tier": resource_data["bestType"]["maxTier"],
+                "best_min_tier": resource_data["bestType"]["minTier"],
                 "shape": resource_profile["shape"],
                 "size_max": resource_profile["sizeMax"],
                 "size_min": resource_profile["sizeMin"],

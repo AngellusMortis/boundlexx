@@ -26,11 +26,17 @@ logger = get_task_logger(__name__)
 
 
 def _get_search_ids():
-    existing_worlds = World.objects.filter(
-        id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID,
-        end__isnull=False,
-        end__gt=timezone.now() - settings.BOUNDLEXX_WORLD_SEARCH_OFFSET,
-    ).order_by("id")
+    existing_worlds = (
+        World.objects.filter(id__lt=settings.BOUNDLESS_EXO_EXPIRED_BASE_ID)
+        .filter(
+            Q(end__isnull=True)
+            | Q(
+                end__isnull=False,
+                end__gt=timezone.now() - settings.BOUNDLEXX_WORLD_SEARCH_OFFSET,
+            )
+        )
+        .order_by("id")
+    )
 
     existing_ids = set()
     lowest_id = settings.BOUNDLESS_EXO_EXPIRED_BASE_ID
