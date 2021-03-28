@@ -18,6 +18,7 @@ from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
 from boundlexx.api.v1.serializers import (
+    KindOfSimpleWorldSerializer,
     URLWorldDistanceSerializer,
     URLWorldRequestBasketPriceSerializer,
     URLWorldSerializer,
@@ -39,22 +40,9 @@ logger = getLogger(__file__)
 
 
 class WorldViewSet(BoundlexxViewSet):
-    queryset = (
-        World.objects.filter(is_public=True)
-        .select_related("assignment")
-        .prefetch_related(
-            "worldblockcolor_set",
-            "worldblockcolor_set__item",
-            "worldblockcolor_set__color",
-            "worldblockcolor_set__first_world",
-            "worldblockcolor_set__last_exo",
-            "worldblockcolor_set__transform_first_world",
-            "worldblockcolor_set__transform_last_exo",
-            "itembuyrank_set",
-            "itemsellrank_set",
-        )
-    )
-    serializer_class = URLWorldSerializer
+    queryset = World.objects.filter(is_public=True)
+    serializer_class = KindOfSimpleWorldSerializer
+    detail_serializer_class = URLWorldSerializer
     lookup_field = "id"
     filter_backends = [
         DjangoFilterBackend,
@@ -70,6 +58,25 @@ class WorldViewSet(BoundlexxViewSet):
         "id",
         "text_name",
     ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        # only get all relations on detail view
+        if self.detail:
+            queryset = queryset.select_related("assignment").prefetch_related(
+                "worldblockcolor_set",
+                "worldblockcolor_set__item",
+                "worldblockcolor_set__color",
+                "worldblockcolor_set__first_world",
+                "worldblockcolor_set__last_exo",
+                "worldblockcolor_set__transform_first_world",
+                "worldblockcolor_set__transform_last_exo",
+                "itembuyrank_set",
+                "itemsellrank_set",
+            )
+
+        return queryset
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -96,7 +103,7 @@ class WorldViewSet(BoundlexxViewSet):
     @action(
         detail=False,
         methods=["get"],
-        serializer_class=URLWorldSerializer,
+        serializer_class=KindOfSimpleWorldSerializer,
         url_path="simple",
     )
     def simple(self, request, *args, **kwargs):
@@ -112,7 +119,7 @@ class WorldViewSet(BoundlexxViewSet):
         return self.list(request, *args, **kwargs)
 
     simple.operation_id = "listWorldsSimple"
-    simple.deprecated = True  # type: ignore
+    simple.deprecated = True
 
     @action(
         detail=True,

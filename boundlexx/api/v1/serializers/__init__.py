@@ -21,6 +21,7 @@ from boundlexx.api.v1.serializers.game import (
     URLWorldShopStandPriceSerializer,
 )
 from boundlexx.api.v1.serializers.world import (
+    KindOfSimpleWorldSerializer,
     PossibleColorSerializer,
     PossibleItemSerializer,
     URLBlockColorSerializer,
@@ -37,6 +38,7 @@ from boundlexx.api.v1.serializers.world import (
 from boundlexx.boundless.models import WorldPoll
 
 __all__ = [
+    "KindOfSimpleWorldSerializer",
     "PossibleColorSerializer",
     "PossibleItemSerializer",
     "URLBlockColorSerializer",
