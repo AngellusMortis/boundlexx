@@ -342,6 +342,9 @@ class WorldNotification(NotificationBase):
             if len(default_color_groups) == 0:
                 default_color_groups = None
 
+        if resources is None:
+            resources = self._get_resources(world)
+
         context = {
             "world": world,
             "color_groups": color_groups,
@@ -459,9 +462,6 @@ class WorldNotification(NotificationBase):
     def forum(
         self, world, resources=None, extra=None
     ):  # pylint: disable=arguments-differ
-
-        if resources is None:
-            self._get_resources(world)
 
         use_forum_links = True
         if extra is not None:
