@@ -49,7 +49,7 @@ class ItemShopPrice(models.Model):
     beacon_name = models.CharField(max_length=64, db_index=True)
     beacon_text_name = models.CharField(max_length=64, null=True, blank=True)
     beacon_html_name = models.CharField(max_length=1024, null=True, blank=True)
-    guild_tag = models.CharField(max_length=8)
+    guild_tag = models.CharField(max_length=16)
     shop_activity = models.IntegerField()
     active = models.BooleanField(db_index=True, default=True)
 
