@@ -79,7 +79,3 @@ services:
       - redis
       - postgres
     command: /start-celerybeat
-
-  flower:
-    <<: *django
-    command: /start-flower

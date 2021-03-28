@@ -18,7 +18,6 @@ from boundlexx.api.examples import world as examples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
 from boundlexx.api.v1.serializers import (
-    KindOfSimpleWorldSerializer,
     URLWorldDistanceSerializer,
     URLWorldRequestBasketPriceSerializer,
     URLWorldSerializer,
@@ -75,17 +74,11 @@ class WorldViewSet(BoundlexxViewSet):
     def list(self, request, *args, **kwargs):  # noqa A003
         """
         Retrieves the list of worlds avaiable in Boundless.
-
-        This endpoint is deprecated in favor of `/api/v1/worlds/simple/`.
-
-        The functionality of this endpoint will be replaced with that one in the
-        on 1 December 2020.
         """
 
         return super().list(request, *args, **kwargs)  # pylint: disable=no-member
 
     list.example = {"list": {"value": get_list_example(examples.WORLD_EXAMPLE)}}  # type: ignore # noqa E501
-    list.deprecated = True  # type: ignore
 
     def retrieve(
         self,
@@ -103,13 +96,23 @@ class WorldViewSet(BoundlexxViewSet):
     @action(
         detail=False,
         methods=["get"],
-        serializer_class=KindOfSimpleWorldSerializer,
+        serializer_class=URLWorldSerializer,
         url_path="simple",
     )
     def simple(self, request, *args, **kwargs):
+        """
+        Migration/simplication of endpoint has been completeled.
+
+        This endpoint is deprecated as it is a copy of `/api/v1/worlds/`.
+
+        The functionality of this endpoint will be replaced with that one in the
+        on 1 May 2020.
+        """
+
         return self.list(request, *args, **kwargs)
 
     simple.operation_id = "listWorldsSimple"
+    simple.deprecated = True  # type: ignore
 
     @action(
         detail=True,

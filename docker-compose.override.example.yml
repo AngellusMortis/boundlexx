@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
     django: &django
@@ -7,7 +7,7 @@ services:
         - ./.env
         - ./.local.env
       ports:
-        - "9000:8000"
+        - "28000:8000"
       volumes:
         - .:/app
         ## Replace with path to your Google Service Account credentials
@@ -39,17 +39,8 @@ services:
       <<: *django
       ports: []
 
-    flower:
-      <<: *django
-      ports:
-        - "6555:5555"
-
     postgres:
     ## enable .local.env file
       env_file:
         - ./.env
         - ./.local.env
-
-    # Add celery-exporter
-    # celery-exporter:
-    #   image: ovalmoney/celery-exporter

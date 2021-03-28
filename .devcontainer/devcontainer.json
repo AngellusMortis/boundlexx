@@ -57,9 +57,6 @@
     // Uncomment the next line if you want start specific services in your Docker Compose config.
     "runServices": [
         "django",
-        "postgres",
-        "redis",
-        "flower",
     ],
     // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
     // "shutdownAction": "none",
@@ -68,7 +65,6 @@
     // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "django",
     "forwardPorts": [
-        9000,
-        6555,
+        28000,
     ],
 }
