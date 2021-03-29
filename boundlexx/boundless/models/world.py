@@ -22,6 +22,7 @@ from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
     calculate_extra_names,
     convert_linear_rgb_to_hex,
+    convert_linear_rgb_to_srgb,
     get_next_rank_update,
     html_name,
 )
@@ -407,6 +408,21 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         return self.owner is None and not self.is_perm
 
     @property
+    def atmosphere_color_tuple(self):
+        if (
+            self.atmosphere_color_r is None
+            or self.atmosphere_color_g is None
+            or self.atmosphere_color_b is None
+        ):
+            return None
+
+        return convert_linear_rgb_to_srgb(
+            self.atmosphere_color_r,
+            self.atmosphere_color_g,
+            self.atmosphere_color_b,
+        )
+
+    @property
     def atmosphere_color(self):
         if (
             self.atmosphere_color_r is None
@@ -415,11 +431,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
         ):
             return None
 
-        return convert_linear_rgb_to_hex(
-            self.atmosphere_color_r,
-            self.atmosphere_color_g,
-            self.atmosphere_color_b,
-        )
+        r, g, b = self.atmosphere_color_tuple
+
+        return f"#{r:02x}{g:02x}{b:02x}"
 
     @property
     def water_color(self):

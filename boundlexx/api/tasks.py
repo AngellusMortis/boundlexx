@@ -81,6 +81,32 @@ def purge_django_cache():
 
 
 @app.task
+def purge_static_cache():
+    if (
+        settings.AZURE_STATIC_CDN_ENDPOINT_NAME is None
+        or len(settings.AZURE_STATIC_CDN_ENDPOINT_NAME) == 0
+    ):
+        logger.warning("Azure settings not configured")
+        return
+
+    credentials = ServicePrincipalCredentials(
+        settings.AZURE_CLIENT_ID,
+        settings.AZURE_CLIENT_SECRET,
+        tenant=settings.AZURE_TENANT_ID,
+    )
+
+    client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
+
+    poller = client.endpoints.purge_content(
+        settings.AZURE_CDN_RESOURCE_GROUP,
+        settings.AZURE_STATIC_CDN_PROFILE_NAME,
+        settings.AZURE_STATIC_CDN_ENDPOINT_NAME,
+        ["/*"],
+    )
+    poller.result()
+
+
+@app.task
 def purge_cache(all_paths=False):
     # run after Azure has had a change to purge
     _reschedule(
@@ -127,6 +153,12 @@ def purge_cache(all_paths=False):
         for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
             logger.info("Purging paths: %s", paths_group)
 
+            print(
+                settings.AZURE_CDN_RESOURCE_GROUP,
+                settings.AZURE_CDN_PROFILE_NAME,
+                settings.AZURE_CDN_ENDPOINT_NAME,
+                paths_group,
+            )
             poller = client.endpoints.purge_content(
                 settings.AZURE_CDN_RESOURCE_GROUP,
                 settings.AZURE_CDN_PROFILE_NAME,

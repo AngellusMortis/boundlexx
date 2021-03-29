@@ -8,7 +8,7 @@ ENV PYTEST ""
 ENV DJANGO_MANAGE ""
 
 RUN apt-get update \
-  && apt-get install -y build-essential libpq-dev gettext nodejs npm git \
+  && apt-get install -y build-essential libpq-dev gettext nodejs npm git python3-mpltoolkits.basemap python3-pillow \
   && npm install -g steam-user \
   && pip install pip --upgrade \
   # cleaning up unused files
@@ -18,8 +18,8 @@ RUN apt-get update \
 RUN addgroup --system --gid ${DJANGO_UID} django \
   && adduser --system --shell /bin/bash --uid ${DJANGO_UID} --ingroup django django
 
-COPY ./docker/bin/auth-ticket.js /auth-ticket.js
-RUN chmod +x /auth-ticket.js
+COPY ./docker/bin/auth-ticket.js ./docker/bin/convert.py /
+RUN chmod +x /auth-ticket.js /convert.py
 RUN mkdir -p /app/.steam
 RUN chown -R django:django /app
 

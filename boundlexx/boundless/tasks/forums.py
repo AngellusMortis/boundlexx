@@ -2,7 +2,6 @@ import re
 import time
 from datetime import timedelta, timezone
 from distutils.util import strtobool
-from io import BytesIO
 from typing import List, Optional, Union
 
 import dateparser
@@ -14,9 +13,9 @@ from django.core.cache import cache
 from django.core.files.base import ContentFile
 from django.utils import timezone as dj_timezone
 from filetype.filetype import get_type
-from PIL import Image
 
 from boundlexx.boundless.models import Color, LocalizedName, World, WorldBlockColor
+from boundlexx.boundless.utils import clean_image
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -204,17 +203,6 @@ def _parse_title(title):
     return world_info
 
 
-def _clean_image(content):
-    img = Image.open(BytesIO(content)).convert("RGBA")
-    img = img.crop(img.getbbox())
-
-    with BytesIO() as output:
-        img.save(output, format="PNG")
-        content = output.getvalue()
-
-    return content
-
-
 def _get_world_image(raw_html, name):
     image = None
 
@@ -243,7 +231,7 @@ def _get_world_image(raw_html, name):
         if file_type is not None:
             extension = file_type.extension
 
-        image = ContentFile(_clean_image(response.content))
+        image = ContentFile(clean_image(response.content))
         image.name = f"{name}.{extension}".lower().replace(" ", "_")
 
     return image

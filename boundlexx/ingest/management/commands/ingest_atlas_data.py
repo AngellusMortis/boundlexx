@@ -4,12 +4,16 @@ import os
 import shutil
 import tempfile
 import zipfile
+from io import BytesIO
 from struct import unpack_from
+from subprocess import run
 
 import djclick as click
 import requests
 from django.core.files.base import ContentFile
+from PIL import Image, ImageDraw, ImageFilter
 
+from boundlexx.api.tasks import purge_static_cache
 from boundlexx.boundless.models import (
     Beacon,
     BeaconPlotColumn,
@@ -17,21 +21,108 @@ from boundlexx.boundless.models import (
     Color,
     World,
 )
-from boundlexx.boundless.utils import html_name
+from boundlexx.boundless.utils import SPHERE_GAP, crop_world, html_name
 
 BASE_DIR = "/tmp/maps"
+GLOW_SOLID = 5
+GLOW_WIDTH = 20
+BLEND_START = 1
+BLEND_END = 0
+TRANS_START = 255
+TRANS_END = 128
+BLUR = 10
+
+
+def _draw_world_image(  # pylint: disable=too-many-locals
+    atlas_image_file, world_id, atmo_color
+):
+    sphere_image_file = os.path.join(BASE_DIR, f"{world_id}_sphere.png")
+    run(
+        ["/convert.py", atlas_image_file, sphere_image_file],
+        check=True,
+        capture_output=True,
+    )
+
+    img = crop_world(Image.open(sphere_image_file))
+    size, _ = img.size
+
+    trans_diff = TRANS_START - TRANS_END
+    blur_diff = BLEND_START - BLEND_END
+    for offset in range(GLOW_WIDTH):
+        offset = max(0, offset - GLOW_SOLID)
+
+        trans = TRANS_START - int(offset / GLOW_WIDTH * trans_diff)
+        blend = BLEND_START - offset / GLOW_WIDTH * blur_diff
+
+        ellipse_coors = (
+            SPHERE_GAP + offset,
+            SPHERE_GAP + offset,
+            size - SPHERE_GAP - offset,
+            size - SPHERE_GAP - offset,
+        )
+
+        # add atmo color
+        atmo = img.copy()
+        drawa = ImageDraw.Draw(atmo)
+        drawa.ellipse(
+            ellipse_coors,
+            outline=(*atmo_color, trans),
+            width=2,
+        )
+
+        img = Image.blend(img, atmo, blend)
+
+    outer_width = 2
+    outer_ellipse = (
+        SPHERE_GAP - outer_width,
+        SPHERE_GAP - outer_width,
+        size - SPHERE_GAP + outer_width,
+        size - SPHERE_GAP + outer_width,
+    )
+    drawa = ImageDraw.Draw(img)
+    drawa.ellipse(
+        outer_ellipse,
+        outline=(0, 0, 0, 255),
+        width=outer_width,
+    )
+
+    mask = Image.new("L", img.size, 0)
+    draw = ImageDraw.Draw(mask)
+    draw.ellipse(
+        outer_ellipse,
+        outline=255,
+        width=outer_width * 2,
+    )
+
+    blurred = img.filter(ImageFilter.GaussianBlur(BLUR))
+    img.paste(blurred, mask=mask)
+
+    with BytesIO() as output:
+        img.save(output, format="PNG")
+        content = output.getvalue()
+
+    image = ContentFile(content)
+    image.name = f"{world_id}.png"
+    return image
 
 
 def _process_image(world, root, name):
-    with open(os.path.join(root, name), "rb") as atlas_image:
-        image = ContentFile(atlas_image.read())
-        image.name = f"{world.id}.png"
+    atlas_image_file = os.path.join(root, name)
+    with open(atlas_image_file, "rb") as image_file:
+        atlas_image = ContentFile(image_file.read())
+        atlas_image.name = f"{world.id}.png"
 
-        if world.atlas_image is not None and world.atlas_image.name:
-            world.atlas_image.delete()
+    image = _draw_world_image(atlas_image_file, world.id, world.atmosphere_color_tuple)
 
-        world.atlas_image = image
-        world.save()
+    if world.atlas_image is not None and world.atlas_image.name:
+        world.atlas_image.delete()
+
+    if world.image is not None and world.image.name:
+        world.image.delete()
+
+    world.atlas_image = atlas_image
+    world.image = image
+    world.save()
 
 
 def _process_beacons(world, root, name):  # pylint: disable=too-many-locals
@@ -142,3 +233,6 @@ def command(dropbox_url):
     click.echo("Cleaning up...")
     os.remove(atlas_zip_file.name)
     shutil.rmtree(BASE_DIR)
+
+    click.echo("Purging CDN cache...")
+    purge_static_cache()

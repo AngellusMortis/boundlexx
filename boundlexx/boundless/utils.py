@@ -4,10 +4,12 @@ import time
 from collections import namedtuple
 from datetime import timedelta
 from http.client import RemoteDisconnected
+from io import BytesIO
 from typing import Callable, Optional
 
 from django.core.cache import cache
 from django.utils.safestring import mark_safe
+from PIL import Image
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from boundlexx.boundless.client import HTTP_ERRORS
@@ -16,28 +18,31 @@ ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
 FORMATTING_REGEX = r":([^:]*):"
 ERROR_THRESHOLD = 5
 DEFAULT_DELAY = 5
+SPHERE_GAP = 10
 
 
 def convert_linear_to_s(linear):
+    linear = linear / 3
+
     if linear <= 0.0031308:
         s = linear * 12.92
-    s = 1.055 * pow(linear, 1.0 / 2.4) - 0.055
+    else:
+        s = 1.055 * pow(linear, 1.0 / 2.4) - 0.055
 
-    # clamp value to 8-bit space
-    if s < 0.0:
-        s = 0.0
-    elif s > 1.0:
-        s = 1.0
     return s
 
 
-def convert_linear_rgb_to_hex(r, g, b):
+def convert_linear_rgb_to_srgb(r, g, b):
     r, g, b = (
         convert_linear_to_s(r),
         convert_linear_to_s(g),
         convert_linear_to_s(b),
     )
-    r, g, b = int(r * 255), int(g * 255), int(b * 255)
+    return (int(r * 255), int(g * 255), int(b * 255))
+
+
+def convert_linear_rgb_to_hex(r, g, b):
+    r, g, b = convert_linear_rgb_to_srgb(r, g, b)
 
     return f"#{r:02x}{g:02x}{b:02x}"
 
@@ -248,6 +253,25 @@ def calculate_extra_names(world, new_name, colors=None):
 
 
 ErrorHandlerResponse = namedtuple("ErrorHandlerResponse", ("response", "has_error"))
+
+
+def crop_world(img):
+    x1, y1, x2, y2 = img.getbbox()
+    img = img.crop((x1 - SPHERE_GAP, y1 - SPHERE_GAP, x2 + SPHERE_GAP, y2 + SPHERE_GAP))
+
+    return img
+
+
+def clean_image(content):
+    img = Image.open(BytesIO(content)).convert("RGBA")
+
+    img = crop_world(img)
+
+    with BytesIO() as output:
+        img.save(output, format="PNG")
+        content = output.getvalue()
+
+    return content
 
 
 class GameErrorHandler:
