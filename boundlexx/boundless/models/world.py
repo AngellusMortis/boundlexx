@@ -282,6 +282,10 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
             GinIndex(fields=["id"]),
         ]
 
+        permissions = [
+            ("can_view_private", "Can view private worlds?"),
+        ]
+
     name = models.CharField(_("Name"), max_length=64, null=True, db_index=True)
     display_name = models.CharField(_("Display Name"), max_length=64, db_index=True)
     region = models.CharField(

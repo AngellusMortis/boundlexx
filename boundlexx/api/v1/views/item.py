@@ -308,7 +308,9 @@ class ItemResourceWorldListViewSet(
         if item_id not in settings.BOUNDLESS_WORLD_POLL_RESOURCE_MAPPING:
             raise Http404
 
-        queryset = World.objects.filter(is_public=True)
+        queryset = World.objects.all()
+        if not self.request.user.has_perm("boundless.can_view_private"):
+            queryset = queryset.filter(is_public=True)
 
         if item_id is not None:
             queryset = queryset.filter(
@@ -337,7 +339,6 @@ class ItemResourceCountViewSet(
     queryset = ResourceCount.objects.filter(
         world_poll__active=True,
         world_poll__world__active=True,
-        world_poll__world__is_public=True,
         world_poll__world__is_creative=False,
     ).select_related("world_poll", "world_poll__world", "item", "item__resource_data")
 
@@ -360,6 +361,14 @@ class ItemResourceCountViewSet(
         "average_per_chunk",
         "percentage",
     ]
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if not self.request.user.has_perm("boundless.can_view_private"):
+            queryset = queryset.filter(world_poll__world__is_public=True)
+
+        return queryset
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -420,7 +429,9 @@ class ItemColorsViewSet(
 ):
     schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = (
-        WorldBlockColor.objects.filter(world__is_creative=False, world__is_public=True)
+        WorldBlockColor.objects.filter(
+            world__is_creative=False,
+        )
         .select_related(
             "color",
             "world",
@@ -447,6 +458,9 @@ class ItemColorsViewSet(
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        if not self.request.user.has_perm("boundless.can_view_private"):
+            queryset = queryset.filter(world__is_public=True)
 
         if self.action == "list":
             queryset = queryset.distinct("rank", "color__game_id")

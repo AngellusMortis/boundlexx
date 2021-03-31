@@ -105,7 +105,7 @@ class BlockColorViewSet(
 ):
     schema = DescriptiveAutoSchema()
     queryset = (
-        WorldBlockColor.objects.filter(world__is_creative=False, world__is_public=True)
+        WorldBlockColor.objects.filter(world__is_creative=False)
         .select_related(
             "item",
             "world",
@@ -135,6 +135,14 @@ class BlockColorViewSet(
     ]
     ordering = ["-rank", "item__game_id", "color__game_id"]
     ordering_fields: List[str] = []
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+
+        if not self.request.user.has_perm("boundless.can_view_private"):
+            queryset = queryset.filter(world__is_public=True)
+
+        return queryset
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

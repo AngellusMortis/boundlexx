@@ -36,7 +36,7 @@ logger = getLogger(__file__)
 
 
 class WorldViewSet(BoundlexxViewSet):
-    queryset = World.objects.filter(is_public=True)
+    queryset = World.objects.all()
     serializer_class = SimpleWorldSerializer
     detail_serializer_class = WorldSerializer
     lookup_field = "id"
@@ -57,6 +57,9 @@ class WorldViewSet(BoundlexxViewSet):
 
     def get_queryset(self):
         queryset = super().get_queryset()
+
+        if not self.request.user.has_perm("boundless.can_view_private"):
+            queryset = queryset.filter(is_public=True)
 
         # only get all relations on detail view
         if self.detail:

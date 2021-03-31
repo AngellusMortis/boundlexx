@@ -40,7 +40,6 @@ class ItemResourceTimeseriesViewSet(
     schema = DescriptiveAutoSchema(tags=["Items", "Timeseries"])
     queryset = ResourceCount.objects.filter(
         world_poll__world__active=True,
-        world_poll__world__is_public=True,
         world_poll__world__is_creative=False,
     ).select_related("world_poll", "world_poll__world", "item", "item__resource_data")
     serializer_class = URLItemResourceCountTimeSeriesSerializer
@@ -55,6 +54,9 @@ class ItemResourceTimeseriesViewSet(
             raise Http404
 
         queryset = super().get_queryset()
+
+        if not self.request.user.has_perm("boundless.can_view_private"):
+            queryset = queryset.filter(world_poll__world__is_public=True)
 
         return queryset
 
