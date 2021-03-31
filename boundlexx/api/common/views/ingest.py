@@ -3,7 +3,6 @@ import logging
 import traceback
 
 from rest_framework import views
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
@@ -17,7 +16,6 @@ logger = logging.getLogger("ingest")
 
 
 class WorldWSDataView(views.APIView):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def _get_data(self, request):
@@ -123,7 +121,6 @@ class WorldWSDataView(views.APIView):
 
 
 class WorldControlSimpleDataView(views.APIView):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     def _get_data(self, request):

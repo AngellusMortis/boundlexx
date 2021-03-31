@@ -1,7 +1,6 @@
 from typing import List
 
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 
 from boundlexx.api.common.serializers import (
@@ -13,7 +12,6 @@ from boundlexx.ingest.models import GameFile
 
 
 class GameFileViewSet(BoundlexxViewSet):
-    authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
     queryset = (

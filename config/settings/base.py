@@ -364,6 +364,10 @@ REST_FRAMEWORK = {
     "DEFAULT_PERMISSION_CLASSES": [
         "rest_framework.permissions.DjangoModelPermissionsOrAnonReadOnly"
     ],
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.SessionAuthentication",
+        "rest_framework.authentication.TokenAuthentication",
+    ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.NamespaceVersioning",  # noqa
     "ALLOWED_VERSIONS": ["v1", "v2"],
     "DEFAULT_PAGINATION_CLASS": "boundlexx.api.pagination.MaxLimitOffsetPagination",  # noqa
