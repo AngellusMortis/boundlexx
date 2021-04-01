@@ -1,89 +1,89 @@
 {
-    // Use IntelliSense to learn about possible attributes.
-    // Hover to view descriptions of existing attributes.
-    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    "version": "0.2.0",
-    "configurations": [
+  // Use IntelliSense to learn about possible attributes.
+  // Hover to view descriptions of existing attributes.
+  // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Boundlexx: Django",
+      "type": "python",
+      "request": "attach",
+      "port": 3000,
+      "host": "127.0.0.1",
+      "justMyCode": false,
+      "pathMappings": [
         {
-            "name": "Boundlexx: Django",
-            "type": "python",
-            "request": "attach",
-            "port": 3000,
-            "host": "127.0.0.1",
-            "justMyCode": false,
-            "pathMappings": [
-                {
-                    "localRoot": "${workspaceFolder}",
-                    "remoteRoot": "."
-                }
-            ],
-        },
-        {
-            "name": "Boundlexx: Shell",
-            "type": "python",
-            "request": "launch",
-            "module": "manage",
-            "args": [
-                "shell_plus",
-            ]
-        },
-        {
-            "name": "Boundlexx: Celery",
-            "type": "python",
-            "request": "launch",
-            "module": "celery",
-            "console": "integratedTerminal",
-            "args": [
-                "-A",
-                "config.celery_app",
-                "worker",
-                "-E",
-                "-l",
-                "info",
-                "-P",
-                "solo",
-                "-Q",
-                "default,distance,cache,notify,poll,shop,control"
-            ],
-        },
-        {
-            "name": "Boundlexx: Debug Ingest",
-            "type": "python",
-            "request": "launch",
-            "module": "manage",
-            "args": [
-                "ingest_game_data",
-                "246.6.0"
-            ]
-        },
-        {
-            "name": "Boundlexx: Debug Create",
-            "type": "python",
-            "request": "launch",
-            "module": "manage",
-            "args": [
-                "create_game_objects",
-                "-r"
-            ]
-        },
-        {
-            "name": "Boundlexx: Debug Command",
-            "type": "python",
-            "request": "launch",
-            "module": "manage",
-            "args": [
-                "force_world_notification",
-                "1226",
-            ]
-        },
-        {
-            "name": "Boundlexx: Shell",
-            "type": "python",
-            "request": "launch",
-            "module": "manage",
-            "args": [
-                "shell"
-            ]
+          "localRoot": "${workspaceFolder}",
+          "remoteRoot": "."
         }
-    ]
+      ],
+    },
+    {
+      "name": "Boundlexx: Shell",
+      "type": "python",
+      "request": "launch",
+      "module": "manage",
+      "args": [
+        "shell_plus",
+      ]
+    },
+    {
+      "name": "Boundlexx: Celery",
+      "type": "python",
+      "request": "launch",
+      "module": "celery",
+      "console": "integratedTerminal",
+      "args": [
+        "-A",
+        "config.celery_app",
+        "worker",
+        "-E",
+        "-l",
+        "info",
+        "-P",
+        "solo",
+        "-Q",
+        "default,distance,cache,notify,poll,shop,control"
+      ],
+    },
+    {
+      "name": "Boundlexx: Debug Ingest",
+      "type": "python",
+      "request": "launch",
+      "module": "manage",
+      "args": [
+        "ingest_game_data",
+        "246.6.0"
+      ]
+    },
+    {
+      "name": "Boundlexx: Debug Create",
+      "type": "python",
+      "request": "launch",
+      "module": "manage",
+      "args": [
+        "create_game_objects",
+        "-r"
+      ]
+    },
+    {
+      "name": "Boundlexx: Debug Command",
+      "type": "python",
+      "request": "launch",
+      "module": "manage",
+      "args": [
+        "force_world_notification",
+        "1226",
+      ]
+    },
+    {
+      "name": "Boundlexx: Shell",
+      "type": "python",
+      "request": "launch",
+      "module": "manage",
+      "args": [
+        "shell"
+      ]
+    }
+  ]
 }
