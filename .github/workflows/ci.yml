@@ -65,13 +65,15 @@ jobs:
         run: docker pull docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_postgres || true
 
       - name: Pull Cached Django Images
-        run: docker pull docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_django || true
+        run: |
+          docker pull docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_django || true
+          docker pull docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_dev_django || true
 
       - name: Build Postgres Image
         run: docker build -t boundlexx_postgres --cache-from docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_postgres -f docker/postgres/Dockerfile .
 
       - name: Build Django Image
-        run: docker build -t boundlexx_django --cache-from docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_django --target production -f docker/django/Dockerfile .
+        run: docker build -t boundlexx_django --cache-from docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_dev_django --target production -f docker/django/Dockerfile .
 
       - name: Push Postgres Image
         run: |
