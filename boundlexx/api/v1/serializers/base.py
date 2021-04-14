@@ -2,6 +2,7 @@ from rest_framework import serializers
 from rest_framework.relations import Hyperlink
 from rest_framework.reverse import reverse
 
+from boundlexx.api.common.serializers import SimpleItemSerializer
 from boundlexx.boundless.models import Item, SkillGroup, World
 
 
@@ -206,7 +207,7 @@ class URLSimpleSkillSerializer(serializers.ModelSerializer):
         ]
 
 
-class URLSimpleItemSerializer(serializers.ModelSerializer):
+class URLSimpleItemSerializer(SimpleItemSerializer):
     url = serializers.HyperlinkedIdentityField(
         view_name="item-detail",
         lookup_field="game_id",
@@ -220,7 +221,9 @@ class URLSimpleItemSerializer(serializers.ModelSerializer):
             "game_id",
             "name",
             "string_id",
+            "image_url",
             "has_colors",
+            "has_world_colors",
             "is_resource",
         ]
 
