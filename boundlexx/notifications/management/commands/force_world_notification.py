@@ -1,3 +1,5 @@
+import os
+
 import djclick as click
 
 from boundlexx.boundless.models import World
@@ -17,4 +19,5 @@ def command(world_id):
     if wp is None:
         click.secho("No world polls!", fg="red")
 
+    os.environ["NOTIFICATION_PRINT"] = "1"
     ExoworldNotification.objects.send_new_notification(wp)

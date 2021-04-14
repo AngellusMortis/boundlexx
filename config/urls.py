@@ -16,7 +16,9 @@ urlpatterns = [
     path("admin_tools/", include("admin_tools.urls")),
     path("api/", include("boundlexx.api.urls")),
     path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+] + static(
+    settings.MEDIA_URL, document_root=settings.MEDIA_ROOT
+)  # type: ignore
 
 if settings.ENABLE_PROMETHEUS:
     urlpatterns += [
@@ -47,7 +49,7 @@ if settings.DEBUG:
     if "debug_toolbar" in settings.INSTALLED_APPS:
         import debug_toolbar
 
-        urlpatterns = [path("__debug__/", include(debug_toolbar.urls))] + urlpatterns
+        urlpatterns.insert(0, path("__debug__/", include(debug_toolbar.urls)))
 
 elif settings.SERVE_STATIC_FILES_DEV:
     urlpatterns += [

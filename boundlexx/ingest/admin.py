@@ -29,5 +29,5 @@ class GameFileAdmin(admin.ModelAdmin):
     ]
 
     formfield_overrides = {
-        models.JSONField: {"widget": JSONEditorWidget},  # type: ignore
+        models.JSONField: {"widget": JSONEditorWidget},
     }

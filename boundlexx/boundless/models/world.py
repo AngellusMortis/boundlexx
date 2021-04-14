@@ -1107,6 +1107,10 @@ class WorldBlockColor(
 
         return self._days(self._now, then)
 
+    @property
+    def variant_lookup_id(self):
+        return f"{self.item.game_id}_{self.color.game_id}"
+
 
 class WorldCreatureColor(
     ExportModelOperationsMixin("world_creature_color"), models.Model  # type: ignore  # noqa E501

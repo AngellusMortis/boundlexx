@@ -4,14 +4,15 @@ from email.utils import parsedate_to_datetime
 from typing import List
 
 import requests
+from azure.identity import ClientSecretCredential
 from azure.mgmt.cdn import CdnManagementClient
+from azure.mgmt.cdn.models import PurgeParameters
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
 from django.utils import timezone
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
-from msrestazure.azure_active_directory import ServicePrincipalCredentials
 from requests.exceptions import ReadTimeout
 
 from boundlexx.api.utils import (
@@ -89,19 +90,19 @@ def purge_static_cache():
         logger.warning("Azure settings not configured")
         return
 
-    credentials = ServicePrincipalCredentials(
-        settings.AZURE_CLIENT_ID,
-        settings.AZURE_CLIENT_SECRET,
-        tenant=settings.AZURE_TENANT_ID,
+    credentials = ClientSecretCredential(
+        tenant_id=settings.AZURE_TENANT_ID,
+        client_id=settings.AZURE_CLIENT_ID,
+        client_secret=settings.AZURE_CLIENT_SECRET,
     )
 
     client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
 
-    poller = client.endpoints.purge_content(
+    poller = client.endpoints.begin_purge_content(
         settings.AZURE_CDN_RESOURCE_GROUP,
         settings.AZURE_STATIC_CDN_PROFILE_NAME,
         settings.AZURE_STATIC_CDN_ENDPOINT_NAME,
-        ["/*"],
+        PurgeParameters(content_paths=["/*"]),
     )
     poller.result()
 
@@ -142,10 +143,10 @@ def purge_cache(all_paths=False):
         return
 
     try:
-        credentials = ServicePrincipalCredentials(
-            settings.AZURE_CLIENT_ID,
-            settings.AZURE_CLIENT_SECRET,
-            tenant=settings.AZURE_TENANT_ID,
+        credentials = ClientSecretCredential(
+            tenant_id=settings.AZURE_TENANT_ID,
+            client_id=settings.AZURE_CLIENT_ID,
+            client_secret=settings.AZURE_CLIENT_SECRET,
         )
 
         client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
@@ -159,11 +160,11 @@ def purge_cache(all_paths=False):
                 settings.AZURE_CDN_ENDPOINT_NAME,
                 paths_group,
             )
-            poller = client.endpoints.purge_content(
+            poller = client.endpoints.begin_purge_content(
                 settings.AZURE_CDN_RESOURCE_GROUP,
                 settings.AZURE_CDN_PROFILE_NAME,
                 settings.AZURE_CDN_ENDPOINT_NAME,
-                paths_group,
+                PurgeParameters(content_paths=paths_group),
             )
             poller.result()
     except (Exception, socket.gaierror) as ex:  # pylint: disable=broad-except

@@ -203,14 +203,19 @@ class ItemAdmin(GameObjAdmin):
     def has_colors(self, obj):
         return obj.has_colors
 
+    def has_world_colors(self, obj):
+        return obj.has_world_colors
+
     is_resource.boolean = True  # type: ignore
     has_colors.boolean = True  # type: ignore
+    has_world_colors.boolean = True  # type: ignore
 
     list_display = [
         "game_id",
         "default_name",
         "is_resource",
         "has_colors",
+        "has_world_colors",
         "active",
     ]
     readonly_fields = [

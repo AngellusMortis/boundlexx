@@ -84,7 +84,7 @@ class SovereignColorsLinkField(serializers.ModelField):
         return Hyperlink(value, None)
 
     def get_attribute(self, obj):
-        if obj.has_colors:
+        if obj.has_world_colors:
             return reverse(
                 "item-sovereign-colors",
                 kwargs={"game_id": obj.game_id},
@@ -147,7 +147,7 @@ class ItemColorsLinkField(serializers.ModelField):
         return Hyperlink(value, None)
 
     def get_attribute(self, obj):
-        if obj.has_colors:
+        if obj.has_world_colors:
             return reverse(
                 "item-colors-list",
                 kwargs={"item__game_id": obj.game_id},

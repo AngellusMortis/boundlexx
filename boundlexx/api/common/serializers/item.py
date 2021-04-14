@@ -2,6 +2,7 @@ from django.utils.translation import gettext_lazy as _
 from rest_framework import serializers
 
 from boundlexx.api.common.serializers.base import (
+    AzureImageField,
     LocalizedNameSerializer,
     LocalizedStringSerializer,
 )
@@ -140,7 +141,9 @@ class SimpleItemSerializer(IDItemSerializer):
     item_subtitle = SubtitleSerializer()
     list_type = LocalizedStringSerializer()
     has_colors = serializers.BooleanField()
+    has_world_colors = serializers.BooleanField()
     is_resource = serializers.BooleanField()
+    image_url = AzureImageField(source="image", allow_null=True)
 
     class Meta:
         model = Item
@@ -148,10 +151,12 @@ class SimpleItemSerializer(IDItemSerializer):
             "game_id",
             "name",
             "string_id",
+            "image_url",
             "localization",
             "item_subtitle",
             "list_type",
             "has_colors",
+            "has_world_colors",
             "is_resource",
         ]
 
@@ -177,6 +182,7 @@ class ItemSerializer(SimpleItemSerializer):
             "game_id",
             "name",
             "string_id",
+            "image_url",
             "next_request_basket_update",
             "next_shop_stand_update",
             "localization",

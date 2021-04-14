@@ -39,6 +39,7 @@ class ForumImage(models.Model):
         TYPE = 2, _("World Type")
         ATMOSPHERE = 3, _("Atmosphere")
         MISC = 4, _("Misc.")
+        ITEM = 5, _("Item")
 
     image_type = models.PositiveSmallIntegerField(
         choices=ImageType.choices, db_index=True
@@ -303,6 +304,11 @@ class WorldNotification(NotificationBase):
             if colors.count() == 0:
                 colors = None
 
+        return colors
+
+    def _get_color_groups(self, world, default=False):
+        colors = self._get_colors(world, default)
+
         color_groups: Dict[str, list] = {}
         if colors is not None:
             for group_name in settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER:
@@ -330,14 +336,37 @@ class WorldNotification(NotificationBase):
 
         return color_groups
 
+    def _get_color_variants(self, world):
+        from boundlexx.boundless.models import (  # pylint: disable=cyclic-import
+            ItemColorVariant,
+            WorldBlockColor,
+        )
+
+        colors = self._get_colors(world) or []
+        default_colors: List[WorldBlockColor] = []
+        if world.is_sovereign:
+            default_colors = self._get_colors(world, default=True) or []
+
+        colors = list(colors) + list(default_colors)
+        variants = set()
+        for wbc in colors:
+            variant = ItemColorVariant.objects.filter(
+                item=wbc.item, color=wbc.color
+            ).first()
+
+            if variant is not None:
+                variants.add(variant)
+
+        return list(variants)
+
     def _get_context(self, world, resources=None):
         if self._context is not None:
             return self._context
 
-        color_groups = self._get_colors(world)
+        color_groups = self._get_color_groups(world)
         default_color_groups = None
         if world.is_sovereign:
-            default_color_groups = self._get_colors(world, default=True)
+            default_color_groups = self._get_color_groups(world, default=True)
 
             if len(default_color_groups) == 0:
                 default_color_groups = None
@@ -391,12 +420,14 @@ class WorldNotification(NotificationBase):
 
         return world_images
 
-    def _get_forum_image_dict(self, image_type, use_forum_links=True):
+    def _get_forum_image_dict(self, image_type, use_forum_links=True, lookup_ids=None):
         image_dict = {}
 
         world_images: Optional[Dict[str, str]] = None
 
-        forum_images = list(ForumImage.objects.filter(image_type=image_type))
+        forum_images = ForumImage.objects.filter(image_type=image_type)
+        if lookup_ids is not None:
+            forum_images = forum_images.filter(lookup_id__in=lookup_ids)
 
         for image in forum_images:
             if use_forum_links:
@@ -412,15 +443,31 @@ class WorldNotification(NotificationBase):
 
         return image_dict
 
-    def _upload_world_image(self, world):
-        logger.info("Uploading world image to the forums: %s", world.image.url)
+    def _upload_log(self, message):
+        if os.environ.get("NOTIFICATION_PRINT"):
+            print(message)
+        else:
+            logger.info(message)
+
+    def _upload_forum_image(self, image_url, image_type, lookup_id):
         client = get_forum_client()
 
-        img_response = requests.get(world.image.url)
-        img_response.raise_for_status()
-        temp_file = NamedTemporaryFile("wb", delete=False)
-        temp_file.write(img_response.content)
-        temp_file.close()
+        tries = 5
+        while tries > 0:
+            img_response = requests.get(image_url, timeout=5)
+            try:
+                img_response.raise_for_status()
+            except requests.exceptions.HTTPError:
+                if tries > 0:
+                    self._upload_log(f"Retring download ({tries})...")
+                    tries -= 1
+                else:
+                    raise
+            else:
+                temp_file = NamedTemporaryFile("wb", delete=False)
+                temp_file.write(img_response.content)
+                temp_file.close()
+                break
 
         kwargs = {
             "type": "composer",
@@ -440,14 +487,32 @@ class WorldNotification(NotificationBase):
         os.remove(temp_file.name)
 
         forum_image = ForumImage.objects.create(
-            image_type=ForumImage.ImageType.WORLD,
-            lookup_id=world.id,
-            url=world.image.url,
+            image_type=image_type,
+            lookup_id=lookup_id,
+            url=image_url,
             shortcut_url=forum_response["short_url"],
         )
         forum_image.save()
 
         return forum_image.shortcut_url
+
+    def _upload_item_image(self, variant):
+        self._upload_log(f"Uploading item image to the forums: {variant.image.url}")
+
+        return self._upload_forum_image(
+            variant.image.url,
+            ForumImage.ImageType.ITEM,
+            variant.lookup_id,
+        )
+
+    def _upload_world_image(self, world):
+        self._upload_log(f"Uploading world image to the forums: {world.image.url}")
+
+        return self._upload_forum_image(
+            world.image.url,
+            ForumImage.ImageType.WORLD,
+            world.id,
+        )
 
     def _get_resources(self, world):
         from boundlexx.boundless.models import (  # pylint: disable=cyclic-import
@@ -478,6 +543,8 @@ class WorldNotification(NotificationBase):
             f"[{'Active' if world.active else 'Inactive'}]"
         )
 
+        variants = self._get_color_variants(world)
+
         extra_context = {
             "color_images": self._get_forum_image_dict(
                 ForumImage.ImageType.COLOR, use_forum_links=use_forum_links
@@ -494,6 +561,11 @@ class WorldNotification(NotificationBase):
             "misc_images": self._get_forum_image_dict(
                 ForumImage.ImageType.MISC, use_forum_links=use_forum_links
             ),
+            "item_images": self._get_forum_image_dict(
+                ForumImage.ImageType.ITEM,
+                use_forum_links=use_forum_links,
+                lookup_ids=[v.lookup_id for v in variants],
+            ),
         }
 
         if (
@@ -507,6 +579,15 @@ class WorldNotification(NotificationBase):
                 )
             else:
                 extra_context["world_images"][world.id] = world.image.url
+
+        for variant in variants:
+            if variant.lookup_id not in extra_context["item_images"]:
+                if use_forum_links:
+                    extra_context["item_images"][
+                        variant.lookup_id
+                    ] = self._upload_item_image(variant)
+                else:
+                    extra_context["item_images"][variant.lookup_id] = variant.image.url
 
         if extra is not None:
             extra_context.update(extra)

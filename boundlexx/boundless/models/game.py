@@ -11,7 +11,11 @@ from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
-from boundlexx.boundless.utils import get_block_color_item_ids, get_next_rank_update
+from boundlexx.boundless.utils import (
+    get_block_color_item_ids,
+    get_next_rank_update,
+    get_world_block_color_item_ids,
+)
 from config.storages import select_storage
 
 
@@ -236,6 +240,8 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     is_block = models.BooleanField(default=False, db_index=True)
     is_liquid = models.BooleanField(default=False, db_index=True)
 
+    image = models.ImageField(storage=select_storage("items"), blank=True, null=True)
+
     class Meta:
         indexes = [
             GinIndex(fields=["string_id"]),
@@ -260,6 +266,10 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     @property
     def has_colors(self):
         return self.game_id in get_block_color_item_ids()
+
+    @property
+    def has_world_colors(self):
+        return self.game_id in get_world_block_color_item_ids()
 
     @property
     def next_shop_stand_update(self):
@@ -615,3 +625,17 @@ class EmojiAltName(models.Model):
         indexes = [
             GinIndex(fields=["name"]),
         ]
+
+
+class ItemColorVariant(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    color = models.ForeignKey(Color, on_delete=models.CASCADE)
+
+    image = models.ImageField(storage=select_storage("items"))
+
+    class Meta:
+        unique_together = ("item", "color")
+
+    @property
+    def lookup_id(self):
+        return f"{self.item.game_id}_{self.color.game_id}"

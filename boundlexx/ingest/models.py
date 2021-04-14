@@ -30,7 +30,7 @@ class GameFile(ExportModelOperationsMixin("game_file"), models.Model):  # type: 
         help_text=_("Version of the game file was ingest from"),
         db_index=True,
     )
-    content = models.JSONField(encoder=DjangoJSONEncoder)  # type: ignore
+    content = models.JSONField(encoder=DjangoJSONEncoder)
 
     class Meta:
         unique_together = (

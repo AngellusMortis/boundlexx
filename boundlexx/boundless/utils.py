@@ -14,7 +14,8 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 
 from boundlexx.boundless.client import HTTP_ERRORS
 
-ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
+ITEM_COLOR_IDS_KEYS = "boundless:block_color_ids"
+WORLD_ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
 FORMATTING_REGEX = r":([^:]*):"
 ERROR_THRESHOLD = 5
 DEFAULT_DELAY = 5
@@ -107,6 +108,24 @@ def get_block_color_item_ids():
 
     if item_ids is None:
         from boundlexx.boundless.models import (  # noqa: E501 # pylint: disable=import-outside-toplevel,cyclic-import
+            ItemColorVariant,
+        )
+
+        block_colors = (
+            ItemColorVariant.objects.all().distinct("item_id").prefetch_related("item")
+        )
+        item_ids = [bc.item.game_id for bc in block_colors]
+
+        cache.set(ITEM_COLOR_IDS_KEYS, item_ids, timeout=86400)
+
+    return item_ids
+
+
+def get_world_block_color_item_ids():
+    item_ids = cache.get(WORLD_ITEM_COLOR_IDS_KEYS)
+
+    if item_ids is None:
+        from boundlexx.boundless.models import (  # noqa: E501 # pylint: disable=import-outside-toplevel,cyclic-import
             WorldBlockColor,
         )
 
@@ -115,7 +134,7 @@ def get_block_color_item_ids():
         )
         item_ids = [bc.item.game_id for bc in block_colors]
 
-        cache.set(ITEM_COLOR_IDS_KEYS, item_ids, timeout=86400)
+        cache.set(WORLD_ITEM_COLOR_IDS_KEYS, item_ids, timeout=86400)
 
     return item_ids
 
