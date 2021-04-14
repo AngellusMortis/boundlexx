@@ -5,7 +5,6 @@ import os
 from datetime import timedelta
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple
-from PIL import Image
 
 import requests
 from django.conf import settings
@@ -18,6 +17,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_celery_results.models import TaskResult
+from PIL import Image
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.api.utils import get_base_url
