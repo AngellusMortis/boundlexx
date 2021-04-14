@@ -566,6 +566,11 @@ class WorldNotification(NotificationBase):
                 use_forum_links=use_forum_links,
                 lookup_ids=[v.lookup_id for v in variants],
             ),
+            "cdn_item_images": self._get_forum_image_dict(
+                ForumImage.ImageType.ITEM,
+                use_forum_links=False,
+                lookup_ids=[v.lookup_id for v in variants],
+            ),
         }
 
         if (
@@ -588,6 +593,7 @@ class WorldNotification(NotificationBase):
                     ] = self._upload_item_image(variant)
                 else:
                     extra_context["item_images"][variant.lookup_id] = variant.image.url
+                extra_context["cdn_item_images"][variant.lookup_id] = variant.image.url
 
         if extra is not None:
             extra_context.update(extra)
