@@ -58,7 +58,7 @@ def _create_icons(item, pbar):
 
     if os.path.isdir(image_dir):
         # default to "white" verison of item for default for colored items
-        default_image = os.path.join(image_dir, "0_228.png")
+        default_image = os.path.join(image_dir, "227_0.png")
         if not os.path.isfile(default_image):
             default_image = os.path.join(image_dir, "0_0.png")
 
