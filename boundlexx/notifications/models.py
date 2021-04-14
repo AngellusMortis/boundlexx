@@ -5,6 +5,7 @@ import os
 from datetime import timedelta
 from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple
+from PIL import Image
 
 import requests
 from django.conf import settings
@@ -449,11 +450,29 @@ class WorldNotification(NotificationBase):
         else:
             logger.info(message)
 
-    def _upload_forum_image(self, image_url, image_type, lookup_id):
+    def _crop_image(self, image_file, size):
+        img = Image.open(image_file.name)
+
+        # crop to bounding box
+        x1, y1, x2, y2 = img.getbbox()
+        img = img.crop((x1 - 5, y1 - 5, x2 + 5, y2 + 5))
+        img = img.crop(img.getbbox())
+
+        # make square
+        x, y = img.size
+        width = max(x, y)
+        new_img = Image.new("RGBA", (width, width), (0, 0, 0, 0))
+        new_img.paste(img, (int((width - x) / 2), int((width - y) / 2)))
+
+        # shrink size
+        new_img.thumbnail((size, size), Image.LANCZOS)
+        new_img.save(image_file.name, format="PNG")
+
+    def _upload_forum_image(self, image_url, image_type, lookup_id, size=None):
         client = get_forum_client()
 
-        tries = 5
-        while tries > 0:
+        tries = 4
+        while tries >= 0:
             img_response = requests.get(image_url, timeout=5)
             try:
                 img_response.raise_for_status()
@@ -468,6 +487,9 @@ class WorldNotification(NotificationBase):
                 temp_file.write(img_response.content)
                 temp_file.close()
                 break
+
+        if size is not None:
+            self._crop_image(temp_file, size)
 
         kwargs = {
             "type": "composer",
@@ -503,6 +525,7 @@ class WorldNotification(NotificationBase):
             variant.image.url,
             ForumImage.ImageType.ITEM,
             variant.lookup_id,
+            size=30,
         )
 
     def _upload_world_image(self, world):
