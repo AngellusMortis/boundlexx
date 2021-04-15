@@ -32,7 +32,7 @@
 {% for group_name, color_group in default_color_groups.items %}{% if group_name %}
 
 _**[{{ group_name|title }}]**_
-{% endif %}{% for color in color_group %}∟{% if color.variant_lookup_id in item_images %}[![{{ color.color.game_id }} {{ color.color.default_name }}|30x30]({{ item_images|key:color.variant_lookup_id }})]({{ cdn_item_images|key:color.variant_lookup_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% include 'boundlexx/notifications/forum_color_icons.md' %}
+{% endif %}{% for color in color_group %}∟{% if color.variant_lookup_id in item_images %}[![{{ color.color.game_id }} {{ color.color.default_name }}|30x30]({{ item_images|key:color.variant_lookup_id }})]({{ cdn_item_images|key:color.variant_lookup_id }}) **- {{ color.item.english|replace:group_name }}** _{{ color.color.game_id }} {{ color.color.default_name }}_{% else %}![{{ color.color.game_id }} {{ color.color.default_name }}|30x30]({{ color_images|key:color.color.game_id }}) **- {{ color.item.english|replace:group_name }} -** _{{ color.color.game_id }} {{ color.color.default_name }}_{% endif %}{% include 'boundlexx/notifications/forum_color_icons.md' %}
 {% endfor %}{% endfor %}
 [/details]
 **-------------------------------------------------------------------**{% endif %}{% if world.special_type == 1 %}
