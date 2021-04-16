@@ -15,8 +15,8 @@ from boundlexx.boundless.models import (
 )
 from boundlexx.boundless.utils import (
     get_block_color_item_ids,
-    get_world_block_color_item_ids,
     get_block_metal_item_ids,
+    get_world_block_color_item_ids,
 )
 
 DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]

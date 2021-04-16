@@ -6,8 +6,8 @@ from boundlexx.api.common.serializers.base import (
     LocalizedNameSerializer,
     LocalizedStringSerializer,
 )
-from boundlexx.api.common.serializers.world import IDWorldSerializer
 from boundlexx.api.common.serializers.color import IDColorSerializer
+from boundlexx.api.common.serializers.world import IDWorldSerializer
 from boundlexx.boundless.models import (
     Item,
     ResourceCount,

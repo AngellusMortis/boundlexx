@@ -249,17 +249,17 @@ def _get_default_color(item):
         default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[source_item.game_id]
     except KeyError:
         if "IGNEOUS" in source_item.name:
-            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[10798]  # type: ignore
+            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[10798]
         elif "SEDIMENTARY" in source_item.name:
-            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[10802]  # type: ignore
+            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[10802]
         elif "ROCK" in source_item.name or "SEAM_DUGUP" in source_item.item.name:
-            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[10802]  # type: ignore
+            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[10802]
         elif "GNARLED" in source_item.name:
-            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[6157]  # type: ignore
+            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[6157]
         elif "BARBED" in source_item.name:
-            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[3085]  # type: ignore
+            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[3085]
         elif "VERDANT" in source_item.name:
-            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[13]  # type: ignore
+            default_color_id = settings.BOUNDLESS_DEFAULT_COLORS[13]
         else:
             raise
 

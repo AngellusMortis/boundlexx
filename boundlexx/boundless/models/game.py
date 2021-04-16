@@ -13,9 +13,9 @@ from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.boundless.utils import (
     get_block_color_item_ids,
+    get_block_metal_item_ids,
     get_next_rank_update,
     get_world_block_color_item_ids,
-    get_block_metal_item_ids,
 )
 from config.storages import select_storage
 
