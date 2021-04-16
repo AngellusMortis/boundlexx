@@ -271,7 +271,11 @@ def _get_default_color(item):
 
 
 def run(  # pylint: disable=too-many-locals
-    force=False, start_id=None, end_id=None, color_variants=True, **kwargs
+    force=False,
+    start_id=None,
+    end_id=None,
+    color_variants=True,
+    **kwargs,
 ):
     items = {}
 
