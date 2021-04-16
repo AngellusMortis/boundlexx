@@ -72,7 +72,7 @@ def command(force, start_item_id, end_item_id, skip_variants, **kwargs):
         if value:
             module = import_module(f"{BASE}.{index}")
             module.run(  # type: ignore
-                force,
+                force=force,
                 start_id=start_item_id,
                 end_id=end_item_id,
                 color_variants=(not skip_variants),
