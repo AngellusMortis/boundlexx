@@ -124,7 +124,7 @@ def _get_levels(recipe_dict):
     return levels
 
 
-def run():
+def run(force=False, **kwargs):
     recipes = GameFile.objects.get(
         folder="assets/archetypes", filename="recipes.msgpack"
     ).content

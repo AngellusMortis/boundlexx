@@ -417,6 +417,7 @@ BOUNDLESS_DS_REQUIRES_AUTH = env.bool("BOUNDLESS_DS_REQUIRES_AUTH", default=Fals
 BOUNDLESS_API_WORLD_DELAY = float(env("BOUNDLESS_API_WORLD_DELAY", default=1.0))
 BOUNDLESS_API_DS_DELAY = float(env("BOUNDLESS_API_DS_DELAY", default=1.0))
 BOUNDLESS_LOCATION = "/boundless/"
+BOUNDLESS_WORLDS_LOCATIONS = "/boundless-worlds/"
 BOUNDLESS_ICONS_LOCATION = "/boundless-icons/"
 BOUNDLESS_ICONS_MAPPING = {
     11632: "ITEM_CROPDROP_RICE",
@@ -435,6 +436,68 @@ BOUNDLESS_ICONS_MAPPING = {
     11642: "FOOD_STARBERRY_RAW",
     11643: "FOOD_STARBERRY_GLOSSY_RAW",
     11644: "FOOD_STARBERRY_JUICY_RAW",
+}
+BOUNDLESS_DEFAULT_COLORS = {
+    # misc.
+    33566: 228,
+    # oortmas
+    13812: 24,
+    33570: 24,
+    # goo
+    11647: 228,
+    32983: 228,
+    32993: 228,
+    # halloween
+    10702: 1,
+    10703: 1,
+    13717: 1,
+    13718: 1,
+    # game defined
+    10850: 28,
+    9555: 87,
+    9838: 25,
+    9839: 82,
+    9840: 60,
+    9841: 93,
+    10775: 93,
+    10774: 25,
+    10788: 25,
+    10789: 93,
+    10790: 93,
+    10792: 60,
+    10793: 93,
+    10791: 25,
+    3085: 82,
+    6157: 87,
+    13: 108,
+    10814: 84,
+    10870: 28,
+    10842: 208,
+    10806: 204,
+    10866: 28,
+    10846: 82,
+    10779: 25,
+    10778: 93,
+    10781: 93,
+    10776: 60,
+    10780: 93,
+    10777: 82,
+    10798: 63,
+    10794: 111,
+    10802: 102,
+    10810: 84,
+    11588: 28,
+    11592: 82,
+    11584: 84,
+    10854: 28,
+    10858: 28,
+    10862: 28,
+    10830: 82,
+    10822: 222,
+    10818: 87,
+    10838: 28,
+    10834: 82,
+    10826: 55,
 }
 
 # timeout for making an API request

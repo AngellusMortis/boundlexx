@@ -203,18 +203,23 @@ class ItemAdmin(GameObjAdmin):
     def has_colors(self, obj):
         return obj.has_colors
 
+    def has_metal_variants(self, obj):
+        return obj.has_metal_variants
+
     def has_world_colors(self, obj):
         return obj.has_world_colors
 
     is_resource.boolean = True  # type: ignore
     has_colors.boolean = True  # type: ignore
     has_world_colors.boolean = True  # type: ignore
+    has_metal_variants.boolean = True  # type: ignore
 
     list_display = [
         "game_id",
         "default_name",
         "is_resource",
         "has_colors",
+        "has_metal_variants",
         "has_world_colors",
         "active",
     ]
@@ -223,6 +228,8 @@ class ItemAdmin(GameObjAdmin):
         "string_id",
         "is_resource",
         "has_colors",
+        "has_metal_variants",
+        "has_world_colors",
     ]
     raw_id_fields = ["item_subtitle"]
     search_fields = ["game_id", "string_id", "localizedname__name"]

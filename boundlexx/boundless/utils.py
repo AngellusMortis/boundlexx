@@ -15,6 +15,7 @@ from requests.exceptions import ConnectionError as RequestsConnectionError
 from boundlexx.boundless.client import HTTP_ERRORS
 
 ITEM_COLOR_IDS_KEYS = "boundless:block_color_ids"
+ITEM_METAL_IDS_KEYS = "boundless:block_metal_ids"
 WORLD_ITEM_COLOR_IDS_KEYS = "boundless:resource_ids"
 FORMATTING_REGEX = r":([^:]*):"
 ERROR_THRESHOLD = 5
@@ -117,6 +118,24 @@ def get_block_color_item_ids():
         item_ids = [bc.item.game_id for bc in block_colors]
 
         cache.set(ITEM_COLOR_IDS_KEYS, item_ids, timeout=86400)
+
+    return item_ids
+
+
+def get_block_metal_item_ids():
+    item_ids = cache.get(ITEM_METAL_IDS_KEYS)
+
+    if item_ids is None:
+        from boundlexx.boundless.models import (  # noqa: E501 # pylint: disable=import-outside-toplevel,cyclic-import
+            ItemMetalVariant,
+        )
+
+        block_colors = (
+            ItemMetalVariant.objects.all().distinct("item_id").prefetch_related("item")
+        )
+        item_ids = [bc.item.game_id for bc in block_colors]
+
+        cache.set(ITEM_METAL_IDS_KEYS, item_ids, timeout=86400)
 
     return item_ids
 

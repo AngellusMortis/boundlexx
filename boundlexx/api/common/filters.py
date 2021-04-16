@@ -16,6 +16,7 @@ from boundlexx.boundless.models import (
 from boundlexx.boundless.utils import (
     get_block_color_item_ids,
     get_world_block_color_item_ids,
+    get_block_metal_item_ids,
 )
 
 DEFAULT_FILTERS = ["limit", "offset", "ordering", "search", "format"]
@@ -87,6 +88,11 @@ class ItemFilterSet(LocalizationFilterSet):
         method="filter_colors",
     )
 
+    has_metal_variants = filters.BooleanFilter(
+        label=_("Filters out items with/without metal variants"),
+        method="filter_metals",
+    )
+
     has_world_colors = filters.BooleanFilter(
         label=_(
             "Filters out items that vary from world to world with "
@@ -109,6 +115,14 @@ class ItemFilterSet(LocalizationFilterSet):
             queryset = queryset.filter(game_id__in=get_block_color_item_ids())
         elif value is False:
             queryset = queryset.exclude(game_id__in=get_block_color_item_ids())
+
+        return queryset
+
+    def filter_metals(self, queryset, name, value):
+        if value:
+            queryset = queryset.filter(game_id__in=get_block_metal_item_ids())
+        elif value is False:
+            queryset = queryset.exclude(game_id__in=get_block_metal_item_ids())
 
         return queryset
 

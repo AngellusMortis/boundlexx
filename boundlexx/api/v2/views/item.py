@@ -101,6 +101,11 @@ class ItemViewSet(
         If a `resource_counts_url` is provided, it means this item is
         a "resource" in Boundless. `resource_counts_url` provide most
         resource counts of the item on all Boundless worlds.
+
+        If `has_color` for an image is true and there is an `image_url`, you can
+        replace the file name from `{item.game_id}.png` to
+        `{item.game_id}_{color.game_id}.png` to get an image for a specific color.
+        The color for the default image is based on the `default_color` property.
         """
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 

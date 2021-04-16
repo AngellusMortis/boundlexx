@@ -4,10 +4,8 @@
 # https://pastebin.com/79MbweER
 
 import os
-from io import BytesIO
 
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.utils.functional import SimpleLazyObject
 from PIL import Image, ImageFilter
 
@@ -161,13 +159,3 @@ def get_emoji(name, layers=None):
         )
 
     return out_image
-
-
-def get_django_image(image, name):
-    image_content = BytesIO()
-    image.save(image_content, format="PNG")
-
-    django_image = ContentFile(image_content.getvalue())
-    django_image.name = name
-
-    return django_image

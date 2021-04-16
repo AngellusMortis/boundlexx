@@ -3,6 +3,7 @@ import requests
 from django.core.files.base import ContentFile
 
 from boundlexx.boundless.models import World
+from boundlexx.utils import make_thumbnail
 
 
 @click.command()
@@ -20,5 +21,9 @@ def command(world_id, image_url):
     if world.image is not None and world.image.name:
         world.image.delete()
 
+    if world.image_small is not None and world.image_small.name:
+        world.image_small.delete()
+
     world.image = image
+    world.image_small = make_thumbnail(image)
     world.save()

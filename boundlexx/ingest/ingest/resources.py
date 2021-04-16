@@ -69,7 +69,7 @@ def _create_resource_liquids():
             liquid.block_item.save()
 
 
-def run():
+def run(force=False, **kwargs):
     resourcetiers = GameFile.objects.get(
         folder="assets/archetypes", filename="resourcetiers.json"
     ).content

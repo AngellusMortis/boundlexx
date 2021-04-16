@@ -15,6 +15,7 @@ from boundlexx.boundless.utils import (
     get_block_color_item_ids,
     get_next_rank_update,
     get_world_block_color_item_ids,
+    get_block_metal_item_ids,
 )
 from config.storages import select_storage
 
@@ -239,8 +240,14 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     build_xp = models.PositiveSmallIntegerField(default=0)
     is_block = models.BooleanField(default=False, db_index=True)
     is_liquid = models.BooleanField(default=False, db_index=True)
+    default_color = models.ForeignKey(
+        Color, on_delete=models.CASCADE, blank=True, null=True
+    )
 
     image = models.ImageField(storage=select_storage("items"), blank=True, null=True)
+    image_small = models.ImageField(
+        storage=select_storage("items"), blank=True, null=True
+    )
 
     class Meta:
         indexes = [
@@ -270,6 +277,10 @@ class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
     @property
     def has_world_colors(self):
         return self.game_id in get_world_block_color_item_ids()
+
+    @property
+    def has_metal_variants(self):
+        return self.game_id in get_block_metal_item_ids()
 
     @property
     def next_shop_stand_update(self):
@@ -589,6 +600,9 @@ class Emoji(models.Model):
     active = models.BooleanField(default=True)
     name = models.CharField(max_length=32, db_index=True)
     image = models.ImageField(storage=select_storage("emoji"))
+    image_small = models.ImageField(
+        storage=select_storage("emoji"), blank=True, null=True
+    )
     category = models.CharField(
         max_length=16,
         choices=EmojiCategory.choices,
@@ -632,6 +646,9 @@ class ItemColorVariant(models.Model):
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
 
     image = models.ImageField(storage=select_storage("items"))
+    image_small = models.ImageField(
+        storage=select_storage("items"), blank=True, null=True
+    )
 
     class Meta:
         unique_together = ("item", "color")
@@ -639,3 +656,20 @@ class ItemColorVariant(models.Model):
     @property
     def lookup_id(self):
         return f"{self.item.game_id}_{self.color.game_id}"
+
+
+class ItemMetalVariant(models.Model):
+    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
+
+    image = models.ImageField(storage=select_storage("items"))
+    image_small = models.ImageField(
+        storage=select_storage("items"), blank=True, null=True
+    )
+
+    class Meta:
+        unique_together = ("item", "metal")
+
+    @property
+    def lookup_id(self):
+        return f"{self.item.game_id}_{self.metal.game_id}"

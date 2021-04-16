@@ -1,15 +1,10 @@
-import os
-
 import djclick as click
 from django.conf import settings
-from django.core.files.base import ContentFile
 
-from boundlexx.api.tasks import purge_static_cache
 from boundlexx.boundless.models import (
     Color,
     ColorValue,
     Item,
-    ItemColorVariant,
     LocalizedName,
     LocalizedString,
     LocalizedStringText,
@@ -37,61 +32,6 @@ def _create_generic(name, index_list, klass):
     return objects
 
 
-def _get_image(image_path, name):
-    with open(image_path, "rb") as image_file:
-        image = ContentFile(image_file.read())
-        image.name = f"{name}.png"
-
-    return image
-
-
-def _create_icons(item, pbar):
-    if settings.BOUNDLESS_ICONS_MAPPING.get(item.game_id):
-        image_dir = os.path.join(
-            settings.BOUNDLESS_ICONS_LOCATION,
-            settings.BOUNDLESS_ICONS_MAPPING.get(item.game_id, ""),
-        )
-    else:
-        image_dir = os.path.join(settings.BOUNDLESS_ICONS_LOCATION, item.name)
-        if not os.path.isdir(image_dir):
-            image_dir = os.path.join(settings.BOUNDLESS_ICONS_LOCATION, item.string_id)
-
-    if os.path.isdir(image_dir):
-        # default to "white" verison of item for default for colored items
-        default_image = os.path.join(image_dir, "227_0.png")
-        if not os.path.isfile(default_image):
-            default_image = os.path.join(image_dir, "0_0.png")
-
-        if os.path.isfile(default_image) and (
-            item.image is None or not item.image.name
-        ):
-            item.image = _get_image(default_image, f"{item.game_id}")
-
-    if os.path.isfile(os.path.join(image_dir, "1_0.png")):
-        existing_colors = [
-            i.color.game_id for i in ItemColorVariant.objects.filter(item=item)
-        ]
-
-        for color in Color.objects.exclude(game_id__in=existing_colors):
-            pbar.label = f"{item.game_id}:{color.game_id}"
-            pbar.render_progress()
-
-            color_index = color.game_id - 1
-            image_path = os.path.join(image_dir, f"{color_index}_{color_index}.png")
-            if not os.path.isfile(image_path):
-                image_path = os.path.join(image_dir, f"{color_index}_0.png")
-
-            if os.path.isfile(image_path):
-                ItemColorVariant.objects.create(
-                    item=item,
-                    color=color,
-                    image=_get_image(
-                        image_path,
-                        f"{item.game_id}_{color.game_id}",
-                    ),
-                )
-
-
 def _create_items(items_list, subtitles):
     compiled_items = GameFile.objects.get(
         folder="assets/archetypes", filename="compileditems.msgpack"
@@ -104,8 +44,6 @@ def _create_items(items_list, subtitles):
     with click.progressbar(items_list, show_pos=True) as pbar:
         for item in pbar:
             string_item_id = str(item["item_id"])
-            pbar.label = string_item_id
-            pbar.render_progress()
 
             item_obj, was_created = Item.objects.get_or_create(
                 game_id=item["item_id"],
@@ -116,7 +54,6 @@ def _create_items(items_list, subtitles):
             item_obj.mint_value = compiled_items[string_item_id]["coinValue"]
             item_obj.max_stack = compiled_items[string_item_id]["maxStackSize"]
             item_obj.can_be_sold = item_obj.game_id not in settings.BOUNDLESS_NO_SELL
-            _create_icons(item_obj, pbar)
 
             # items that cannot be dropped or minted are not normally obtainable
             can_drop = compiled_items[string_item_id]["canDrop"]
@@ -136,8 +73,6 @@ def _create_items(items_list, subtitles):
             if was_created:
                 items_created += 1
 
-    click.echo("Purging CDN cache...")
-    purge_static_cache()
     print_result("item", items_created)
     print_result("item", items_disabled, "disabled")
 
@@ -264,7 +199,7 @@ def _create_localization_data(strings, data):
         print_result("localized strings", strings_created)
 
 
-def run():
+def run(force=False, **kwargs):
     strings = GameFile.objects.get(
         folder="assets/archetypes", filename="itemcolorstrings.dat"
     ).content

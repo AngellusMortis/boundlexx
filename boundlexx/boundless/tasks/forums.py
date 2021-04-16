@@ -340,7 +340,7 @@ def _normalize_world_info(world_info):  # pylint: disable=too-many-branches
         if end is None:
             del world_info["end"]
         else:
-            world_info["start"] = end.replace(tzinfo=timezone.utc)
+            world_info["end"] = end.replace(tzinfo=timezone.utc)
 
     if "tier" in world_info:
         # NAME (#)

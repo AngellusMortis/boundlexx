@@ -177,7 +177,7 @@ class ItemViewSet(
         If `has_color` for an image is true and there is an `image_url`, you can
         replace the file name from `{item.game_id}.png` to
         `{item.game_id}_{color.game_id}.png` to get an image for a specific color.
-        The default image is _always_ White (228) if the item has colors.
+        The color for the default image is based on the `default_color` property.
         """
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 

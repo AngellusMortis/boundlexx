@@ -223,7 +223,9 @@ class URLSimpleItemSerializer(SimpleItemSerializer):
             "string_id",
             "image_url",
             "has_colors",
+            "has_metal_variants",
             "has_world_colors",
+            "default_color",
             "is_resource",
         ]
 

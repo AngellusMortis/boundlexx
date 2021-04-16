@@ -1,9 +1,10 @@
 import djclick as click
 
 from boundlexx.boundless.models import LocalizedString, Skill, SkillGroup
-from boundlexx.ingest.ingest.icon import get_django_image, get_image
+from boundlexx.ingest.ingest.icon import get_image
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
+from boundlexx.utils import get_django_image
 
 
 def _set_skill_attrs(skill, attrs):
@@ -16,7 +17,7 @@ def _set_skill_attrs(skill, attrs):
             setattr(skill, attr_name, attr_value)
 
 
-def run():
+def run(force=False, **kwargs):
     skilltrees = GameFile.objects.get(
         folder="assets/archetypes", filename="skilltrees.msgpack"
     ).content

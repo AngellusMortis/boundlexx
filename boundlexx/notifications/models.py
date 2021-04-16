@@ -3,10 +3,8 @@ from __future__ import annotations
 import logging
 import os
 from datetime import timedelta
-from tempfile import NamedTemporaryFile
 from typing import Any, Dict, List, Optional, Tuple
 
-import requests
 from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.contrib.humanize.templatetags.humanize import intcomma, naturaltime
@@ -28,6 +26,7 @@ from boundlexx.notifications.tasks import (
     update_forum_post,
 )
 from boundlexx.notifications.utils import get_forum_client
+from boundlexx.utils import download_image
 
 User = get_user_model()
 logger = logging.getLogger(__file__)
@@ -471,23 +470,7 @@ class WorldNotification(NotificationBase):
     def _upload_forum_image(self, image_url, image_type, lookup_id, size=None):
         client = get_forum_client()
 
-        tries = 4
-        while tries >= 0:
-            img_response = requests.get(image_url, timeout=5)
-            try:
-                img_response.raise_for_status()
-            except requests.exceptions.HTTPError:
-                if tries > 0:
-                    self._upload_log(f"Retring download ({tries})...")
-                    tries -= 1
-                else:
-                    raise
-            else:
-                temp_file = NamedTemporaryFile("wb", delete=False)
-                temp_file.write(img_response.content)
-                temp_file.close()
-                break
-
+        temp_file = download_image(image_url)
         if size is not None:
             self._crop_image(temp_file, size)
 

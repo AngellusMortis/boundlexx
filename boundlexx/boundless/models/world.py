@@ -30,6 +30,7 @@ from boundlexx.notifications.models import (
     ExoworldNotification,
     SovereignColorNotification,
 )
+from boundlexx.utils import make_thumbnail
 from config.storages import select_storage
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
@@ -220,6 +221,11 @@ class WorldManager(models.Manager):
         new_data = False
         if "image" in world_info and (world.image is None or not world.image.name):
             world.image = world_info["image"]
+            world.image.name = f"{world.id}.png"
+            if world.image_small is not None and world.image_small.name:
+                world.image_small.delete()
+            world.image_small = make_thumbnail(world_info["image"])
+            world.image_small.name = f"{world.id}_small.png"
             do_refresh = True
             new_data = True
         if world.forum_id is None:
@@ -380,6 +386,9 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     end = models.DateTimeField(blank=True, null=True, db_index=True)
 
     image = models.ImageField(blank=True, null=True, storage=select_storage("worlds"))
+    image_small = models.ImageField(
+        blank=True, null=True, storage=select_storage("worlds")
+    )
     notification_sent = models.BooleanField(null=True)
 
     is_public_edit = models.BooleanField(null=True)

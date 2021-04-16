@@ -7,6 +7,7 @@ from boundlexx.api.common.serializers.base import (
     LocalizedStringSerializer,
 )
 from boundlexx.api.common.serializers.world import IDWorldSerializer
+from boundlexx.api.common.serializers.color import IDColorSerializer
 from boundlexx.boundless.models import (
     Item,
     ResourceCount,
@@ -141,6 +142,8 @@ class SimpleItemSerializer(IDItemSerializer):
     item_subtitle = SubtitleSerializer()
     list_type = LocalizedStringSerializer()
     has_colors = serializers.BooleanField()
+    default_color = IDColorSerializer(allow_null=True)
+    has_metal_variants = serializers.BooleanField()
     has_world_colors = serializers.BooleanField()
     is_resource = serializers.BooleanField()
     image_url = AzureImageField(source="image", allow_null=True)
@@ -153,7 +156,9 @@ class SimpleItemSerializer(IDItemSerializer):
             "string_id",
             "image_url",
             "has_colors",
+            "has_metal_variants",
             "has_world_colors",
+            "default_color",
             "localization",
             "item_subtitle",
             "list_type",
@@ -184,7 +189,9 @@ class ItemSerializer(SimpleItemSerializer):
             "string_id",
             "image_url",
             "has_colors",
+            "has_metal_variants",
             "has_world_colors",
+            "default_color",
             "next_request_basket_update",
             "next_shop_stand_update",
             "localization",

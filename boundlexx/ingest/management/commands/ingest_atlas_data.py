@@ -22,6 +22,7 @@ from boundlexx.boundless.models import (
     World,
 )
 from boundlexx.boundless.utils import SPHERE_GAP, crop_world, html_name
+from boundlexx.utils import make_thumbnail
 
 BASE_DIR = "/tmp/maps"
 GLOW_SOLID = 5
@@ -120,8 +121,12 @@ def _process_image(world, root, name):
     if world.image is not None and world.image.name:
         world.image.delete()
 
+    if world.image_small is not None and world.image_small.name:
+        world.image_small.delete()
+
     world.atlas_image = atlas_image
     world.image = image
+    world.image_small = make_thumbnail(image)
     world.save()
 
 

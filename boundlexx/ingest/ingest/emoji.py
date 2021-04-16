@@ -3,9 +3,10 @@ import requests
 from django.conf import settings
 
 from boundlexx.boundless.models import Emoji, EmojiAltName
-from boundlexx.ingest.ingest.icon import emoji_layer_data, get_django_image, get_emoji
+from boundlexx.ingest.ingest.icon import emoji_layer_data, get_emoji
 from boundlexx.ingest.ingest.utils import print_result
 from boundlexx.ingest.models import GameFile
+from boundlexx.utils import get_django_image, make_thumbnail
 
 GROUP_TO_CATEGORY = {
     "smileys-emotion": "SMILEY",
@@ -35,7 +36,7 @@ def _get_emoji_list():
     return response.json()
 
 
-def run():
+def run(force=False, **kwargs):
     emoji_list = _get_emoji_list()
 
     emoji_nametable = GameFile.objects.get(
@@ -65,6 +66,9 @@ def run():
                 if emoji.image is not None and emoji.image.name:
                     emoji.image.delete()
                 emoji.image = emoji_image
+                if emoji.image_small is not None and emoji.image_small.name:
+                    emoji.image_small.delete()
+                emoji.image_small = make_thumbnail(emoji_image)
 
             alt_names = emoji_nametable.get(name)
 
