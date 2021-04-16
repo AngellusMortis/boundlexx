@@ -36,7 +36,7 @@ def _get_emoji_list():
     return response.json()
 
 
-def run(force=False, **kwargs):
+def run(**kwargs):  # pylint: disable=too-many-locals
     emoji_list = _get_emoji_list()
 
     emoji_nametable = GameFile.objects.get(

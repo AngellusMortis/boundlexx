@@ -9,8 +9,7 @@ from boundlexx.boundless.models import World
 from boundlexx.utils import download_image, get_django_image_from_file, make_thumbnail
 
 
-@click.command()
-def command():
+def _thumbs():
     click.echo("Adding thumbs/renmaing images...")
     duplicates = []
     worlds = World.objects.filter(image__isnull=False)
@@ -68,6 +67,8 @@ def command():
     click.echo("-----duplicates")
     click.echo(duplicates)
 
+
+def _missing():
     click.echo("Fixing abandoned images...")
     not_found = []
     multiple = []
@@ -83,7 +84,7 @@ def command():
                 world_name = world_name.replace("_", " ").title()
 
                 worlds = World.objects.filter(display_name__icontains=world_name)
-                if worlds.count() == 0:
+                if worlds.count() == 0:  # pylint: disable=no-else-continue
                     not_found.append(filename)
                     continue
                 elif worlds.count() > 1:
@@ -110,3 +111,9 @@ def command():
     click.echo(not_found)
     click.echo("-----multiple")
     click.echo(multiple)
+
+
+@click.command()
+def command():
+    _thumbs()
+    _missing()

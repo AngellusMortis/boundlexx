@@ -17,7 +17,7 @@ def _set_skill_attrs(skill, attrs):
             setattr(skill, attr_name, attr_value)
 
 
-def run(force=False, **kwargs):
+def run(**kwargs):  # pylint: disable=too-many-locals
     skilltrees = GameFile.objects.get(
         folder="assets/archetypes", filename="skilltrees.msgpack"
     ).content

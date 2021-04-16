@@ -191,6 +191,17 @@ def _create_metal_icons(force, item, image_dir, pbar):
             )
 
 
+def _get_default_image(image_dir, item):
+    has_colors = os.path.isfile(os.path.join(image_dir, "10_0.png"))
+    if has_colors:
+        item.default_color = _get_default_color(item)
+        default_image = os.path.join(image_dir, f"{item.default_color.game_id-1}_0.png")
+    else:
+        default_image = os.path.join(image_dir, "0_0.png")
+
+    return default_image
+
+
 def _create_icons(item, pbar, force=False, color_variants=True):
     if settings.BOUNDLESS_ICONS_MAPPING.get(item.game_id):
         image_dir = os.path.join(
@@ -203,14 +214,7 @@ def _create_icons(item, pbar, force=False, color_variants=True):
             image_dir = os.path.join(settings.BOUNDLESS_ICONS_LOCATION, item.string_id)
 
     if os.path.isdir(image_dir):
-        has_colors = os.path.isfile(os.path.join(image_dir, "10_0.png"))
-        if has_colors:
-            item.default_color = _get_default_color(item)
-            default_image = os.path.join(
-                image_dir, f"{item.default_color.game_id-1}_0.png"
-            )
-        else:
-            default_image = os.path.join(image_dir, "0_0.png")
+        default_image = _get_default_image(image_dir, item)
 
         if os.path.isfile(default_image) and (
             force or item.image is None or not item.image.name
@@ -266,7 +270,9 @@ def _get_default_color(item):
     return Color.objects.get(game_id=default_color_id)
 
 
-def run(force=False, start_id=None, end_id=None, color_variants=True, **kwargs):
+def run(  # pylint: disable=too-many-locals
+    force=False, start_id=None, end_id=None, color_variants=True, **kwargs
+):
     items = {}
 
     compiled_items = GameFile.objects.get(
