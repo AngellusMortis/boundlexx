@@ -66,9 +66,9 @@ def run(**kwargs):  # pylint: disable=too-many-locals
                 if emoji.image is not None and emoji.image.name:
                     emoji.image.delete()
                 emoji.image = emoji_image
-                if emoji.image_small is not None and emoji.image_small.name:
-                    emoji.image_small.delete()
-                emoji.image_small = make_thumbnail(emoji_image)
+            if emoji.image_small is not None and emoji.image_small.name:
+                emoji.image_small.delete()
+            emoji.image_small = make_thumbnail(emoji_image)
 
             alt_names = emoji_nametable.get(name)
 
