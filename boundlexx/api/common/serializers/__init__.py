@@ -24,6 +24,7 @@ from boundlexx.api.common.serializers.item import (
     ItemSerializer,
     SimpleItemSerializer,
 )
+from boundlexx.api.common.serializers.metal import MetalSerializer
 from boundlexx.api.common.serializers.recipe import (
     IDRecipeGroupSerializer,
     RecipeGroupSerializer,
@@ -102,6 +103,7 @@ __all__ = [
     "LocalizedStringSerializer",
     "LocalizedStringTextSerializer",
     "LocationSerializer",
+    "MetalSerializer",
     "NullSerializer",
     "PossibleItemWBCSerializer",
     "PossibleWBCSerializer",

@@ -7,6 +7,7 @@ from boundlexx.api.v2.views.item import (
     ItemResourceWorldListViewSet,
     ItemViewSet,
 )
+from boundlexx.api.v2.views.metal import MetalViewSet
 from boundlexx.api.v2.views.recipe import RecipeGroupViewSet, RecipeViewSet
 from boundlexx.api.v2.views.skill import SkillGroupViewSet, SkillViewSet
 from boundlexx.api.v2.views.timeseries import (
@@ -25,6 +26,7 @@ __all__ = [
     "ItemResourceTimeseriesViewSet",
     "ItemResourceWorldListViewSet",
     "ItemViewSet",
+    "MetalViewSet",
     "RecipeGroupViewSet",
     "RecipeViewSet",
     "SkillGroupViewSet",

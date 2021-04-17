@@ -177,10 +177,7 @@ def _create_metal_icons(force, item, image_dir, pbar):
         pbar.label = f"{item.game_id}:{metal.game_id}"
         pbar.render_progress()
 
-        image_path = os.path.join(image_dir, f"{metal}_{metal.game_id}.png")
-        if not os.path.isfile(image_path):
-            image_path = os.path.join(image_dir, f"{metal}_0.png")
-
+        image_path = os.path.join(image_dir, f"{metal.game_id}_0.png")
         if os.path.isfile(image_path):
             image = _crop_image(image_path, f"{item.game_id}_{metal.game_id}")
             ItemMetalVariant.objects.create(

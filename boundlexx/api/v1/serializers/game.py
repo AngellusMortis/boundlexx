@@ -9,6 +9,7 @@ from boundlexx.api.common.serializers import (
     ItemResourceCountSerializer,
     ItemSerializer,
     ItemShopStandPriceSerializer,
+    MetalSerializer,
     RecipeGroupSerializer,
     RecipeInputSerializer,
     RecipeLevelSerializer,
@@ -36,6 +37,7 @@ from boundlexx.boundless.models import (
     Item,
     ItemRequestBasketPrice,
     ItemShopStandPrice,
+    Metal,
     Recipe,
     RecipeGroup,
     RecipeInput,
@@ -68,6 +70,22 @@ class URLColorSerializer(ColorSerializer):
             "game_id",
             "base_color",
             "gleam_color",
+            "localization",
+        ]
+
+
+class URLMetalSerializer(MetalSerializer):
+    url = serializers.HyperlinkedIdentityField(
+        view_name="metal-detail",
+        lookup_field="game_id",
+        read_only=True,
+    )
+
+    class Meta:
+        model = Metal
+        fields = [
+            "url",
+            "game_id",
             "localization",
         ]
 
