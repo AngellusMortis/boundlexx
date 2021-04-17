@@ -8,7 +8,7 @@ class ModelDiffMixin:
     """
 
     def __init__(self, *args, **kwargs):
-        super(ModelDiffMixin).__init__(*args, **kwargs)  # type: ignore
+        super().__init__(*args, **kwargs)  # type: ignore
         self.__initial = self._dict
 
     @property
@@ -37,11 +37,11 @@ class ModelDiffMixin:
         Saves model and set initial state.
         """
         if force or self.has_changed:
-            super(ModelDiffMixin).save(*args, **kwargs)  # type: ignore
+            super().save(*args, **kwargs)  # type: ignore
             self.__initial = self._dict
 
     def refresh_from_db(self, *args, **kwargs):
-        super(ModelDiffMixin).refresh_from_db(*args, **kwargs)  # type: ignore
+        super().refresh_from_db(*args, **kwargs)  # type: ignore
         self.__initial = self._dict
 
     @property
