@@ -15,8 +15,8 @@ from django.utils import timezone
 from django_celery_results.models import TaskResult
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
-from boundlexx.boundless.client import HTTP_ERRORS, BoundlessClient
-from boundlexx.boundless.client import World as SimpleWorld
+from boundlexx.boundless.game import HTTP_ERRORS, BoundlessClient
+from boundlexx.boundless.game import World as SimpleWorld
 from boundlexx.boundless.models import (
     Color,
     Item,

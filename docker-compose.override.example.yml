@@ -10,8 +10,12 @@ services:
         - "28000:8000"
       volumes:
         - .:/app
-        ## Replace with path your Boundless install
+        ## Replace with path to your Boundless install
         - C:\Program Files\Steam\steamapps\common\Boundless:/boundless
+        ## Replace with path to `boundlexx_client` repo
+        - /path/to/boundlexx_client:/app/boundlexx/boundless/client.py
+        ## Replace with path to you out folder for `boundless_icon_render`
+        - /path/to/boundless_icon_render/out:/boundless-icons
 
     manage:
       <<: *django

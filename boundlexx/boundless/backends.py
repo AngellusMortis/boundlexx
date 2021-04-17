@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.backends import ModelBackend
 from requests import HTTPError
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.game import BoundlessClient
 
 User = get_user_model()
 

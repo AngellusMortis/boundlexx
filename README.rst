@@ -1,6 +1,6 @@
 Boundlexx
 =========
- 
+
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
      :target: https://github.com/pydanny/cookiecutter-django/
      :alt: Built with Cookiecutter Django
@@ -22,10 +22,19 @@ Remote Containers extension. It is recommend to use those. So make sure you have
 
 * `Docker`_
 * `VS Code`_ with the `Remote Containers extension`_.
+* MacOSX version of Boundless installed somewhere. You can use `steamcmd`_ to install it via the following command:
+
+  ```bash
+  steamcmd +@sSteamCmdForcePlatformType macos +login username +force_install_dir /path/to/install +app_update 324510 -beta testing validate +quit
+  ```
+
+* `Boundless Icon Renderer`_ set up and ran if you want to import item images into Boundlexx
 
 .. _Docker: https://docs.docker.com/get-docker/
 .. _VS Code: https://code.visualstudio.com/
 .. _Remote Containers extension: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers
+.. _steamcmd: https://developer.valvesoftware.com/wiki/SteamCMD
+.. _Boundless Icon Renderer: https://forum.playboundless.com/t/icon-renderer/55879
 
 Setup
 -----
@@ -44,3 +53,4 @@ Setup
    Then sign in with Discord or Github
 #. Back in VS Code, run the command "Tasks: Run Task" and then "Boundlexx: Make Superuser".
 #. Enter the username for your user when prompted.
+#. Repeat "Tasks: Run Task" for the "Boundlexx: Ingest Game Data" and "Boundlexx: Create Game Objects" tasks.

@@ -34,9 +34,15 @@
             "problemMatcher": []
         },
         {
-            "label": "Boundlexx: Tail Output",
+            "label": "Boundlexx: Ingest Game Data",
             "type": "shell",
-            "command": "tail -f /tmp/django.log",
+            "command": "source <(cat ${workspaceFolder}/.local.env | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py ingest_game_data 249.4.0",
+            "problemMatcher": []
+        },
+        {
+            "label": "Boundlexx: Create Game Objects",
+            "type": "shell",
+            "command": "source <(cat ${workspaceFolder}/.local.env | grep -v '^#' | sed -E 's|^(.+)=(.*)$|export \\1=\\2|g') && python ${workspaceFolder}/manage.py create_game_objects",
             "problemMatcher": []
         },
     ],
@@ -57,7 +63,6 @@
                 "createsuperuser",
                 "migrate",
                 "makemigrations",
-                "creatersakey",
             ],
             "default": "shell_plus"
         },

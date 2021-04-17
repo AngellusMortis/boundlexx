@@ -12,7 +12,7 @@ from django.utils.safestring import mark_safe
 from PIL import Image
 from requests.exceptions import ConnectionError as RequestsConnectionError
 
-from boundlexx.boundless.client import HTTP_ERRORS
+from boundlexx.boundless.game import HTTP_ERRORS
 
 ITEM_COLOR_IDS_KEYS = "boundless:block_color_ids"
 ITEM_METAL_IDS_KEYS = "boundless:block_metal_ids"

@@ -8,7 +8,7 @@ ENV PYTEST ""
 ENV DJANGO_MANAGE ""
 
 RUN apt-get update \
-  && apt-get install -y build-essential libpq-dev gettext nodejs npm git python3-mpltoolkits.basemap python3-pillow lsb-release imagemagick mesa-utils xvfb \
+  && apt-get install -y build-essential libpq-dev gettext nodejs npm git python3-mpltoolkits.basemap python3-pillow lsb-release \
   && npm install -g steam-user \
   && pip install pip --upgrade \
   # cleaning up unused files
@@ -86,6 +86,8 @@ RUN chmod +x /start-celerybeat
 
 COPY --chown=django:django ./docker/celery/production/flower/start /start-flower
 RUN chmod +x /start-flower
+
+COPY ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
 
 COPY --chown=django:django ./manage.py /app/
 COPY --chown=django:django ./locale /app/locale

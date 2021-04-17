@@ -37,8 +37,6 @@ beautifulsoup4==4.9.3
     # via -r /app/requirements/in/base.in
 billiard==3.6.4.0
     # via celery
-git+https://github.com/AngellusMortis/boundless_headless_renderer.git
-    # via -r /app/requirements/in/base.in
 cachetools==4.2.1
     # via
     #   google-auth
@@ -151,11 +149,9 @@ gevent==21.1.2
     # via
     #   gevent-eventemitter
     #   steam
-glcontext==2.3.3
-    # via moderngl
 google-auth-oauthlib==0.4.4
     # via gspread
-google-auth==1.28.1
+google-auth==1.29.0
     # via
     #   google-auth-oauthlib
     #   gspread
@@ -179,10 +175,6 @@ jedi==0.18.0
     # via ipython
 kombu==4.6.11
     # via celery
-git+https://github.com/moderngl/moderngl@67c9d33#egg=moderngl
-    # via
-    #   -r /app/requirements/in/base.in
-    #   boundless-headless-renderer
 msal-extensions==0.3.0
     # via azure-identity
 msal==1.11.0
@@ -192,17 +184,11 @@ msal==1.11.0
 msgpack==1.0.2
     # via
     #   -r /app/requirements/in/base.in
-    #   boundless-headless-renderer
     #   djangorestframework-msgpack
 msrest==0.6.21
     # via azure-mgmt-cdn
-multipledispatch==0.6.0
-    # via pyrr
 numpy==1.20.2
-    # via
-    #   -r /app/requirements/in/base.in
-    #   boundless-headless-renderer
-    #   pyrr
+    # via -r /app/requirements/in/base.in
 oauthlib==3.1.0
     # via requests-oauthlib
 openpyxl==3.0.7
@@ -214,9 +200,7 @@ pexpect==4.8.0
 pickleshare==0.7.5
     # via ipython
 pillow==8.2.0
-    # via
-    #   -r /app/requirements/in/base.in
-    #   boundless-headless-renderer
+    # via -r /app/requirements/in/base.in
 portalocker==1.7.1
     # via msal-extensions
 prometheus-client==0.8.0
@@ -247,8 +231,6 @@ pygments==2.8.1
     # via ipython
 pyjwt[crypto]==2.0.1
     # via msal
-pyrr==0.10.3
-    # via boundless-headless-renderer
 python-crontab==2.5.1
     # via django-celery-beat
 python-dateutil==2.8.1
@@ -301,7 +283,6 @@ six==1.15.0
     #   azure-identity
     #   google-auth
     #   isodate
-    #   multipledispatch
     #   protobuf
     #   python-dateutil
     #   steam
@@ -332,13 +313,11 @@ vine==1.3.0
     #   amqp
     #   celery
     #   flower
-wand==0.6.6
-    # via boundless-headless-renderer
 wcwidth==0.2.5
     # via prompt-toolkit
 zope.event==4.5.0
     # via gevent
-zope.interface==5.3.0
+zope.interface==5.4.0
     # via gevent
 
 # The following packages are considered to be unsafe in a requirements file:

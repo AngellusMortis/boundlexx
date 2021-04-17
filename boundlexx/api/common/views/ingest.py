@@ -7,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
-from boundlexx.boundless.client import BoundlessClient
+from boundlexx.boundless.game import BoundlessClient
 from boundlexx.boundless.models import World, WorldBlockColor, WorldCreatureColor
 from boundlexx.boundless.tasks import add_world_control_data, recalculate_colors
 from boundlexx.notifications.models import ExoworldNotification

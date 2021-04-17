@@ -15,9 +15,9 @@ from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
 from django_prometheus.models import ExportModelOperationsMixin
 
-from boundlexx.boundless.client import BoundlessClient, Location
-from boundlexx.boundless.client import Settlment as SimpleSettlement
-from boundlexx.boundless.client import World as SimpleWorld
+from boundlexx.boundless.game import BoundlessClient, Location
+from boundlexx.boundless.game import Settlement as SimpleSettlement
+from boundlexx.boundless.game import World as SimpleWorld
 from boundlexx.boundless.models.game import Block, Color, Item, Skill
 from boundlexx.boundless.utils import (
     calculate_extra_names,

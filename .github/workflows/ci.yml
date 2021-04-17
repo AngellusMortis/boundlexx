@@ -58,8 +58,15 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Checkout Client Repository
+        uses: actions/checkout@v2
+        with:
+          repository: "AngellusMortis/boundlexx_client"
+          token: "${{ secrets.GHCR_PAT }}"
+          path: boundlexx_client
+
       - name: Log into Registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
       - name: Pull Cached Postgres Images
         run: docker pull ghcr.io/angellusmortis/boundlexx_postgres || true
@@ -73,7 +80,7 @@ jobs:
         run: docker build -t boundlexx_postgres --cache-from ghcr.io/angellusmortis/boundlexx_postgres -f docker/postgres/Dockerfile .
 
       - name: Build Django Image
-        run: docker build -t boundlexx_django --cache-from ghcr.io/angellusmortis/boundlexx_dev_django --target production -f docker/django/Dockerfile .
+        run: docker build -t boundlexx_django --cache-from ghcr.io/angellusmortis/boundlexx_dev_django --cache-from ghcr.io/angellusmortis/boundlexx_django --target production -f docker/django/Dockerfile .
 
       - name: Push Postgres Image
         run: |

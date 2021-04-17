@@ -7,8 +7,8 @@ from django.db import models
 from django.utils import timezone
 from django_prometheus.models import ExportModelOperationsMixin
 
-from boundlexx.boundless.client import Location, ShopItem
-from boundlexx.boundless.client import World as SimpleWorld
+from boundlexx.boundless.game import Location, ShopItem
+from boundlexx.boundless.game import World as SimpleWorld
 from boundlexx.boundless.models.game import Item
 from boundlexx.boundless.models.world import World
 from boundlexx.boundless.utils import html_name

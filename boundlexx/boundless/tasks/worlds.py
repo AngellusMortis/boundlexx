@@ -9,8 +9,8 @@ from django.db.models import Q
 from django.utils import timezone
 from requests.exceptions import HTTPError
 
-from boundlexx.boundless.client import BoundlessClient
-from boundlexx.boundless.client import World as SimpleWorld
+from boundlexx.boundless.game import BoundlessClient
+from boundlexx.boundless.game import World as SimpleWorld
 from boundlexx.boundless.models import (
     Color,
     Settlement,
