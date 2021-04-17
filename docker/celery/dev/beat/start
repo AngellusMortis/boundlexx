@@ -3,4 +3,6 @@
 set -o errexit
 set -o nounset
 
+rm -f /tmp/celerybeat.pid
+
 celery -A config.celery_app beat -l INFO --pidfile=/tmp/celerybeat.pid
