@@ -10,7 +10,7 @@ services:
       dockerfile: ./docker/django/Dockerfile
       target: dev
       cache_from:
-        - docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_dev_django
+        - ghcr.io/angellusmortis/boundlexx_dev_django
         - boundlexx_dev_django
     image: boundlexx_dev_django
     depends_on:
@@ -51,7 +51,7 @@ services:
       context: .
       dockerfile: ./docker/postgres/Dockerfile
       cache_from:
-        - docker.pkg.github.com/angellusmortis/boundlexx/boundlexx_postgres
+        - ghcr.io/angellusmortis/boundlexx_postgres
         - boundlexx_postgres
     image: boundlexx_postgres
     shm_size: 1g
