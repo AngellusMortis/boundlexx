@@ -845,7 +845,9 @@ class WorldBlockColorManager(models.Manager):
 
         return create, updated
 
-    def create_colors_from_ws(self, world, block_colors, user=None):
+    def create_colors_from_ws(  # pylint: disable=too-many-locals
+        self, world, block_colors, user=None
+    ):
         default = True
         if world.is_sovereign or world.special_type == 1:
             default = False
@@ -884,8 +886,7 @@ class WorldBlockColorManager(models.Manager):
                     block_colors_created += 1
 
         if block_colors_created > 0 or block_colors_updated > 0:
-            world.list_updated = timezone.now()
-            world.save()
+            world.save(force=True)
 
         return block_colors_created
 
