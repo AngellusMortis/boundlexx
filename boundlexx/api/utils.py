@@ -11,7 +11,7 @@ PURGE_CACHE_LOCK = "boundless:purge_cache_lock"
 PURGE_CACHE_PATHS = "boundless:purge_cache_paths"
 PURGE_CACHE_TASK = "boundlexx.api.tasks.purge_cache"
 PURGE_GROUPS = {
-    "__all__": ["/api/v1/*"],
+    "__all__": ["/api/v1/*", "/api/v2/*"],
     "World": ["/api/v1/worlds/", "/api/v1/worlds/{world_id}/*"],
     "Color": ["/api/v1/colors/", "/api/v1/colors/{color_id}/*"],
     "Item": ["/api/v1/items/", "/api/v1/items/{item_id}/*"],
