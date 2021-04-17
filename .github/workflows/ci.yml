@@ -84,7 +84,7 @@ jobs:
 
       - name: Push Postgres Image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/boundlexx_postgres
+          IMAGE_ID=ghcr.io/angellusmortis/boundlexx_postgres
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
@@ -106,7 +106,7 @@ jobs:
 
       - name: Push Django Image
         run: |
-          IMAGE_ID=ghcr.io/${{ github.repository }}/boundlexx_django
+          IMAGE_ID=ghcr.io/angellusmortis/boundlexx_django
 
           # Change all uppercase to lowercase
           IMAGE_ID=$(echo $IMAGE_ID | tr '[A-Z]' '[a-z]')
