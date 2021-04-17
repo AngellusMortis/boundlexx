@@ -121,7 +121,10 @@ def _crop_image(image_path, name):
 
 
 def _create_color_icons(force, item, image_dir, pbar):
-    ItemMetalVariant.objects.filter(item=item).delete()
+    for imv in ItemMetalVariant.objects.filter(item=item):
+        imv.image.delete()
+        if imv.image_small is not None and imv.image_small.name:
+            imv.image_small.delete()
 
     if force:
         existing_colors = []
@@ -157,7 +160,10 @@ def _create_color_icons(force, item, image_dir, pbar):
 
 
 def _create_metal_icons(force, item, image_dir, pbar):
-    ItemColorVariant.objects.filter(item=item).delete()
+    for icv in ItemColorVariant.objects.filter(item=item):
+        icv.image.delete()
+        if icv.image_small is not None and icv.image_small.name:
+            icv.image_small.delete()
 
     if force:
         existing_colors = []
