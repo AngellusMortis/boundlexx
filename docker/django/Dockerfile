@@ -87,12 +87,11 @@ RUN chmod +x /start-celerybeat
 COPY --chown=django:django ./docker/celery/production/flower/start /start-flower
 RUN chmod +x /start-flower
 
-COPY ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
-
 COPY --chown=django:django ./manage.py /app/
 COPY --chown=django:django ./locale /app/locale
 COPY --chown=django:django ./config /app/config
 COPY --chown=django:django ./boundlexx /app/boundlexx
+COPY --chown=django:django ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
 
 USER django
 
