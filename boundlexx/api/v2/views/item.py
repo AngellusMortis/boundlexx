@@ -106,6 +106,9 @@ class ItemViewSet(
         replace the file name from `{item.game_id}.png` to
         `{item.game_id}_{color.game_id}.png` to get an image for a specific color.
         The color for the default image is based on the `default_color` property.
+
+        `has_metal_variants` is the same thing, but for the 5 different types of
+        metals.
         """
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
