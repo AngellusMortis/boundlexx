@@ -25,6 +25,7 @@ Remote Containers extension. It is recommend to use those. So make sure you have
 * MacOSX version of Boundless installed somewhere. You can use `steamcmd`_ to install it via the following command:
 
    .. code-block:: bash
+
       steamcmd +@sSteamCmdForcePlatformType macos +login username +force_install_dir /path/to/install +app_update 324510 -beta testing validate +quit
 
 * `Boundless Icon Renderer`_ set up and ran if you want to import item images into Boundlexx
