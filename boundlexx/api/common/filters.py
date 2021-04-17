@@ -207,9 +207,17 @@ class WorldFilterSet(BaseFilterSet):
     )
     end = filters.IsoDateTimeFromToRangeFilter(
         label=_(
-            "Filters start based on a given time contraint. `end_after` sets "
+            "Filters end based on a given time contraint. `end_after` sets "
             "lower bound and `end_before` sets upper bound. Format is "
             "<a href='https://en.wikipedia.org/wiki/ISO_8601'>ISO 8601</a>"
+        ),
+    )
+    last_updated = filters.IsoDateTimeFromToRangeFilter(
+        label=_(
+            "Filters last_updated based on a given time contraint. "
+            "`last_updated_after` sets lower bound and `last_updated_before` sets "
+            "upper bound. Format is <a href='https://en.wikipedia.org/wiki/ISO_8601'>"
+            "ISO 8601</a>"
         ),
     )
 

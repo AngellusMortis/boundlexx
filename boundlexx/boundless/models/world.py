@@ -31,6 +31,7 @@ from boundlexx.notifications.models import (
     SovereignColorNotification,
 )
 from boundlexx.utils import make_thumbnail
+from boundlexx.utils.models import ModelDiffMixin
 from config.storages import select_storage
 
 PORTAL_CONDUITS = [2, 3, 4, 6, 8, 10, 15, 18, 24]
@@ -243,7 +244,7 @@ class WorldManager(models.Manager):
         return world, created
 
 
-class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore  # pylint: disable=too-many-public-methods  # noqa: E501
+class World(ExportModelOperationsMixin("world"), ModelDiffMixin, models.Model):  # type: ignore  # pylint: disable=too-many-public-methods  # noqa: E501
     objects = WorldManager()
 
     class Region(models.TextChoices):
@@ -398,6 +399,8 @@ class World(ExportModelOperationsMixin("world"), models.Model):  # type: ignore 
     html_name = models.TextField(blank=True, null=True)
     text_name = models.TextField(blank=True, null=True)
     sort_name = models.TextField(blank=True, null=True, db_index=True)
+
+    last_updated = models.DateTimeField(auto_now=True)
 
     atlas_image = models.ImageField(
         blank=True, null=True, storage=select_storage("atlas")
@@ -824,6 +827,7 @@ class WorldBlockColorManager(models.Manager):
 
     def _update_existing_color(self, wbc, color, default, user=None):
         create = False
+        updated = False
         if wbc is None:
             create = True
         elif wbc.color != color:
@@ -833,12 +837,13 @@ class WorldBlockColorManager(models.Manager):
                     or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS
                 ):
                     wbc.color = color
+                updated = True
             else:
                 wbc.active = False
                 create = True
             wbc.save()
 
-        return create
+        return create, updated
 
     def create_colors_from_ws(self, world, block_colors, user=None):
         default = True
@@ -854,6 +859,7 @@ class WorldBlockColorManager(models.Manager):
         colors = self._get_colors()
 
         block_colors_created = 0
+        block_colors_updated = 0
         for block_name, color_id in block_colors.items():
             block = blocks.get(block_name)
 
@@ -861,7 +867,11 @@ class WorldBlockColorManager(models.Manager):
                 wbc = wbcs.get(block.block_item.game_id)
                 color = colors[color_id]
 
-                create = self._update_existing_color(wbc, color, default, user=user)
+                create, updated = self._update_existing_color(
+                    wbc, color, default, user=user
+                )
+                if updated:
+                    block_colors_updated += 1
                 if create:
                     WorldBlockColor.objects.create(
                         world=world,
@@ -872,6 +882,10 @@ class WorldBlockColorManager(models.Manager):
                         uploader=user,
                     )
                     block_colors_created += 1
+
+        if block_colors_created > 0 or block_colors_updated > 0:
+            world.list_updated = timezone.now()
+            world.save()
 
         return block_colors_created
 
@@ -998,6 +1012,10 @@ class WorldBlockColorManager(models.Manager):
 
         new_block_colors = self._create_default_colors(world, default_colors, user=user)
         block_colors_created += len(new_block_colors)
+
+        if block_colors_created > 0:
+            world.save(force=True)
+
         self._log(logger, "Created %s default", block_colors_created)
         block_colors_created += self._create_unknown_colors(
             possible_colors, new_block_colors, user=user

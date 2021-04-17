@@ -462,6 +462,9 @@ def _ingest_world_data(topics, is_perm=False, is_sovereign=False):
             if created:
                 number_created += 1
 
+        if number_created > 0:
+            world.save(force=True)
+
         if world.id < settings.BOUNDLESS_EXO_EXPIRED_BASE_ID:
             # only add world as parsed if the data is "complete" and has image
             cutoff = dj_timezone.now() - timedelta(days=7)

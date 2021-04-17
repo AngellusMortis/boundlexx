@@ -601,7 +601,6 @@ BOUNDLESS_FORUM_NAME_MAPPINGS = {
     "Verdant": "Verdant Grass",
     "Weeping Waxcap": "Weeping Waxcap Fungus",
 }
-BOUNDLESS_SHEETS_WORLDS_URL = "https://docs.google.com/spreadsheets/d/1yT1Fqepw5YjiO5O_5SzruRrSQFBzO2PsY5rwzTaXRBc/edit"  # noqa: E501
 BOUNDLESS_LANGUAGES = [
     ("english", "English"),
     ("french", "French"),

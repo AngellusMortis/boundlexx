@@ -1,12 +1,66 @@
-2020-11-4
----------
+2021-04-17
+----------
+
+* Removes `BoundlessClient` to seperate private repo
+* Migrates Docker Images from `docker.pkg.github.com` to `ghcr.io`
+* Removes Google Sheets related tasks/code
+* Adds `ModelDiffMixin` to only update World model when it actually changes
+* Adds `last_updated` to `/worlds/` and accompanying filter
+
+2021-04-16
+----------
+
+* Adds thumbnail images for Worlds, Item and Emojis
+* Adds `default_color` for Items and uses it to determine default item image
+* Adds `/metals/` endpoint
+
+2021-04-14
+----------
+
+* Adds images for items
+* Adds item images to forum template
+* Updates purge_cache command to purged redis cached data
+
+
+2021-03-30
+----------
+
+* Adds permissions to allow authed users to access private worlds
+
+2021-03-29
+----------
+
+* Adds world image creation from Atlas image dumps
+
+2021-03-28
+----------
+
+* Removes deprecated listWorld endpoint on v1
+* Fixes set of world IDs that get searched for
+* Fixes initial resources not being added back to forum post on update
+
+2021-03-27
+----------
+
+* Fixes length of guild_tag for longer guild names
+* Fixes issue for uploading JSON for perm worlds
+* Adds server address to world list view
+* Fixes for testing version 249.4
+
+2021-03-21
+----------
+
+* Upgrades to docker-compose file 3.8 spec
+
+2020-11-04
+----------
 
 * Adds full categorization of Emojis
 * Adds update link to forum template generator
 * Refactors Boundless Client
 
-2020-11-1
----------
+2020-11-01
+----------
 
 * Adds affiliation attrbution/disclaimer.
 * Changes resources to properly pull from game files.
