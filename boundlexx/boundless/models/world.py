@@ -1464,8 +1464,8 @@ class Settlement(models.Model):
     location_z = models.IntegerField()
     prestige = models.PositiveIntegerField(db_index=True)
     name = models.CharField(max_length=64)
-    text_name = models.CharField(max_length=64)
-    html_name = models.CharField(max_length=1024)
+    text_name = models.CharField(max_length=64, blank=True, null=True)
+    html_name = models.CharField(max_length=1024, blank=True, null=True)
 
     _location = None
     objects = SettlementManager()

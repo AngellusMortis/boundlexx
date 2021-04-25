@@ -1,3 +1,8 @@
+2021-04-25
+----------
+
+* Updates `html_name` fields to escape all existing HTML before calculating
+
 2021-04-17
 ----------
 

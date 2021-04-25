@@ -8,6 +8,7 @@ from io import BytesIO
 from typing import Callable, Optional
 
 from django.core.cache import cache
+from django.utils.html import escape
 from django.utils.safestring import mark_safe
 from PIL import Image
 from requests.exceptions import ConnectionError as RequestsConnectionError
@@ -234,7 +235,7 @@ def html_name(string, strip=False, colors=None):
         colors = list(
             Color.objects.all().prefetch_related("localizedname_set", "colorvalue_set")
         )
-    final_string = string[:]
+    final_string = str(escape(string[:]))
 
     for match in re.finditer(FORMATTING_REGEX, string):
         format_string = match.group(0)
