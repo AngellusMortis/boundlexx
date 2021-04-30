@@ -20,7 +20,8 @@ Requirements
 This project is configured to work with Docker inside of VS Code using the
 Remote Containers extension. It is recommend to use those. So make sure you have:
 
-* `Docker`_
+* `Docker Engine and Compose`_. Requires at least
+* Docker Buildkit enabled (add `export DOCKER_BUILDKIT=1` to your shell rc or set it manually before running commands)
 * `VS Code`_ with the `Remote Containers extension`_.
 * MacOSX version of Boundless installed somewhere. You can use `steamcmd`_ to install it via the following command:
 
@@ -30,7 +31,7 @@ Remote Containers extension. It is recommend to use those. So make sure you have
 
 * `Boundless Icon Renderer`_ set up and ran if you want to import item images into Boundlexx
 
-.. _Docker: https://docs.docker.com/get-docker/
+.. _Docker Engine and Compose: https://docs.docker.com/get-docker/
 .. _VS Code: https://code.visualstudio.com/
 .. _Remote Containers extension: https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers
 .. _steamcmd: https://developer.valvesoftware.com/wiki/SteamCMD

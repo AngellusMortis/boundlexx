@@ -39,7 +39,7 @@ def _draw_world_image(  # pylint: disable=too-many-locals
 ):
     sphere_image_file = os.path.join(BASE_DIR, f"{world_id}_sphere.png")
     run(
-        ["/convert.py", atlas_image_file, sphere_image_file],
+        ["/usr/local/bin/convert-atlas", atlas_image_file, sphere_image_file],
         check=True,
         capture_output=True,
     )

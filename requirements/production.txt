@@ -37,7 +37,7 @@ beautifulsoup4==4.9.3
     # via -r /app/requirements/in/base.in
 billiard==3.6.4.0
     # via celery
-cachetools==4.2.1
+cachetools==4.2.2
     # via steam
 celery==4.4.7
     # via
@@ -109,7 +109,7 @@ django-storages[azure]==1.11.1
     # via -r /app/requirements/in/base.in
 django-timezone-field==4.1.2
     # via django-celery-beat
-django==3.1.8
+django==3.2
     # via
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
@@ -133,7 +133,7 @@ djangorestframework==3.12.4
     #   drf-extensions
 git+https://github.com/chibisov/drf-extensions.git@002a67ce
     # via -r /app/requirements/in/base.in
-et-xmlfile==1.0.1
+et-xmlfile==1.1.0
     # via openpyxl
 filetype==1.0.7
     # via -r /app/requirements/in/base.in
@@ -151,7 +151,7 @@ greenlet==1.0.0
     # via gevent
 humanfriendly==9.1
     # via coloredlogs
-humanize==3.4.1
+humanize==3.5.0
     # via flower
 idna==2.10
     # via requests
@@ -213,7 +213,7 @@ pydiscourse==1.1.2
     # via -r /app/requirements/in/base.in
 pygments==2.8.1
     # via ipython
-pyjwt[crypto]==2.0.1
+pyjwt[crypto]==2.1.0
     # via msal
 python-crontab==2.5.1
     # via django-celery-beat

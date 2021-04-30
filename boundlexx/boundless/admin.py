@@ -194,22 +194,21 @@ class MetalAdmin(GameObjAdmin):
 
 @admin.register(Item)
 class ItemAdmin(GameObjAdmin):
+    @admin.display(boolean=True)
     def is_resource(self, obj):
         return obj.is_resource
 
+    @admin.display(boolean=True)
     def has_colors(self, obj):
         return obj.has_colors
 
+    @admin.display(boolean=True)
     def has_metal_variants(self, obj):
         return obj.has_metal_variants
 
+    @admin.display(boolean=True)
     def has_world_colors(self, obj):
         return obj.has_world_colors
-
-    is_resource.boolean = True  # type: ignore
-    has_colors.boolean = True  # type: ignore
-    has_world_colors.boolean = True  # type: ignore
-    has_metal_variants.boolean = True  # type: ignore
 
     list_display = [
         "game_id",
@@ -335,18 +334,17 @@ class WorldCreatureColorInline(admin.TabularInline):
 
 @admin.register(World)
 class WorldAdmin(admin.ModelAdmin):
+    @admin.display(boolean=True)
     def is_perm(self, obj):
         return obj.is_perm
 
+    @admin.display(boolean=True)
     def is_exo(self, obj):
         return obj.is_exo
 
+    @admin.display(boolean=True)
     def is_sovereign(self, obj):
         return obj.is_sovereign
-
-    is_perm.boolean = True  # type: ignore
-    is_exo.boolean = True  # type: ignore
-    is_sovereign.boolean = True  # type: ignore
 
     list_display = [
         "id",
@@ -463,10 +461,9 @@ class WorldPollResultInline(admin.StackedInline):
 class ResourceCountInline(admin.TabularInline):
     model = ResourceCount
 
+    @admin.display(boolean=True)
     def is_embedded(self, obj):
         return obj.is_embedded
-
-    is_embedded.boolean = True  # type: ignore
 
     fields = [
         "item",
@@ -561,20 +558,17 @@ class RecipeGroupAdmin(admin.ModelAdmin):
 class RecipeInputInline(admin.TabularInline):
     model = RecipeLevel.inputs.through
 
+    @admin.display(description="group")
     def input_group(self, obj):
         return obj.recipeinput.group or "-"
 
-    input_group.short_description = "group"  # type: ignore
-
+    @admin.display(description="item")
     def input_item(self, obj):
         return obj.recipeinput.item or "-"
 
-    input_item.short_description = "item"  # type: ignore
-
+    @admin.display(description="count")
     def input_count(self, obj):
         return obj.recipeinput.count
-
-    input_count.short_description = "count"  # type: ignore
 
     fields = [
         "input_group",
@@ -613,15 +607,13 @@ class RecipeLevelAdmin(admin.ModelAdmin):
 class RecipeRequirementsInline(admin.TabularInline):
     model = Recipe.requirements.through
 
+    @admin.display(description="skill")
     def requirements_skill(self, obj):
         return obj.reciperequirement.skill
 
-    requirements_skill.short_description = "skill"  # type: ignore
-
+    @admin.display(description="level")
     def requirements_level(self, obj):
         return obj.reciperequirement.level
-
-    requirements_level.short_description = "level"  # type: ignore
 
     fields = [
         "requirements_skill",
@@ -638,17 +630,15 @@ class RecipeRequirementsInline(admin.TabularInline):
 class RecipeLevelInline(admin.TabularInline):
     model = Recipe.levels.through
 
+    @admin.display(description="level")
     def level(self, obj):
         return obj.recipelevel.get_level_display()
 
-    level.short_description = "level"  # type: ignore
-
+    @admin.display(description="link")
     def link(self, obj):
         link = reverse("admin:boundless_recipelevel_change", args=(obj.recipelevel.id,))
 
         return mark_safe(f'<a href="{link}">View</a>')  # nosec
-
-    link.short_description = "link"  # type: ignore
 
     fields = [
         "level",

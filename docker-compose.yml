@@ -10,6 +10,7 @@ services:
       dockerfile: ./docker/django/Dockerfile
       target: dev
       cache_from:
+        - ghcr.io/angellusmortis/boundlexx_django
         - ghcr.io/angellusmortis/boundlexx_dev_django
         - boundlexx_dev_django
     image: boundlexx_dev_django
@@ -20,7 +21,7 @@ services:
       - .:/app
     env_file:
       - ./.env
-    command: /start
+    command: start
 
   manage:
     <<: *django
@@ -38,13 +39,13 @@ services:
     <<: *django
     depends_on: []
     entrypoint: /bin/bash
-    command: -c "/lint.sh"
+    command: -c "lint-code"
 
   format:
     <<: *django
     depends_on: []
     entrypoint: /bin/bash
-    command: -c "/format.sh"
+    command: -c "format-code"
 
   postgres:
     build:
@@ -69,7 +70,7 @@ services:
     depends_on:
       - redis
       - postgres
-    command: /start-celeryworker
+    command: start-celeryworker
     environment:
       - CELERY_WORKER_QUEUES=default,distance,cache,notify,poll,shop,control
 
@@ -78,4 +79,4 @@ services:
     depends_on:
       - redis
       - postgres
-    command: /start-celerybeat
+    command: start-celerybeat
