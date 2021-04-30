@@ -250,6 +250,7 @@ def create_world_colors_export():
     homeworlds = workbook["Homeworlds"]
     exoworlds = workbook["Exoworlds"]
     sovereign = workbook["Sovereign"]
+    sovereign.append(["Name", "Avaiable Colors"])
 
     worlds = World.objects.filter(owner__isnull=True, is_creative=False).order_by("id")
 
@@ -297,8 +298,6 @@ def create_world_colors_export():
             exoworlds.append(columns)
         else:
             homeworlds.append(columns)
-
-    sovereign.append(["Name", "Avaiable Colors"])
 
     set_column_widths(homeworlds)
     set_column_widths(exoworlds)
