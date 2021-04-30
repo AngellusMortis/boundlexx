@@ -209,7 +209,9 @@ def command(dropbox_url):
     response.raise_for_status()
 
     click.echo("Writing zip...")
-    atlas_zip_file = tempfile.NamedTemporaryFile(delete=False)
+    atlas_zip_file = tempfile.NamedTemporaryFile(  # pylint: disable=consider-using-with
+        delete=False
+    )
     atlas_zip_file.write(response.content)
     atlas_zip_file.close()
 

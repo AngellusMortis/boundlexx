@@ -44,7 +44,9 @@ def download_image(image_url):
             else:
                 raise
         else:
-            temp_file = NamedTemporaryFile("wb", delete=False)
+            temp_file = NamedTemporaryFile(  # pylint: disable=consider-using-with
+                "wb", delete=False
+            )
             temp_file.write(img_response.content)
             temp_file.close()
             break

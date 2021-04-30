@@ -356,10 +356,9 @@ CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Your stuff...
 # ------------------------------------------------------------------------------
-ADMIN_TOOLS_MENU = "boundlexx.admin.menu.BoundlexxMenu"
-ADMIN_TOOLS_INDEX_DASHBOARD = "boundlexx.admin.dashboard.BoundlexxIndexDashboard"
-ADMIN_TOOLS_APP_INDEX_DASHBOARD = "boundlexx.admin.dashboard.BoundlexxAppIndexDashboard"
-FLOWER_BASE_URL = env("FLOWER_BASE_URL")
+# ADMIN_TOOLS_MENU = "boundlexx.admin.menu.BoundlexxMenu"
+# ADMIN_TOOLS_INDEX_DASHBOARD = "boundlexx.admin.dashboard.BoundlexxIndexDashboard"
+# ADMIN_TOOLS_APP_INDEX_DASHBOARD = "boundlexx.admin.dashboard.BoundlexxAppIndexDashboard"
 
 REST_FRAMEWORK = {
     # Use Django's standard `django.contrib.auth` permissions,

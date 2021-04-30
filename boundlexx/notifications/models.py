@@ -479,16 +479,14 @@ class WorldNotification(NotificationBase):
             "synchronous": "true",
         }
 
-        try:
-            upload_file = open(temp_file.name, "rb")
+        with open(temp_file.name, "rb") as upload_file:
             # upload_image does not properly close file...
             forum_response = client._post(  # pylint: disable=protected-access
                 "/uploads.json",
                 files={"file": upload_file},
                 **kwargs,
             )
-        finally:
-            upload_file.close()
+
         os.remove(temp_file.name)
 
         forum_image = ForumImage.objects.create(

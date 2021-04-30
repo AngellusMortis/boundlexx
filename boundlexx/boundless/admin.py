@@ -3,6 +3,7 @@ from typing import Sequence, Type
 
 from django.conf import settings
 from django.contrib import admin
+from django.contrib.admin import display  # type: ignore
 from django.contrib.admin.options import InlineModelAdmin
 from django.templatetags.tz import localtime
 from django.urls import reverse
@@ -194,19 +195,19 @@ class MetalAdmin(GameObjAdmin):
 
 @admin.register(Item)
 class ItemAdmin(GameObjAdmin):
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def is_resource(self, obj):
         return obj.is_resource
 
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def has_colors(self, obj):
         return obj.has_colors
 
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def has_metal_variants(self, obj):
         return obj.has_metal_variants
 
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def has_world_colors(self, obj):
         return obj.has_world_colors
 
@@ -334,15 +335,15 @@ class WorldCreatureColorInline(admin.TabularInline):
 
 @admin.register(World)
 class WorldAdmin(admin.ModelAdmin):
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def is_perm(self, obj):
         return obj.is_perm
 
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def is_exo(self, obj):
         return obj.is_exo
 
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def is_sovereign(self, obj):
         return obj.is_sovereign
 
@@ -461,7 +462,7 @@ class WorldPollResultInline(admin.StackedInline):
 class ResourceCountInline(admin.TabularInline):
     model = ResourceCount
 
-    @admin.display(boolean=True)
+    @display(boolean=True)
     def is_embedded(self, obj):
         return obj.is_embedded
 
@@ -558,15 +559,15 @@ class RecipeGroupAdmin(admin.ModelAdmin):
 class RecipeInputInline(admin.TabularInline):
     model = RecipeLevel.inputs.through
 
-    @admin.display(description="group")
+    @display(description="group")
     def input_group(self, obj):
         return obj.recipeinput.group or "-"
 
-    @admin.display(description="item")
+    @display(description="item")
     def input_item(self, obj):
         return obj.recipeinput.item or "-"
 
-    @admin.display(description="count")
+    @display(description="count")
     def input_count(self, obj):
         return obj.recipeinput.count
 
@@ -607,11 +608,11 @@ class RecipeLevelAdmin(admin.ModelAdmin):
 class RecipeRequirementsInline(admin.TabularInline):
     model = Recipe.requirements.through
 
-    @admin.display(description="skill")
+    @display(description="skill")
     def requirements_skill(self, obj):
         return obj.reciperequirement.skill
 
-    @admin.display(description="level")
+    @display(description="level")
     def requirements_level(self, obj):
         return obj.reciperequirement.level
 
@@ -630,11 +631,11 @@ class RecipeRequirementsInline(admin.TabularInline):
 class RecipeLevelInline(admin.TabularInline):
     model = Recipe.levels.through
 
-    @admin.display(description="level")
+    @display(description="level")
     def level(self, obj):
         return obj.recipelevel.get_level_display()
 
-    @admin.display(description="link")
+    @display(description="link")
     def link(self, obj):
         link = reverse("admin:boundless_recipelevel_change", args=(obj.recipelevel.id,))
 

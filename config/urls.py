@@ -13,7 +13,7 @@ urlpatterns = [
     path("robots.txt", include("robots.urls")),
     path("favicon.ico/", RedirectView.as_view(url="/static/img/logo.ico")),
     path("forum-format/", ForumFormatView.as_view(), name="forum_format"),
-    path("admin_tools/", include("admin_tools.urls")),
+    # path("admin_tools/", include("admin_tools.urls")),
     path("api/", include("boundlexx.api.urls")),
     path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),
 ] + static(
