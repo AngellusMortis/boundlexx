@@ -13,6 +13,9 @@ on:
   # Run tests for any PRs.
   pull_request:
 
+env:
+  DOCKER_BUILDKIT: 1
+
 jobs:
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
