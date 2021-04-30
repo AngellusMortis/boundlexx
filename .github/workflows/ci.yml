@@ -27,6 +27,9 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
+      - name: Fix permissions
+        run: sudo chown -R 1000:1000 $GITHUB_WORKSPACE
+
       - name: Log into Registry
         run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u AngellusMortis --password-stdin
 
