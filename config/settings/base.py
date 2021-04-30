@@ -92,11 +92,11 @@ WSGI_APPLICATION = "config.wsgi.application"
 # APPS
 # ------------------------------------------------------------------------------
 ADMIN_APPS = [
-    "boundlexx.admin.theme",
-    "admin_tools",
-    "admin_tools.theming",
-    "admin_tools.menu",
-    "admin_tools.dashboard",
+    # "boundlexx.admin.theme",
+    # "admin_tools",
+    # "admin_tools.theming",
+    # "admin_tools.menu",
+    # "admin_tools.dashboard",
     "boundlexx.admin.apps.BoundlexxAdminConfig",
     # "django.contrib.admin",
 ]
@@ -148,6 +148,9 @@ AUTHENTICATION_BACKENDS = [
     "django.contrib.auth.backends.ModelBackend",
     "boundlexx.boundless.backends.BoundlessAuthenticationBackend",
 ]
+
+DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
+
 # https://docs.djangoproject.com/en/dev/ref/settings/#auth-user-model
 AUTH_USER_MODEL = "users.User"
 # https://docs.djangoproject.com/en/dev/ref/settings/#login-url
@@ -235,7 +238,7 @@ TEMPLATES = [
             "loaders": [
                 "django.template.loaders.filesystem.Loader",
                 "django.template.loaders.app_directories.Loader",
-                "admin_tools.template_loaders.Loader",
+                # "admin_tools.template_loaders.Loader",
             ],
             # https://docs.djangoproject.com/en/dev/ref/settings/#template-context-processors
             "context_processors": [

@@ -1,5 +1,7 @@
-from django.contrib.admin.apps import AdminConfig
+from django.contrib.admin.apps import AdminConfig as _BaseAdminConfig
+
+__all__ = ["BoundlexxAdminConfig"]
 
 
-class BoundlexxAdminConfig(AdminConfig):
+class BoundlexxAdminConfig(_BaseAdminConfig):
     default_site = "boundlexx.admin.BoundlexxAdminSite"

@@ -1,7 +1,6 @@
 # Django
 argon2-cffi
 click
-django-admin-tools
 django-celery-results
 django-click
 django-cors-headers
