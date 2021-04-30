@@ -11,16 +11,23 @@ from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.db.models import Q
 from django.utils import timezone
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
+from openpyxl import Workbook
+from openpyxl.writer.excel import save_virtual_workbook
 from requests.exceptions import ReadTimeout
 
 from boundlexx.api.utils import (
     PURGE_CACHE_LOCK,
     PURGE_CACHE_PATHS,
     PURGE_GROUPS,
+    create_export_file,
     queue_purge_paths,
+    set_column_widths,
 )
+from boundlexx.boundless.models import Item, World, WorldBlockColor
+from boundlexx.boundless.utils import get_world_block_color_item_ids
 from config.celery_app import app
 
 MAX_SINGLE_PURGE = 50
@@ -32,6 +39,9 @@ WARM_CACHE_PATHS: List[str] = [
     # "/api/v2/schema/",
     # "/api/v2/schema/?format=openapi-json",
 ]
+COLOR_EXPORT_FILENAME = "color_export"
+COLOR_EXPORT_DESCRIPTION = """Export for all known block colors in the known universe.
+"""
 
 logger = get_task_logger(__name__)
 
@@ -228,3 +238,75 @@ def _warm_cache(path):
         if not rescheduled:
             _reschedule_warm(timezone.now() + timedelta(seconds=60), path)
         lock.release()
+
+
+@app.task
+def create_world_colors_export():
+    workbook = Workbook()
+    workbook.active.title = "Homeworlds"
+    workbook.create_sheet("Exoworlds")
+    workbook.create_sheet("Sovereign")
+
+    homeworlds = workbook["Homeworlds"]
+    exoworlds = workbook["Exoworlds"]
+    sovereign = workbook["Sovereign"]
+
+    worlds = World.objects.filter(owner__isnull=True, is_creative=False).order_by("id")
+
+    logger.info("Generating Sovereign Color...")
+    items = Item.objects.filter(game_id__in=get_world_block_color_item_ids()).order_by(
+        "game_id"
+    )
+    headers = [
+        "Name",
+        "ID",
+    ]
+    for item in items:
+        headers.append(item.english)
+
+        sovereign_columns = [item.english]
+        wbcs = (
+            WorldBlockColor.objects.filter(item=item, is_default=True)
+            .filter(
+                Q(world__isnull=True)
+                | Q(world__end__isnull=True, world__is_creative=False)
+                | Q(world__owner__isnull=False, world__is_creative=False)
+            )
+            .select_related("item")
+            .order_by("color__game_id")
+            .distinct("color__game_id")
+        )
+
+        for wbc in wbcs:
+            sovereign_columns.append(f"{wbc.color.default_name} ({wbc.color.game_id})")
+
+        sovereign.append(sovereign_columns)
+
+    logger.info("Generating World Rows...")
+    homeworlds.append(headers)
+    exoworlds.append(headers)
+    for world in worlds:
+        columns = [world.display_name, world.id]
+
+        for wbc in world.worldblockcolor_set.filter(is_default=True).order_by(
+            "item__game_id"
+        ):
+            columns.append(f"{wbc.color.default_name} ({wbc.color.game_id})")
+
+        if world.is_exo:
+            exoworlds.append(columns)
+        else:
+            homeworlds.append(columns)
+
+    sovereign.append(["Name", "Avaiable Colors"])
+
+    set_column_widths(homeworlds)
+    set_column_widths(exoworlds)
+    set_column_widths(sovereign)
+
+    create_export_file(
+        COLOR_EXPORT_FILENAME,
+        "xlsx",
+        COLOR_EXPORT_DESCRIPTION,
+        save_virtual_workbook(workbook),
+    )

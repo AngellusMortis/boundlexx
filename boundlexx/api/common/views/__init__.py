@@ -1,3 +1,4 @@
+from boundlexx.api.common.views.exported import ExportedFileViewSet
 from boundlexx.api.common.views.forum import ForumFormatAPIView, ForumFormatView
 from boundlexx.api.common.views.gamefile import GameFileViewSet
 from boundlexx.api.common.views.ingest import (
@@ -7,6 +8,7 @@ from boundlexx.api.common.views.ingest import (
 )
 
 __all__ = [
+    "ExportedFileViewSet",
     "ForumFormatAPIView",
     "ForumFormatView",
     "GameFileViewSet",

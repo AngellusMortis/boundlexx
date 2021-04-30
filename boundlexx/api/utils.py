@@ -1,11 +1,16 @@
 from datetime import timedelta
+from typing import List
 
 from django.conf import settings
 from django.contrib.sites.models import Site
 from django.core.cache import cache
+from django.core.files.base import ContentFile
 from django.db import ProgrammingError
 from django.utils import timezone
 from django_celery_beat.models import IntervalSchedule, PeriodicTask
+from openpyxl.utils import get_column_letter
+
+from boundlexx.api.models import ExportedFile
 
 PURGE_CACHE_LOCK = "boundless:purge_cache_lock"
 PURGE_CACHE_PATHS = "boundless:purge_cache_paths"
@@ -101,3 +106,33 @@ def queue_purge_paths(new_paths):
             task.start_time = run_time
             task.enabled = True
             task.save()
+
+
+def set_column_widths(sheet):
+    column_widths: List[int] = []
+    for row in sheet.rows:
+        for i, cell in enumerate(row):
+            value = str(cell.value) if cell.value is not None else ""
+
+            if len(column_widths) > i:
+                if len(value) > column_widths[i]:
+                    column_widths[i] = len(value)
+            else:
+                column_widths += [len(value)]
+
+    for i, column_width in enumerate(column_widths):
+        sheet.column_dimensions[get_column_letter(i + 1)].width = column_width + 2
+
+
+def create_export_file(name, ext, description, content):
+    xlsx_file = ContentFile(content)
+    xlsx_file.name = f"{name}.{ext}"
+
+    existing_file = ExportedFile.objects.filter(name=name).first()
+    if existing_file is not None:
+        existing_file.exported_file.delete()
+        existing_file.delete()
+
+    ExportedFile.objects.create(
+        name=name, description=description, exported_file=xlsx_file
+    )

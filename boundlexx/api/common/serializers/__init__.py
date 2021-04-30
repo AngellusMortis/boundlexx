@@ -4,6 +4,7 @@ from rest_framework import serializers
 
 from boundlexx.api.common.serializers.base import (
     AzureImageField,
+    ExportedFileSerializer,
     LangFilterListSerializer,
     LocalizedNameSerializer,
     LocalizedStringSerializer,
@@ -82,6 +83,7 @@ __all__ = [
     "BowSerializer",
     "ColorSerializer",
     "EmojiSerializer",
+    "ExportedFileSerializer",
     "ForumFormatPostSerialzier",
     "ForumFormatSerialzier",
     "GameFileSerializer",

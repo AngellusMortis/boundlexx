@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from boundlexx.api.models import ExportedFile
 from boundlexx.boundless.models import (
     LocalizedName,
     LocalizedString,
@@ -85,3 +86,11 @@ class LocationSerializer(NullSerializer):
             "y": instance.y,
             "z": instance.z,
         }
+
+
+class ExportedFileSerializer(serializers.ModelSerializer):
+    url = AzureImageField(source="exported_file")
+
+    class Meta:
+        model = ExportedFile
+        fields = ["name", "description", "url"]

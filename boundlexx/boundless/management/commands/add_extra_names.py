@@ -1,17 +1,6 @@
-from datetime import timedelta
-
 import djclick as click
-from django.utils import timezone
 
-from boundlexx.boundless.models import (
-    BeaconScan,
-    Color,
-    ItemRequestBasketPrice,
-    ItemShopStandPrice,
-    LeaderboardRecord,
-    Settlement,
-    World,
-)
+from boundlexx.boundless.models import BeaconScan, Color, Settlement, World
 from boundlexx.boundless.utils import calculate_extra_names, html_name
 
 
@@ -43,66 +32,6 @@ def _worlds(force, colors):
         for world in pbar:
             world = calculate_extra_names(world, world.display_name, colors=colors)
             world.save()
-
-
-def _shops(force, colors):
-    click.echo("Clearing all shops...")
-    cutoff = timezone.now() - timedelta(days=30)
-    if force:
-        ItemShopStandPrice.objects.filter(time__gte=cutoff).update(
-            beacon_text_name=None, beacon_html_name=None
-        )
-        ItemRequestBasketPrice.objects.filter(time__gte=cutoff).update(
-            beacon_text_name=None, beacon_html_name=None
-        )
-
-    click.echo("Doing Shop Stands...")
-    stands = ItemShopStandPrice.objects.filter(time__gte=cutoff)
-    with click.progressbar(
-        stands.iterator(), length=stands.count(), show_percent=True, show_pos=True
-    ) as pbar:
-        for stand in pbar:
-            stand.beacon_text_name = html_name(
-                stand.beacon_name, strip=True, colors=colors
-            )
-            stand.beacon_html_name = html_name(stand.beacon_name, colors=colors)
-            stand.save()
-
-    click.echo("Doing Request Baskets...")
-    baskets = ItemRequestBasketPrice.objects.filter(time__gte=cutoff)
-    with click.progressbar(
-        baskets.iterator(), length=baskets.count(), show_percent=True, show_pos=True
-    ) as pbar:
-        for basket in pbar:
-            basket.beacon_text_name = html_name(
-                basket.beacon_name, strip=True, colors=colors
-            )
-            basket.beacon_html_name = html_name(basket.beacon_name, colors=colors)
-            basket.save()
-
-
-def _leaderboards(force, colors):
-    click.echo("Doing Leaderboards...")
-    cutoff = timezone.now() - timedelta(days=7)
-    if force:
-        LeaderboardRecord.objects.filter(time__gte=cutoff).update(
-            text_name=None, html_name=None
-        )
-
-    leaderboards = LeaderboardRecord.objects.filter(time__gte=cutoff)
-    with click.progressbar(
-        leaderboards.iterator(),
-        length=leaderboards.count(),
-        show_percent=True,
-        show_pos=True,
-    ) as pbar:
-        for leaderboard in pbar:
-            if leaderboard.name is not None and leaderboard.text_name is None:
-                leaderboard.text_name = html_name(
-                    leaderboard.name, strip=True, colors=colors
-                )
-                leaderboard.html_name = html_name(leaderboard.name, colors=colors)
-                leaderboard.save()
 
 
 def _settlements(force, colors):
@@ -148,20 +77,6 @@ def _settlements(force, colors):
     help="Do worlds",
 )
 @click.option(
-    "-s",
-    "--shops",
-    "enable_shops",
-    is_flag=True,
-    help="Do shops",
-)
-@click.option(
-    "-l",
-    "--leaderboards",
-    "enable_leaderboards",
-    is_flag=True,
-    help="Do leaderboards",
-)
-@click.option(
     "-t",
     "--settlements",
     "enable_settlements",
@@ -199,9 +114,3 @@ def command(  # pylint: disable=too-many-arguments
 
     if enable_beacons:
         _beacons(force, colors)
-
-    if enable_leaderboards:
-        _leaderboards(force, colors)
-
-    if enable_shops:
-        _shops(force, colors)
