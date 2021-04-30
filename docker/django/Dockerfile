@@ -42,7 +42,7 @@ RUN pip install --no-cache-dir -r /requirements/production.txt
 FROM base as production
 ENV PYTHONDONTWRITEBYTECODE 1
 
-COPY --from=builder-dev /usr/local/bin/ /usr/local/bin/
+COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY --from=builder /usr/local/lib/python3.8/ /usr/local/lib/python3.8/
 COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/production/start /usr/local/bin/start
