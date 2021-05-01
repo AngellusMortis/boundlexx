@@ -4,139 +4,156 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0005_auto_20200726_0340'), ('boundless', '0006_auto_20200726_1318')]
-
     dependencies = [
-        ('boundless', '0004_auto_20200722_2249'),
+        ("boundless", "0004_auto_20200722_2249"),
     ]
 
     operations = [
         migrations.RemoveField(
-            model_name='world',
-            name='is_perm',
+            model_name="world",
+            name="is_perm",
         ),
         migrations.AddField(
-            model_name='world',
-            name='address',
-            field=models.CharField(default=None, max_length=128, verbose_name='Server Address'),
+            model_name="world",
+            name="address",
+            field=models.CharField(
+                default=None, max_length=128, verbose_name="Server Address"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='api_url',
-            field=models.URLField(default=None, verbose_name='API URL'),
+            model_name="world",
+            name="api_url",
+            field=models.URLField(default=None, verbose_name="API URL"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='chunks_url',
-            field=models.URLField(default=None, verbose_name='Chunks URL'),
+            model_name="world",
+            name="chunks_url",
+            field=models.URLField(default=None, verbose_name="Chunks URL"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='end',
+            model_name="world",
+            name="end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='ip_address',
-            field=models.GenericIPAddressField(default=None, verbose_name='Server IP Address'),
+            model_name="world",
+            name="ip_address",
+            field=models.GenericIPAddressField(
+                default=None, verbose_name="Server IP Address"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='planets_url',
-            field=models.URLField(default=None, verbose_name='Planets URL'),
+            model_name="world",
+            name="planets_url",
+            field=models.URLField(default=None, verbose_name="Planets URL"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='start',
+            model_name="world",
+            name="start",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='time_offset',
-            field=models.DateTimeField(default=None, verbose_name='Time Offset'),
+            model_name="world",
+            name="time_offset",
+            field=models.DateTimeField(default=None, verbose_name="Time Offset"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='websocket_url',
-            field=models.URLField(default=None, verbose_name='Websocket URL'),
+            model_name="world",
+            name="websocket_url",
+            field=models.URLField(default=None, verbose_name="Websocket URL"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='world',
-            name='description',
-            field=models.CharField(max_length=16, verbose_name='Description'),
+            model_name="world",
+            name="description",
+            field=models.CharField(max_length=16, verbose_name="Description"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='display_name',
-            field=models.CharField(max_length=64, verbose_name='Display Name'),
+            model_name="world",
+            name="display_name",
+            field=models.CharField(max_length=64, verbose_name="Display Name"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='name',
-            field=models.CharField(max_length=64, verbose_name='Name'),
+            model_name="world",
+            name="name",
+            field=models.CharField(max_length=64, verbose_name="Name"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='region',
-            field=models.CharField(choices=[('use', 'US East'), ('use', 'US West'), ('ecu', 'EU Central'), ('aus', 'Australia'), ('creative', 'Creative')], max_length=16, verbose_name='Server Region'),
+            model_name="world",
+            name="region",
+            field=models.CharField(
+                choices=[
+                    ("use", "US East"),
+                    ("use", "US West"),
+                    ("ecu", "EU Central"),
+                    ("aus", "Australia"),
+                    ("creative", "Creative"),
+                ],
+                max_length=16,
+                verbose_name="Server Region",
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='size',
-            field=models.IntegerField(verbose_name='World Size'),
+            model_name="world",
+            name="size",
+            field=models.IntegerField(verbose_name="World Size"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='tier',
-            field=models.IntegerField(verbose_name='Tier'),
+            model_name="world",
+            name="tier",
+            field=models.IntegerField(verbose_name="Tier"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='world_type',
-            field=models.CharField(max_length=16, verbose_name='World Type'),
+            model_name="world",
+            name="world_type",
+            field=models.CharField(max_length=16, verbose_name="World Type"),
         ),
         migrations.AddField(
-            model_name='world',
-            name='atmosphere_color_b',
-            field=models.FloatField(default=None, verbose_name='Atmosphere Linear B Color'),
+            model_name="world",
+            name="atmosphere_color_b",
+            field=models.FloatField(
+                default=None, verbose_name="Atmosphere Linear B Color"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='atmosphere_color_g',
-            field=models.FloatField(default=None, verbose_name='Atmosphere Linear G Color'),
+            model_name="world",
+            name="atmosphere_color_g",
+            field=models.FloatField(
+                default=None, verbose_name="Atmosphere Linear G Color"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='atmosphere_color_r',
-            field=models.FloatField(default=None, verbose_name='Atmosphere Linear R Color'),
+            model_name="world",
+            name="atmosphere_color_r",
+            field=models.FloatField(
+                default=None, verbose_name="Atmosphere Linear R Color"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='water_color_b',
-            field=models.FloatField(default=None, verbose_name='Water Linear B Color'),
+            model_name="world",
+            name="water_color_b",
+            field=models.FloatField(default=None, verbose_name="Water Linear B Color"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='water_color_g',
-            field=models.FloatField(default=None, verbose_name='Water Linear G Color'),
+            model_name="world",
+            name="water_color_g",
+            field=models.FloatField(default=None, verbose_name="Water Linear G Color"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='water_color_r',
-            field=models.FloatField(default=None, verbose_name='Water Linear R Color'),
+            model_name="world",
+            name="water_color_r",
+            field=models.FloatField(default=None, verbose_name="Water Linear R Color"),
             preserve_default=False,
         ),
     ]
