@@ -12,7 +12,6 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.game import BoundlessClient, Location
 from boundlexx.boundless.game import Settlement as SimpleSettlement
@@ -243,7 +242,7 @@ class WorldManager(models.Manager):
         return world, created
 
 
-class World(ExportModelOperationsMixin("world"), ModelDiffMixin, models.Model):  # type: ignore  # pylint: disable=too-many-public-methods  # noqa: E501
+class World(ModelDiffMixin, models.Model):
     objects = WorldManager()
 
     class Region(models.TextChoices):
@@ -681,9 +680,7 @@ class World(ExportModelOperationsMixin("world"), ModelDiffMixin, models.Model): 
         return settings.BOUNDLESS_BOWS.get(self.world_type)
 
 
-class WorldDistance(
-    ExportModelOperationsMixin("world_distance"), models.Model  # type: ignore
-):
+class WorldDistance(models.Model):
     world_source = models.ForeignKey(World, on_delete=models.CASCADE, related_name="+")
     world_dest = models.ForeignKey(World, on_delete=models.CASCADE, related_name="+")
     distance = models.PositiveSmallIntegerField(_("Distance to work in blinksecs"))
@@ -1024,9 +1021,7 @@ class WorldBlockColorManager(models.Manager):
         return block_colors_created
 
 
-class WorldBlockColor(
-    ExportModelOperationsMixin("world_block_color"), models.Model  # type: ignore # noqa E501
-):
+class WorldBlockColor(models.Model):
     objects = WorldBlockColorManager()
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, blank=True, null=True)
@@ -1139,9 +1134,7 @@ class WorldBlockColor(
         return f"{self.item.game_id}_{self.color.game_id}"
 
 
-class WorldCreatureColor(
-    ExportModelOperationsMixin("world_creature_color"), models.Model  # type: ignore  # noqa E501
-):
+class WorldCreatureColor(models.Model):
     class CreatureType(models.TextChoices):
         CUTTLETRUNK = "CUTTLETRUNK", _("Cuttletrunk")
         HOPPER = "HOPPER", _("Hopper")
@@ -1266,7 +1259,7 @@ class WorldPollManager(models.Manager):
         return world_poll
 
 
-class WorldPoll(ExportModelOperationsMixin("world_poll"), models.Model):  # type: ignore # noqa E501
+class WorldPoll(models.Model):
     objects = WorldPollManager()
 
     world = models.ForeignKey("World", on_delete=models.CASCADE)
@@ -1288,9 +1281,7 @@ class WorldPoll(ExportModelOperationsMixin("world_poll"), models.Model):  # type
         return self.leaderboardrecord_set.all()
 
 
-class WorldPollResult(
-    ExportModelOperationsMixin("world_poll_result"), models.Model  # type: ignore # noqa E501
-):
+class WorldPollResult(models.Model):
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     player_count = models.PositiveSmallIntegerField(_("Player Count"))
@@ -1307,9 +1298,7 @@ class WorldPollResult(
         )
 
 
-class ResourceCount(
-    ExportModelOperationsMixin("resource_count"), models.Model  # type: ignore
-):
+class ResourceCount(models.Model):
     time = models.DateTimeField(default=timezone.now, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
@@ -1335,9 +1324,7 @@ class ResourceCount(
         return False
 
 
-class LeaderboardRecord(
-    ExportModelOperationsMixin("leaderboard_record"), models.Model  # type: ignore # noqa E501
-):
+class LeaderboardRecord(models.Model):
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     world_rank = models.PositiveSmallIntegerField(_("World Rank"))

@@ -7,7 +7,6 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
-from django_prometheus.models import ExportModelOperationsMixin
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.boundless.utils import (
@@ -62,9 +61,7 @@ class GameObj(PolymorphicModel):
         return localized_name
 
 
-class LocalizedName(
-    ExportModelOperationsMixin("localized_name"), PolymorphicModel  # type: ignore  # noqa E501
-):
+class LocalizedName(PolymorphicModel):
     game_obj = models.ForeignKey(GameObj, on_delete=models.CASCADE)
     lang = models.CharField(_("Language"), max_length=16)
     name = models.CharField(_("Name"), max_length=128, db_index=True)
@@ -120,11 +117,11 @@ class LocalizedStringText(models.Model):
         ]
 
 
-class Subtitle(ExportModelOperationsMixin("subtitle"), GameObj):  # type: ignore # noqa E501
+class Subtitle(GameObj):
     pass
 
 
-class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore
+class Color(GameObj):
     @cached_property
     def base_color(self):
         colors: dict[int, int] = {}
@@ -154,7 +151,7 @@ class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore
         return None
 
 
-class ColorValue(ExportModelOperationsMixin("color_value"), models.Model):  # type: ignore # noqa E501
+class ColorValue(models.Model):
     class ColorType(models.TextChoices):
         CHARACTER = "CHARACTER", _("CHARACTER")
         CHARACTER_DECAL = "CHARACTER_DECAL", _("CHARACTER_DECAL")
@@ -206,11 +203,11 @@ class ColorValue(ExportModelOperationsMixin("color_value"), models.Model):  # ty
         return f"#{self.base:06x}"
 
 
-class Metal(ExportModelOperationsMixin("metal"), GameObj):  # type: ignore
+class Metal(GameObj):
     pass
 
 
-class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore
+class Item(GameObj):
     item_subtitle = models.ForeignKey(
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )

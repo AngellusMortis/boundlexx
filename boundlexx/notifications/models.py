@@ -15,6 +15,7 @@ from django.template.loader import render_to_string
 from django.utils import timezone
 from django.utils.translation import gettext_lazy as _
 from django_celery_results.models import TaskResult
+from django_prometheus.models import ExportModelOperationsMixin
 from PIL import Image
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
@@ -32,7 +33,7 @@ User = get_user_model()
 logger = logging.getLogger(__file__)
 
 
-class ForumImage(models.Model):
+class ForumImage(ExportModelOperationsMixin("forum_image"), models.Model):  # type: ignore # noqa E501
     class ImageType(models.IntegerChoices):
         COLOR = 0, _("Color")
         WORLD = 1, _("World")
@@ -68,7 +69,7 @@ class SubscriptionBase(PolymorphicModel):
         raise NotImplementedError()
 
 
-class ForumCategorySubscription(SubscriptionBase):
+class ForumCategorySubscription(ExportModelOperationsMixin("forum_category_subcription"), SubscriptionBase):  # type: ignore # noqa E501
     category_id = models.IntegerField(null=True, blank=True)
 
     def send(self, forum, **kwargs):  # pylint: disable=arguments-differ
@@ -85,7 +86,7 @@ class ForumCategorySubscription(SubscriptionBase):
             update_forum_post.delay(world.forum_id, title, raw)
 
 
-class ForumPMSubscription(SubscriptionBase):
+class ForumPMSubscription(ExportModelOperationsMixin("forum_pm_subcription"), SubscriptionBase):  # type: ignore # noqa E501
     pm_recipents = models.TextField(null=True, blank=True)
 
     def send(self, forum, **kwargs):  # pylint: disable=arguments-differ
@@ -99,7 +100,7 @@ class ForumPMSubscription(SubscriptionBase):
         )
 
 
-class DiscordWebhookSubscription(SubscriptionBase):
+class DiscordWebhookSubscription(ExportModelOperationsMixin("discord_webhook_subcription"), SubscriptionBase):  # type: ignore # noqa E501
     webhook_url = models.CharField(max_length=256)
     roles = models.TextField(blank=True, null=True)
     users = models.TextField(blank=True, null=True)
@@ -787,27 +788,27 @@ class WorldNotification(NotificationBase):
         return embeds, files
 
 
-class ExoworldNotification(WorldNotification):
+class ExoworldNotification(ExportModelOperationsMixin("exoworld_notification"), WorldNotification):  # type: ignore # noqa E501
     _world_type = "exoworld"
 
 
-class ExoworldExpiredNotification(WorldNotification):
+class ExoworldExpiredNotification(ExportModelOperationsMixin("exoworld_expired_notification"), WorldNotification):  # type: ignore # noqa E501
     _world_type = "exoworld"
 
 
-class SovereignWorldNotification(WorldNotification):
+class SovereignWorldNotification(ExportModelOperationsMixin("sovereign_world_notification"), WorldNotification):  # type: ignore # noqa E501
     _world_type = "sovereign world"
 
 
-class CreativeWorldNotification(WorldNotification):
+class CreativeWorldNotification(ExportModelOperationsMixin("createive_world_notification"), WorldNotification):  # type: ignore # noqa E501
     _world_type = "creative world"
 
 
-class HomeworldNotification(WorldNotification):
+class HomeworldNotification(ExportModelOperationsMixin("homeworld_notification"), WorldNotification):  # type: ignore # noqa E501
     _world_type = "homeworld"
 
 
-class SovereignColorNotification(NotificationBase):
+class SovereignColorNotification(ExportModelOperationsMixin("sovereign_color_notification"), NotificationBase):  # type: ignore # noqa E501
     objects = PolymorphicNotificationManager()
 
     def embed(self, item, colors, new_ids):  # pylint: disable=arguments-differ
@@ -850,7 +851,7 @@ class SovereignColorNotification(NotificationBase):
         return [main_embed], None
 
 
-class FailedTaskNotification(NotificationBase):
+class FailedTaskNotification(ExportModelOperationsMixin("failed_task_notification"), NotificationBase):  # type: ignore # noqa E501
     objects = PolymorphicNotificationManager()
 
     def markdown(self, task):  # pylint: disable=arguments-differ

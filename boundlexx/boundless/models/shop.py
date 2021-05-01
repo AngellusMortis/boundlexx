@@ -5,7 +5,6 @@ from datetime import timedelta
 from django.conf import settings
 from django.db import models
 from django.utils import timezone
-from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.game import Location, ShopItem
 from boundlexx.boundless.game import World as SimpleWorld
@@ -89,15 +88,11 @@ class ItemShopPrice(models.Model):
         ).encode("utf8")
 
 
-class ItemShopStandPrice(
-    ExportModelOperationsMixin("item_shop_stand_price"), ItemShopPrice  # type: ignore  # noqa E501
-):
+class ItemShopStandPrice(ItemShopPrice):
     objects = ItemShopPriceManager()
 
 
-class ItemRequestBasketPrice(
-    ExportModelOperationsMixin("item_request_basket_price"), ItemShopPrice  # type: ignore  # noqa E501
-):
+class ItemRequestBasketPrice(ItemShopPrice):
     objects = ItemShopPriceManager()
 
 
@@ -162,9 +157,9 @@ class ItemRank(models.Model):
         return self.last_update + timedelta(minutes=self.query_delay)
 
 
-class ItemBuyRank(ExportModelOperationsMixin("item_buy_rank"), ItemRank):  # type: ignore  # noqa E501
+class ItemBuyRank(ItemRank):
     pass
 
 
-class ItemSellRank(ExportModelOperationsMixin("item_sell_rank"), ItemRank):  # type: ignore  # noqa E501
+class ItemSellRank(ItemRank):
     pass
