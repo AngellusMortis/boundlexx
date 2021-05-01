@@ -108,7 +108,7 @@ def purge_static_cache():
     client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
 
     poller = client.endpoints.begin_purge_content(
-        settings.AZURE_CDN_RESOURCE_GROUP,
+        settings.AZURE_STATIC_CDN_RESOURCE_GROUP,
         settings.AZURE_STATIC_CDN_PROFILE_NAME,
         settings.AZURE_STATIC_CDN_ENDPOINT_NAME,
         PurgeParameters(content_paths=["/*"]),
