@@ -11,26 +11,6 @@ import storages.backends.azure_storage
 
 
 class Migration(migrations.Migration):
-
-    replaces = [
-        ("boundless", "0007_worldpoll_active"),
-        ("boundless", "0008_worldpoll_time"),
-        ("boundless", "0009_testing_updates"),
-        ("boundless", "0010_mayor_id_to_int"),
-        ("boundless", "0011_colorvalue"),
-        ("boundless", "0012_world_updates"),
-        ("boundless", "0013_auto_20200805_2025"),
-        ("boundless", "0014_auto_20200805_2124"),
-        ("boundless", "0015_auto_20200806_1109"),
-        ("boundless", "0016_resourcecount_percentage"),
-        ("boundless", "0017_auto_20200809_2312"),
-        ("boundless", "0018_auto_20200809_2316"),
-        (
-            "boundless",
-            "0019_auto_20200826_2146_squashed_0046_auto_20201102_2259_squashed_0061_auto_20210425_1713",
-        ),
-    ]
-
     dependencies = [
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
         ("boundless", "0006_create_worldpoll_timeseries"),
