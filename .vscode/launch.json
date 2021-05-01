@@ -36,11 +36,11 @@
         "worker",
         "-E",
         "-l",
-        "info",
+        "DEBUG",
         "-P",
         "solo",
         "-Q",
-        "default,distance,cache,notify,poll,shop,control"
+        "${env:CELERY_WORKER_QUEUES}"
       ],
     },
     {

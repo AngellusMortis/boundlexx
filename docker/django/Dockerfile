@@ -44,16 +44,14 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
 COPY --from=builder /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
-COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/production/start /usr/local/bin/start
-COPY --chown=django:django ./docker/celery/production/worker/start /usr/local/bin/start-celeryworker
 COPY --chown=django:django ./manage.py /app/manage.py
 COPY --chown=django:django ./locale /app/locale
 COPY --chown=django:django ./config /app/config
 COPY --chown=django:django ./boundlexx /app/boundlexx
 COPY --chown=django:django ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
 
-RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start /usr/local/bin/start-celeryworker \
+RUN chmod +x /usr/local/bin/start \
   && rm /requirements -rf
 
 USER django
@@ -72,7 +70,6 @@ ENV PYTHONDONTWRITEBYTECODE 1
 COPY --from=builder-dev /usr/local/bin/ /usr/local/bin/
 COPY --from=builder-dev /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
 COPY --chown=django:django ./docker/django/dev/start /usr/local/bin/start
-COPY --chown=django:django ./docker/celery/dev/worker/start
 
 RUN chmod +x /usr/local/bin/start \
   && rm /requirements -rf
