@@ -612,7 +612,7 @@ BOUNDLESS_WORLD_LIQUIDS = {
     "METAL": ("Lava", "Lava"),
     "CHILL": ("Water", "Water"),
     "BURN": ("Lava", "Lava"),
-    "UMBRIS": ("Lava", "Water"),
+    "DARKMATTER": ("Lava", "Water"),
 }
 BOUNDLESS_WORLD_TYPE_MAPPING = {
     1: "LUSH",
