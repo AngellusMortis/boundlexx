@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 import djclick as click
 
@@ -68,7 +68,7 @@ def _get_requirements(requirements_list):
 
 
 def _get_inputs(inputs_list):
-    inputs: Dict[RecipeLevel.Level, List[RecipeInput]] = {
+    inputs: dict[RecipeLevel.Level, list[RecipeInput]] = {
         RecipeLevel.Level.SINGLE: [],
         RecipeLevel.Level.BULK: [],
         RecipeLevel.Level.MASS: [],

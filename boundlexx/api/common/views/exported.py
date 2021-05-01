@@ -1,5 +1,3 @@
-from typing import List
-
 from django_filters.rest_framework import DjangoFilterBackend
 
 from boundlexx.api.common.serializers import ExportedFileSerializer
@@ -15,7 +13,7 @@ class ExportedFileViewSet(BoundlexxListViewSet):
         DjangoFilterBackend,
     ]
     ordering = ["-rank", "id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

@@ -1,5 +1,4 @@
 from datetime import timedelta
-from typing import List
 
 from django.conf import settings
 from django.contrib.sites.models import Site
@@ -109,7 +108,7 @@ def queue_purge_paths(new_paths):
 
 
 def set_column_widths(sheet):
-    column_widths: List[int] = []
+    column_widths: list[int] = []
     for row in sheet.rows:
         for i, cell in enumerate(row):
             value = str(cell.value) if cell.value is not None else ""

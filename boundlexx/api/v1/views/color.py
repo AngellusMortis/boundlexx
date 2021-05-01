@@ -1,5 +1,3 @@
-from typing import List
-
 from django.db.models import Q
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
@@ -66,7 +64,7 @@ class ColorViewSet(BoundlexxViewSet):
     filterset_class = LocalizationFilterSet
     search_fields = ["localizedname__name", "game_id"]
     ordering = ["-rank", "game_id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """
@@ -166,7 +164,7 @@ class BlockColorViewSet(
         "world__display_name",
     ]
     ordering = ["-rank", "item__game_id", "color__game_id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def get_queryset(self):
         queryset = super().get_queryset()

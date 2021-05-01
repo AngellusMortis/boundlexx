@@ -1,5 +1,3 @@
-from typing import List
-
 from django.conf import settings
 from django.db.models import Q
 from django.http import Http404
@@ -64,7 +62,7 @@ class ItemViewSet(
     filterset_class = ItemFilterSet
     search_fields = ["string_id", "localizedname__name", "game_id"]
     ordering = ["-rank", "game_id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def get_queryset(self):
         queryset = super().get_queryset()
@@ -246,7 +244,7 @@ class ItemResourceCountViewSet(
         "world_poll__world__name",
     ]
     ordering = ["-rank", "world_poll__world_id", "-count"]
-    ordering_fields: List[str] = [
+    ordering_fields: list[str] = [
         "count",
         "average_per_chunk",
         "percentage",
@@ -337,7 +335,7 @@ class ItemColorsViewSet(
         "color__localizedname__name",
     ]
     ordering = ["-rank", "color__game_id", "world_id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     serializer_class = ItemColorSerializer
     detail_serializer_class = WorldColorSerializer

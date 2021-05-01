@@ -1,5 +1,3 @@
-from typing import List
-
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
@@ -32,7 +30,7 @@ class EmojiViewSet(BoundlexxViewSet):
     filterset_class = EmojiFilterSet
     search_fields = ["name", "emojialtname__name"]
     ordering = ["-rank", "name"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def get_object(self):
         queryset = self.filter_queryset(self.get_queryset())

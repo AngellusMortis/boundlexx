@@ -1,5 +1,3 @@
-from typing import List
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
@@ -78,7 +76,7 @@ class SkillGroupViewSet(BoundlexxViewSet):
     ]
     filterset_class = LocalizationFilterSet
     ordering = ["-rank", "id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
     search_fields = [
         "name",
         "display_name__strings__text",
@@ -123,7 +121,7 @@ class SkillViewSet(BoundlexxViewSet):
     ]
     filterset_class = SkillFilterSet
     ordering = ["-rank", "id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
     search_fields = [
         "name",
         "description__strings__text",

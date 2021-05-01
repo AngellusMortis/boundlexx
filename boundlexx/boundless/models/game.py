@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import re
-from typing import Dict
 
 from django.contrib.postgres.indexes import GinIndex
 from django.core.cache import cache
@@ -128,7 +127,7 @@ class Subtitle(ExportModelOperationsMixin("subtitle"), GameObj):  # type: ignore
 class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore
     @cached_property
     def base_color(self):
-        colors: Dict[int, int] = {}
+        colors: dict[int, int] = {}
 
         for color in self.colorvalue_set.all():
             color_count = colors.get(color.base, 0) + 1

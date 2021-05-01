@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional
+from typing import Optional
 
 from django.db.models import Avg, Func, Max, Min, StdDev, Variance
 from django.http import Http404
@@ -25,7 +25,7 @@ class TimeseriesMixin:
     ]
     filterset_class = TimeseriesFilterSet
     time_bucket_serializer_class: Optional[BaseSerializer] = None
-    number_fields: List[str] = []
+    number_fields: list[str] = []
     stats_functions = [Avg, Mode, Median, Min, Max, StdDev, Variance]
 
     def get_queryset(self):
@@ -68,7 +68,7 @@ class TimeseriesMixin:
         values_list = ["time_bucket"]
 
         if len(self.number_fields) > 0:
-            aggregate_args: Dict[str, Func] = {}
+            aggregate_args: dict[str, Func] = {}
             for field in self.number_fields:
                 for func in self.stats_functions:
                     name = func.__name__.lower()

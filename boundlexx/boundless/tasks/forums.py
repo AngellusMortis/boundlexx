@@ -2,7 +2,7 @@ import re
 import time
 from datetime import timedelta, timezone
 from distutils.util import strtobool
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import dateparser
 import requests
@@ -240,7 +240,7 @@ def _get_world_image(raw_html, name):
 def _parse_permissions(perm_string):
     perms = perm_string.split(" : ")[1].split(" | ")
 
-    global_perms: List[List[Union[str, bool]]] = []
+    global_perms: list[list[Union[str, bool]]] = []
 
     for perm in perms:
         match = PERM_REGEX.match(perm)

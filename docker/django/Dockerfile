@@ -1,5 +1,5 @@
 # base image used by other stages
-FROM python:3.8-slim-buster as base
+FROM python:3.9-slim-buster as base
 
 ARG DJANGO_UID=1000
 
@@ -43,7 +43,7 @@ FROM base as production
 ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
-COPY --from=builder /usr/local/lib/python3.8/ /usr/local/lib/python3.8/
+COPY --from=builder /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
 COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/production/start /usr/local/bin/start
 COPY --chown=django:django ./docker/celery/production/worker/start /usr/local/bin/start-celeryworker
@@ -71,7 +71,7 @@ FROM base as dev
 ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY --from=builder-dev /usr/local/bin/ /usr/local/bin/
-COPY --from=builder-dev /usr/local/lib/python3.8/ /usr/local/lib/python3.8/
+COPY --from=builder-dev /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
 COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/dev/start /usr/local/bin/start
 COPY --chown=django:django ./docker/celery/dev/worker/start /usr/local/bin/start-celeryworker

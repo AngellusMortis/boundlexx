@@ -1,4 +1,4 @@
-from typing import Any, List
+from typing import Any
 from urllib.parse import urlencode
 
 from django.http import HttpResponse
@@ -39,7 +39,7 @@ class ForumFormatAPIView(GenericViewSet):
     permission_classes = [AllowAny]
     serializer_class = ForumFormatPostSerialzier
     response_serializer = ForumFormatSerialzier
-    authentication_classes: List[Any] = []
+    authentication_classes: list[Any] = []
 
     def post(self, request):
         post = self.serializer_class(data=request.data)

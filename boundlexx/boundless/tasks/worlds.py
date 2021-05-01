@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from typing import List
-
 from celery.utils.log import get_task_logger
 from django.conf import settings
 from django.core.cache import cache
@@ -167,7 +165,7 @@ def get_worlds(ids_to_scan, client=None):
     if client is None:
         client = BoundlessClient()
 
-    worlds: List[dict] = []
+    worlds: list[dict] = []
 
     for world_id in ids_to_scan:
         world_data = client.get_world_data(SimpleWorld(world_id, None))

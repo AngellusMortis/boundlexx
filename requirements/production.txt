@@ -6,7 +6,7 @@
 #
 --no-binary psycopg2
 
-amqp==2.6.1
+amqp==5.0.6
     # via kombu
 argon2-cffi==20.1.0
     # via -r /app/requirements/in/base.in
@@ -39,12 +39,11 @@ billiard==3.6.4.0
     # via celery
 cachetools==4.2.2
     # via steam
-celery==4.4.7
+celery==5.0.5
     # via
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
     #   django-celery-results
-    #   flower
 certifi==2020.12.5
     # via
     #   msrest
@@ -55,9 +54,19 @@ cffi==1.14.5
     #   cryptography
 chardet==4.0.0
     # via requests
+click-didyoumean==0.0.3
+    # via celery
+click-plugins==1.1.1
+    # via celery
+click-repl==0.1.6
+    # via celery
 click==7.1.2
     # via
     #   -r /app/requirements/in/base.in
+    #   celery
+    #   click-didyoumean
+    #   click-plugins
+    #   click-repl
     #   django-click
 colorama==0.4.4
     # via -r /app/requirements/in/base.in
@@ -129,13 +138,11 @@ djangorestframework==3.12.4
     #   django-rest-fuzzysearch
     #   djangorestframework-msgpack
     #   drf-extensions
-git+https://github.com/chibisov/drf-extensions.git@002a67ce
+drf-extensions==0.7.0
     # via -r /app/requirements/in/base.in
 et-xmlfile==1.1.0
     # via openpyxl
 filetype==1.0.7
-    # via -r /app/requirements/in/base.in
-flower==0.9.7
     # via -r /app/requirements/in/base.in
 future==0.18.2
     # via django-json-widget
@@ -149,20 +156,20 @@ greenlet==1.0.0
     # via gevent
 humanfriendly==9.1
     # via coloredlogs
-humanize==3.5.0
-    # via flower
 idna==2.10
     # via requests
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.22.0
+ipython==7.23.0
     # via -r /app/requirements/in/base.in
 isodate==0.6.0
     # via msrest
 jedi==0.18.0
     # via ipython
-kombu==4.6.11
+kombu==5.0.2
     # via celery
+matplotlib-inline==0.1.2
+    # via ipython
 msal-extensions==0.3.0
     # via azure-identity
 msal==1.11.0
@@ -191,12 +198,12 @@ pillow==8.2.0
     # via -r /app/requirements/in/base.in
 portalocker==1.7.1
     # via msal-extensions
-prometheus-client==0.8.0
-    # via
-    #   django-prometheus
-    #   flower
+prometheus-client==0.10.1
+    # via django-prometheus
 prompt-toolkit==3.0.18
-    # via ipython
+    # via
+    #   click-repl
+    #   ipython
 protobuf==3.15.8
     # via steam
 psycopg2==2.8.6
@@ -223,7 +230,7 @@ python-dateutil==2.8.1
     #   python-crontab
 python-redis-lock[django]==3.7.0
     # via -r /app/requirements/in/base.in
-python-slugify==4.0.1
+python-slugify==5.0.0
     # via -r /app/requirements/in/base.in
 pytz==2021.1
     # via
@@ -231,7 +238,6 @@ pytz==2021.1
     #   dateparser
     #   django
     #   django-timezone-field
-    #   flower
     #   tzlocal
 pyyaml==5.4.1
     # via -r /app/requirements/in/base.in
@@ -259,6 +265,7 @@ six==1.15.0
     #   argon2-cffi
     #   azure-core
     #   azure-identity
+    #   click-repl
     #   isodate
     #   protobuf
     #   python-dateutil
@@ -271,10 +278,10 @@ steam[client]==1.2.0
     # via -r /app/requirements/in/base.in
 text-unidecode==1.3
     # via python-slugify
-tornado==6.1
-    # via flower
 traitlets==5.0.5
-    # via ipython
+    # via
+    #   ipython
+    #   matplotlib-inline
 tzlocal==2.1
     # via dateparser
 uritemplate==3.0.1
@@ -285,11 +292,10 @@ uwsgi==2.0.19.1
     # via -r /app/requirements/in/production.in
 vdf==3.3
     # via steam
-vine==1.3.0
+vine==5.0.0
     # via
     #   amqp
     #   celery
-    #   flower
 wcwidth==0.2.5
     # via prompt-toolkit
 zope.event==4.5.0

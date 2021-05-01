@@ -5,7 +5,6 @@
 
 from collections import namedtuple
 from struct import unpack_from
-from typing import Dict, List
 
 LanguagePointer = namedtuple("LanguagePointer", ("name", "start_index", "end_index"))
 
@@ -138,7 +137,7 @@ def decode_index_data(binary):
     language_count = unpack_from("B", binary, offset)[0]
     offset += 1
 
-    languages: List[dict] = []
+    languages: list[dict] = []
     for _ in range(language_count):
         language_name_length = unpack_from("B", binary, offset)[0]
         offset += 1
@@ -205,19 +204,19 @@ def decode_language(
         binary, item_strings_pointer, len(item_types), language["end_index"]
     )
 
-    color_strings: Dict[int, str] = {}
+    color_strings: dict[int, str] = {}
     for index, color_name in enumerate(color_names):
         color_strings[index + 1] = color_name
 
-    metal_strings: Dict[int, str] = {}
+    metal_strings: dict[int, str] = {}
     for index, metal_name in enumerate(metal_names):
         metal_strings[index] = metal_name
 
-    item_strings: Dict[int, dict] = {}
+    item_strings: dict[int, dict] = {}
     for index, item_type in enumerate(item_types):
         item_strings[item_type["item_id"]] = item_names[index]
 
-    subtitle_strings: Dict[int, str] = {}
+    subtitle_strings: dict[int, str] = {}
     for index, subtitle_string in enumerate(item_subtitles):
         subtitle_strings[index] = subtitle_string
 

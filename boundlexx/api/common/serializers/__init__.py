@@ -151,12 +151,14 @@ class ForumFormatPostSerialzier(NullSerializer):
         ),
         label="World ID",
     )
-    will_renew = serializers.NullBooleanField(
+    will_renew = serializers.BooleanField(
+        allow_null=True,
         required=False,
         help_text="Do you plan to renew this world? Required for Sovereign worlds.",
         label="Will Renew?",
     )
-    compactness = serializers.NullBooleanField(
+    compactness = serializers.BooleanField(
+        allow_null=True,
         required=False,
         help_text="Is Beacon compactness enabled?",
         label="Beacon Compactness?",

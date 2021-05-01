@@ -5,7 +5,6 @@ from ast import literal_eval
 from collections import namedtuple
 from datetime import timedelta
 from http.client import RemoteDisconnected
-from typing import Dict, List
 
 from celery.utils.log import get_task_logger
 from django.conf import settings
@@ -156,8 +155,8 @@ def _update_prices_multi(worlds, name=None):
 
 
 def _get_ranks(item, rank_klass, all_worlds):
-    ranks: Dict[int, ItemRank] = {}
-    worlds: List[SimpleWorld] = []
+    ranks: dict[int, ItemRank] = {}
+    worlds: list[SimpleWorld] = []
 
     now = timezone.now()
 
@@ -205,7 +204,7 @@ def _get_shops(client, client_method, item, world):
 
 
 def _update_item_prices(
-    item, rank_klass, client_method: str, price_klass, all_worlds: List[SimpleWorld]
+    item, rank_klass, client_method: str, price_klass, all_worlds: list[SimpleWorld]
 ):
 
     client = BoundlessClient()
@@ -422,7 +421,7 @@ def clean_up_queued_worlds():
 
     actual_queued_worlds = set()
     for task in in_progress_tasks:
-        world_ids: List[int] = literal_eval(task.task_args)[0]
+        world_ids: list[int] = literal_eval(task.task_args)[0]
         for world_id in world_ids:
             if world_id in actual_queued_worlds:
                 logger.warning("Duplicate world ID found!")

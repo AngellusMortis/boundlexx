@@ -1,7 +1,6 @@
 import socket
 from datetime import timedelta
 from email.utils import parsedate_to_datetime
-from typing import List
 
 import requests
 from azure.identity import ClientSecretCredential
@@ -33,7 +32,7 @@ from config.celery_app import app
 MAX_SINGLE_PURGE = 50
 WARM_CACHE_TASK = "boundlexx.api.tasks.warm_cache"
 PURGE_DJ_CACHE = "boundlexx.api.tasks.purge_django_cache"
-WARM_CACHE_PATHS: List[str] = [
+WARM_CACHE_PATHS: list[str] = [
     # "/api/v1/schema/",
     # "/api/v1/schema/?format=openapi-json",
     # "/api/v2/schema/",

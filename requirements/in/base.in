@@ -17,15 +17,14 @@ django-robots
 django-storages[azure]
 django<4.0
 djangorestframework
-git+https://github.com/chibisov/drf-extensions.git@002a67ce
+drf-extensions
 git+https://github.com/AngellusMortis/django-rest-framework-msgpack.git
 python-redis-lock[django]
 
 
 # Celery
-celery<5
+celery<6
 django-celery-beat
-flower
 
 # Misc
 azure-identity

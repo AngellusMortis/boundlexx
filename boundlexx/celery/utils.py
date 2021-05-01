@@ -1,12 +1,10 @@
-from typing import List
-
 from celery.app.task import Task
 from django.core.cache import cache
 
 from .models import TaskOutput
 
 
-def get_output_for_task(task: Task) -> List[str]:
+def get_output_for_task(task: Task) -> list[str]:
     output = []
 
     task_output = TaskOutput.objects.filter(task=task).first()

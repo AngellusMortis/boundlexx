@@ -1,5 +1,4 @@
 from logging import getLogger
-from typing import List
 
 from django.db.models import Q
 from django.http import Http404
@@ -48,7 +47,7 @@ class WorldViewSet(BoundlexxViewSet):
     ]
     filterset_class = WorldFilterSet
     ordering = ["-rank", "id"]
-    ordering_fields: List[str] = ["sort_name", "start", "end"]
+    ordering_fields: list[str] = ["sort_name", "start", "end"]
     search_fields = [
         "name",
         "id",

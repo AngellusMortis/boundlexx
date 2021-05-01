@@ -2,7 +2,6 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta
-from typing import Dict, List, Set, Tuple
 
 import pytz
 from django.conf import settings
@@ -796,7 +795,7 @@ class WorldBlockColorManager(models.Manager):
         return block_color, created
 
     def _get_blocks(self, attr, **lookup):
-        block_cache: Dict[str, Block] = {}
+        block_cache: dict[str, Block] = {}
         blocks = Block.objects.filter(**lookup).select_related("block_item")
         for block in blocks.all():
             block_cache[getattr(block, attr)] = block
@@ -927,7 +926,7 @@ class WorldBlockColorManager(models.Manager):
             )
             .select_related("item", "world", "color")
         )
-        wbcs: Dict[int, Set[int]] = {}
+        wbcs: dict[int, set[int]] = {}
         for wbc in all_wbcs.all().iterator():
             ecolors = wbcs.get(wbc.item.game_id, set())
             ecolors.add(wbc.color.game_id)
@@ -978,7 +977,7 @@ class WorldBlockColorManager(models.Manager):
         self._log(logger, "Number of blocks: %s", len(blocks))
 
         default_colors = []
-        possible_colors: List[Tuple[Item, List[Color]]] = []
+        possible_colors: list[tuple[Item, list[Color]]] = []
 
         for block_id, data in color_data.items():
             block = blocks.get(block_id)
@@ -1450,7 +1449,7 @@ class Settlement(models.Model):
         CITY = 4, _("City")
         GREAT_CITY = 5, _("Great City")
 
-    RANK_LEVEL_MAP: Dict[int, int] = {
+    RANK_LEVEL_MAP: dict[int, int] = {
         0: 10000,
         1: 50000,
         2: 250000,

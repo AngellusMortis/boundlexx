@@ -6,7 +6,7 @@ from collections import namedtuple
 from dataclasses import dataclass
 from http.client import RemoteDisconnected
 from struct import unpack_from
-from typing import List, Union
+from typing import Union
 
 from requests.exceptions import ConnectionError as RequestsConnectionError
 from requests.exceptions import RequestException
@@ -56,7 +56,7 @@ class ShopItem:
     location: Location
 
     @staticmethod
-    def from_binary(binary: bytes) -> List[ShopItem]:
+    def from_binary(binary: bytes) -> list[ShopItem]:
         items = []
 
         offset = 0
@@ -106,7 +106,7 @@ class Settlement:
     location: Location
 
     @staticmethod
-    def from_binary(binary: bytes) -> List[Settlement]:
+    def from_binary(binary: bytes) -> list[Settlement]:
         binary = zlib.decompress(binary[5:])
 
         offset = 8
@@ -114,7 +114,7 @@ class Settlement:
         count = unpack_from("<I", binary, offset)[0]
         offset += 4
 
-        settlements: List[Settlement] = []
+        settlements: list[Settlement] = []
 
         while len(settlements) < count and offset < len(binary):
             name_length = unpack_from("<B", binary, offset)[0]

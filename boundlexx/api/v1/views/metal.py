@@ -1,5 +1,3 @@
-from typing import List
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
@@ -36,7 +34,7 @@ class MetalViewSet(BoundlexxViewSet):
     filterset_class = LocalizationFilterSet
     search_fields = ["localizedname__name", "game_id"]
     ordering = ["-rank", "game_id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

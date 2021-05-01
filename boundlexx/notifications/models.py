@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import os
 from datetime import timedelta
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Optional
 
 from django.conf import settings
 from django.contrib.auth import get_user_model
@@ -309,7 +309,7 @@ class WorldNotification(NotificationBase):
     def _get_color_groups(self, world, default=False):
         colors = self._get_colors(world, default)
 
-        color_groups: Dict[str, list] = {}
+        color_groups: dict[str, list] = {}
         if colors is not None:
             for group_name in settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER:
                 color_groups[group_name] = []
@@ -321,7 +321,7 @@ class WorldNotification(NotificationBase):
                 order_index = list(
                     settings.BOUNDLESS_WORLD_POLL_GROUP_ORDER[group_name]
                 ).index(item_id)
-                color_group: List[Tuple[int, str]] = color_groups[group_name]
+                color_group: list[tuple[int, str]] = color_groups[group_name]
                 color_group.append((order_index, color))
                 color_groups[group_name] = color_group
 
@@ -343,7 +343,7 @@ class WorldNotification(NotificationBase):
         )
 
         colors = self._get_colors(world) or []
-        default_colors: List[WorldBlockColor] = []
+        default_colors: list[WorldBlockColor] = []
         if world.is_sovereign:
             default_colors = self._get_colors(world, default=True) or []
 
@@ -413,7 +413,7 @@ class WorldNotification(NotificationBase):
         from boundlexx.boundless.models import World  # pylint: disable=cyclic-import
 
         worlds = World.objects.filter(id__in=ids)
-        world_images: Dict[str, str] = {}
+        world_images: dict[str, str] = {}
 
         for world in worlds:
             world_images[str(world.id)] = world.image.url
@@ -423,7 +423,7 @@ class WorldNotification(NotificationBase):
     def _get_forum_image_dict(self, image_type, use_forum_links=True, lookup_ids=None):
         image_dict = {}
 
-        world_images: Optional[Dict[str, str]] = None
+        world_images: Optional[dict[str, str]] = None
 
         forum_images = ForumImage.objects.filter(image_type=image_type)
         if lookup_ids is not None:
@@ -614,9 +614,9 @@ class WorldNotification(NotificationBase):
         )
 
     def _main_embed(self, world, is_update=False):
-        files: Optional[Dict[str, str]] = None
+        files: Optional[dict[str, str]] = None
 
-        main_embed: Dict[str, Any] = {
+        main_embed: dict[str, Any] = {
             "fields": [
                 {
                     "name": "🌍 World Details",
@@ -687,7 +687,7 @@ class WorldNotification(NotificationBase):
 
     def _resource_embed(self, embedded_resources, surface_resources):
         resource_embed: dict = {"title": "World Resources"}
-        fields: List[Dict[str, str]] = []
+        fields: list[dict[str, str]] = []
 
         resource_groups = (
             (embedded_resources, "Embedded Resources"),
@@ -729,7 +729,7 @@ class WorldNotification(NotificationBase):
 
     def _color_embed(self, world, color_groups):
         color_embed: dict = {"title": "Block Colors"}
-        fields: List[Dict[str, str]] = []
+        fields: list[dict[str, str]] = []
         for group_name, color_group in color_groups.items():
             value = ""
             for color in color_group:
@@ -841,7 +841,7 @@ class SovereignColorNotification(NotificationBase):
             }
         )
 
-        main_embed: Dict[str, Any] = {
+        main_embed: dict[str, Any] = {
             "title": item.english,
             "description": "New Sovereign selectable colors found!",
             "fields": fields,
@@ -859,7 +859,7 @@ class FailedTaskNotification(NotificationBase):
             output = task.traceback.split("\n")
 
         messages = []
-        message: List[str] = []
+        message: list[str] = []
         for line in output:
             if len("\n".join(message) + line) >= 1750:
                 messages.append(message)

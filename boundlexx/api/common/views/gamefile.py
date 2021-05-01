@@ -1,5 +1,3 @@
-from typing import List
-
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.permissions import IsAuthenticated
 
@@ -31,7 +29,7 @@ class GameFileViewSet(BoundlexxViewSet):
         "file_type",
     ]
     ordering = ["-rank", "id"]
-    ordering_fields: List[str] = []
+    ordering_fields: list[str] = []
 
     def list(self, request, *args, **kwargs):  # noqa A003
         """

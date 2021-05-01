@@ -1,7 +1,7 @@
 from django.conf import settings
 from django.core.exceptions import SuspiciousOperation
 from django.db.models import F, Func, Q, Value
-from django.utils.translation import ugettext as _
+from django.utils.translation import gettext as _
 from django_filters.rest_framework import FilterSet, filters
 from rest_framework.filters import BaseFilterBackend
 
