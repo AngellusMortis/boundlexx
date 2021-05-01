@@ -5,9 +5,6 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('ingest', '0001_initial'), ('ingest', '0002_auto_20200912_1426'), ('ingest', '0003_auto_20200930_1058')]
-
     initial = True
 
     dependencies = [
