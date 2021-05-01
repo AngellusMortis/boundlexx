@@ -20,7 +20,7 @@ RUN apt-get update \
 
 COPY ./requirements /requirements
 COPY ./docker/bin/* /usr/local/bin/
-RUN chmod +x /usr/local/bin/steam-auth-ticket /usr/local/bin/convert-atlas
+RUN chmod +x /usr/local/bin/steam-auth-ticket /usr/local/bin/convert-atlas /usr/local/bin/lint-code /usr/local/bin/format-code /usr/local/bin/entrypoint /usr/local/bin/start-celerybeat /usr/local/bin/start-celeryworker
 RUN mkdir -p /app/.steam
 RUN chown -R django:django /app
 
@@ -47,14 +47,13 @@ COPY --from=builder /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
 COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/production/start /usr/local/bin/start
 COPY --chown=django:django ./docker/celery/production/worker/start /usr/local/bin/start-celeryworker
-COPY --chown=django:django ./docker/celery/production/beat/start /usr/local/bin/start-celerybeat
 COPY --chown=django:django ./manage.py /app/manage.py
 COPY --chown=django:django ./locale /app/locale
 COPY --chown=django:django ./config /app/config
 COPY --chown=django:django ./boundlexx /app/boundlexx
 COPY --chown=django:django ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
 
-RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start /usr/local/bin/start-celeryworker /usr/local/bin/start-celerybeat \
+RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start /usr/local/bin/start-celeryworker \
   && rm /requirements -rf
 
 USER django
@@ -72,12 +71,10 @@ ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY --from=builder-dev /usr/local/bin/ /usr/local/bin/
 COPY --from=builder-dev /usr/local/lib/python3.9/ /usr/local/lib/python3.9/
-COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/dev/start /usr/local/bin/start
-COPY --chown=django:django ./docker/celery/dev/worker/start /usr/local/bin/start-celeryworker
-COPY --chown=django:django ./docker/celery/dev/beat/start /usr/local/bin/start-celerybeat
+COPY --chown=django:django ./docker/celery/dev/worker/start
 
-RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start /usr/local/bin/start-celeryworker /usr/local/bin/start-celerybeat /usr/local/bin/lint-code /usr/local/bin/format-code \
+RUN chmod +x /usr/local/bin/start \
   && rm /requirements -rf
 
 USER django

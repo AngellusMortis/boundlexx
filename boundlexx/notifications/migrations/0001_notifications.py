@@ -1412,17 +1412,6 @@ def add_default_images(apps, schema_editor):
 
 
 class Migration(migrations.Migration):
-
-    replaces = [
-        ("notifications", "0001_initial"),
-        ("notifications", "0002_sovereigncolornotification"),
-        ("notifications", "0003_forumimage"),
-        ("notifications", "0004_forumcategorysubscription_forumpmsubscription"),
-        ("notifications", "0005_exoworldexpirednotification"),
-        ("notifications", "0006_auto_20201114_1125"),
-        ("notifications", "0007_auto_20210414_0842"),
-    ]
-
     initial = True
 
     dependencies = [

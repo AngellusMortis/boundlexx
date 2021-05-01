@@ -6,9 +6,6 @@ import storages.backends.azure_storage
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('api', '0001_initial'), ('api', '0002_exportedfile')]
-
     initial = True
 
     dependencies = [
