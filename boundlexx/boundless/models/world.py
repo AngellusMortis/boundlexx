@@ -242,7 +242,7 @@ class WorldManager(models.Manager):
         return world, created
 
 
-class World(ModelDiffMixin, models.Model):
+class World(ModelDiffMixin, models.Model):  # pylint: disable=too-many-public-methods
     objects = WorldManager()
 
     class Region(models.TextChoices):
