@@ -48,7 +48,10 @@ COPY --chown=django:django ./docker/django/entrypoint /usr/local/bin/entrypoint
 COPY --chown=django:django ./docker/django/production/start /usr/local/bin/start
 COPY --chown=django:django ./docker/celery/production/worker/start /usr/local/bin/start-celeryworker
 COPY --chown=django:django ./docker/celery/production/beat/start /usr/local/bin/start-celerybeat
-COPY --chown=django:django ./manage.py ./locale/ ./config/ ./boundlexx/ /app/
+COPY --chown=django:django ./manage.py /app/manage.py
+COPY --chown=django:django ./locale /app/locale
+COPY --chown=django:django ./config /app/config
+COPY --chown=django:django ./boundlexx /app/boundlexx
 COPY --chown=django:django ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
 
 RUN chmod +x /usr/local/bin/entrypoint /usr/local/bin/start /usr/local/bin/start-celeryworker /usr/local/bin/start-celerybeat \
