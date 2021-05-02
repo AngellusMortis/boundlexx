@@ -1,3 +1,12 @@
+2021-05-01
+----------
+
+* Upgrades to Python 3.9
+* Upgrades to Django 3.2
+* Squashes all existing mirgations
+* Updates Azure code to match new Terraformed environment
+* Updates static file caching to be smarter
+
 2021-04-25
 ----------
 
