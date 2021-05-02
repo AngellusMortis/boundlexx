@@ -318,7 +318,7 @@ def run(  # pylint: disable=too-many-locals
             item.save()
 
     click.echo("Purging CDN cache...")
-    purge_static_cache()
+    purge_static_cache(["items"])
 
     click.echo("Creating AltItems...")
     with click.progressbar(compiled_items.items()) as pbar:

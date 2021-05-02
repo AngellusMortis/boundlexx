@@ -337,6 +337,7 @@ LOGGING = {
     "loggers": {
         "root": {"level": "INFO", "handlers": ["console"]},
         "ingest": {"level": "INFO", "handlers": ["console"]},
+        "azure": {"level": "WARNING"},
         "django": {"handlers": ["console"], "level": "INFO"},
         "django.server": {
             "handlers": ["django.server"],

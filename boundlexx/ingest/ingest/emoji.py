@@ -2,6 +2,7 @@ import djclick as click
 import requests
 from django.conf import settings
 
+from boundlexx.api.tasks import purge_static_cache
 from boundlexx.boundless.models import Emoji, EmojiAltName
 from boundlexx.ingest.ingest.icon import emoji_layer_data, get_emoji
 from boundlexx.ingest.ingest.utils import print_result
@@ -97,3 +98,5 @@ def run(**kwargs):  # pylint: disable=too-many-locals
                 emoji_created += 1
 
     print_result("emojis", emoji_created)
+    click.echo("Purging CDN cache...")
+    purge_static_cache(["emoji"])

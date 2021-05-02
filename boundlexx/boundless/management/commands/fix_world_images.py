@@ -5,6 +5,7 @@ from azure.common import AzureMissingResourceHttpError
 from django.conf import settings
 from requests.exceptions import HTTPError
 
+from boundlexx.api.tasks import purge_static_cache
 from boundlexx.boundless.models import World
 from boundlexx.utils import download_image, get_django_image_from_file, make_thumbnail
 
@@ -117,3 +118,6 @@ def _missing():
 def command():
     _thumbs()
     _missing()
+
+    click.echo("Purging CDN cache...")
+    purge_static_cache(["worlds"])

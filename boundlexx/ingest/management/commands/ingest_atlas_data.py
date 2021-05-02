@@ -242,4 +242,4 @@ def command(dropbox_url):
     shutil.rmtree(BASE_DIR)
 
     click.echo("Purging CDN cache...")
-    purge_static_cache()
+    purge_static_cache(["worlds", "atlas"])

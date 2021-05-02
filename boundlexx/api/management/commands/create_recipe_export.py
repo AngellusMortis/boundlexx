@@ -2,6 +2,7 @@ import djclick as click
 from openpyxl import Workbook
 from openpyxl.writer.excel import save_virtual_workbook
 
+from boundlexx.api.tasks import purge_static_cache
 from boundlexx.api.utils import create_export_file, set_column_widths
 from boundlexx.boundless.models import Recipe, RecipeGroup
 
@@ -157,3 +158,6 @@ def command():
 
     click.echo("Creating file...")
     create_export_file(FILENAME, "xlsx", DESCRIPTION, save_virtual_workbook(workbook))
+
+    click.echo("Purging CDN cache...")
+    purge_static_cache(["exports"])

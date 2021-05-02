@@ -38,6 +38,16 @@ WARM_CACHE_PATHS: list[str] = [
     # "/api/v2/schema/",
     # "/api/v2/schema/?format=openapi-json",
 ]
+STATIC_CONTAINERS: list[str] = [
+    "atlas",
+    "emoji",
+    "exports",
+    "images",
+    "items",
+    "logos",
+    "skills",
+    "worlds",
+]
 COLOR_EXPORT_FILENAME = "color_export"
 COLOR_EXPORT_DESCRIPTION = """Export for all known block colors in the known universe.
 """
@@ -91,13 +101,16 @@ def purge_django_cache():
 
 
 @app.task
-def purge_static_cache():
+def purge_static_cache(containers: list[str] = None):
     if (
         settings.AZURE_STATIC_CDN_ENDPOINT_NAME is None
         or len(settings.AZURE_STATIC_CDN_ENDPOINT_NAME) == 0
     ):
         logger.warning("Azure settings not configured")
         return
+
+    if containers is None:
+        containers = STATIC_CONTAINERS
 
     credentials = ClientSecretCredential(
         tenant_id=settings.AZURE_TENANT_ID,
@@ -107,11 +120,22 @@ def purge_static_cache():
 
     client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
 
+    paths_group: list[str] = []
+    for group in containers:
+        paths_group.append(f"/{settings.AZURE_CONTAINER_PREFIX}{group}/*")
+    logger.info(
+        "Purging paths: %s %s %s %s",
+        settings.AZURE_STATIC_CDN_RESOURCE_GROUP,
+        settings.AZURE_STATIC_CDN_PROFILE_NAME,
+        settings.AZURE_STATIC_CDN_ENDPOINT_NAME,
+        paths_group,
+    )
+
     poller = client.endpoints.begin_purge_content(
         settings.AZURE_STATIC_CDN_RESOURCE_GROUP,
         settings.AZURE_STATIC_CDN_PROFILE_NAME,
         settings.AZURE_STATIC_CDN_ENDPOINT_NAME,
-        PurgeParameters(content_paths=["/*"]),
+        PurgeParameters(content_paths=paths_group),
     )
     poller.result()
 
@@ -161,14 +185,14 @@ def purge_cache(all_paths=False):
         client = CdnManagementClient(credentials, settings.AZURE_SUBSCRIPTION_ID)
 
         for paths_group in _path_chunks(paths, MAX_SINGLE_PURGE):
-            logger.info("Purging paths: %s", paths_group)
-
-            print(
+            logger.info(
+                "Purging paths: %s %s %s %s",
                 settings.AZURE_CDN_RESOURCE_GROUP,
                 settings.AZURE_CDN_PROFILE_NAME,
                 settings.AZURE_CDN_ENDPOINT_NAME,
                 paths_group,
             )
+
             poller = client.endpoints.begin_purge_content(
                 settings.AZURE_CDN_RESOURCE_GROUP,
                 settings.AZURE_CDN_PROFILE_NAME,

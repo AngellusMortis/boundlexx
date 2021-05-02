@@ -1,5 +1,6 @@
 import djclick as click
 
+from boundlexx.api.tasks import purge_static_cache
 from boundlexx.boundless.models import LocalizedString, Skill, SkillGroup
 from boundlexx.ingest.ingest.icon import get_image
 from boundlexx.ingest.ingest.utils import print_result
@@ -80,3 +81,6 @@ def run(**kwargs):  # pylint: disable=too-many-locals
                     skill.save()
         print_result("skill groups", skill_groups_created)
         print_result("skills", skills_created)
+
+    click.echo("Purging CDN cache...")
+    purge_static_cache(["skills"])
