@@ -7,6 +7,7 @@ from django.core.cache import cache
 from django.db import models
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
 from boundlexx.boundless.utils import (
@@ -61,7 +62,7 @@ class GameObj(PolymorphicModel):
         return localized_name
 
 
-class LocalizedName(PolymorphicModel):
+class LocalizedName(ExportModelOperationsMixin("localized_name"), PolymorphicModel):  # type: ignore # noqa E501
     game_obj = models.ForeignKey(GameObj, on_delete=models.CASCADE)
     lang = models.CharField(_("Language"), max_length=16)
     name = models.CharField(_("Name"), max_length=128, db_index=True)
@@ -76,14 +77,14 @@ class LocalizedName(PolymorphicModel):
         return f"{self.lang}: {self.name}"
 
 
-class LocalizedString(models.Model):
+class LocalizedString(ExportModelOperationsMixin("localized_string"), models.Model):  # type: ignore # noqa E501
     string_id = models.CharField(max_length=128, unique=True)
 
     def __str__(self):
         return self.string_id
 
 
-class LocalizedStringText(models.Model):
+class LocalizedStringText(ExportModelOperationsMixin("localized_string_text"), models.Model):  # type: ignore # noqa E501
     STYLE_REGEX = r"\$\[STYLE\(([^]]*),[^[]*\)\]"
     ATTRIBUTE_REGEX = r"\${(ATTRIBUTE|BUNDLE|ACTION)\(([^}]*)\)\}"
     POST_REL_REGEX = r" \(an increase of \$\{ATTRIBUTE[^}]*\}\)"
@@ -117,11 +118,11 @@ class LocalizedStringText(models.Model):
         ]
 
 
-class Subtitle(GameObj):
+class Subtitle(ExportModelOperationsMixin("subtitle"), GameObj):  # type: ignore # noqa E501
     pass
 
 
-class Color(GameObj):
+class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore # noqa E501
     @cached_property
     def base_color(self):
         colors: dict[int, int] = {}
@@ -151,7 +152,7 @@ class Color(GameObj):
         return None
 
 
-class ColorValue(models.Model):
+class ColorValue(ExportModelOperationsMixin("color_value"), models.Model):  # type: ignore # noqa E501
     class ColorType(models.TextChoices):
         CHARACTER = "CHARACTER", _("CHARACTER")
         CHARACTER_DECAL = "CHARACTER_DECAL", _("CHARACTER_DECAL")
@@ -203,11 +204,11 @@ class ColorValue(models.Model):
         return f"#{self.base:06x}"
 
 
-class Metal(GameObj):
+class Metal(ExportModelOperationsMixin("metal"), GameObj):  # type: ignore # noqa E501
     pass
 
 
-class Item(GameObj):
+class Item(ExportModelOperationsMixin("item"), GameObj):  # type: ignore # noqa E501
     item_subtitle = models.ForeignKey(
         Subtitle, on_delete=models.SET_NULL, blank=True, null=True
     )
@@ -287,7 +288,7 @@ class Item(GameObj):
         return get_next_rank_update(self.itembuyrank_set.all())
 
 
-class ResourceData(models.Model):
+class ResourceData(ExportModelOperationsMixin("resource_data"), models.Model):  # type: ignore # noqa E501
     class Tier(models.IntegerChoices):
         TIER_1 = 0, _("T1 - Placid")
         TIER_2 = 1, _("T2 - Temperate")
@@ -376,7 +377,7 @@ class ResourceData(models.Model):
         return types
 
 
-class ResourceDataBestWorld(models.Model):
+class ResourceDataBestWorld(ExportModelOperationsMixin("resource_data_best_world"), models.Model):  # type: ignore # noqa E501
     class WorldType(models.TextChoices):
         TYPE_LUSH = "LUSH", _("Lush")
         TYPE_METAL = "METAL", _("Metal")
@@ -406,28 +407,28 @@ class ResourceDataBestWorld(models.Model):
     )
 
 
-class AltItem(GameObj):
+class AltItem(ExportModelOperationsMixin("alt_item"), GameObj):  # type: ignore # noqa E501
     name = models.CharField(_("String ID"), max_length=64)
     base_item = models.ForeignKey(
         Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
     )
 
 
-class Block(GameObj):
+class Block(ExportModelOperationsMixin("block"), GameObj):  # type: ignore # noqa E501
     name = models.CharField(_("Name"), max_length=64, unique=True)
     block_item = models.ForeignKey(
         Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
     )
 
 
-class Liquid(GameObj):
+class Liquid(ExportModelOperationsMixin("liquid"), GameObj):  # type: ignore # noqa E501
     name = models.CharField(_("Name"), max_length=64, unique=True)
     block_item = models.ForeignKey(
         Item, on_delete=models.CASCADE, blank=True, null=True, related_name="+"
     )
 
 
-class SkillGroup(models.Model):
+class SkillGroup(ExportModelOperationsMixin("skill_group"), models.Model):  # type: ignore # noqa E501
     class SkillType(models.TextChoices):
         ATTRIBUTES = "Attributes", _("Attributes")
         BASIC = "Basic", _("Basic")
@@ -447,7 +448,7 @@ class SkillGroup(models.Model):
         return self.name
 
 
-class Skill(models.Model):
+class Skill(ExportModelOperationsMixin("skill"), models.Model):  # type: ignore # noqa E501
     class LinkType(models.TextChoices):
         NONE = "None", _("None")
         LEFT = "Left", _("Left")
@@ -479,7 +480,7 @@ class Skill(models.Model):
         return self.name
 
 
-class RecipeGroup(models.Model):
+class RecipeGroup(ExportModelOperationsMixin("recipe_group"), models.Model):  # type: ignore # noqa E501
     name = models.CharField(max_length=32, unique=True)
     display_name = models.ForeignKey(LocalizedString, on_delete=models.CASCADE)
     members = models.ManyToManyField(Item)
@@ -488,7 +489,7 @@ class RecipeGroup(models.Model):
         return self.name
 
 
-class RecipeInput(models.Model):
+class RecipeInput(ExportModelOperationsMixin("recipe_input"), models.Model):  # type: ignore # noqa E501
     group = models.ForeignKey(
         RecipeGroup, on_delete=models.CASCADE, blank=True, null=True
     )
@@ -496,7 +497,7 @@ class RecipeInput(models.Model):
     count = models.PositiveSmallIntegerField()
 
 
-class RecipeLevel(models.Model):
+class RecipeLevel(ExportModelOperationsMixin("recipe_level"), models.Model):  # type: ignore # noqa E501
     class Level(models.IntegerChoices):
         SINGLE = 0, _("Single")
         BULK = 1, _("Bulk")
@@ -511,12 +512,12 @@ class RecipeLevel(models.Model):
     inputs = models.ManyToManyField(RecipeInput)
 
 
-class RecipeRequirement(models.Model):
+class RecipeRequirement(ExportModelOperationsMixin("recipe_requirement"), models.Model):  # type: ignore # noqa E501
     skill = models.ForeignKey(Skill, on_delete=models.CASCADE)
     level = models.PositiveSmallIntegerField()
 
 
-class Recipe(GameObj):
+class Recipe(ExportModelOperationsMixin("recipe"), GameObj):  # type: ignore # noqa E501
     class MachineType(models.TextChoices):
         COMPACTOR = "COMPACTOR", _("COMPACTOR")
         CRAFTING_TABLE = "CRAFTING_TABLE", _("CRAFTING_TABLE")
@@ -578,7 +579,7 @@ class EmojiManager(models.Manager):
         )
 
 
-class Emoji(models.Model):
+class Emoji(ExportModelOperationsMixin("emoji"), models.Model):  # type: ignore # noqa E501
     class EmojiCategory(models.TextChoices):
         SMILEY = "SMILEY", _("Smiley & Emotion")
         PEOPLE = "PEOPLE", _("People & Body")
@@ -627,7 +628,7 @@ class Emoji(models.Model):
         return names
 
 
-class EmojiAltName(models.Model):
+class EmojiAltName(ExportModelOperationsMixin("emoji_alt_name"), models.Model):  # type: ignore # noqa E501
     emoji = models.ForeignKey(Emoji, on_delete=models.CASCADE)
     name = models.CharField(max_length=32, db_index=True)
 
@@ -637,7 +638,7 @@ class EmojiAltName(models.Model):
         ]
 
 
-class ItemColorVariant(models.Model):
+class ItemColorVariant(ExportModelOperationsMixin("item_color_variant"), models.Model):  # type: ignore # noqa E501
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     color = models.ForeignKey(Color, on_delete=models.CASCADE)
 
@@ -654,7 +655,7 @@ class ItemColorVariant(models.Model):
         return f"{self.item.game_id}_{self.color.game_id}"
 
 
-class ItemMetalVariant(models.Model):
+class ItemMetalVariant(ExportModelOperationsMixin("item_metal_variant"), models.Model):  # type: ignore # noqa E501
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     metal = models.ForeignKey(Metal, on_delete=models.CASCADE)
 

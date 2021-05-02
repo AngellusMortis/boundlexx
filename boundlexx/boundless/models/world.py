@@ -12,6 +12,7 @@ from django.db import models, transaction
 from django.utils import timezone
 from django.utils.functional import cached_property
 from django.utils.translation import gettext_lazy as _
+from django_prometheus.models import ExportModelOperationsMixin
 
 from boundlexx.boundless.game import BoundlessClient, Location
 from boundlexx.boundless.game import Settlement as SimpleSettlement
@@ -242,7 +243,9 @@ class WorldManager(models.Manager):
         return world, created
 
 
-class World(ModelDiffMixin, models.Model):  # pylint: disable=too-many-public-methods
+class World(  # pylint: disable=too-many-public-methods
+    ExportModelOperationsMixin("world"), ModelDiffMixin, models.Model  # type: ignore # noqa E501
+):
     objects = WorldManager()
 
     class Region(models.TextChoices):
@@ -680,7 +683,7 @@ class World(ModelDiffMixin, models.Model):  # pylint: disable=too-many-public-me
         return settings.BOUNDLESS_BOWS.get(self.world_type)
 
 
-class WorldDistance(models.Model):
+class WorldDistance(ExportModelOperationsMixin("world_distance"), models.Model):  # type: ignore # noqa E501
     world_source = models.ForeignKey(World, on_delete=models.CASCADE, related_name="+")
     world_dest = models.ForeignKey(World, on_delete=models.CASCADE, related_name="+")
     distance = models.PositiveSmallIntegerField(_("Distance to work in blinksecs"))
@@ -1021,7 +1024,7 @@ class WorldBlockColorManager(models.Manager):
         return block_colors_created
 
 
-class WorldBlockColor(models.Model):
+class WorldBlockColor(ExportModelOperationsMixin("world_block_color"), models.Model):  # type: ignore # noqa E501
     objects = WorldBlockColorManager()
 
     world = models.ForeignKey(World, on_delete=models.CASCADE, blank=True, null=True)
@@ -1134,7 +1137,7 @@ class WorldBlockColor(models.Model):
         return f"{self.item.game_id}_{self.color.game_id}"
 
 
-class WorldCreatureColor(models.Model):
+class WorldCreatureColor(ExportModelOperationsMixin("world_creature_color"), models.Model):  # type: ignore # noqa E501
     class CreatureType(models.TextChoices):
         CUTTLETRUNK = "CUTTLETRUNK", _("Cuttletrunk")
         HOPPER = "HOPPER", _("Hopper")
@@ -1259,7 +1262,7 @@ class WorldPollManager(models.Manager):
         return world_poll
 
 
-class WorldPoll(models.Model):
+class WorldPoll(ExportModelOperationsMixin("world_poll"), models.Model):  # type: ignore # noqa E501
     objects = WorldPollManager()
 
     world = models.ForeignKey("World", on_delete=models.CASCADE)
@@ -1281,7 +1284,7 @@ class WorldPoll(models.Model):
         return self.leaderboardrecord_set.all()
 
 
-class WorldPollResult(models.Model):
+class WorldPollResult(ExportModelOperationsMixin("world_poll_result"), models.Model):  # type: ignore # noqa E501
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     player_count = models.PositiveSmallIntegerField(_("Player Count"))
@@ -1298,7 +1301,7 @@ class WorldPollResult(models.Model):
         )
 
 
-class ResourceCount(models.Model):
+class ResourceCount(ExportModelOperationsMixin("resource_count"), models.Model):  # type: ignore # noqa E501
     time = models.DateTimeField(default=timezone.now, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     item = models.ForeignKey("Item", on_delete=models.CASCADE)
@@ -1324,7 +1327,7 @@ class ResourceCount(models.Model):
         return False
 
 
-class LeaderboardRecord(models.Model):
+class LeaderboardRecord(ExportModelOperationsMixin("leaderboard_record"), models.Model):  # type: ignore # noqa E501
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     world_poll = models.ForeignKey("WorldPoll", on_delete=models.CASCADE)
     world_rank = models.PositiveSmallIntegerField(_("World Rank"))
@@ -1347,7 +1350,7 @@ class LeaderboardRecord(models.Model):
         ordering = ["world_rank"]
 
 
-class Beacon(models.Model):
+class Beacon(ExportModelOperationsMixin("beacon"), models.Model):  # type: ignore # noqa E501
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
     active = models.BooleanField(db_index=True, default=True)
 
@@ -1380,7 +1383,7 @@ class Beacon(models.Model):
         return None
 
 
-class BeaconScan(models.Model):
+class BeaconScan(ExportModelOperationsMixin("beacon_scan"), models.Model):  # type: ignore # noqa E501
     time = models.DateTimeField(auto_now_add=True, primary_key=True)
 
     beacon = models.ForeignKey("Beacon", on_delete=models.CASCADE)
@@ -1400,7 +1403,7 @@ class BeaconScan(models.Model):
         )
 
 
-class BeaconPlotColumn(models.Model):
+class BeaconPlotColumn(ExportModelOperationsMixin("beacon_plot_column"), models.Model):  # type: ignore # noqa E501
     beacon = models.ForeignKey("Beacon", on_delete=models.CASCADE)
     plot_x = models.IntegerField()
     plot_z = models.IntegerField()
@@ -1427,7 +1430,7 @@ class SettlementManager(models.Manager):
         )
 
 
-class Settlement(models.Model):
+class Settlement(ExportModelOperationsMixin("settlement"), models.Model):  # type: ignore # noqa E501
     class RankLevels(models.IntegerChoices):
         OUTPOST = 0, _("Outpost")
         HAMLET = 1, _("Hamlet")
