@@ -124,7 +124,7 @@ def update_forum_post(topic_id, title, content, wiki=False):
     huey.cache.set(FORUM_CALL_KEY, last_call, FORUM_DELAY)
 
 
-@huey.task(retries=0, retry_delay=5, priority=90)
+@huey.task(retries=5, retry_delay=5, priority=90)
 @huey.lock_task(FORUM_LOCK_KEY)
 def create_forum_post(world_id=None, wiki=False, **kwargs):
     last_call = huey.cache.get(FORUM_CALL_KEY) or 0

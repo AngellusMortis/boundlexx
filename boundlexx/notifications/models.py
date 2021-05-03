@@ -93,7 +93,6 @@ class ForumPMSubscription(ExportModelOperationsMixin("forum_pm_subcription"), Su
         world, title, raw = forum
 
         create_forum_post(
-            world_id=world.id,
             content=raw,
             title=title,
             archetype="private_message",
