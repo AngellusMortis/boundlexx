@@ -19,15 +19,14 @@ from django_prometheus.models import ExportModelOperationsMixin
 from PIL import Image
 from polymorphic.models import PolymorphicManager, PolymorphicModel
 
-from boundlexx.api.utils import get_base_url
 from boundlexx.notifications.tasks import (
     create_forum_post,
+    render_discord_messages,
     send_discord_webhook,
     set_notification_sent,
     update_forum_post,
 )
-from boundlexx.notifications.utils import get_forum_client
-from boundlexx.utils import download_image
+from boundlexx.utils import download_image, get_forum_client
 
 User = get_user_model()
 logger = logging.getLogger(__file__)
@@ -76,27 +75,30 @@ class ForumCategorySubscription(ExportModelOperationsMixin("forum_category_subcr
         world, title, raw = forum
 
         if world.forum_id is None:
-            create_forum_post.delay(
+            create_forum_post(
                 world_id=world.id,
                 content=raw,
                 category_id=self.category_id,
                 title=title,
+                wiki=True,
             )
         else:
-            update_forum_post.delay(world.forum_id, title, raw)
+            update_forum_post(world.forum_id, title, raw, wiki=True)
 
 
 class ForumPMSubscription(ExportModelOperationsMixin("forum_pm_subcription"), SubscriptionBase):  # type: ignore # noqa E501
     pm_recipents = models.TextField(null=True, blank=True)
 
     def send(self, forum, **kwargs):  # pylint: disable=arguments-differ
-        _, title, raw = forum
+        world, title, raw = forum
 
-        create_forum_post.delay(
+        create_forum_post(
+            world_id=world.id,
             content=raw,
             title=title,
             archetype="private_message",
             target_recipients=self.pm_recipents,
+            wiki=True,
         )
 
 
@@ -158,7 +160,7 @@ class DiscordWebhookSubscription(ExportModelOperationsMixin("discord_webhook_sub
 
                 data_list.append(data)
 
-        send_discord_webhook.delay(self.webhook_url, data_list, files)
+        send_discord_webhook(self.webhook_url, data_list, files)
 
 
 class NotificationBase(PolymorphicModel):
@@ -212,6 +214,9 @@ class PolymorphicNotificationManager(PolymorphicManager):
 
 
 class NewWorldNotificationManager(PolymorphicNotificationManager):
+    def set_notification_sent(self, world_id, sent):
+        set_notification_sent(world_id, sent)
+
     def send_new_notification(self, world_poll):
         world = world_poll.world
 
@@ -236,9 +241,9 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             and world.forum_id
             and world.worldblockcolor_set.count() > 0
         ):
-            set_notification_sent.delay(world.id, True)
+            self.set_notification_sent(world.id, True)
         else:
-            set_notification_sent.delay(world.id, False)
+            self.set_notification_sent(world.id, False)
 
     def send_update_notification(self, world):
         send_update = (
@@ -259,7 +264,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
 
         if world.is_sovereign:
             send_update = False
-            set_notification_sent.delay(world.id, True)
+            self.set_notification_sent(world.id, True)
 
         if send_update:
             # no sovereign/creative worlds
@@ -270,7 +275,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             elif world.is_perm:
                 HomeworldNotification.objects.send_notification(world)
 
-            set_notification_sent.delay(world.id, True)
+            self.set_notification_sent(world.id, True)
 
 
 class WorldNotification(NotificationBase):
@@ -851,33 +856,22 @@ class SovereignColorNotification(ExportModelOperationsMixin("sovereign_color_not
         return [main_embed], None
 
 
+class FailedTaskNotificationManager(PolymorphicManager):
+    def send_notification(self, task, exc=None):
+        notifications = self.filter(active=True)
+
+        messages = render_discord_messages(is_huey=exc is not None, task=task, exc=exc)
+        for notification in notifications:
+            if not isinstance(notification.subscription, DiscordWebhookSubscription):
+                raise ValueError(
+                    "Only DiscordWebhookSubscription as for this notification type"
+                )
+
+            send_discord_webhook(notification.subscription.webhook_url, messages)
+
+
 class FailedTaskNotification(ExportModelOperationsMixin("failed_task_notification"), NotificationBase):  # type: ignore # noqa E501
-    objects = PolymorphicNotificationManager()
-
-    def markdown(self, task):  # pylint: disable=arguments-differ
-        output = ""
-        if task.traceback is not None:
-            output = task.traceback.split("\n")
-
-        messages = []
-        message: list[str] = []
-        for line in output:
-            if len("\n".join(message) + line) >= 1750:
-                messages.append(message)
-                message = []
-            message.append(line)
-        messages.append(message)
-
-        return self._markdown_replace(
-            render_to_string(
-                "boundlexx/notifications/failed_task.md",
-                {
-                    "task": task,
-                    "messages": messages,
-                    "base_url": get_base_url(admin=True),
-                },
-            )
-        )
+    objects = FailedTaskNotificationManager()
 
 
 @receiver(post_save, sender=TaskResult)

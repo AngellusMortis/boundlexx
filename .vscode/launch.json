@@ -44,6 +44,30 @@
       ],
     },
     {
+      "name": "Boundlexx: Huey (No Django)",
+      "type": "python",
+      "request": "launch",
+      "module": "huey.bin.huey_consumer",
+      "console": "integratedTerminal",
+      "args": [
+        "config.huey.huey",
+        "-w",
+        "2",
+      ],
+    },
+    {
+      "name": "Boundlexx: Huey (Django)",
+      "type": "python",
+      "request": "launch",
+      "module": "manage",
+      "args": [
+        "run_huey",
+        "-A",
+        "-w",
+        "2",
+      ]
+    },
+    {
       "name": "Boundlexx: Debug Ingest",
       "type": "python",
       "request": "launch",
@@ -70,7 +94,7 @@
       "module": "manage",
       "args": [
         "force_world_notification",
-        "1226",
+        "3025",
       ]
     },
     {

@@ -22,6 +22,9 @@ git+https://github.com/AngellusMortis/django-rest-framework-msgpack.git
 python-redis-lock[django]
 
 
+# Huey
+huey
+
 # Celery
 celery<6
 django-celery-beat
@@ -46,3 +49,4 @@ pyyaml
 semver
 steam[client]
 uritemplate
+httpx[http2]

@@ -7,7 +7,7 @@ from boundlexx.api.common.filters import (
     LocalizationFilterSet,
     SkillFilterSet,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import URLSkillGroupSerializer, URLSkillSerializer
@@ -58,9 +58,8 @@ SKILL_GROUP_EXAMPLE = {
 }
 
 
-class SkillGroupViewSet(BoundlexxViewSet):
-    schema = DescriptiveAutoSchema(tags=["Skills"])
-
+class SkillGroupViewSet(BoundlexxReadOnlyViewSet):
+    schema = DescriptiveAutoSchema(tags=["skills"])
     queryset = (
         SkillGroup.objects.all()
         .select_related("display_name")
@@ -105,7 +104,7 @@ class SkillGroupViewSet(BoundlexxViewSet):
     retrieve.example = {"retrieve": {"value": SKILL_GROUP_EXAMPLE}}  # type: ignore # noqa E501
 
 
-class SkillViewSet(BoundlexxViewSet):
+class SkillViewSet(BoundlexxReadOnlyViewSet):
     queryset = (
         Skill.objects.all()
         .select_related("group", "description", "display_name")

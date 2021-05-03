@@ -8,14 +8,13 @@ from boundlexx.api.common.filters import (
     SkillFilterSet,
 )
 from boundlexx.api.common.serializers import SkillGroupSerializer, SkillSerializer
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.boundless.models import Skill, SkillGroup
 
 
-class SkillGroupViewSet(BoundlexxViewSet):
-    schema = DescriptiveAutoSchema(tags=["Skills"])
-
+class SkillGroupViewSet(BoundlexxReadOnlyViewSet):
+    schema = DescriptiveAutoSchema(tags=["skills"])
     queryset = (
         SkillGroup.objects.all()
         .select_related("display_name")
@@ -56,7 +55,7 @@ class SkillGroupViewSet(BoundlexxViewSet):
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
 
-class SkillViewSet(BoundlexxViewSet):
+class SkillViewSet(BoundlexxReadOnlyViewSet):
     queryset = (
         Skill.objects.all()
         .select_related("group", "description", "display_name")

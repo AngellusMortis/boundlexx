@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -26,8 +26,7 @@ from boundlexx.api.common.serializers import (
     SimpleItemSerializer,
     WorldColorSerializer,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
-from boundlexx.api.schemas import DescriptiveAutoSchema
+from boundlexx.api.common.viewsets import BoundlexxListViewSet, BoundlexxReadOnlyViewSet
 from boundlexx.boundless.models import (
     Item,
     ItemRequestBasketPrice,
@@ -38,9 +37,7 @@ from boundlexx.boundless.models import (
 )
 
 
-class ItemViewSet(
-    BoundlexxViewSet,
-):
+class ItemViewSet(BoundlexxReadOnlyViewSet):
     queryset = (
         Item.objects.filter(active=True)
         .select_related("item_subtitle", "list_type", "description")
@@ -221,9 +218,8 @@ class ItemViewSet(
 
 class ItemResourceCountViewSet(
     NestedViewSetMixin,
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(
         world_poll__active=True,
         world_poll__world__active=True,
@@ -311,9 +307,8 @@ class ItemResourceCountViewSet(
 
 class ItemColorsViewSet(
     NestedViewSetMixin,
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = (
         WorldBlockColor.objects.filter(world__is_creative=False)
         .select_related(
@@ -374,10 +369,7 @@ class ItemColorsViewSet(
     retrieve.operation_id = "retrieveItemColors"  # type: ignore # noqa E501
 
 
-class ItemResourceWorldListViewSet(
-    NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
-):
-    schema = DescriptiveAutoSchema(tags=["Items"])
+class ItemResourceWorldListViewSet(NestedViewSetMixin, BoundlexxListViewSet):
     serializer_class = IDWorldSerializer
 
     def get_queryset(self):

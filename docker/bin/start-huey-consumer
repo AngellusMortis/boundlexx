@@ -1,0 +1,48 @@
+#!/bin/bash
+
+set -o errexit
+set -o pipefail
+set -o nounset
+
+function script_usage() {
+    cat << EOF
+Usage:
+	-h|--help				Displays this help
+	-d|--django				Enable Django support
+EOF
+}
+
+###
+# Setup
+###
+DJANGO=0
+
+while [[ $# -gt 0 ]];
+do
+	key="$1"
+	case $key in
+		-h|--help)
+		shift
+		script_usage
+		exit 0
+		;;
+
+		-d|--django)
+		DJANGO=1
+		shift
+		;;
+
+		-*)
+		echo "Invalid parameter was provided: $key"
+		exit 2
+		;;
+	esac
+done
+
+pushd /app/ 2>/dev/null 1>&2
+if [ $DJANGO -eq 1 ]; then
+    python ./manage.py run_huey -w $HUEY_WORKER_COUNT -k thread -n
+else
+    huey_consumer config.huey.huey -w $HUEY_WORKER_COUNT -k thread -n
+fi
+popd  2>/dev/null 1>&2

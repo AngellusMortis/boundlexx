@@ -6,6 +6,8 @@ from pathlib import Path
 
 import environ
 
+from config.huey_app import huey
+
 ROOT_DIR = Path(__file__).parents[2]
 # boundlexx/)
 APPS_DIR = ROOT_DIR / "boundlexx"
@@ -119,6 +121,7 @@ DJANGO_APPS = [
     "django.forms",
 ]
 THIRD_PARTY_APPS = [
+    "huey.contrib.djhuey",
     "django_celery_beat",
     "django_celery_results",
     "rest_framework",
@@ -318,7 +321,7 @@ LOGGING = {
     "formatters": {
         "colored": {
             "()": "coloredlogs.ColoredFormatter",
-            "format": "%(levelname)s %(asctime)s %(module)s "
+            "format": "%(levelname)s %(asctime)s %(name)s %(module)s "
             "%(process)d %(thread)d %(message)s",  # noqa E501
         },
     },
@@ -338,6 +341,7 @@ LOGGING = {
         "root": {"level": "INFO", "handlers": ["console"]},
         "ingest": {"level": "INFO", "handlers": ["console"]},
         "azure": {"level": "WARNING"},
+        "huey": {"handlers": [], "propagate": False},
         "django": {"handlers": ["console"], "level": "INFO"},
         "django.server": {
             "handlers": ["django.server"],
@@ -361,6 +365,10 @@ CELERY_TASK_TRACK_STARTED = True
 CELERY_RESULT_SERIALIZER = "json"
 # http://docs.celeryproject.org/en/latest/userguide/configuration.html#beat-scheduler
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
+
+# Huey
+# ------------------------------------------------------------------------------
+HUEY = huey
 
 # Your stuff...
 # ------------------------------------------------------------------------------
@@ -580,7 +588,7 @@ BOUNDLESS_NO_SELL = [
     6157,  # gnarled grass block item
 ]
 BOUNDLESS_TESTING_FEATURES = env.bool("BOUNDLESS_TESTING_FEATURES", default=False)
-BOUNDLESS_FORUM_BASE_URL = "https://forum.playboundless.com"
+BOUNDLESS_FORUM_BASE_URL = env("BOUNDLESS_FORUM_BASE_URL")
 BOUNDLESS_FORUM_POST_USER = env("BOUNDLESS_FORUM_POST_USER")
 BOUNDLESS_FORUM_POST_KEY = env("BOUNDLESS_FORUM_POST_KEY")
 BOUNDLESS_FORUM_NAME_MAPPINGS = {
@@ -733,7 +741,6 @@ BOUNDLESS_WORLD_POLL_GROUP_ORDER = {
     "plant": [10777, 10781, 10776, 10778, 10780, 10774, 10775, 10779],
     "fungus": [10790, 10789, 10793, 10788, 10791, 10792],
 }
-BOUNDLESS_TRUSTED_UPLOAD_USERS = env.list("BOUNDLESS_TRUSTED_UPLOAD_USERS", default=[])
 
 BOUNDLESS_WORLD_POLL_COLOR_GROUPINGS = {
     9555: "",  # Gleam

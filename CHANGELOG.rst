@@ -1,3 +1,11 @@
+2021-05-03
+----------
+
+* Adds Huey to eventually replace Celery. `boundlexx.notifications` tasks
+    migrated. New tasks are (mostly) designed to run _without_ Django or DB.
+* Adds `/ingest-*` endpoints under main API with seiralizers and everything
+* Adds `/ingest/world-forum-id/` endpoint for Huey
+
 2021-05-01
 ----------
 

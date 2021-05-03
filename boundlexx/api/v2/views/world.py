@@ -20,8 +20,7 @@ from boundlexx.api.common.serializers import (
     WorldSerializer,
     WorldShopStandPriceSerializer,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
-from boundlexx.api.schemas import DescriptiveAutoSchema
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.boundless.models import (
     Beacon,
     ItemRequestBasketPrice,
@@ -34,7 +33,7 @@ from boundlexx.boundless.models import (
 logger = getLogger(__file__)
 
 
-class WorldViewSet(BoundlexxViewSet):
+class WorldViewSet(BoundlexxReadOnlyViewSet):
     queryset = World.objects.all()
     serializer_class = SimpleWorldSerializer
     detail_serializer_class = WorldSerializer
@@ -275,13 +274,12 @@ class WorldViewSet(BoundlexxViewSet):
     settlements.operation_id = "listWorldSettlements"
 
 
-class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
+class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxReadOnlyViewSet):
     queryset = (
         WorldDistance.objects.filter(world_source__active=True, world_dest__active=True)
         .select_related("world_source", "world_dest")
         .order_by("distance")
     )
-    schema = DescriptiveAutoSchema(tags=["Worlds"])
     serializer_class = WorldDistanceSerializer
     lookup_field = "world_id"
 

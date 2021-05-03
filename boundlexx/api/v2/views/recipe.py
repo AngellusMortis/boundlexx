@@ -2,14 +2,13 @@ from django_filters.rest_framework import DjangoFilterBackend
 
 from boundlexx.api.common.filters import LocalizationFilterSet, RecipeFilterSet
 from boundlexx.api.common.serializers import RecipeGroupSerializer, RecipeSerializer
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.boundless.models import Recipe, RecipeGroup
 
 
-class RecipeGroupViewSet(BoundlexxViewSet):
-    schema = DescriptiveAutoSchema(tags=["Recipes"])
-
+class RecipeGroupViewSet(BoundlexxReadOnlyViewSet):
+    schema = DescriptiveAutoSchema(tags=["recipes"])
     queryset = (
         RecipeGroup.objects.all()
         .select_related("display_name")
@@ -41,7 +40,7 @@ class RecipeGroupViewSet(BoundlexxViewSet):
         return super().retrieve(request, *args, **kwargs)  # pylint: disable=no-member
 
 
-class RecipeViewSet(BoundlexxViewSet):
+class RecipeViewSet(BoundlexxReadOnlyViewSet):
     queryset = (
         Recipe.objects.all()
         .select_related("output")

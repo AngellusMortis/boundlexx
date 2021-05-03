@@ -5,7 +5,7 @@ from rest_framework import filters
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, EmojiFilterSet
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import URLEmojiSerializer
 from boundlexx.boundless.models import Emoji
@@ -17,7 +17,7 @@ EMOJI_EXAMPLE = {
 }
 
 
-class EmojiViewSet(BoundlexxViewSet):
+class EmojiViewSet(BoundlexxReadOnlyViewSet):
     queryset = Emoji.objects.filter(active=True).prefetch_related("emojialtname_set")
     serializer_class = URLEmojiSerializer
     lookup_field = "name"

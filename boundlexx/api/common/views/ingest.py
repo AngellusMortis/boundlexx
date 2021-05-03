@@ -2,11 +2,19 @@ import json
 import logging
 import traceback
 
-from rest_framework import views
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.throttling import UserRateThrottle
 
+from boundlexx.api.common.serializers import (
+    WebsocketResponseSerializer,
+    WebsocketSerializer,
+    WorldControlSerializer,
+    WorldControlSimpleSerializer,
+    WorldForumIDSerializer,
+)
+from boundlexx.api.common.viewsets import BoundlexxGenericViewSet
+from boundlexx.api.permissions import IsWorldTrusted
 from boundlexx.boundless.game import BoundlessClient
 from boundlexx.boundless.models import World, WorldBlockColor, WorldCreatureColor
 from boundlexx.boundless.tasks import add_world_control_data, recalculate_colors
@@ -15,8 +23,16 @@ from boundlexx.notifications.models import ExoworldNotification
 logger = logging.getLogger("ingest")
 
 
-class WorldWSDataView(views.APIView):
+class WorldWSDataView(BoundlexxGenericViewSet):
+    """
+    Accepts World config object from the Boundless game Websocket.
+
+    Requires API Key.
+    """
+
     permission_classes = [IsAuthenticated]
+    serializer_class = WebsocketSerializer
+    response_serializer_class = WebsocketResponseSerializer
 
     def _get_data(self, request):
         world_id = None
@@ -28,10 +44,6 @@ class WorldWSDataView(views.APIView):
             # world data
             if "world_id" in request.data:
                 world_id = int(request.data["world_id"])
-            elif "display_name" in request.data:
-                display_name = request.data["display_name"]
-            else:
-                display_name = request.data.get("config", {}).get("displayName")
 
             # walk block/creature data just to make sure it is valid
             for key, value in request.data["config"]["world"]["blockColors"].items():
@@ -112,16 +124,25 @@ class WorldWSDataView(views.APIView):
                 ExoworldNotification.objects.send_update_notification(world)
 
         return Response(
-            status=200,
+            status=201,
             data={
                 "blocks": block_colors_created,
                 "creatures": creature_colors_created,
             },
         )
 
+    post.operation_id = "ingestWebsocketData"  # type: ignore # noqa E501
 
-class WorldControlSimpleDataView(views.APIView):
-    permission_classes = [IsAuthenticated]
+
+class WorldControlSimpleDataView(BoundlexxGenericViewSet):
+    """
+    Accepts World data from the World Control.
+
+    Requires API Key. Requires special permission to use.
+    """
+
+    permission_classes = [IsAuthenticated, IsWorldTrusted]
+    serializer_class = WorldControlSimpleSerializer
 
     def _get_data(self, request):
         world_id = None
@@ -195,12 +216,21 @@ class WorldControlSimpleDataView(views.APIView):
         response, _ = self.process_data(request)
 
         if response is None:
-            response = Response(status=200)
+            response = Response(status=201)
         return response
+
+    post.operation_id = "ingestWorldControlDataSimple"  # type: ignore # noqa E501
 
 
 class WorldControlDataView(WorldControlSimpleDataView):
+    """
+    Accepts World data from the World Control.
+
+    Requires API Key. Requires special permission to use.
+    """
+
     throttle_classes = [UserRateThrottle]
+    serializer_class = WorldControlSerializer
 
     def post(self, request, *args, **kwargs):
         response, world = self.process_data(request)
@@ -226,4 +256,30 @@ class WorldControlDataView(WorldControlSimpleDataView):
             return Response(status=400)
 
         add_world_control_data.delay(world.id, color_data, request.user.id)
-        return Response(status=200)
+        return Response(status=202)
+
+    post.requires_processing = True  # type: ignore
+    post.operation_id = "ingestWorldControlData"  # type: ignore # noqa E501
+
+
+class WorldForumIDView(BoundlexxGenericViewSet):
+    """
+    Allows setting forum ID for a given world
+
+    Requires API Key. Requires special permission to use.
+    """
+
+    permission_classes = [IsAuthenticated, IsWorldTrusted]
+    serializer_class = WorldForumIDSerializer
+
+    def post(self, request, *args, **kwargs):
+        post = self.serializer_class(data=request.data)
+
+        if not post.is_valid() or post.world is None:
+            return Response(post.errors, status=400)
+
+        post.world.forum_id = post.data["forum_id"]
+        post.world.save()
+        return Response(status=201)
+
+    post.operation_id = "ingestWorldForumID"  # type: ignore # noqa E501

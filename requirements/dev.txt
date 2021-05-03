@@ -65,6 +65,7 @@ celery==5.0.5
     #   django-celery-results
 certifi==2020.12.5
     # via
+    #   httpx
     #   msrest
     #   requests
 cffi==1.14.5
@@ -224,10 +225,26 @@ greenlet==1.0.0
     # via gevent
 groundwork-sphinx-theme==1.1.1
     # via -r /app/requirements/in/dev.in
+h11==0.12.0
+    # via httpcore
+h2==3.2.0
+    # via httpx
+hpack==3.0.0
+    # via h2
+httpcore==0.13.2
+    # via httpx
+httpx[http2]==0.18.1
+    # via -r /app/requirements/in/base.in
+huey==2.3.2
+    # via -r /app/requirements/in/base.in
 humanfriendly==9.1
     # via coloredlogs
+hyperframe==5.2.0
+    # via h2
 idna==2.10
-    # via requests
+    # via
+    #   requests
+    #   rfc3986
 imagesize==1.2.0
     # via sphinx
 iniconfig==1.1.1
@@ -435,6 +452,8 @@ requests==2.25.1
     #   requests-oauthlib
     #   sphinx
     #   steam
+rfc3986[idna2008]==1.4.0
+    # via httpx
 semver==2.13.0
     # via -r /app/requirements/in/base.in
 six==1.15.0
@@ -454,6 +473,10 @@ six==1.15.0
     #   steam
 smmap==4.0.0
     # via gitdb
+sniffio==1.2.0
+    # via
+    #   httpcore
+    #   httpx
 snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.2.1
@@ -504,7 +527,7 @@ traitlets==5.0.5
     #   matplotlib-inline
 typed-ast==1.4.3
     # via mypy
-typing-extensions==3.7.4.3
+typing-extensions==3.10.0.0
     # via
     #   django-stubs
     #   mypy

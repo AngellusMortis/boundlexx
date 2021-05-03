@@ -16,12 +16,12 @@ from boundlexx.api.common.serializers import (
     ColorSerializer,
     PossibleItemWBCSerializer,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.boundless.models import Color, WorldBlockColor
 
 
-class ColorViewSet(BoundlexxViewSet):
+class ColorViewSet(BoundlexxReadOnlyViewSet):
     queryset = Color.objects.filter(active=True).prefetch_related(
         "localizedname_set", "colorvalue_set"
     )
@@ -99,7 +99,7 @@ class ColorViewSet(BoundlexxViewSet):
 
 class BlockColorViewSet(
     NestedViewSetMixin,
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
     schema = DescriptiveAutoSchema()
     queryset = (

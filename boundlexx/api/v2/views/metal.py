@@ -4,7 +4,7 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, LocalizationFilterSet
 from boundlexx.api.common.serializers import MetalSerializer
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.utils import get_list_example
 from boundlexx.boundless.models import Metal
 
@@ -20,7 +20,7 @@ METAL_EXAMPLE = {
 }
 
 
-class MetalViewSet(BoundlexxViewSet):
+class MetalViewSet(BoundlexxReadOnlyViewSet):
     queryset = Metal.objects.filter(active=True).prefetch_related("localizedname_set")
     serializer_class = MetalSerializer
     lookup_field = "game_id"

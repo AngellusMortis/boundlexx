@@ -1,18 +1,14 @@
 from typing import Any
 from urllib.parse import urlencode
 
-from django.http import HttpResponse
-from django.shortcuts import render
-from django.views.generic import FormView
 from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 
 from boundlexx.api.common.serializers import (
     ForumFormatPostSerialzier,
     ForumFormatSerialzier,
 )
-from boundlexx.api.forms import ForumFormatForm
+from boundlexx.api.common.viewsets import BoundlexxGenericViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.notifications.models import WorldNotification
 
@@ -33,12 +29,17 @@ def get_response(world, extra):
     return title, body
 
 
-class ForumFormatAPIView(GenericViewSet):
-    schema = DescriptiveAutoSchema(tags=["Misc."])
+class ForumFormatAPIView(BoundlexxGenericViewSet):
+    """
+    Generates a Discourse markdown template ready to be posted on the
+    Boundless forums for a world.
+    """
+
+    schema = DescriptiveAutoSchema(tags=["misc"])
 
     permission_classes = [AllowAny]
     serializer_class = ForumFormatPostSerialzier
-    response_serializer = ForumFormatSerialzier
+    response_serializer_class = ForumFormatSerialzier
     authentication_classes: list[Any] = []
 
     def post(self, request):
@@ -101,32 +102,3 @@ class ForumFormatAPIView(GenericViewSet):
         return Response(post.errors, status=400)
 
     post.operation_id = "createForumTemplate"  # type: ignore # noqa E501
-
-
-class ForumFormatView(FormView):
-    template_name = "boundlexx/forum_format.html"
-    form_class = ForumFormatForm
-
-    def form_valid(self, form):
-        world = form.cleaned_data["world"]
-        extra = {
-            "perms": {
-                "can_visit": form.cleaned_data["can_visit"],
-                "can_edit": form.cleaned_data["can_edit"],
-                "can_claim": form.cleaned_data["can_claim"],
-            },
-            "compactness": form.cleaned_data["compactness"],
-            "directions": form.cleaned_data["portal_directions"],
-            "username": form.cleaned_data["username"],
-            "will_renew": form.cleaned_data["will_renew"],
-        }
-
-        title, body = get_response(world, extra)
-
-        return HttpResponse(
-            render(
-                self.request,
-                "boundlexx/forum_output.html",
-                context={"title": title, "body": body},
-            ),
-        )

@@ -5,11 +5,13 @@ from boundlexx.api.common.serializers import (
     GameFileSerializer,
     SimpleGameFileSerializer,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
+from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.ingest.models import GameFile
 
 
-class GameFileViewSet(BoundlexxViewSet):
+class GameFileViewSet(BoundlexxReadOnlyViewSet):
+    schema = DescriptiveAutoSchema(tags=["game"])
     permission_classes = [IsAuthenticated]
 
     queryset = (

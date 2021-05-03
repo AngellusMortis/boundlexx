@@ -12,9 +12,8 @@ from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import DedupedFilter, WorldFilterSet
 from boundlexx.api.common.serializers import BeaconSerializer, SettlementSerializer
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.examples import world as examples
-from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_list_example
 from boundlexx.api.v1.serializers import (
     KindOfSimpleWorldSerializer,
@@ -38,7 +37,7 @@ BlockColorResponse = namedtuple("BlockColorResponse", ("id", "block_colors"))
 logger = getLogger(__file__)
 
 
-class WorldViewSet(BoundlexxViewSet):
+class WorldViewSet(BoundlexxReadOnlyViewSet):
     queryset = World.objects.all()
     serializer_class = KindOfSimpleWorldSerializer
     detail_serializer_class = URLWorldSerializer
@@ -308,13 +307,12 @@ class WorldViewSet(BoundlexxViewSet):
     settlements.operation_id = "listWorldSettlements"
 
 
-class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxViewSet):
+class WorldDistanceViewSet(NestedViewSetMixin, BoundlexxReadOnlyViewSet):
     queryset = (
         WorldDistance.objects.filter(world_source__active=True, world_dest__active=True)
         .select_related("world_source", "world_dest")
         .order_by("distance")
     )
-    schema = DescriptiveAutoSchema(tags=["Worlds"])
     serializer_class = URLWorldDistanceSerializer
     lookup_field = "world_id"
 

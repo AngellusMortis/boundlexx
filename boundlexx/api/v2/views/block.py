@@ -1,11 +1,9 @@
 from boundlexx.api.common.serializers import BlockSerializer
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.boundless.models import Block
 
 
-class BlockViewSet(
-    BoundlexxViewSet,
-):
+class BlockViewSet(BoundlexxReadOnlyViewSet):
     queryset = (
         Block.objects.filter(block_item__isnull=False)
         .select_related("block_item")

@@ -9,7 +9,7 @@ from boundlexx.api.common.serializers import (
     ItemResourceCountTimeSeriesTBSerializer,
     WorldPollTBSerializer,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.examples import world as wexamples
 from boundlexx.api.schemas import DescriptiveAutoSchema
 from boundlexx.api.utils import get_base_url, get_list_example
@@ -35,9 +35,9 @@ ITEM_RESOURCE_TIMESERIES_EXAMPLE = {
 
 
 class ItemResourceTimeseriesViewSet(
-    TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet
+    TimeseriesMixin, NestedViewSetMixin, BoundlexxReadOnlyViewSet
 ):
-    schema = DescriptiveAutoSchema(tags=["Items", "Timeseries"])
+    schema = DescriptiveAutoSchema(tags=["items", "timeseries"])
     queryset = ResourceCount.objects.filter(
         world_poll__world__active=True,
         world_poll__world__is_creative=False,
@@ -85,8 +85,8 @@ class ItemResourceTimeseriesViewSet(
     retrieve.operation_id = "retrieveItemResourceTimeseries"  # type: ignore # noqa E501
 
 
-class WorldPollViewSet(TimeseriesMixin, NestedViewSetMixin, BoundlexxViewSet):
-    schema = DescriptiveAutoSchema(tags=["Worlds", "Timeseries"])
+class WorldPollViewSet(TimeseriesMixin, NestedViewSetMixin, BoundlexxReadOnlyViewSet):
+    schema = DescriptiveAutoSchema(tags=["worlds", "timeseries"])
     queryset = (
         WorldPoll.objects.all()
         .select_related("world")

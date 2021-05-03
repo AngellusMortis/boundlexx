@@ -76,6 +76,8 @@ disable = [
   'useless-super-delegation',
   'duplicate-code',
   'import-outside-toplevel',
+  'ungrouped-imports',
+  'too-many-ancestors',
 ]
 
 [tool.pylint.design]

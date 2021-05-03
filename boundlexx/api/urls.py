@@ -11,7 +11,10 @@ urlpatterns = [
     path("", RedirectView.as_view(url="/api/v1/"), name="go-to-default-api"),
     path("v1/", include((apiv1.urls, "api"), namespace="v1")),
     path("v2/", include((apiv2.urls, "api"), namespace="v2")),
-    path("ingest-ws-data/", views.WorldWSDataView.as_view()),
-    path("ingest-wcsimple-data/", views.WorldControlSimpleDataView.as_view()),
-    path("ingest-wc-data/", views.WorldControlDataView.as_view()),
+    path("ingest-ws-data/", views.WorldWSDataView.as_view({"post": "post"})),
+    path(
+        "ingest-wcsimple-data/",
+        views.WorldControlSimpleDataView.as_view({"post": "post"}),
+    ),
+    path("ingest-wc-data/", views.WorldControlDataView.as_view({"post": "post"})),
 ]

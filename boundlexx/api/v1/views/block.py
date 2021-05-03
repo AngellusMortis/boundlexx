@@ -1,10 +1,10 @@
-from boundlexx.api.common.viewsets import BoundlexxViewSet
+from boundlexx.api.common.viewsets import BoundlexxReadOnlyViewSet
 from boundlexx.api.v1.serializers import URLBlockSerializer
 from boundlexx.boundless.models import Block
 
 
 class BlockViewSet(
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
     queryset = (
         Block.objects.filter(block_item__isnull=False)

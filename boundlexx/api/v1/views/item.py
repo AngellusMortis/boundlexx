@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import Http404
 from django.shortcuts import get_object_or_404
 from django_filters.rest_framework import DjangoFilterBackend
-from rest_framework import filters, mixins, viewsets
+from rest_framework import filters
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework_extensions.mixins import NestedViewSetMixin
@@ -15,8 +15,7 @@ from boundlexx.api.common.filters import (
     ItemFilterSet,
     ItemResourceCountFilterSet,
 )
-from boundlexx.api.common.viewsets import BoundlexxViewSet
-from boundlexx.api.schemas import DescriptiveAutoSchema
+from boundlexx.api.common.viewsets import BoundlexxListViewSet, BoundlexxReadOnlyViewSet
 from boundlexx.api.utils import get_base_url, get_list_example
 from boundlexx.api.v1.serializers import (
     PossibleColorSerializer,
@@ -122,7 +121,7 @@ ITEM_SOVEREIGN_COLORS_EXAMPLE = {
 
 
 class ItemViewSet(
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
     queryset = (
         Item.objects.filter(active=True)
@@ -302,10 +301,7 @@ class ItemViewSet(
     sovereign_colors.operation_id = "listItemSovereignColors"  # noqa E501
 
 
-class ItemResourceWorldListViewSet(
-    NestedViewSetMixin, mixins.ListModelMixin, viewsets.GenericViewSet
-):
-    schema = DescriptiveAutoSchema(tags=["Items"])
+class ItemResourceWorldListViewSet(NestedViewSetMixin, BoundlexxListViewSet):
     serializer_class = URLSimpleWorldSerializer
 
     def get_queryset(self):
@@ -339,9 +335,8 @@ class ItemResourceWorldListViewSet(
 
 class ItemResourceCountViewSet(
     NestedViewSetMixin,
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = ResourceCount.objects.filter(
         world_poll__active=True,
         world_poll__world__active=True,
@@ -431,9 +426,8 @@ class ItemResourceCountViewSet(
 
 class ItemColorsViewSet(
     NestedViewSetMixin,
-    BoundlexxViewSet,
+    BoundlexxReadOnlyViewSet,
 ):
-    schema = DescriptiveAutoSchema(tags=["Items"])
     queryset = (
         WorldBlockColor.objects.filter(
             world__is_creative=False,

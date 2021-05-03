@@ -1,6 +1,8 @@
 import re
+import warnings
 
 from django.conf import settings
+from rest_framework.exceptions import APIException
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
 
@@ -12,6 +14,39 @@ class DescriptiveAutoSchema(AutoSchema):
             tags[index] = tag.title()
 
         return tags
+
+    def get_response_serializer(self, path, method):
+        view = self.view
+
+        if not hasattr(view, "get_response_serializer"):
+            return self.get_serializer(path, method)
+
+        try:
+            return view.get_response_serializer()
+        except APIException:
+            warnings.warn(
+                "{}.get_response_serializer() raised an exception during "
+                "schema generation. Serializer fields will not be "
+                "generated for {} {}.".format(view.__class__.__name__, method, path)
+            )
+        return None
+
+    def get_responses(self, path, method):
+        responses = super().get_responses(path, method)
+
+        if not hasattr(self.view, "action"):
+            return responses
+        action = getattr(self.view, self.view.action)
+
+        if hasattr(action, "example"):
+            responses[list(responses.keys())[0]]["content"]["application/json"][
+                "examples"
+            ] = action.example
+
+        if hasattr(action, "requires_processing") and action.requires_processing:
+            responses = {"202": list(responses.values())[0]}
+
+        return responses
 
     def get_operation(self, path, method):
         operation = super().get_operation(path, method)
@@ -34,11 +69,6 @@ class DescriptiveAutoSchema(AutoSchema):
 
         operation["summary"] = summary
         operation["operationId"] = operation_id
-
-        if hasattr(action, "example"):
-            operation["responses"]["200"]["content"]["application/json"][
-                "examples"
-            ] = action.example
 
         if hasattr(action, "deprecated"):
             operation["deprecated"] = action.deprecated

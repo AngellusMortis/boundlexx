@@ -25,10 +25,7 @@ from boundlexx.boundless.utils import (
     get_next_rank_update,
     html_name,
 )
-from boundlexx.notifications.models import (
-    ExoworldNotification,
-    SovereignColorNotification,
-)
+from boundlexx.notifications import send_color_update_notification, send_exo_notifcation
 from boundlexx.utils import make_thumbnail
 from boundlexx.utils.models import ModelDiffMixin
 from config.storages import select_storage
@@ -238,7 +235,7 @@ class WorldManager(models.Manager):
             world.refresh_from_db()
 
         if new_data and world.owner is None:
-            ExoworldNotification.objects.send_update_notification(world)
+            send_exo_notifcation(world, is_update=True)
 
         return world, created
 
@@ -292,6 +289,7 @@ class World(  # pylint: disable=too-many-public-methods
 
         permissions = [
             ("can_view_private", "Can view private worlds?"),
+            ("is_trusted_user", "Is trusted editor of world data?"),
         ]
 
     name = models.CharField(_("Name"), max_length=64, null=True, db_index=True)
@@ -831,10 +829,7 @@ class WorldBlockColorManager(models.Manager):
             create = True
         elif wbc.color != color:
             if default:
-                if (
-                    user is None
-                    or user.username in settings.BOUNDLESS_TRUSTED_UPLOAD_USERS
-                ):
+                if user is None or user.has_perm("boundless.is_trusted_user"):
                     wbc.color = color
                 updated = True
             else:
@@ -957,7 +952,7 @@ class WorldBlockColorManager(models.Manager):
 
             if len(new_color_ids) > 0:
                 new_color_ids_list = list(new_color_ids)
-                SovereignColorNotification.objects.send_notification(
+                send_color_update_notification(
                     item,
                     Color.objects.filter(game_id__in=new_color_ids_list),
                     new_color_ids_list,
@@ -1257,7 +1252,7 @@ class WorldPollManager(models.Manager):
             and not world.notification_sent
             and (new_world or world.is_sovereign)
         ):
-            ExoworldNotification.objects.send_new_notification(world_poll)
+            send_exo_notifcation(world_poll)
 
         return world_poll
 

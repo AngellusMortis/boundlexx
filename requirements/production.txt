@@ -46,6 +46,7 @@ celery==5.0.5
     #   django-celery-results
 certifi==2020.12.5
     # via
+    #   httpx
     #   msrest
     #   requests
 cffi==1.14.5
@@ -154,10 +155,26 @@ gevent==21.1.2
     #   steam
 greenlet==1.0.0
     # via gevent
+h11==0.12.0
+    # via httpcore
+h2==3.2.0
+    # via httpx
+hpack==3.0.0
+    # via h2
+httpcore==0.13.2
+    # via httpx
+httpx[http2]==0.18.1
+    # via -r /app/requirements/in/base.in
+huey==2.3.2
+    # via -r /app/requirements/in/base.in
 humanfriendly==9.1
     # via coloredlogs
+hyperframe==5.2.0
+    # via h2
 idna==2.10
-    # via requests
+    # via
+    #   requests
+    #   rfc3986
 ipython-genutils==0.2.0
     # via traitlets
 ipython==7.23.0
@@ -258,6 +275,8 @@ requests==2.25.1
     #   pydiscourse
     #   requests-oauthlib
     #   steam
+rfc3986[idna2008]==1.4.0
+    # via httpx
 semver==2.13.0
     # via -r /app/requirements/in/base.in
 six==1.15.0
@@ -270,6 +289,10 @@ six==1.15.0
     #   protobuf
     #   python-dateutil
     #   steam
+sniffio==1.2.0
+    # via
+    #   httpcore
+    #   httpx
 soupsieve==2.2.1
     # via beautifulsoup4
 sqlparse==0.4.1

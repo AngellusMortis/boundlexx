@@ -80,3 +80,15 @@ services:
       - redis
       - postgres
     command: start-celerybeat
+
+  huey-consumer:
+    <<: *django
+    depends_on:
+      - redis
+    command: start-huey-consumer
+
+  huey-scheduler:
+    <<: *django
+    depends_on:
+      - redis
+    command: start-huey-scheduler

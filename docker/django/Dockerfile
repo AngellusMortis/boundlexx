@@ -6,6 +6,7 @@ ARG DJANGO_UID=1000
 ENV PYTHONUNBUFFERED 1
 ENV PYTEST ""
 ENV DJANGO_MANAGE ""
+ENV HUEY_WORKER_COUNT 2
 
 RUN addgroup --system --gid ${DJANGO_UID} django \
   && adduser --system --shell /bin/bash --uid ${DJANGO_UID} --ingroup django django
@@ -20,7 +21,7 @@ RUN apt-get update \
 
 COPY ./requirements /requirements
 COPY ./docker/bin/* /usr/local/bin/
-RUN chmod +x /usr/local/bin/steam-auth-ticket /usr/local/bin/convert-atlas /usr/local/bin/lint-code /usr/local/bin/format-code /usr/local/bin/entrypoint /usr/local/bin/start-celerybeat /usr/local/bin/start-celeryworker
+RUN chmod +x /usr/local/bin/steam-auth-ticket /usr/local/bin/convert-atlas /usr/local/bin/lint-code /usr/local/bin/format-code /usr/local/bin/entrypoint /usr/local/bin/start-celerybeat /usr/local/bin/start-celeryworker /usr/local/bin/start-huey-consumer /usr/local/bin/start-huey-scheduler
 RUN mkdir -p /app/.steam
 RUN chown -R django:django /app
 

@@ -1,3 +1,5 @@
+from typing import Optional
+
 from rest_framework import serializers
 
 from boundlexx.api.models import ExportedFile
@@ -5,7 +7,10 @@ from boundlexx.boundless.models import (
     LocalizedName,
     LocalizedString,
     LocalizedStringText,
+    World,
 )
+
+BASE_QUERY = World.objects.all().select_related("assignment")
 
 
 class NullSerializer(serializers.Serializer):
@@ -14,6 +19,35 @@ class NullSerializer(serializers.Serializer):
 
     def update(self, instance, validated_data):
         return
+
+
+class WorldIDPostSerializer(NullSerializer):
+    world_id = serializers.IntegerField(
+        required=True,
+        help_text=(
+            "World ID of given world. You can get "
+            'your World ID from the <a href="https://forum.playboundless.com/'
+            "uploads/default/original/3X/3/f/3fef2e21cedc3d4594971d6143d40110bd489686"
+            '.jpeg" target="_blank">Debug Menu</a> if you are on PC'
+        ),
+        label="World ID",
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.world: Optional[World] = None
+
+    def validate_world_id(self, value):
+        try:
+            world = BASE_QUERY.get(pk=value)
+        except World.DoesNotExist:
+            raise serializers.ValidationError(  # pylint: disable=raise-missing-from
+                "Could not find a world with that ID"
+            )
+        else:
+            self.world = world
+
+        return value
 
 
 class AzureImageField(serializers.ImageField):

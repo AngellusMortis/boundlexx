@@ -1,10 +1,14 @@
 from io import BytesIO
 from tempfile import NamedTemporaryFile
 
+import environ
 import requests
 from django.conf import settings
 from django.core.files.base import ContentFile
 from PIL import Image
+from pydiscourse import DiscourseClient
+
+env = environ.Env()
 
 
 def show_toolbar(request):
@@ -66,3 +70,11 @@ def get_django_image(image, name):
 
 def get_django_image_from_file(image_path, name):
     return get_django_image(Image.open(image_path), name)
+
+
+def get_forum_client():
+    return DiscourseClient(
+        env("BOUNDLESS_FORUM_BASE_URL"),
+        api_username=env("BOUNDLESS_FORUM_POST_USER"),
+        api_key=env("BOUNDLESS_FORUM_POST_KEY"),
+    )
