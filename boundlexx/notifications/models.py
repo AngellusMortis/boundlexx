@@ -90,7 +90,7 @@ class ForumPMSubscription(ExportModelOperationsMixin("forum_pm_subcription"), Su
     pm_recipents = models.TextField(null=True, blank=True)
 
     def send(self, forum, **kwargs):  # pylint: disable=arguments-differ
-        world, title, raw = forum
+        _, title, raw = forum
 
         create_forum_post(
             content=raw,
