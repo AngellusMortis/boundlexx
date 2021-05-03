@@ -69,6 +69,7 @@ class Huey(PriorityRedisHuey):
     def create_consumer(self, **options):
         self._check_for_django()
 
+        logger.info("Connection pool: %s", self.storage.pool)
         if self.has_django:
             logger.info("Initialized WITH Django support")
         else:
