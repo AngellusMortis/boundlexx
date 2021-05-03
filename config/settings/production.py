@@ -84,8 +84,12 @@ LOGGING = {
     "formatters": {
         "colored": {
             "()": "coloredlogs.ColoredFormatter",
-            "format": "%(levelname)s %(asctime)s %(module)s "
+            "format": "%(levelname)s %(asctime)s %(name)s %(module)s "
             "%(process)d %(thread)d %(message)s",  # noqa E501
+        },
+        "huey_colored": {
+            "()": "coloredlogs.ColoredFormatter",
+            "format": "%(levelname)s %(asctime)s %(name)s %(threadName)s %(message)s",
         },
     },
     "handlers": {
@@ -93,6 +97,11 @@ LOGGING = {
             "level": "INFO",
             "class": "logging.StreamHandler",
             "formatter": "colored",
+        },
+        "huey": {
+            "level": "INFO",
+            "class": "logging.StreamHandler",
+            "formatter": "huey_colored",
         },
         "django.server": {
             "level": "INFO",
@@ -104,6 +113,7 @@ LOGGING = {
         "root": {"level": "INFO", "handlers": ["console"]},
         "ingest": {"level": "INFO", "handlers": ["console"]},
         "azure": {"level": "WARNING"},
+        "huey": {"handlers": ["huey"], "propagate": False},
         "django": {"handlers": ["console"], "level": "INFO"},
         "django.request": {
             "handlers": ["console"],
