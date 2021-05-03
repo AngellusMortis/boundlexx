@@ -1,5 +1,6 @@
 import traceback
 
+import environ
 from huey.api import Task
 from huey.signals import SIGNAL_ERROR
 
@@ -34,8 +35,10 @@ __all__ = [
     "update_forum_post",
 ]
 
+env = environ.Env()
 FAILED_TASK_TEMPLATE = """A task failed!
 
+Env: `{base_url}`
 Task Name: `{name}` ({type})
 Task ID: `{id}`
 Output:
@@ -47,13 +50,21 @@ Output:
 
 def huey_template(task: Task, lines: list[str]):
     return FAILED_TASK_TEMPLATE.format(
-        name=task.name, id=task.id, output="".join(lines), type="Huey"
+        base_url=env("HUEY_BOUNDLEXX_API_URL_BASE"),
+        name=task.name,
+        id=task.id,
+        output="".join(lines),
+        type="Huey",
     )
 
 
 def celery_template(task, lines: list[str]):
     return FAILED_TASK_TEMPLATE.format(
-        name=task.task_name, id=task.task_id, output="".join(lines), type="Celery"
+        base_url=env("HUEY_BOUNDLEXX_API_URL_BASE"),
+        name=task.task_name,
+        id=task.task_id,
+        output="".join(lines),
+        type="Celery",
     )
 
 
