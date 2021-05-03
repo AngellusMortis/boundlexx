@@ -12,8 +12,8 @@ from boundlexx.api.common.serializers.block import BlockSerializer
 from boundlexx.api.common.serializers.color import ColorSerializer
 from boundlexx.api.common.serializers.emoji import EmojiSerializer
 from boundlexx.api.common.serializers.forum import (
-    ForumFormatPostSerialzier,
-    ForumFormatSerialzier,
+    ForumFormatPostSerializer,
+    ForumFormatSerializer,
 )
 from boundlexx.api.common.serializers.gamefile import (
     GameFileSerializer,
@@ -90,8 +90,8 @@ __all__ = [
     "ColorSerializer",
     "EmojiSerializer",
     "ExportedFileSerializer",
-    "ForumFormatPostSerialzier",
-    "ForumFormatSerialzier",
+    "ForumFormatPostSerializer",
+    "ForumFormatSerializer",
     "GameFileSerializer",
     "IDItemSerializer",
     "IDRecipeGroupSerializer",

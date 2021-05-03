@@ -3,7 +3,7 @@ from rest_framework import serializers
 from boundlexx.api.common.serializers.base import NullSerializer, WorldIDPostSerializer
 
 
-class ForumFormatPostSerialzier(WorldIDPostSerializer):
+class ForumFormatPostSerializer(WorldIDPostSerializer):
     username = serializers.CharField(
         required=False,
         help_text="Your Boundless Username. Required for Sovereign worlds.",
@@ -85,6 +85,6 @@ class ForumFormatPostSerialzier(WorldIDPostSerializer):
         return attrs
 
 
-class ForumFormatSerialzier(NullSerializer):
+class ForumFormatSerializer(NullSerializer):
     title = serializers.CharField(read_only=True)
     body = serializers.CharField(read_only=True)

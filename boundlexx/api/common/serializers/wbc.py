@@ -7,7 +7,7 @@ from boundlexx.api.common.serializers.world import IDWorldSerializer
 from boundlexx.boundless.models import WorldBlockColor
 
 
-class BaseWBCSerialzier(serializers.ModelSerializer):
+class BaseWBCSerializer(serializers.ModelSerializer):
     color = IDColorSerializer()
     item = IDItemSerializer()
     world = IDWorldSerializer()
@@ -68,7 +68,7 @@ class BaseWBCSerialzier(serializers.ModelSerializer):
     )
 
 
-class PossibleWBCSerializer(BaseWBCSerialzier):
+class PossibleWBCSerializer(BaseWBCSerializer):
     class Meta:
         model = WorldBlockColor
         fields = [
@@ -76,7 +76,7 @@ class PossibleWBCSerializer(BaseWBCSerialzier):
         ]
 
 
-class PossibleItemWBCSerializer(BaseWBCSerialzier):
+class PossibleItemWBCSerializer(BaseWBCSerializer):
     class Meta:
         model = WorldBlockColor
         fields = [
@@ -84,7 +84,7 @@ class PossibleItemWBCSerializer(BaseWBCSerialzier):
         ]
 
 
-class WorldBlockColorSerializer(BaseWBCSerialzier):
+class WorldBlockColorSerializer(BaseWBCSerializer):
     class Meta:
         model = WorldBlockColor
         fields = [
@@ -107,7 +107,7 @@ class WorldBlockColorSerializer(BaseWBCSerialzier):
         ]
 
 
-class BlockColorSerializer(BaseWBCSerialzier):
+class BlockColorSerializer(BaseWBCSerializer):
     class Meta:
         model = WorldBlockColor
         fields = [
@@ -130,7 +130,7 @@ class BlockColorSerializer(BaseWBCSerialzier):
         ]
 
 
-class ItemColorSerializer(BaseWBCSerialzier):
+class ItemColorSerializer(BaseWBCSerializer):
     class Meta:
         model = WorldBlockColor
         fields = [
@@ -152,7 +152,7 @@ class ItemColorSerializer(BaseWBCSerialzier):
         ]
 
 
-class WorldColorSerializer(BaseWBCSerialzier):
+class WorldColorSerializer(BaseWBCSerializer):
     class Meta:
         model = WorldBlockColor
         fields = [

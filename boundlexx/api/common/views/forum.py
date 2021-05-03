@@ -5,8 +5,8 @@ from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
 
 from boundlexx.api.common.serializers import (
-    ForumFormatPostSerialzier,
-    ForumFormatSerialzier,
+    ForumFormatPostSerializer,
+    ForumFormatSerializer,
 )
 from boundlexx.api.common.viewsets import BoundlexxGenericViewSet
 from boundlexx.api.schemas import DescriptiveAutoSchema
@@ -38,8 +38,8 @@ class ForumFormatAPIView(BoundlexxGenericViewSet):
     schema = DescriptiveAutoSchema(tags=["misc"])
 
     permission_classes = [AllowAny]
-    serializer_class = ForumFormatPostSerialzier
-    response_serializer_class = ForumFormatSerialzier
+    serializer_class = ForumFormatPostSerializer
+    response_serializer_class = ForumFormatSerializer
     authentication_classes: list[Any] = []
 
     def post(self, request):
