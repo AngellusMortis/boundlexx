@@ -51,6 +51,7 @@
       "console": "integratedTerminal",
       "args": [
         "config.huey.huey",
+        "-f",
         "-w",
         "2",
       ],
@@ -62,6 +63,7 @@
       "module": "manage",
       "args": [
         "run_huey",
+        "-f",
         "-A",
         "-w",
         "2",

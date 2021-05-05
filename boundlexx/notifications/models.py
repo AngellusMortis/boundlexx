@@ -619,8 +619,6 @@ class WorldNotification(NotificationBase):
         )
 
     def _main_embed(self, world, is_update=False):
-        files: Optional[dict[str, str]] = None
-
         main_embed: dict[str, Any] = {
             "fields": [
                 {
@@ -657,9 +655,9 @@ class WorldNotification(NotificationBase):
             main_embed["url"] = world.forum_url
 
         if world.image.name:
-            main_embed["thumbnail"] = {"url": f"attachment://{world.image.name}"}
-
-            files = {world.image.name: world.image.url}
+            main_embed["thumbnail"] = {
+                "url": world.image.url
+            }
 
         if world.assignment is not None:
             main_embed["fields"].append(
@@ -688,7 +686,7 @@ class WorldNotification(NotificationBase):
                 },
             )
 
-        return main_embed, files
+        return main_embed
 
     def _resource_embed(self, embedded_resources, surface_resources):
         resource_embed: dict = {"title": "World Resources"}
@@ -774,7 +772,7 @@ class WorldNotification(NotificationBase):
         context = self._get_context(world, resources)
 
         embeds = []
-        main_embed, files = self._main_embed(world, resources is None)
+        main_embed = self._main_embed(world, resources is None)
         embeds.append(main_embed)
 
         if not world.is_creative and resources is not None:
@@ -789,7 +787,7 @@ class WorldNotification(NotificationBase):
             if color_embed is not None:
                 embeds.append(color_embed)
 
-        return embeds, files
+        return embeds, None
 
 
 class ExoworldNotification(ExportModelOperationsMixin("exoworld_notification"), WorldNotification):  # type: ignore # noqa E501

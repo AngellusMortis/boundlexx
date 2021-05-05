@@ -1,7 +1,8 @@
 import json
 import logging
 import time
-from typing import Optional
+from io import BytesIO
+from typing import Optional, IO
 
 import httpx
 
@@ -64,18 +65,18 @@ def send_discord_webhook(
                 headers={"Content-Type": "application/json"},
             )
         else:
-            raw_files: dict[str, bytes] = {}
+            raw_files: dict[str, IO[bytes]] = {}
             for filename, file_url in files.items():
                 logger.info("Downloading file URL %s", file_url)
                 file_response = httpx.get(file_url)
                 file_response.raise_for_status()
 
-                raw_files[filename] = file_response.content
+                raw_files[filename] = BytesIO(file_response.content)
 
             response = httpx.post(
                 webhook_url,
                 data={"payload_json": json.dumps(data)},
-                files=files,
+                files=raw_files,
             )
 
         if response.is_error:
