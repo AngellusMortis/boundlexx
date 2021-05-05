@@ -2,7 +2,7 @@ import json
 import logging
 import time
 from io import BytesIO
-from typing import Optional, IO
+from typing import IO, Optional
 
 import httpx
 

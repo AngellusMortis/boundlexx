@@ -655,9 +655,7 @@ class WorldNotification(NotificationBase):
             main_embed["url"] = world.forum_url
 
         if world.image.name:
-            main_embed["thumbnail"] = {
-                "url": world.image.url
-            }
+            main_embed["thumbnail"] = {"url": world.image.url}
 
         if world.assignment is not None:
             main_embed["fields"].append(
