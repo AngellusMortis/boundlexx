@@ -5,6 +5,8 @@ from django.conf import settings
 from rest_framework.exceptions import APIException
 from rest_framework.schemas.openapi import AutoSchema, SchemaGenerator
 
+from boundlexx.api.common.serializers import AzureImageField
+
 
 class DescriptiveAutoSchema(AutoSchema):
     def get_tags(self, path, method):
@@ -91,6 +93,12 @@ class DescriptiveAutoSchema(AutoSchema):
                     }
 
         return params
+
+    def map_field(self, field):
+        if isinstance(field, AzureImageField):
+            return {"type": "string", "format": "uri"}
+
+        return super().map_field(field)
 
 
 class BoundlexxSchemaGenerator(SchemaGenerator):

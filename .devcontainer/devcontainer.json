@@ -25,7 +25,7 @@
         "files.trimTrailingWhitespace": true,
         "python.analysis.openFilesOnly": false,
         "python.envFile": "${workspaceFolder}/.local.env",
-        "python.pythonPath": "/usr/local/bin/python",
+        "python.defaultInterpreterPath": "/usr/local/bin/python",
         "python.formatting.blackArgs": [
             "--line-length",
             "88"
