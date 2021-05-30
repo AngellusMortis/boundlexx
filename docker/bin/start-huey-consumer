@@ -41,8 +41,8 @@ done
 
 pushd /app/ 2>/dev/null 1>&2
 if [ $DJANGO -eq 1 ]; then
-    python ./manage.py run_huey -w $HUEY_WORKER_COUNT -k thread -n
+    python ./manage.py run_huey -f -w $HUEY_WORKER_COUNT -k thread -n
 else
-    huey_consumer config.huey.huey -w $HUEY_WORKER_COUNT -k thread -n
+    huey_consumer config.huey.huey -f -w $HUEY_WORKER_COUNT -k thread -n
 fi
 popd  2>/dev/null 1>&2
