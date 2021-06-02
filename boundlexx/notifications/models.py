@@ -251,7 +251,7 @@ class NewWorldNotificationManager(PolymorphicNotificationManager):
             and (
                 (world.forum_id and world.image.name)
                 or not world.is_exo
-                or timezone.now() > world.start + timedelta(days=1)
+                or timezone.now() > world.start + timedelta(hours=2)
             )
         )
 
