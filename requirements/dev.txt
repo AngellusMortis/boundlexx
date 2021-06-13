@@ -10,6 +10,8 @@ alabaster==0.7.12
     # via sphinx
 amqp==5.0.6
     # via kombu
+anyio==3.1.0
+    # via httpcore
 appdirs==1.4.4
     # via black
 argon2-cffi==20.1.0
@@ -20,7 +22,7 @@ astroid==2.5.6
     # via
     #   pylint
     #   pylint-celery
-attrs==20.3.0
+attrs==21.2.0
     # via
     #   flake8-bugbear
     #   jsonschema
@@ -30,11 +32,11 @@ azure-common==1.1.27
     #   azure-mgmt-cdn
     #   azure-storage-blob
     #   azure-storage-common
-azure-core==1.13.0
+azure-core==1.15.0
     # via
     #   azure-identity
     #   azure-mgmt-core
-azure-identity==1.5.0
+azure-identity==1.6.0
     # via -r /app/requirements/in/base.in
 azure-mgmt-cdn==11.0.0
     # via -r /app/requirements/in/base.in
@@ -54,16 +56,16 @@ beautifulsoup4==4.9.3
     # via -r /app/requirements/in/base.in
 billiard==3.6.4.0
     # via celery
-black==21.4b2
+black==21.6b0
     # via -r /app/requirements/in/dev.in
 cachetools==4.2.2
     # via steam
-celery==5.0.5
+celery==5.1.0
     # via
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
     #   django-celery-results
-certifi==2020.12.5
+certifi==2021.5.30
     # via
     #   httpx
     #   msrest
@@ -78,7 +80,7 @@ click-didyoumean==0.0.3
     # via celery
 click-plugins==1.1.1
     # via celery
-click-repl==0.1.6
+click-repl==0.2.0
     # via celery
 click==7.1.2
     # via
@@ -92,7 +94,7 @@ click==7.1.2
     #   pip-tools
 colorama==0.4.4
     # via -r /app/requirements/in/base.in
-coloredlogs==15.0
+coloredlogs==15.0.1
     # via -r /app/requirements/in/base.in
 coverage[toml]==5.5
     # via
@@ -107,8 +109,10 @@ cryptography==3.4.7
     #   pyjwt
 dateparser==1.0.0
     # via -r /app/requirements/in/base.in
-decorator==5.0.7
-    # via ipython
+decorator==5.0.9
+    # via
+    #   ipdb
+    #   ipython
 django-celery-beat==2.2.0
     # via -r /app/requirements/in/base.in
 django-celery-results==2.0.1
@@ -117,9 +121,9 @@ django-click==2.2.0
     # via -r /app/requirements/in/base.in
 django-cors-headers==3.7.0
     # via -r /app/requirements/in/base.in
-django-coverage-plugin==1.8.0
+django-coverage-plugin==2.0.0
     # via -r /app/requirements/in/dev.in
-django-crispy-forms==1.11.2
+django-crispy-forms==1.12.0
     # via -r /app/requirements/in/base.in
 django-debug-toolbar==3.2.1
     # via -r /app/requirements/in/dev.in
@@ -137,7 +141,7 @@ django-polymorphic==3.0.0
     # via -r /app/requirements/in/base.in
 django-prometheus==2.1.0
     # via -r /app/requirements/in/base.in
-django-redis==4.12.1
+django-redis==5.0.0
     # via
     #   -r /app/requirements/in/base.in
     #   python-redis-lock
@@ -153,7 +157,7 @@ django-stubs==1.8.0
     # via -r /app/requirements/in/dev.in
 django-timezone-field==4.1.2
     # via django-celery-beat
-django==3.2
+django==3.2.4
     # via
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
@@ -179,7 +183,7 @@ djangorestframework==3.12.4
     #   django-rest-fuzzysearch
     #   djangorestframework-msgpack
     #   drf-extensions
-docutils==0.16
+docutils==0.17.1
     # via sphinx
 drf-extensions==0.7.0
     # via -r /app/requirements/in/base.in
@@ -187,7 +191,7 @@ et-xmlfile==1.1.0
     # via openpyxl
 factory-boy==3.2.0
     # via -r /app/requirements/in/dev.in
-faker==8.1.2
+faker==8.7.0
     # via factory-boy
 filetype==1.0.7
     # via -r /app/requirements/in/base.in
@@ -197,11 +201,11 @@ flake8-builtins==1.5.3
     # via -r /app/requirements/in/dev.in
 flake8-commas==2.0.0
     # via -r /app/requirements/in/dev.in
-flake8-comprehensions==3.4.0
+flake8-comprehensions==3.5.0
     # via -r /app/requirements/in/dev.in
 flake8-isort==4.0.0
     # via -r /app/requirements/in/dev.in
-flake8==3.9.1
+flake8==3.9.2
     # via
     #   -r /app/requirements/in/dev.in
     #   flake8-bugbear
@@ -219,9 +223,9 @@ gevent==21.1.2
     #   steam
 gitdb==4.0.7
     # via gitpython
-gitpython==3.1.14
+gitpython==3.1.17
     # via bandit
-greenlet==1.0.0
+greenlet==1.1.0
     # via gevent
 groundwork-sphinx-theme==1.1.1
     # via -r /app/requirements/in/dev.in
@@ -231,29 +235,30 @@ h2==3.2.0
     # via httpx
 hpack==3.0.0
     # via h2
-httpcore==0.13.2
+httpcore==0.13.4
     # via httpx
 httpx[http2]==0.18.1
     # via -r /app/requirements/in/base.in
 huey==2.3.2
     # via -r /app/requirements/in/base.in
-humanfriendly==9.1
+humanfriendly==9.2
     # via coloredlogs
 hyperframe==5.2.0
     # via h2
 idna==2.10
     # via
+    #   anyio
     #   requests
     #   rfc3986
 imagesize==1.2.0
     # via sphinx
 iniconfig==1.1.1
     # via pytest
-ipdb==0.13.7
+ipdb==0.13.9
     # via -r /app/requirements/in/dev.in
 ipython-genutils==0.2.0
     # via traitlets
-ipython==7.23.0
+ipython==7.24.1
     # via
     #   -r /app/requirements/in/base.in
     #   ipdb
@@ -267,17 +272,17 @@ isort==5.8.0
     #   pylint
 jedi==0.18.0
     # via ipython
-jinja2==2.11.3
+jinja2==3.0.1
     # via sphinx
 jsonschema==3.2.0
     # via
     #   openapi-schema-validator
     #   openapi-spec-validator
-kombu==5.0.2
+kombu==5.1.0
     # via celery
 lazy-object-proxy==1.6.0
     # via astroid
-markupsafe==1.1.1
+markupsafe==2.0.1
     # via jinja2
 matplotlib-inline==0.1.2
     # via ipython
@@ -287,7 +292,7 @@ mccabe==0.6.1
     #   pylint
 msal-extensions==0.3.0
     # via azure-identity
-msal==1.11.0
+msal==1.12.0
     # via
     #   azure-identity
     #   msal-extensions
@@ -301,17 +306,17 @@ mypy-extensions==0.4.3
     # via
     #   black
     #   mypy
-mypy==0.812
+mypy==0.902
     # via
     #   -r /app/requirements/in/dev.in
     #   django-stubs
-numpy==1.20.2
+numpy==1.20.3
     # via -r /app/requirements/in/base.in
-oauthlib==3.1.0
+oauthlib==3.1.1
     # via requests-oauthlib
 openapi-schema-validator==0.1.5
     # via openapi-spec-validator
-openapi-spec-validator==0.3.0
+openapi-spec-validator==0.3.1
     # via -r /app/requirements/in/dev.in
 openpyxl==3.0.7
     # via -r /app/requirements/in/base.in
@@ -340,13 +345,13 @@ pluggy==0.13.1
     # via pytest
 portalocker==1.7.1
     # via msal-extensions
-prometheus-client==0.10.1
+prometheus-client==0.11.0
     # via django-prometheus
 prompt-toolkit==3.0.18
     # via
     #   click-repl
     #   ipython
-protobuf==3.15.8
+protobuf==3.17.3
     # via steam
 psycopg2==2.8.6
     # via -r /app/requirements/in/base.in
@@ -366,7 +371,7 @@ pydiscourse==1.1.2
     # via -r /app/requirements/in/base.in
 pyflakes==2.3.1
     # via flake8
-pygments==2.8.1
+pygments==2.9.0
     # via
     #   ipython
     #   sphinx
@@ -380,7 +385,7 @@ pylint-plugin-utils==0.6
     # via
     #   pylint-celery
     #   pylint-django
-pylint==2.8.2
+pylint==2.8.3
     # via
     #   pylint-celery
     #   pylint-django
@@ -389,15 +394,15 @@ pyparsing==2.4.7
     # via packaging
 pyrsistent==0.17.3
     # via jsonschema
-pytest-cov==2.11.1
+pytest-cov==2.12.1
     # via -r /app/requirements/in/dev.in
-pytest-django==4.2.0
+pytest-django==4.4.0
     # via -r /app/requirements/in/dev.in
 pytest-dotenv==0.5.2
     # via -r /app/requirements/in/dev.in
 pytest-sugar==0.9.4
     # via -r /app/requirements/in/dev.in
-pytest==6.2.3
+pytest==6.2.4
     # via
     #   -r /app/requirements/in/dev.in
     #   pytest-cov
@@ -417,7 +422,7 @@ python-dotenv==0.17.1
     # via pytest-dotenv
 python-redis-lock[django]==3.7.0
     # via -r /app/requirements/in/base.in
-python-slugify==5.0.0
+python-slugify==5.0.2
     # via -r /app/requirements/in/base.in
 pytz==2021.1
     # via
@@ -452,11 +457,11 @@ requests==2.25.1
     #   requests-oauthlib
     #   sphinx
     #   steam
-rfc3986[idna2008]==1.4.0
+rfc3986[idna2008]==1.5.0
     # via httpx
 semver==2.13.0
     # via -r /app/requirements/in/base.in
-six==1.15.0
+six==1.16.0
     # via
     #   argon2-cffi
     #   azure-core
@@ -475,13 +480,14 @@ smmap==4.0.0
     # via gitdb
 sniffio==1.2.0
     # via
+    #   anyio
     #   httpcore
     #   httpx
 snowballstemmer==2.1.0
     # via sphinx
 soupsieve==2.2.1
     # via beautifulsoup4
-sphinx==3.5.4
+sphinx==4.0.2
     # via
     #   -r /app/requirements/in/dev.in
     #   groundwork-sphinx-theme
@@ -489,13 +495,13 @@ sphinxcontrib-applehelp==1.0.2
     # via sphinx
 sphinxcontrib-devhelp==1.0.2
     # via sphinx
-sphinxcontrib-htmlhelp==1.0.3
+sphinxcontrib-htmlhelp==2.0.0
     # via sphinx
 sphinxcontrib-jsmath==1.0.1
     # via sphinx
 sphinxcontrib-qthelp==1.0.3
     # via sphinx
-sphinxcontrib-serializinghtml==1.1.4
+sphinxcontrib-serializinghtml==1.1.5
     # via sphinx
 sqlparse==0.4.1
     # via
@@ -518,15 +524,15 @@ toml==0.10.2
     #   black
     #   coverage
     #   ipdb
+    #   mypy
     #   pep517
     #   pylint
     #   pytest
+    #   pytest-cov
 traitlets==5.0.5
     # via
     #   ipython
     #   matplotlib-inline
-typed-ast==1.4.3
-    # via mypy
 typing-extensions==3.10.0.0
     # via
     #   django-stubs
@@ -535,17 +541,18 @@ tzlocal==2.1
     # via dateparser
 uritemplate==3.0.1
     # via -r /app/requirements/in/base.in
-urllib3==1.26.4
+urllib3==1.26.5
     # via requests
-vdf==3.3
+vdf==3.4
     # via steam
 vine==5.0.0
     # via
     #   amqp
     #   celery
+    #   kombu
 wcwidth==0.2.5
     # via prompt-toolkit
-werkzeug==1.0.1
+werkzeug==2.0.1
     # via -r /app/requirements/in/dev.in
 wrapt==1.12.1
     # via astroid

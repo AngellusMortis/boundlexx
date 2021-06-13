@@ -6,6 +6,7 @@ from django_filters.rest_framework import FilterSet, filters
 from rest_framework.filters import BaseFilterBackend
 
 from boundlexx.boundless.models import (
+    Color,
     Emoji,
     Item,
     Recipe,
@@ -74,6 +75,12 @@ class LangFilter(filters.ChoiceFilter):
 
 class LocalizationFilterSet(BaseFilterSet):
     lang = LangFilter()
+
+
+class ColorFilterSet(LocalizationFilterSet):
+    class Meta:
+        model = Color
+        fields = ["shade", "base", "group"]
 
 
 class EmojiFilterSet(BaseFilterSet):

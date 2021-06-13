@@ -34,6 +34,12 @@ BASE = "boundlexx.ingest.ingest"
     help="Run all core group (Metals/Items/Subtitles/Localization Data",
 )
 @click.option(
+    "-l",
+    "--color",
+    is_flag=True,
+    help="Color Group",
+)
+@click.option(
     "-r",
     "--recipe",
     is_flag=True,

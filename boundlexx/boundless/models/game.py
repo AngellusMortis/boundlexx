@@ -122,7 +122,84 @@ class Subtitle(ExportModelOperationsMixin("subtitle"), GameObj):  # type: ignore
     pass
 
 
-class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore # noqa E501
+class Color(GameObj):
+    # class Color(ExportModelOperationsMixin("color"), GameObj):  # type: ignore # noqa E501
+    class ColorShade(models.TextChoices):
+        BLACK = "BLACK", _("Black")
+        SHADOW = "SHADOW", _("Shadow")
+        NIGHT = "NIGHT", _("Night")
+        STRONG = "STRONG", _("Strong")
+        DARK = "DARK", _("Dark")
+        DEEP = "DEEP", _("Deep")
+        HOT = "HOT", _("Hot")
+        SILK = "SILK", _("Silk")
+        OXIDE = "OXIDE", _("Oxide")
+        PURE = "PURE", _("Pure")
+        WARM = "WARM", _("Warm")
+        SLATE = "SLATE", _("Slate")
+        RUST = "RUST", _("Rust")
+        VIVID = "VIVID", _("Vidid")
+        LIGHT = "LIGHT", _("Light")
+        PALE = "PALE", _("Pale")
+        ASHEN = "ASHEN", _("Ashen")
+        BRIGHT = "BRIGHT", _("Bright")
+        STARK = "STARK", _("Stark")
+        COOL = "COOL", _("Cool")
+        WEARY = "WEARY", _("Weary")
+        LUMINOUS = "LUMINOUS", _("Luminous")
+        CRISP = "CRISP", _("Crisp")
+        COLD = "COLD", _("Cold")
+        WHITE = "WHITE", _("White")
+
+    class ColorBase(models.TextChoices):
+        AZURE = "AZURE", _("Azure")
+        CERULEAN = "CERULEAN", _("Cerulean")
+        COBALT = "COBALT", _("Cobalt")
+        BLUE = "BLUE", _("Blue")
+        LAVENDER = "LAVENDER", _("Lavender")
+        LILAC = "LILAC", _("Lilac")
+        MAGENTA = "MAGENTA", _("Magenta")
+        VIOLET = "VIOLET", _("Violet")
+        BERRY = "BERRY", _("Berry")
+        FUCHSIA = "FUCHSIA", _("Fuchsia")
+        CHERRY = "CHERRY", _("Cherry")
+        RED = "RED", _("Red")
+        ROSE = "ROSE", _("Rose")
+        ORANGE = "ORANGE", _("Orange")
+        SEPIA = "SEPIA", _("Sepia")
+        TAUPE = "TAUPE", _("Taupe")
+        MUSTARD = "MUSTARD", _("Mustard")
+        TAN = "TAN", _("Tan")
+        YELLOW = "YELLOW", _("Yellow")
+        LIME = "LIME", _("Lime")
+        MOSS = "MOSS", _("Moss")
+        GREEN = "GREEN", _("Green")
+        MINT = "MINT", _("Mint")
+        TEAL = "TEAL", _("Teal")
+        VIRIDIAN = "VIRIDIAN", _("Viridian")
+        TURQUOISE = "TURQUOISE", _("Turquoise")
+        SLATE = "SLATE", _("Slate")
+        BLACK = "BLACK", _("Black")
+
+    class ColorGroup(models.TextChoices):
+        BLUE = "BLUE", _("Blue")
+        VIOLET = "VIOLET", _("Violet")
+        RED = "RED", _("Red")
+        ORANGE = "ORANGE", _("Orange")
+        YELLOW = "YELLOW", _("Yellow")
+        GREEN = "GREEN", _("Green")
+        BLACK = "BLACK", _("Black")
+
+    shade = models.CharField(
+        max_length=16, choices=ColorShade.choices, blank=True, null=True
+    )
+    base = models.CharField(
+        max_length=16, choices=ColorBase.choices, blank=True, null=True
+    )
+    group = models.CharField(
+        max_length=16, choices=ColorGroup.choices, blank=True, null=True
+    )
+
     @cached_property
     def base_color(self):
         colors: dict[int, int] = {}

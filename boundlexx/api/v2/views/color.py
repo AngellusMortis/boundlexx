@@ -7,8 +7,8 @@ from rest_framework_extensions.mixins import NestedViewSetMixin
 from rest_fuzzysearch.search import RankedFuzzySearchFilter
 
 from boundlexx.api.common.filters import (
+    ColorFilterSet,
     DedupedFilter,
-    LocalizationFilterSet,
     WorldBlockColorFilterSet,
 )
 from boundlexx.api.common.serializers import (
@@ -33,7 +33,7 @@ class ColorViewSet(BoundlexxReadOnlyViewSet):
         filters.OrderingFilter,
         DedupedFilter,
     ]
-    filterset_class = LocalizationFilterSet
+    filterset_class = ColorFilterSet
     search_fields = ["localizedname__name", "game_id"]
     ordering = ["-rank", "game_id"]
     ordering_fields: list[str] = []

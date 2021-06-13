@@ -19,6 +19,9 @@ class ColorSerializer(serializers.ModelSerializer):
     )
     base_color = serializers.CharField()
     gleam_color = serializers.CharField()
+    shade = serializers.ChoiceField(Color.ColorShade.choices)
+    base = serializers.ChoiceField(Color.ColorBase.choices)
+    group = serializers.ChoiceField(Color.ColorGroup.choices)
 
     class Meta:
         model = Color
@@ -27,4 +30,7 @@ class ColorSerializer(serializers.ModelSerializer):
             "base_color",
             "gleam_color",
             "localization",
+            "shade",
+            "base",
+            "group",
         ]

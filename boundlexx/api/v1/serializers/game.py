@@ -71,6 +71,9 @@ class URLColorSerializer(ColorSerializer):
             "base_color",
             "gleam_color",
             "localization",
+            "shade",
+            "base",
+            "group",
         ]
 
 
