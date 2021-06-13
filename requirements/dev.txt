@@ -533,6 +533,16 @@ traitlets==5.0.5
     # via
     #   ipython
     #   matplotlib-inline
+types-dateparser==0.1.2
+    # via -r /app/requirements/in/dev.in
+types-pytz==0.1.0
+    # via -r /app/requirements/in/dev.in
+types-pyyaml==0.1.6
+    # via -r /app/requirements/in/dev.in
+types-redis==3.5.0
+    # via -r /app/requirements/in/dev.in
+types-requests==0.1.10
+    # via -r /app/requirements/in/dev.in
 typing-extensions==3.10.0.0
     # via
     #   django-stubs

@@ -34,12 +34,12 @@ def _create_color_group_data(colors: list[Color]):
             parts = set(color.default_name.lower().split(" "))
 
             for shade, values in shades.items():
-                if len(parts) == 1:
-                    color.shade = Color.ColorShade.PURE
-                    break
-
                 if len(parts & values) > 0:
                     color.shade = shade
+                    break
+
+                if len(parts) == 1:
+                    color.shade = Color.ColorShade.PURE
                     break
 
             for base, values in bases.items():
