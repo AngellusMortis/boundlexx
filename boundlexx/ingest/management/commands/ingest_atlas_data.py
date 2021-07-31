@@ -136,6 +136,9 @@ def _process_beacons(world, root, name):  # pylint: disable=too-many-locals
     with gzip.open(os.path.join(root, name)) as beacons_file:
         buffer = beacons_file.read()
 
+    if len(buffer) == 0:
+        return
+
     # adapted from https://docs.playboundless.com/modding/http-beacons.html
     offset = 0
 
