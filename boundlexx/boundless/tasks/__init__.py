@@ -25,6 +25,7 @@ from boundlexx.boundless.tasks.worlds import (
     poll_worlds,
     search_new_worlds,
 )
+from boundlexx.notifications.models import ExoworldNotification
 from config.celery_app import app
 
 logger = get_task_logger(__name__)
@@ -69,11 +70,15 @@ def _get_block_colors(world_ids):
 
 
 @app.task
-def recalculate_colors(world_ids=None, log=None):
+def recalculate_colors(  # pylint: disable=too-many-branches
+    world_ids=None, log=None, max_age=None
+):
     if log is None:
         log = logger.info
 
     wbcs = _get_block_colors(world_ids)
+    if max_age is not None:
+        wbcs = wbcs.filter(time__gte=max_age)
     log("Updating timing for all world block colors...")
     with click.progressbar(
         wbcs.iterator(), length=wbcs.count(), show_percent=True, show_pos=True
@@ -84,6 +89,8 @@ def recalculate_colors(world_ids=None, log=None):
                 block_color.save()
 
     wbcs = _get_block_colors(world_ids)
+    if max_age is not None:
+        wbcs = wbcs.filter(time__gte=max_age)
     log("Recalculcating dynamic properties...")
     with click.progressbar(
         wbcs.iterator(), length=wbcs.count(), show_percent=True, show_pos=True
@@ -140,6 +147,14 @@ def recalculate_colors(world_ids=None, log=None):
                 block_color.is_new_transform = False
 
             block_color.save()
+
+
+@app.task
+def recalculate_and_send_exo(world_id):
+    world = World.objects.get(id=world_id)
+    recalculate_colors([world.id])
+    if world.owner is None:
+        ExoworldNotification.objects.send_update_notification(world)
 
 
 @app.task

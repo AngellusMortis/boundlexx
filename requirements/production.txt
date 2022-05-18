@@ -6,64 +6,69 @@
 #
 --no-binary psycopg2
 
-amqp==5.0.6
+amqp==5.1.1
     # via kombu
-anyio==3.1.0
+anyio==3.6.1
     # via httpcore
-argon2-cffi==20.1.0
+argon2-cffi-bindings==21.2.0
+    # via argon2-cffi
+argon2-cffi==21.3.0
     # via -r /app/requirements/in/base.in
-asgiref==3.3.4
+asgiref==3.5.2
     # via django
-azure-common==1.1.27
-    # via
-    #   azure-mgmt-cdn
-    #   azure-storage-blob
-    #   azure-storage-common
-azure-core==1.15.0
+asttokens==2.0.5
+    # via stack-data
+async-timeout==4.0.2
+    # via redis
+azure-common==1.1.28
+    # via azure-mgmt-cdn
+azure-core==1.24.0
     # via
     #   azure-identity
     #   azure-mgmt-core
-azure-identity==1.6.0
+    #   azure-storage-blob
+azure-identity==1.10.0
     # via -r /app/requirements/in/base.in
-azure-mgmt-cdn==11.0.0
+azure-mgmt-cdn==12.0.0
     # via -r /app/requirements/in/base.in
-azure-mgmt-core==1.2.2
+azure-mgmt-core==1.3.0
     # via azure-mgmt-cdn
-azure-storage-blob==2.1.0
+azure-storage-blob==12.12.0
     # via django-storages
-azure-storage-common==2.1.0
-    # via azure-storage-blob
 backcall==0.2.0
     # via ipython
-beautifulsoup4==4.9.3
+beautifulsoup4==4.11.1
     # via -r /app/requirements/in/base.in
 billiard==3.6.4.0
     # via celery
-cachetools==4.2.2
+cachetools==5.1.0
     # via steam
-celery==5.1.0
+celery==5.2.6
     # via
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
     #   django-celery-results
-certifi==2021.5.30
+certifi==2021.10.8
     # via
+    #   httpcore
     #   httpx
     #   msrest
     #   requests
-cffi==1.14.5
+cffi==1.15.0
     # via
-    #   argon2-cffi
+    #   argon2-cffi-bindings
     #   cryptography
-chardet==4.0.0
-    # via requests
-click-didyoumean==0.0.3
+charset-normalizer==2.0.12
+    # via
+    #   httpx
+    #   requests
+click-didyoumean==0.3.0
     # via celery
 click-plugins==1.1.1
     # via celery
 click-repl==0.2.0
     # via celery
-click==7.1.2
+click==8.1.3
     # via
     #   -r /app/requirements/in/base.in
     #   celery
@@ -75,51 +80,53 @@ colorama==0.4.4
     # via -r /app/requirements/in/base.in
 coloredlogs==15.0.1
     # via -r /app/requirements/in/base.in
-cryptography==3.4.7
+cryptography==37.0.2
     # via
     #   azure-identity
-    #   azure-storage-common
+    #   azure-storage-blob
     #   msal
     #   pyjwt
-dateparser==1.0.0
+dateparser==1.1.1
     # via -r /app/requirements/in/base.in
-decorator==5.0.9
+decorator==5.1.1
     # via ipython
-django-celery-beat==2.2.0
+deprecated==1.2.13
+    # via redis
+django-celery-beat==2.2.1
     # via -r /app/requirements/in/base.in
-django-celery-results==2.0.1
+django-celery-results==2.3.1
     # via -r /app/requirements/in/base.in
-django-click==2.2.0
+django-click==2.3.0
     # via -r /app/requirements/in/base.in
-django-cors-headers==3.7.0
+django-cors-headers==3.12.0
     # via -r /app/requirements/in/base.in
-django-crispy-forms==1.12.0
+django-crispy-forms==1.14.0
     # via -r /app/requirements/in/base.in
-django-environ==0.4.5
+django-environ==0.8.1
     # via -r /app/requirements/in/base.in
-django-filter==2.4.0
+django-filter==21.1
     # via -r /app/requirements/in/base.in
 django-json-widget==1.1.1
     # via -r /app/requirements/in/base.in
-django-model-utils==4.1.1
+django-model-utils==4.2.0
     # via -r /app/requirements/in/base.in
-django-polymorphic==3.0.0
+django-polymorphic==3.1.0
     # via -r /app/requirements/in/base.in
-django-prometheus==2.1.0
+django-prometheus==2.2.0
     # via -r /app/requirements/in/base.in
-django-redis==5.0.0
+django-redis==5.2.0
     # via
     #   -r /app/requirements/in/base.in
     #   python-redis-lock
 django-rest-fuzzysearch==0.5.1
     # via -r /app/requirements/in/base.in
-django-robots==4.0
+django-robots==5.0
     # via -r /app/requirements/in/base.in
-django-storages[azure]==1.11.1
+django-storages[azure]==1.12.3
     # via -r /app/requirements/in/base.in
-django-timezone-field==4.1.2
+django-timezone-field==4.2.3
     # via django-celery-beat
-django==3.2.4
+django==3.2.13
     # via
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
@@ -135,144 +142,152 @@ django==3.2.4
     #   djangorestframework-msgpack
 git+https://github.com/AngellusMortis/django-rest-framework-msgpack.git
     # via -r /app/requirements/in/base.in
-djangorestframework==3.12.4
+djangorestframework==3.13.1
     # via
     #   -r /app/requirements/in/base.in
     #   django-rest-fuzzysearch
     #   djangorestframework-msgpack
     #   drf-extensions
-drf-extensions==0.7.0
+drf-extensions==0.7.1
     # via -r /app/requirements/in/base.in
 et-xmlfile==1.1.0
     # via openpyxl
-filetype==1.0.7
+executing==0.8.3
+    # via stack-data
+filetype==1.0.13
     # via -r /app/requirements/in/base.in
 future==0.18.2
     # via django-json-widget
 gevent-eventemitter==2.1
     # via steam
-gevent==21.1.2
+gevent==21.12.0
     # via
     #   gevent-eventemitter
     #   steam
-greenlet==1.1.0
+greenlet==1.1.2
     # via gevent
 h11==0.12.0
     # via httpcore
-h2==3.2.0
+h2==4.1.0
     # via httpx
-hpack==3.0.0
+hpack==4.0.0
     # via h2
-httpcore==0.13.4
+httpcore==0.14.7
     # via httpx
-httpx[http2]==0.18.1
+httpx[http2]==0.22.0
     # via -r /app/requirements/in/base.in
-huey==2.3.2
+huey==2.4.3
     # via -r /app/requirements/in/base.in
-humanfriendly==9.2
+humanfriendly==10.0
     # via coloredlogs
-hyperframe==5.2.0
+hyperframe==6.0.1
     # via h2
-idna==2.10
+idna==3.3
     # via
     #   anyio
     #   requests
     #   rfc3986
-ipython-genutils==0.2.0
-    # via traitlets
-ipython==7.24.1
+ipython==8.3.0
     # via -r /app/requirements/in/base.in
-isodate==0.6.0
+isodate==0.6.1
     # via msrest
-jedi==0.18.0
+jedi==0.18.1
     # via ipython
-kombu==5.1.0
+kombu==5.2.4
     # via celery
-matplotlib-inline==0.1.2
+matplotlib-inline==0.1.3
     # via ipython
-msal-extensions==0.3.0
+msal-extensions==1.0.0
     # via azure-identity
-msal==1.12.0
+msal==1.17.0
     # via
     #   azure-identity
     #   msal-extensions
-msgpack==1.0.2
+msgpack==1.0.3
     # via
     #   -r /app/requirements/in/base.in
     #   djangorestframework-msgpack
 msrest==0.6.21
-    # via azure-mgmt-cdn
-numpy==1.20.3
+    # via
+    #   azure-mgmt-cdn
+    #   azure-storage-blob
+numpy==1.22.3
     # via -r /app/requirements/in/base.in
-oauthlib==3.1.1
+oauthlib==3.2.0
     # via requests-oauthlib
-openpyxl==3.0.7
+openpyxl==3.0.9
     # via -r /app/requirements/in/base.in
-parso==0.8.2
+packaging==21.3
+    # via redis
+parso==0.8.3
     # via jedi
 pexpect==4.8.0
     # via ipython
 pickleshare==0.7.5
     # via ipython
-pillow==8.2.0
+pillow==9.1.1
     # via -r /app/requirements/in/base.in
-portalocker==1.7.1
+portalocker==2.4.0
     # via msal-extensions
-prometheus-client==0.11.0
+prometheus-client==0.14.1
     # via django-prometheus
-prompt-toolkit==3.0.18
+prompt-toolkit==3.0.29
     # via
     #   click-repl
     #   ipython
-protobuf==3.17.3
+protobuf==3.20.1
     # via steam
-psycopg2==2.8.6
+psycopg2==2.9.3
     # via -r /app/requirements/in/base.in
 ptyprocess==0.7.0
     # via pexpect
-pycparser==2.20
+pure-eval==0.2.2
+    # via stack-data
+pycparser==2.21
     # via cffi
-pycryptodomex==3.10.1
+pycryptodomex==3.14.1
     # via steam
-pydiscourse==1.1.2
+pydiscourse==1.2.0
     # via -r /app/requirements/in/base.in
-pygments==2.9.0
+pygments==2.12.0
     # via ipython
-pyjwt[crypto]==2.1.0
+pyjwt[crypto]==2.4.0
     # via msal
-python-crontab==2.5.1
+pyparsing==3.0.9
+    # via packaging
+python-crontab==2.6.0
     # via django-celery-beat
-python-dateutil==2.8.1
+python-dateutil==2.8.2
     # via
-    #   azure-storage-common
     #   dateparser
     #   djangorestframework-msgpack
     #   python-crontab
 python-redis-lock[django]==3.7.0
     # via -r /app/requirements/in/base.in
-python-slugify==5.0.2
+python-slugify==6.1.2
     # via -r /app/requirements/in/base.in
-pytz==2021.1
+pytz-deprecation-shim==0.1.0.post0
+    # via tzlocal
+pytz==2022.1
     # via
     #   celery
     #   dateparser
     #   django
     #   django-timezone-field
-    #   tzlocal
-pyyaml==5.4.1
+    #   djangorestframework
+pyyaml==6.0
     # via -r /app/requirements/in/base.in
-redis==3.5.3
+redis==4.3.1
     # via
     #   django-redis
     #   python-redis-lock
-regex==2021.4.4
+regex==2022.3.2
     # via dateparser
-requests-oauthlib==1.3.0
+requests-oauthlib==1.3.1
     # via msrest
-requests==2.25.1
+requests==2.27.1
     # via
     #   azure-core
-    #   azure-storage-common
     #   msal
     #   msrest
     #   pydiscourse
@@ -284,12 +299,11 @@ semver==2.13.0
     # via -r /app/requirements/in/base.in
 six==1.16.0
     # via
-    #   argon2-cffi
+    #   asttokens
     #   azure-core
     #   azure-identity
     #   click-repl
     #   isodate
-    #   protobuf
     #   python-dateutil
     #   steam
 sniffio==1.2.0
@@ -297,25 +311,31 @@ sniffio==1.2.0
     #   anyio
     #   httpcore
     #   httpx
-soupsieve==2.2.1
+soupsieve==2.3.2.post1
     # via beautifulsoup4
-sqlparse==0.4.1
+sqlparse==0.4.2
     # via django
-steam[client]==1.2.0
+stack-data==0.2.0
+    # via ipython
+steam[client]==1.3.0
     # via -r /app/requirements/in/base.in
 text-unidecode==1.3
     # via python-slugify
-traitlets==5.0.5
+traitlets==5.2.1.post0
     # via
     #   ipython
     #   matplotlib-inline
-tzlocal==2.1
+typing-extensions==4.2.0
+    # via azure-core
+tzdata==2022.1
+    # via pytz-deprecation-shim
+tzlocal==4.2
     # via dateparser
-uritemplate==3.0.1
+uritemplate==4.1.1
     # via -r /app/requirements/in/base.in
-urllib3==1.26.5
+urllib3==1.26.9
     # via requests
-uwsgi==2.0.19.1
+uwsgi==2.0.20
     # via -r /app/requirements/in/production.in
 vdf==3.4
     # via steam
@@ -326,6 +346,8 @@ vine==5.0.0
     #   kombu
 wcwidth==0.2.5
     # via prompt-toolkit
+wrapt==1.14.1
+    # via deprecated
 zope.event==4.5.0
     # via gevent
 zope.interface==5.4.0

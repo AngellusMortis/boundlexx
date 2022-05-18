@@ -17,8 +17,7 @@ from boundlexx.api.common.viewsets import BoundlexxGenericViewSet
 from boundlexx.api.permissions import IsWorldTrusted
 from boundlexx.boundless.game import BoundlessClient
 from boundlexx.boundless.models import World, WorldBlockColor, WorldCreatureColor
-from boundlexx.boundless.tasks import add_world_control_data, recalculate_colors
-from boundlexx.notifications.models import ExoworldNotification
+from boundlexx.boundless.tasks import add_world_control_data, recalculate_and_send_exo
 
 logger = logging.getLogger("ingest")
 
@@ -119,9 +118,7 @@ class WorldWSDataView(BoundlexxGenericViewSet):
         )
 
         if block_colors_created > 0:
-            recalculate_colors.delay([world.id])
-            if world.owner is None:
-                ExoworldNotification.objects.send_update_notification(world)
+            recalculate_and_send_exo.delay(world.id)
 
         return Response(
             status=201,
