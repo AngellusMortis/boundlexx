@@ -72,12 +72,12 @@ BASE = "boundlexx.ingest.ingest"
 def command(force, start_item_id, end_item_id, skip_variants, **kwargs):
     if not any(kwargs.values()):
         for index in kwargs:
-            kwargs[index] = True
+            kwargs[index] = True  # pylint: disable=modified-iterating-dict
 
     for index, value in kwargs.items():
         if value:
             module = import_module(f"{BASE}.{index}")
-            module.run(  # type: ignore
+            module.run(
                 force=force,
                 start_id=start_item_id,
                 end_id=end_item_id,

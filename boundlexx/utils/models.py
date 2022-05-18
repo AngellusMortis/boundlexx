@@ -8,7 +8,7 @@ class ModelDiffMixin:
     """
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)  # type: ignore
+        super().__init__(*args, **kwargs)
         self.__initial = self._dict
 
     @property

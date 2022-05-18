@@ -20,7 +20,7 @@ class BoundlessAuthenticationBackend(ModelBackend):
         try:
             user = User.objects.get(username=boundless_user["username"])
         except User.DoesNotExist:
-            user = None  # type: ignore
+            user = None
             if settings.BOUNDLESS_AUTH_AUTO_CREATE:
                 user = User.objects.create(
                     username=boundless_user["username"],

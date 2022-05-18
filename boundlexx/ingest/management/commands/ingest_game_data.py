@@ -12,7 +12,7 @@ from boundlexx.ingest.utils import decode_itemcolorstrings
 
 
 def _parse_json_file(filepath):
-    with open(filepath, "r") as f:
+    with open(filepath, "r", encoding="utf8") as f:
         json_content = json.load(f)
 
     return json_content

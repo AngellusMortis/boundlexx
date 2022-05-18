@@ -3,7 +3,7 @@ from typing import Sequence, Type
 
 from django.conf import settings
 from django.contrib import admin
-from django.contrib.admin import display  # type: ignore
+from django.contrib.admin import display
 from django.contrib.admin.options import InlineModelAdmin
 from django.templatetags.tz import localtime
 from django.urls import reverse

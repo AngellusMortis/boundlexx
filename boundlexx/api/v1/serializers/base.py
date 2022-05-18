@@ -61,8 +61,8 @@ class ResourceCountLinkField(serializers.ModelField):
         kwargs["allow_null"] = True
         super().__init__(*args, **kwargs)
 
-    def to_representation(self, value):  # pylint: disable=arguments-differ
-        return Hyperlink(value, None)
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
+        return Hyperlink(obj, None)
 
     def get_attribute(self, obj):
         if obj.is_resource:
@@ -81,8 +81,8 @@ class SovereignColorsLinkField(serializers.ModelField):
         kwargs["allow_null"] = True
         super().__init__(*args, **kwargs)
 
-    def to_representation(self, value):  # pylint: disable=arguments-differ
-        return Hyperlink(value, None)
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
+        return Hyperlink(obj, None)
 
     def get_attribute(self, obj):
         if obj.has_world_colors:
@@ -101,8 +101,8 @@ class ShopURL(serializers.ModelField):
         kwargs["allow_null"] = True
         super().__init__(*args, **kwargs)
 
-    def to_representation(self, value):  # pylint: disable=arguments-differ
-        return Hyperlink(value, None)
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
+        return Hyperlink(obj, None)
 
     def get_url(self, obj):
         return None
@@ -144,8 +144,8 @@ class ItemColorsLinkField(serializers.ModelField):
         kwargs["allow_null"] = True
         super().__init__(*args, **kwargs)
 
-    def to_representation(self, value):  # pylint: disable=arguments-differ
-        return Hyperlink(value, None)
+    def to_representation(self, obj):  # pylint: disable=arguments-differ
+        return Hyperlink(obj, None)
 
     def get_attribute(self, obj):
         if obj.has_world_colors:

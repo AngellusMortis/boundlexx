@@ -1,5 +1,5 @@
 # pylint: disable=protected-access
-import parser
+import parser  # pylint: disable=deprecated-module
 import re
 
 import djclick as click
