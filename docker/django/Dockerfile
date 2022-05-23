@@ -13,7 +13,7 @@ RUN addgroup --system --gid ${DJANGO_UID} django \
 
 RUN apt-get update \
   && apt-get install -y libpq-dev gettext nodejs npm git python3-mpltoolkits.basemap python3-pillow lsb-release \
-  && npm install -g steam-user \
+  && npm install -g steam-user@4.19.12 \
   && pip install pip --upgrade \
   # cleaning up unused files
   && apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false \
