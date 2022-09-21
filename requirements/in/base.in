@@ -14,7 +14,7 @@ django-prometheus
 django-redis
 django-rest-fuzzysearch
 django-robots
-django-storages[azure]
+django-storages[azure]<1.12 # https://github.com/jschneier/django-storages/issues/1116
 django<4.0
 djangorestframework
 drf-extensions
