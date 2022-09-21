@@ -1389,7 +1389,7 @@ class BeaconScan(ExportModelOperationsMixin("beacon_scan"), models.Model):  # ty
     num_columns = models.PositiveIntegerField(blank=True, null=True)
     name = models.CharField(max_length=64, blank=True, null=True)
     text_name = models.CharField(max_length=64, blank=True, null=True)
-    html_name = models.CharField(max_length=1024, blank=True, null=True)
+    html_name = models.TextField(blank=True, null=True)
 
     class Meta:
         unique_together = (

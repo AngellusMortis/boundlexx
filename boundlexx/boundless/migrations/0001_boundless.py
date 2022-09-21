@@ -10,1435 +10,2630 @@ import storages.backends.azure_storage
 
 
 class Migration(migrations.Migration):
-
-    replaces = [('boundless', '0001_initial'), ('boundless', '0002_create_item_timeseries'), ('boundless', '0003_string_id_creative'), ('boundless', '0004_auto_20200722_2249'), ('boundless', '0005_fill_out_worlds'), ('boundless', '0006_create_worldpoll_timeseries'), ('boundless', '0007_worldpoll_active_squashed_0019_auto_20200826_2146_squashed_0046_auto_20201102_2259_squashed_0061_auto_20210425_1713')]
-
     initial = True
 
     dependencies = [
-        ('contenttypes', '0002_remove_content_type_name'),
+        ("contenttypes", "0002_remove_content_type_name"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         django.contrib.postgres.operations.BtreeGinExtension(),
         migrations.CreateModel(
-            name='GameObj',
+            name="GameObj",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('active', models.BooleanField(default=True, verbose_name='Active')),
-                ('game_id', models.IntegerField(db_index=True, verbose_name='Game ID')),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_boundless.gameobj_set+', to='contenttypes.contenttype')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("active", models.BooleanField(default=True, verbose_name="Active")),
+                ("game_id", models.IntegerField(db_index=True, verbose_name="Game ID")),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_boundless.gameobj_set+",
+                        to="contenttypes.contenttype",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('game_id', 'polymorphic_ctype')},
+                "unique_together": {("game_id", "polymorphic_ctype")},
             },
         ),
         migrations.CreateModel(
-            name='World',
+            name="World",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=64)),
-                ('display_name', models.CharField(max_length=64)),
-                ('region', models.CharField(choices=[('use', 'US East'), ('use', 'US West'), ('ecu', 'EU Central'), ('aus', 'Australia')], max_length=3)),
-                ('tier', models.IntegerField()),
-                ('description', models.CharField(max_length=16)),
-                ('size', models.IntegerField()),
-                ('world_type', models.CharField(max_length=16)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64)),
+                ("display_name", models.CharField(max_length=64)),
+                (
+                    "region",
+                    models.CharField(
+                        choices=[
+                            ("use", "US East"),
+                            ("use", "US West"),
+                            ("ecu", "EU Central"),
+                            ("aus", "Australia"),
+                        ],
+                        max_length=3,
+                    ),
+                ),
+                ("tier", models.IntegerField()),
+                ("description", models.CharField(max_length=16)),
+                ("size", models.IntegerField()),
+                ("world_type", models.CharField(max_length=16)),
             ],
         ),
         migrations.CreateModel(
-            name='Color',
+            name="Color",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='Metal',
+            name="Metal",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='Subtitle',
+            name="Subtitle",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='LocalizedName',
+            name="LocalizedName",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('lang', models.CharField(max_length=16, verbose_name='Language')),
-                ('name', models.CharField(max_length=128, verbose_name='Name')),
-                ('game_obj', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.gameobj')),
-                ('polymorphic_ctype', models.ForeignKey(editable=False, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='polymorphic_boundless.localizedname_set+', to='contenttypes.contenttype')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("lang", models.CharField(max_length=16, verbose_name="Language")),
+                ("name", models.CharField(max_length=128, verbose_name="Name")),
+                (
+                    "game_obj",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.gameobj",
+                    ),
+                ),
+                (
+                    "polymorphic_ctype",
+                    models.ForeignKey(
+                        editable=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        related_name="polymorphic_boundless.localizedname_set+",
+                        to="contenttypes.contenttype",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('game_obj', 'lang')},
+                "unique_together": {("game_obj", "lang")},
             },
         ),
         migrations.CreateModel(
-            name='Item',
+            name="Item",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
-                ('item_subtitle', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='boundless.subtitle')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
+                (
+                    "item_subtitle",
+                    models.ForeignKey(
+                        blank=True,
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        to="boundless.subtitle",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='ItemShopStandPrice',
+            name="ItemShopStandPrice",
             fields=[
-                ('time', models.DateTimeField(auto_now=True, primary_key=True, serialize=False)),
-                ('location_x', models.IntegerField()),
-                ('location_y', models.IntegerField()),
-                ('location_z', models.IntegerField()),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('item_count', models.IntegerField()),
-                ('beacon_name', models.CharField(db_index=True, max_length=64)),
-                ('guild_tag', models.CharField(max_length=8)),
-                ('shop_activity', models.IntegerField()),
-                ('active', models.BooleanField(db_index=True, default=True)),
-                ('world', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item')),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("location_x", models.IntegerField()),
+                ("location_y", models.IntegerField()),
+                ("location_z", models.IntegerField()),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("item_count", models.IntegerField()),
+                ("beacon_name", models.CharField(db_index=True, max_length=64)),
+                ("guild_tag", models.CharField(max_length=8)),
+                ("shop_activity", models.IntegerField()),
+                ("active", models.BooleanField(db_index=True, default=True)),
+                (
+                    "world",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.world",
+                    ),
+                ),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'unique_together': {('time', 'world', 'location_x', 'location_y', 'item', 'price', 'item_count')},
+                "abstract": False,
+                "unique_together": {
+                    (
+                        "time",
+                        "world",
+                        "location_x",
+                        "location_y",
+                        "item",
+                        "price",
+                        "item_count",
+                    )
+                },
             },
         ),
         migrations.CreateModel(
-            name='ItemRequestBasketPrice',
+            name="ItemRequestBasketPrice",
             fields=[
-                ('time', models.DateTimeField(auto_now=True, primary_key=True, serialize=False)),
-                ('location_x', models.IntegerField()),
-                ('location_y', models.IntegerField()),
-                ('location_z', models.IntegerField()),
-                ('price', models.DecimalField(decimal_places=2, max_digits=10)),
-                ('item_count', models.IntegerField()),
-                ('beacon_name', models.CharField(db_index=True, max_length=64)),
-                ('guild_tag', models.CharField(max_length=8)),
-                ('shop_activity', models.IntegerField()),
-                ('active', models.BooleanField(db_index=True, default=True)),
-                ('world', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item')),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("location_x", models.IntegerField()),
+                ("location_y", models.IntegerField()),
+                ("location_z", models.IntegerField()),
+                ("price", models.DecimalField(decimal_places=2, max_digits=10)),
+                ("item_count", models.IntegerField()),
+                ("beacon_name", models.CharField(db_index=True, max_length=64)),
+                ("guild_tag", models.CharField(max_length=8)),
+                ("shop_activity", models.IntegerField()),
+                ("active", models.BooleanField(db_index=True, default=True)),
+                (
+                    "world",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.world",
+                    ),
+                ),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
-                'unique_together': {('time', 'world', 'location_x', 'location_y', 'item', 'price', 'item_count')},
+                "abstract": False,
+                "unique_together": {
+                    (
+                        "time",
+                        "world",
+                        "location_x",
+                        "location_y",
+                        "item",
+                        "price",
+                        "item_count",
+                    )
+                },
             },
         ),
         migrations.RunSQL(
-            sql='CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE',
-            reverse_sql='',
+            sql="CREATE EXTENSION IF NOT EXISTS timescaledb CASCADE",
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql='ALTER TABLE "boundless_itemshopstandprice" DROP CONSTRAINT "boundless_itemshopstandprice_pkey"',
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql="SELECT create_hypertable('boundless_itemshopstandprice', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)",
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql='ALTER TABLE "boundless_itemrequestbasketprice" DROP CONSTRAINT "boundless_itemrequestbasketprice_pkey"',
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql="SELECT create_hypertable('boundless_itemrequestbasketprice', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)",
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.AlterField(
-            model_name='world',
-            name='region',
-            field=models.CharField(choices=[('use', 'US East'), ('use', 'US West'), ('ecu', 'EU Central'), ('aus', 'Australia'), ('creative', 'Creative')], max_length=16),
+            model_name="world",
+            name="region",
+            field=models.CharField(
+                choices=[
+                    ("use", "US East"),
+                    ("use", "US West"),
+                    ("ecu", "EU Central"),
+                    ("aus", "Australia"),
+                    ("creative", "Creative"),
+                ],
+                max_length=16,
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='string_id',
-            field=models.CharField(max_length=64, verbose_name='String ID'),
+            model_name="item",
+            name="string_id",
+            field=models.CharField(max_length=64, verbose_name="String ID"),
         ),
         migrations.AddField(
-            model_name='world',
-            name='active',
+            model_name="world",
+            name="active",
             field=models.BooleanField(db_index=True, default=True),
         ),
         migrations.CreateModel(
-            name='ItemSellRank',
+            name="ItemSellRank",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rank', models.PositiveSmallIntegerField(default=5)),
-                ('last_update', models.DateTimeField(blank=True, null=True)),
-                ('state_hash', models.CharField(default='', max_length=128)),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item')),
-                ('world', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("rank", models.PositiveSmallIntegerField(default=5)),
+                ("last_update", models.DateTimeField(blank=True, null=True)),
+                ("state_hash", models.CharField(default="", max_length=128)),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+                    ),
+                ),
+                (
+                    "world",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.world",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.CreateModel(
-            name='ItemBuyRank',
+            name="ItemBuyRank",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('rank', models.PositiveSmallIntegerField(default=5)),
-                ('last_update', models.DateTimeField(blank=True, null=True)),
-                ('state_hash', models.CharField(default='', max_length=128)),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item')),
-                ('world', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("rank", models.PositiveSmallIntegerField(default=5)),
+                ("last_update", models.DateTimeField(blank=True, null=True)),
+                ("state_hash", models.CharField(default="", max_length=128)),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+                    ),
+                ),
+                (
+                    "world",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.world",
+                    ),
+                ),
             ],
             options={
-                'abstract': False,
+                "abstract": False,
             },
         ),
         migrations.AddField(
-            model_name='world',
-            name='address',
-            field=models.CharField(default=None, max_length=128, verbose_name='Server Address'),
+            model_name="world",
+            name="address",
+            field=models.CharField(
+                default=None, max_length=128, verbose_name="Server Address"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='api_url',
-            field=models.URLField(default=None, verbose_name='API URL'),
+            model_name="world",
+            name="api_url",
+            field=models.URLField(default=None, verbose_name="API URL"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='chunks_url',
-            field=models.URLField(default=None, verbose_name='Chunks URL'),
+            model_name="world",
+            name="chunks_url",
+            field=models.URLField(default=None, verbose_name="Chunks URL"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='end',
+            model_name="world",
+            name="end",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='ip_address',
-            field=models.GenericIPAddressField(default=None, verbose_name='Server IP Address'),
+            model_name="world",
+            name="ip_address",
+            field=models.GenericIPAddressField(
+                default=None, verbose_name="Server IP Address"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='planets_url',
-            field=models.URLField(default=None, verbose_name='Planets URL'),
+            model_name="world",
+            name="planets_url",
+            field=models.URLField(default=None, verbose_name="Planets URL"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='start',
+            model_name="world",
+            name="start",
             field=models.DateTimeField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='time_offset',
-            field=models.DateTimeField(default=None, verbose_name='Time Offset'),
+            model_name="world",
+            name="time_offset",
+            field=models.DateTimeField(default=None, verbose_name="Time Offset"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='websocket_url',
-            field=models.URLField(default=None, verbose_name='Websocket URL'),
+            model_name="world",
+            name="websocket_url",
+            field=models.URLField(default=None, verbose_name="Websocket URL"),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='world',
-            name='description',
-            field=models.CharField(max_length=16, verbose_name='Description'),
+            model_name="world",
+            name="description",
+            field=models.CharField(max_length=16, verbose_name="Description"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='display_name',
-            field=models.CharField(max_length=64, verbose_name='Display Name'),
+            model_name="world",
+            name="display_name",
+            field=models.CharField(max_length=64, verbose_name="Display Name"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='name',
-            field=models.CharField(max_length=64, verbose_name='Name'),
+            model_name="world",
+            name="name",
+            field=models.CharField(max_length=64, verbose_name="Name"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='region',
-            field=models.CharField(choices=[('use', 'US East'), ('use', 'US West'), ('ecu', 'EU Central'), ('aus', 'Australia'), ('creative', 'Creative')], max_length=16, verbose_name='Server Region'),
+            model_name="world",
+            name="region",
+            field=models.CharField(
+                choices=[
+                    ("use", "US East"),
+                    ("use", "US West"),
+                    ("ecu", "EU Central"),
+                    ("aus", "Australia"),
+                    ("creative", "Creative"),
+                ],
+                max_length=16,
+                verbose_name="Server Region",
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='size',
-            field=models.IntegerField(verbose_name='World Size'),
+            model_name="world",
+            name="size",
+            field=models.IntegerField(verbose_name="World Size"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='tier',
-            field=models.IntegerField(verbose_name='Tier'),
+            model_name="world",
+            name="tier",
+            field=models.IntegerField(verbose_name="Tier"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='world_type',
-            field=models.CharField(max_length=16, verbose_name='World Type'),
+            model_name="world",
+            name="world_type",
+            field=models.CharField(max_length=16, verbose_name="World Type"),
         ),
         migrations.AddField(
-            model_name='world',
-            name='atmosphere_color_b',
-            field=models.FloatField(default=None, verbose_name='Atmosphere Linear B Color'),
+            model_name="world",
+            name="atmosphere_color_b",
+            field=models.FloatField(
+                default=None, verbose_name="Atmosphere Linear B Color"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='atmosphere_color_g',
-            field=models.FloatField(default=None, verbose_name='Atmosphere Linear G Color'),
+            model_name="world",
+            name="atmosphere_color_g",
+            field=models.FloatField(
+                default=None, verbose_name="Atmosphere Linear G Color"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='atmosphere_color_r',
-            field=models.FloatField(default=None, verbose_name='Atmosphere Linear R Color'),
+            model_name="world",
+            name="atmosphere_color_r",
+            field=models.FloatField(
+                default=None, verbose_name="Atmosphere Linear R Color"
+            ),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='water_color_b',
-            field=models.FloatField(default=None, verbose_name='Water Linear B Color'),
+            model_name="world",
+            name="water_color_b",
+            field=models.FloatField(default=None, verbose_name="Water Linear B Color"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='water_color_g',
-            field=models.FloatField(default=None, verbose_name='Water Linear G Color'),
+            model_name="world",
+            name="water_color_g",
+            field=models.FloatField(default=None, verbose_name="Water Linear G Color"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='water_color_r',
-            field=models.FloatField(default=None, verbose_name='Water Linear R Color'),
+            model_name="world",
+            name="water_color_r",
+            field=models.FloatField(default=None, verbose_name="Water Linear R Color"),
             preserve_default=False,
         ),
         migrations.CreateModel(
-            name='WorldPoll',
+            name="WorldPoll",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('world', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "world",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.world",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='WorldPollResult',
+            name="WorldPollResult",
             fields=[
-                ('time', models.DateTimeField(auto_now=True, primary_key=True, serialize=False)),
-                ('player_count', models.PositiveSmallIntegerField(verbose_name='Player Count')),
-                ('beacon_count', models.PositiveIntegerField(verbose_name='Beacon Count')),
-                ('plot_count', models.PositiveIntegerField(verbose_name='Plot Count')),
-                ('total_prestige', models.PositiveIntegerField(verbose_name='Total Prestige')),
-                ('world_poll', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.worldpoll')),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now=True, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    "player_count",
+                    models.PositiveSmallIntegerField(verbose_name="Player Count"),
+                ),
+                (
+                    "beacon_count",
+                    models.PositiveIntegerField(verbose_name="Beacon Count"),
+                ),
+                ("plot_count", models.PositiveIntegerField(verbose_name="Plot Count")),
+                (
+                    "total_prestige",
+                    models.PositiveIntegerField(verbose_name="Total Prestige"),
+                ),
+                (
+                    "world_poll",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.worldpoll",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('time', 'world_poll')},
+                "unique_together": {("time", "world_poll")},
             },
         ),
         migrations.CreateModel(
-            name='ResourceCount',
+            name="ResourceCount",
             fields=[
-                ('time', models.DateTimeField(auto_now=True, primary_key=True, serialize=False)),
-                ('count', models.PositiveIntegerField(verbose_name='Plot Count')),
-                ('item', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item')),
-                ('world_poll', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.worldpoll')),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("count", models.PositiveIntegerField(verbose_name="Plot Count")),
+                (
+                    "item",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+                    ),
+                ),
+                (
+                    "world_poll",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.worldpoll",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('time', 'world_poll', 'item')},
+                "unique_together": {("time", "world_poll", "item")},
             },
         ),
         migrations.CreateModel(
-            name='LeaderboardRecord',
+            name="LeaderboardRecord",
             fields=[
-                ('time', models.DateTimeField(auto_now=True, primary_key=True, serialize=False)),
-                ('world_rank', models.PositiveSmallIntegerField(verbose_name='World Rank')),
-                ('guild_tag', models.CharField(max_length=7, verbose_name='Guild Tag')),
-                ('mayor_id', models.PositiveSmallIntegerField()),
-                ('mayor_name', models.CharField(max_length=64)),
-                ('mayor_type', models.PositiveSmallIntegerField()),
-                ('name', models.CharField(max_length=64)),
-                ('prestige', models.PositiveIntegerField()),
-                ('world_poll', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.worldpoll')),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now=True, primary_key=True, serialize=False
+                    ),
+                ),
+                (
+                    "world_rank",
+                    models.PositiveSmallIntegerField(verbose_name="World Rank"),
+                ),
+                ("guild_tag", models.CharField(max_length=7, verbose_name="Guild Tag")),
+                ("mayor_id", models.PositiveSmallIntegerField()),
+                ("mayor_name", models.CharField(max_length=64)),
+                ("mayor_type", models.PositiveSmallIntegerField()),
+                ("name", models.CharField(max_length=64)),
+                ("prestige", models.PositiveIntegerField()),
+                (
+                    "world_poll",
+                    models.ForeignKey(
+                        on_delete=django.db.models.deletion.CASCADE,
+                        to="boundless.worldpoll",
+                    ),
+                ),
             ],
             options={
-                'unique_together': {('time', 'world_poll', 'world_rank')},
+                "unique_together": {("time", "world_poll", "world_rank")},
             },
         ),
         migrations.RunSQL(
             sql='ALTER TABLE "boundless_worldpollresult" DROP CONSTRAINT "boundless_worldpollresult_pkey"',
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql="SELECT create_hypertable('boundless_worldpollresult', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)",
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql='ALTER TABLE "boundless_resourcecount" DROP CONSTRAINT "boundless_resourcecount_pkey"',
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql="SELECT create_hypertable('boundless_resourcecount', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)",
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql='ALTER TABLE "boundless_leaderboardrecord" DROP CONSTRAINT "boundless_leaderboardrecord_pkey"',
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql="SELECT create_hypertable('boundless_leaderboardrecord', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)",
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.CreateModel(
-            name='AltItem',
+            name="AltItem",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
-                ('name', models.CharField(max_length=64, verbose_name='String ID')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
+                ("name", models.CharField(max_length=64, verbose_name="String ID")),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='Beacon',
+            name="Beacon",
             fields=[
-                ('time', models.DateTimeField(auto_now_add=True, primary_key=True, serialize=False)),
-                ('active', models.BooleanField(db_index=True, default=True)),
-                ('is_campfire', models.BooleanField()),
-                ('location_x', models.IntegerField()),
-                ('location_y', models.IntegerField()),
-                ('location_z', models.IntegerField()),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now_add=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("active", models.BooleanField(db_index=True, default=True)),
+                ("is_campfire", models.BooleanField()),
+                ("location_x", models.IntegerField()),
+                ("location_y", models.IntegerField()),
+                ("location_z", models.IntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='BeaconPlotColumn',
+            name="BeaconPlotColumn",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('plot_x', models.IntegerField()),
-                ('plot_z', models.IntegerField()),
-                ('count', models.PositiveSmallIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("plot_x", models.IntegerField()),
+                ("plot_z", models.IntegerField()),
+                ("count", models.PositiveSmallIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='BeaconScan',
+            name="BeaconScan",
             fields=[
-                ('time', models.DateTimeField(auto_now_add=True, primary_key=True, serialize=False)),
-                ('mayor_name', models.CharField(max_length=64)),
-                ('prestige', models.PositiveIntegerField(blank=True, null=True)),
-                ('compactness', models.SmallIntegerField(blank=True, null=True)),
-                ('num_plots', models.PositiveIntegerField(blank=True, null=True)),
-                ('num_columns', models.PositiveIntegerField(blank=True, null=True)),
-                ('name', models.CharField(blank=True, max_length=64, null=True)),
-                ('text_name', models.CharField(blank=True, max_length=64, null=True)),
-                ('html_name', models.CharField(blank=True, max_length=1024, null=True)),
+                (
+                    "time",
+                    models.DateTimeField(
+                        auto_now_add=True, primary_key=True, serialize=False
+                    ),
+                ),
+                ("mayor_name", models.CharField(max_length=64)),
+                ("prestige", models.PositiveIntegerField(blank=True, null=True)),
+                ("compactness", models.SmallIntegerField(blank=True, null=True)),
+                ("num_plots", models.PositiveIntegerField(blank=True, null=True)),
+                ("num_columns", models.PositiveIntegerField(blank=True, null=True)),
+                ("name", models.CharField(blank=True, max_length=64, null=True)),
+                ("text_name", models.CharField(blank=True, max_length=64, null=True)),
+                ("html_name", models.CharField(blank=True, max_length=1024, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Block',
+            name="Block",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
-                ('name', models.CharField(max_length=64, unique=True, verbose_name='Name')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=64, unique=True, verbose_name="Name"),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='ColorValue',
+            name="ColorValue",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('color_type', models.CharField(choices=[('CHARACTER', 'CHARACTER'), ('CHARACTER_DECAL', 'CHARACTER_DECAL'), ('CREATURE_BASE', 'CREATURE_BASE'), ('CREATURE_AUX', 'CREATURE_AUX'), ('CREATURE_EXOTIC', 'CREATURE_EXOTIC'), ('WOOD', 'WOOD'), ('ROCK', 'ROCK'), ('GRASS', 'GRASS'), ('ICE', 'ICE'), ('GLACIER', 'GLACIER'), ('SOIL', 'SOIL'), ('ASH', 'ASH'), ('GLEAM', 'GLEAM'), ('GRAVEL', 'GRAVEL'), ('GROWTH', 'GROWTH'), ('MOULD', 'MOULD'), ('SAND', 'SAND'), ('SPONGE', 'SPONGE'), ('LEAVES', 'LEAVES'), ('MANTLE', 'MANTLE'), ('MUD', 'MUD'), ('TANGLE', 'TANGLE'), ('THORNS', 'THORNS'), ('FLORA_1', 'FLORA_1'), ('FLORA_DECAL_1', 'FLORA_DECAL_1'), ('FLORA_2', 'FLORA_2'), ('FLORA_DECAL_2', 'FLORA_DECAL_2'), ('FLORA_3', 'FLORA_3'), ('FLORA_DECAL_3', 'FLORA_DECAL_3'), ('FLORA_4', 'FLORA_4'), ('FLORA_DECAL_4', 'FLORA_DECAL_4'), ('INK', 'INK'), ('FIBER', 'FIBER')], max_length=64)),
-                ('shade', models.IntegerField()),
-                ('base', models.IntegerField()),
-                ('hlight', models.IntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "color_type",
+                    models.CharField(
+                        choices=[
+                            ("CHARACTER", "CHARACTER"),
+                            ("CHARACTER_DECAL", "CHARACTER_DECAL"),
+                            ("CREATURE_BASE", "CREATURE_BASE"),
+                            ("CREATURE_AUX", "CREATURE_AUX"),
+                            ("CREATURE_EXOTIC", "CREATURE_EXOTIC"),
+                            ("WOOD", "WOOD"),
+                            ("ROCK", "ROCK"),
+                            ("GRASS", "GRASS"),
+                            ("ICE", "ICE"),
+                            ("GLACIER", "GLACIER"),
+                            ("SOIL", "SOIL"),
+                            ("ASH", "ASH"),
+                            ("GLEAM", "GLEAM"),
+                            ("GRAVEL", "GRAVEL"),
+                            ("GROWTH", "GROWTH"),
+                            ("MOULD", "MOULD"),
+                            ("SAND", "SAND"),
+                            ("SPONGE", "SPONGE"),
+                            ("LEAVES", "LEAVES"),
+                            ("MANTLE", "MANTLE"),
+                            ("MUD", "MUD"),
+                            ("TANGLE", "TANGLE"),
+                            ("THORNS", "THORNS"),
+                            ("FLORA_1", "FLORA_1"),
+                            ("FLORA_DECAL_1", "FLORA_DECAL_1"),
+                            ("FLORA_2", "FLORA_2"),
+                            ("FLORA_DECAL_2", "FLORA_DECAL_2"),
+                            ("FLORA_3", "FLORA_3"),
+                            ("FLORA_DECAL_3", "FLORA_DECAL_3"),
+                            ("FLORA_4", "FLORA_4"),
+                            ("FLORA_DECAL_4", "FLORA_DECAL_4"),
+                            ("INK", "INK"),
+                            ("FIBER", "FIBER"),
+                        ],
+                        max_length=64,
+                    ),
+                ),
+                ("shade", models.IntegerField()),
+                ("base", models.IntegerField()),
+                ("hlight", models.IntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='Emoji',
+            name="Emoji",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('active', models.BooleanField(default=True)),
-                ('name', models.CharField(db_index=True, max_length=32)),
-                ('image', models.ImageField(storage=storages.backends.azure_storage.AzureStorage(azure_container='local-emoji'), upload_to='')),
-                ('image_small', models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-emoji'), upload_to='')),
-                ('category', models.CharField(blank=True, choices=[('SMILEY', 'Smiley & Emotion'), ('PEOPLE', 'People & Body'), ('COMPONENT', 'Component'), ('ANIMAL', 'Animals & Nature'), ('FOOD', 'Food & Drink'), ('TRAVEL', 'Travel & Places'), ('ACTIVITIES', 'Activities'), ('OBJECTS', 'Objects'), ('SYMBOLS', 'Symbols'), ('FLAGS', 'Flags'), ('BOUNDLESS', 'Boundless'), ('UNCATEGORIZED', 'Uncategorized')], db_index=True, max_length=16, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("active", models.BooleanField(default=True)),
+                ("name", models.CharField(db_index=True, max_length=32)),
+                (
+                    "image",
+                    models.ImageField(
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-emoji"
+                        ),
+                        upload_to="",
+                    ),
+                ),
+                (
+                    "image_small",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-emoji"
+                        ),
+                        upload_to="",
+                    ),
+                ),
+                (
+                    "category",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("SMILEY", "Smiley & Emotion"),
+                            ("PEOPLE", "People & Body"),
+                            ("COMPONENT", "Component"),
+                            ("ANIMAL", "Animals & Nature"),
+                            ("FOOD", "Food & Drink"),
+                            ("TRAVEL", "Travel & Places"),
+                            ("ACTIVITIES", "Activities"),
+                            ("OBJECTS", "Objects"),
+                            ("SYMBOLS", "Symbols"),
+                            ("FLAGS", "Flags"),
+                            ("BOUNDLESS", "Boundless"),
+                            ("UNCATEGORIZED", "Uncategorized"),
+                        ],
+                        db_index=True,
+                        max_length=16,
+                        null=True,
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='EmojiAltName',
+            name="EmojiAltName",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(db_index=True, max_length=32)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(db_index=True, max_length=32)),
             ],
         ),
         migrations.CreateModel(
-            name='ItemColorVariant',
+            name="ItemColorVariant",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(storage=storages.backends.azure_storage.AzureStorage(azure_container='local-items'), upload_to='')),
-                ('image_small', models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-items'), upload_to='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-items"
+                        ),
+                        upload_to="",
+                    ),
+                ),
+                (
+                    "image_small",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-items"
+                        ),
+                        upload_to="",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='ItemMetalVariant',
+            name="ItemMetalVariant",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('image', models.ImageField(storage=storages.backends.azure_storage.AzureStorage(azure_container='local-items'), upload_to='')),
-                ('image_small', models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-items'), upload_to='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "image",
+                    models.ImageField(
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-items"
+                        ),
+                        upload_to="",
+                    ),
+                ),
+                (
+                    "image_small",
+                    models.ImageField(
+                        blank=True,
+                        null=True,
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-items"
+                        ),
+                        upload_to="",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Liquid',
+            name="Liquid",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
-                ('name', models.CharField(max_length=64, unique=True, verbose_name='Name')),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
+                (
+                    "name",
+                    models.CharField(max_length=64, unique=True, verbose_name="Name"),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='LocalizedString',
+            name="LocalizedString",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('string_id', models.CharField(max_length=128, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("string_id", models.CharField(max_length=128, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='LocalizedStringText',
+            name="LocalizedStringText",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('lang', models.CharField(max_length=16, verbose_name='Language')),
-                ('text', models.TextField()),
-                ('_plain_text', models.TextField(blank=True, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("lang", models.CharField(max_length=16, verbose_name="Language")),
+                ("text", models.TextField()),
+                ("_plain_text", models.TextField(blank=True, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Recipe',
+            name="Recipe",
             fields=[
-                ('gameobj_ptr', models.OneToOneField(auto_created=True, on_delete=django.db.models.deletion.CASCADE, parent_link=True, primary_key=True, serialize=False, to='boundless.gameobj')),
-                ('heat', models.PositiveSmallIntegerField()),
-                ('craft_xp', models.PositiveSmallIntegerField()),
-                ('machine', models.CharField(blank=True, choices=[('COMPACTOR', 'COMPACTOR'), ('CRAFTING_TABLE', 'CRAFTING_TABLE'), ('DYE_MAKER', 'DYE_MAKER'), ('EXTRACTOR', 'EXTRACTOR'), ('FURNACE', 'FURNACE'), ('MIXER', 'MIXER'), ('REFINERY', 'REFINERY'), ('WORKBENCH', 'WORKBENCH')], db_index=True, max_length=16, null=True)),
-                ('can_hand_craft', models.BooleanField()),
-                ('machine_level', models.CharField(blank=True, choices=[('', ''), ('Standard', 'Standard'), ('Powered', 'Powered'), ('Overdriven', 'Overdriven'), ('Supercharged', 'Supercharged')], max_length=16, null=True)),
-                ('power', models.PositiveIntegerField()),
-                ('group_name', models.CharField(max_length=32)),
-                ('knowledge_unlock_level', models.PositiveIntegerField()),
-                ('required_event', models.CharField(blank=True, choices=[('GLEAMBOW_RACING', 'Gleambow Racting'), ('CHRISTMAS', 'Christmas'), ('VALENTINES', 'Valentines'), ('HALLOWEEN', 'Halloween'), ('BIRTHDAY', 'Birthday')], max_length=16, null=True)),
-                ('required_backer_tier', models.PositiveSmallIntegerField(blank=True, null=True)),
+                (
+                    "gameobj_ptr",
+                    models.OneToOneField(
+                        auto_created=True,
+                        on_delete=django.db.models.deletion.CASCADE,
+                        parent_link=True,
+                        primary_key=True,
+                        serialize=False,
+                        to="boundless.gameobj",
+                    ),
+                ),
+                ("heat", models.PositiveSmallIntegerField()),
+                ("craft_xp", models.PositiveSmallIntegerField()),
+                (
+                    "machine",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("COMPACTOR", "COMPACTOR"),
+                            ("CRAFTING_TABLE", "CRAFTING_TABLE"),
+                            ("DYE_MAKER", "DYE_MAKER"),
+                            ("EXTRACTOR", "EXTRACTOR"),
+                            ("FURNACE", "FURNACE"),
+                            ("MIXER", "MIXER"),
+                            ("REFINERY", "REFINERY"),
+                            ("WORKBENCH", "WORKBENCH"),
+                        ],
+                        db_index=True,
+                        max_length=16,
+                        null=True,
+                    ),
+                ),
+                ("can_hand_craft", models.BooleanField()),
+                (
+                    "machine_level",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("", ""),
+                            ("Standard", "Standard"),
+                            ("Powered", "Powered"),
+                            ("Overdriven", "Overdriven"),
+                            ("Supercharged", "Supercharged"),
+                        ],
+                        max_length=16,
+                        null=True,
+                    ),
+                ),
+                ("power", models.PositiveIntegerField()),
+                ("group_name", models.CharField(max_length=32)),
+                ("knowledge_unlock_level", models.PositiveIntegerField()),
+                (
+                    "required_event",
+                    models.CharField(
+                        blank=True,
+                        choices=[
+                            ("GLEAMBOW_RACING", "Gleambow Racting"),
+                            ("CHRISTMAS", "Christmas"),
+                            ("VALENTINES", "Valentines"),
+                            ("HALLOWEEN", "Halloween"),
+                            ("BIRTHDAY", "Birthday"),
+                        ],
+                        max_length=16,
+                        null=True,
+                    ),
+                ),
+                (
+                    "required_backer_tier",
+                    models.PositiveSmallIntegerField(blank=True, null=True),
+                ),
             ],
             options={
-                'abstract': False,
-                'base_manager_name': 'objects',
+                "abstract": False,
+                "base_manager_name": "objects",
             },
-            bases=('boundless.gameobj',),
+            bases=("boundless.gameobj",),
         ),
         migrations.CreateModel(
-            name='RecipeGroup',
+            name="RecipeGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('name', models.CharField(max_length=32, unique=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("name", models.CharField(max_length=32, unique=True)),
             ],
         ),
         migrations.CreateModel(
-            name='RecipeInput',
+            name="RecipeInput",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('count', models.PositiveSmallIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("count", models.PositiveSmallIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='RecipeLevel',
+            name="RecipeLevel",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('level', models.PositiveIntegerField(choices=[(0, 'Single'), (1, 'Bulk'), (2, 'Mass')])),
-                ('wear', models.PositiveIntegerField()),
-                ('spark', models.PositiveIntegerField()),
-                ('duration', models.PositiveIntegerField()),
-                ('output_quantity', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "level",
+                    models.PositiveIntegerField(
+                        choices=[(0, "Single"), (1, "Bulk"), (2, "Mass")]
+                    ),
+                ),
+                ("wear", models.PositiveIntegerField()),
+                ("spark", models.PositiveIntegerField()),
+                ("duration", models.PositiveIntegerField()),
+                ("output_quantity", models.PositiveIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='RecipeRequirement',
+            name="RecipeRequirement",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('level', models.PositiveSmallIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("level", models.PositiveSmallIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='ResourceData',
+            name="ResourceData",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_embedded', models.BooleanField()),
-                ('exo_only', models.BooleanField(default=False)),
-                ('max_tier', models.PositiveSmallIntegerField(choices=[(0, 'T1 - Placid'), (1, 'T2 - Temperate'), (2, 'T3 - Rugged'), (3, 'T4 - Inhospitable'), (4, 'T5 - Turbulent'), (5, 'T6 - Fierce'), (6, 'T7 - Savage'), (7, 'T8 - Brutal')], help_text='Max tier of world to be found on. Starts at 0.', verbose_name='Max Tier')),
-                ('min_tier', models.PositiveSmallIntegerField(choices=[(0, 'T1 - Placid'), (1, 'T2 - Temperate'), (2, 'T3 - Rugged'), (3, 'T4 - Inhospitable'), (4, 'T5 - Turbulent'), (5, 'T6 - Fierce'), (6, 'T7 - Savage'), (7, 'T8 - Brutal')], help_text='Min tier of world to be found on. Starts at 0.', verbose_name='Min Tier')),
-                ('best_max_tier', models.PositiveSmallIntegerField(choices=[(0, 'T1 - Placid'), (1, 'T2 - Temperate'), (2, 'T3 - Rugged'), (3, 'T4 - Inhospitable'), (4, 'T5 - Turbulent'), (5, 'T6 - Fierce'), (6, 'T7 - Savage'), (7, 'T8 - Brutal')], help_text='Max tier of world to be found on. Starts at 0.', verbose_name='Max Tier')),
-                ('best_min_tier', models.PositiveSmallIntegerField(choices=[(0, 'T1 - Placid'), (1, 'T2 - Temperate'), (2, 'T3 - Rugged'), (3, 'T4 - Inhospitable'), (4, 'T5 - Turbulent'), (5, 'T6 - Fierce'), (6, 'T7 - Savage'), (7, 'T8 - Brutal')], help_text='Min tier of world to be found on. Starts at 0.', verbose_name='Min Tier')),
-                ('shape', models.PositiveSmallIntegerField()),
-                ('size_max', models.PositiveSmallIntegerField()),
-                ('size_min', models.PositiveSmallIntegerField()),
-                ('altitude_max', models.PositiveSmallIntegerField()),
-                ('altitude_min', models.PositiveSmallIntegerField()),
-                ('distance_max', models.PositiveSmallIntegerField(blank=True, null=True)),
-                ('distance_min', models.PositiveSmallIntegerField(blank=True, null=True)),
-                ('cave_weighting', models.FloatField()),
-                ('size_skew_to_min', models.FloatField()),
-                ('blocks_above_max', models.PositiveSmallIntegerField()),
-                ('blocks_above_min', models.PositiveSmallIntegerField()),
-                ('liquid_above_max', models.PositiveSmallIntegerField()),
-                ('liquid_above_min', models.PositiveSmallIntegerField()),
-                ('noise_frequency', models.FloatField(blank=True, null=True)),
-                ('noise_threshold', models.FloatField(blank=True, null=True)),
-                ('three_d_weighting', models.FloatField()),
-                ('surface_weighting', models.FloatField()),
-                ('altitude_best_lower', models.PositiveSmallIntegerField()),
-                ('altitude_best_upper', models.PositiveSmallIntegerField()),
-                ('distance_best_lower', models.PositiveSmallIntegerField(blank=True, null=True)),
-                ('distance_best_upper', models.PositiveSmallIntegerField(blank=True, null=True)),
-                ('blocks_above_best_lower', models.PositiveSmallIntegerField()),
-                ('blocks_above_best_upper', models.PositiveSmallIntegerField()),
-                ('liquid_above_best_upper', models.PositiveSmallIntegerField()),
-                ('liquid_above_best_lower', models.PositiveSmallIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("is_embedded", models.BooleanField()),
+                ("exo_only", models.BooleanField(default=False)),
+                (
+                    "max_tier",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (0, "T1 - Placid"),
+                            (1, "T2 - Temperate"),
+                            (2, "T3 - Rugged"),
+                            (3, "T4 - Inhospitable"),
+                            (4, "T5 - Turbulent"),
+                            (5, "T6 - Fierce"),
+                            (6, "T7 - Savage"),
+                            (7, "T8 - Brutal"),
+                        ],
+                        help_text="Max tier of world to be found on. Starts at 0.",
+                        verbose_name="Max Tier",
+                    ),
+                ),
+                (
+                    "min_tier",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (0, "T1 - Placid"),
+                            (1, "T2 - Temperate"),
+                            (2, "T3 - Rugged"),
+                            (3, "T4 - Inhospitable"),
+                            (4, "T5 - Turbulent"),
+                            (5, "T6 - Fierce"),
+                            (6, "T7 - Savage"),
+                            (7, "T8 - Brutal"),
+                        ],
+                        help_text="Min tier of world to be found on. Starts at 0.",
+                        verbose_name="Min Tier",
+                    ),
+                ),
+                (
+                    "best_max_tier",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (0, "T1 - Placid"),
+                            (1, "T2 - Temperate"),
+                            (2, "T3 - Rugged"),
+                            (3, "T4 - Inhospitable"),
+                            (4, "T5 - Turbulent"),
+                            (5, "T6 - Fierce"),
+                            (6, "T7 - Savage"),
+                            (7, "T8 - Brutal"),
+                        ],
+                        help_text="Max tier of world to be found on. Starts at 0.",
+                        verbose_name="Max Tier",
+                    ),
+                ),
+                (
+                    "best_min_tier",
+                    models.PositiveSmallIntegerField(
+                        choices=[
+                            (0, "T1 - Placid"),
+                            (1, "T2 - Temperate"),
+                            (2, "T3 - Rugged"),
+                            (3, "T4 - Inhospitable"),
+                            (4, "T5 - Turbulent"),
+                            (5, "T6 - Fierce"),
+                            (6, "T7 - Savage"),
+                            (7, "T8 - Brutal"),
+                        ],
+                        help_text="Min tier of world to be found on. Starts at 0.",
+                        verbose_name="Min Tier",
+                    ),
+                ),
+                ("shape", models.PositiveSmallIntegerField()),
+                ("size_max", models.PositiveSmallIntegerField()),
+                ("size_min", models.PositiveSmallIntegerField()),
+                ("altitude_max", models.PositiveSmallIntegerField()),
+                ("altitude_min", models.PositiveSmallIntegerField()),
+                (
+                    "distance_max",
+                    models.PositiveSmallIntegerField(blank=True, null=True),
+                ),
+                (
+                    "distance_min",
+                    models.PositiveSmallIntegerField(blank=True, null=True),
+                ),
+                ("cave_weighting", models.FloatField()),
+                ("size_skew_to_min", models.FloatField()),
+                ("blocks_above_max", models.PositiveSmallIntegerField()),
+                ("blocks_above_min", models.PositiveSmallIntegerField()),
+                ("liquid_above_max", models.PositiveSmallIntegerField()),
+                ("liquid_above_min", models.PositiveSmallIntegerField()),
+                ("noise_frequency", models.FloatField(blank=True, null=True)),
+                ("noise_threshold", models.FloatField(blank=True, null=True)),
+                ("three_d_weighting", models.FloatField()),
+                ("surface_weighting", models.FloatField()),
+                ("altitude_best_lower", models.PositiveSmallIntegerField()),
+                ("altitude_best_upper", models.PositiveSmallIntegerField()),
+                (
+                    "distance_best_lower",
+                    models.PositiveSmallIntegerField(blank=True, null=True),
+                ),
+                (
+                    "distance_best_upper",
+                    models.PositiveSmallIntegerField(blank=True, null=True),
+                ),
+                ("blocks_above_best_lower", models.PositiveSmallIntegerField()),
+                ("blocks_above_best_upper", models.PositiveSmallIntegerField()),
+                ("liquid_above_best_upper", models.PositiveSmallIntegerField()),
+                ("liquid_above_best_lower", models.PositiveSmallIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='ResourceDataBestWorld',
+            name="ResourceDataBestWorld",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('world_type', models.CharField(choices=[('LUSH', 'Lush'), ('METAL', 'Metal'), ('COAL', 'Coal'), ('CORROSIVE', 'Corrosive'), ('SHOCK', 'Shock'), ('BLAST', 'Blast'), ('TOXIC', 'Toxic'), ('CHILL', 'Chill'), ('BURN', 'Burn'), ('DARKMATTER', 'Umbris'), ('RIFT', 'Rift'), ('BLINK', 'Blink')], max_length=10, verbose_name='World Type')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "world_type",
+                    models.CharField(
+                        choices=[
+                            ("LUSH", "Lush"),
+                            ("METAL", "Metal"),
+                            ("COAL", "Coal"),
+                            ("CORROSIVE", "Corrosive"),
+                            ("SHOCK", "Shock"),
+                            ("BLAST", "Blast"),
+                            ("TOXIC", "Toxic"),
+                            ("CHILL", "Chill"),
+                            ("BURN", "Burn"),
+                            ("DARKMATTER", "Umbris"),
+                            ("RIFT", "Rift"),
+                            ("BLINK", "Blink"),
+                        ],
+                        max_length=10,
+                        verbose_name="World Type",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='Settlement',
+            name="Settlement",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('location_x', models.IntegerField()),
-                ('location_z', models.IntegerField()),
-                ('prestige', models.PositiveIntegerField(db_index=True)),
-                ('name', models.CharField(max_length=64)),
-                ('text_name', models.CharField(blank=True, max_length=64, null=True)),
-                ('html_name', models.CharField(blank=True, max_length=1024, null=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                ("location_x", models.IntegerField()),
+                ("location_z", models.IntegerField()),
+                ("prestige", models.PositiveIntegerField(db_index=True)),
+                ("name", models.CharField(max_length=64)),
+                ("text_name", models.CharField(blank=True, max_length=64, null=True)),
+                ("html_name", models.CharField(blank=True, max_length=1024, null=True)),
             ],
         ),
         migrations.CreateModel(
-            name='Skill',
+            name="Skill",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('number_unlocks', models.PositiveIntegerField(help_text='How many times this skill can be unlocked')),
-                ('cost', models.PositiveIntegerField()),
-                ('name', models.CharField(max_length=64, unique=True)),
-                ('order', models.PositiveIntegerField()),
-                ('category', models.CharField(max_length=32)),
-                ('link_type', models.CharField(choices=[('None', 'None'), ('Left', 'Left'), ('Right', 'Right')], max_length=8)),
-                ('bundle_prefix', models.CharField(max_length=128)),
-                ('affected_by_other_skills', models.BooleanField()),
-                ('icon', models.ImageField(storage=storages.backends.azure_storage.AzureStorage(azure_container='local-skills'), upload_to='')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "number_unlocks",
+                    models.PositiveIntegerField(
+                        help_text="How many times this skill can be unlocked"
+                    ),
+                ),
+                ("cost", models.PositiveIntegerField()),
+                ("name", models.CharField(max_length=64, unique=True)),
+                ("order", models.PositiveIntegerField()),
+                ("category", models.CharField(max_length=32)),
+                (
+                    "link_type",
+                    models.CharField(
+                        choices=[
+                            ("None", "None"),
+                            ("Left", "Left"),
+                            ("Right", "Right"),
+                        ],
+                        max_length=8,
+                    ),
+                ),
+                ("bundle_prefix", models.CharField(max_length=128)),
+                ("affected_by_other_skills", models.BooleanField()),
+                (
+                    "icon",
+                    models.ImageField(
+                        storage=storages.backends.azure_storage.AzureStorage(
+                            azure_container="local-skills"
+                        ),
+                        upload_to="",
+                    ),
+                ),
             ],
         ),
         migrations.CreateModel(
-            name='SkillGroup',
+            name="SkillGroup",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('skill_type', models.CharField(choices=[('Attributes', 'Attributes'), ('Basic', 'Basic'), ('Epic', 'Epic')], max_length=16)),
-                ('name', models.CharField(max_length=16, unique=True)),
-                ('unlock_level', models.PositiveIntegerField()),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "skill_type",
+                    models.CharField(
+                        choices=[
+                            ("Attributes", "Attributes"),
+                            ("Basic", "Basic"),
+                            ("Epic", "Epic"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                ("name", models.CharField(max_length=16, unique=True)),
+                ("unlock_level", models.PositiveIntegerField()),
             ],
         ),
         migrations.CreateModel(
-            name='WorldBlockColor',
+            name="WorldBlockColor",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('is_default', models.BooleanField(default=True, help_text='Is this the color the world spawned with?')),
-                ('time', models.DateTimeField(auto_now_add=True)),
-                ('created_time', models.DateTimeField(auto_now_add=True)),
-                ('active', models.BooleanField(default=True, help_text='Is this the current color for the world?')),
-                ('is_new', models.BooleanField(default=False, help_text='This is the first time this WBC has appeared on non-Exo')),
-                ('is_new_transform', models.BooleanField(default=False, help_text='This is the first time this WBC has been avaiable via transform')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "is_default",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Is this the color the world spawned with?",
+                    ),
+                ),
+                ("time", models.DateTimeField(auto_now_add=True)),
+                ("created_time", models.DateTimeField(auto_now_add=True)),
+                (
+                    "active",
+                    models.BooleanField(
+                        default=True,
+                        help_text="Is this the current color for the world?",
+                    ),
+                ),
+                (
+                    "is_new",
+                    models.BooleanField(
+                        default=False,
+                        help_text="This is the first time this WBC has appeared on non-Exo",
+                    ),
+                ),
+                (
+                    "is_new_transform",
+                    models.BooleanField(
+                        default=False,
+                        help_text="This is the first time this WBC has been avaiable via transform",
+                    ),
+                ),
             ],
             options={
-                'ordering': ['item_id'],
+                "ordering": ["item_id"],
             },
         ),
         migrations.CreateModel(
-            name='WorldCreatureColor',
+            name="WorldCreatureColor",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('creature_type', models.CharField(choices=[('CUTTLETRUNK', 'Cuttletrunk'), ('HOPPER', 'Hopper'), ('HUNTER', 'Hunter'), ('ROADRUNNER', 'Roadrunner'), ('SPITTER', 'Spitter'), ('WILDSTOCK', 'Wildstock')], max_length=16)),
-                ('color_data', models.TextField()),
-                ('time', models.DateTimeField(auto_now_add=True)),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "creature_type",
+                    models.CharField(
+                        choices=[
+                            ("CUTTLETRUNK", "Cuttletrunk"),
+                            ("HOPPER", "Hopper"),
+                            ("HUNTER", "Hunter"),
+                            ("ROADRUNNER", "Roadrunner"),
+                            ("SPITTER", "Spitter"),
+                            ("WILDSTOCK", "Wildstock"),
+                        ],
+                        max_length=16,
+                    ),
+                ),
+                ("color_data", models.TextField()),
+                ("time", models.DateTimeField(auto_now_add=True)),
             ],
         ),
         migrations.CreateModel(
-            name='WorldDistance',
+            name="WorldDistance",
             fields=[
-                ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
-                ('distance', models.PositiveSmallIntegerField(verbose_name='Distance to work in blinksecs')),
+                (
+                    "id",
+                    models.AutoField(
+                        auto_created=True,
+                        primary_key=True,
+                        serialize=False,
+                        verbose_name="ID",
+                    ),
+                ),
+                (
+                    "distance",
+                    models.PositiveSmallIntegerField(
+                        verbose_name="Distance to work in blinksecs"
+                    ),
+                ),
             ],
         ),
         migrations.AlterModelOptions(
-            name='gameobj',
-            options={'ordering': ['game_id']},
+            name="gameobj",
+            options={"ordering": ["game_id"]},
         ),
         migrations.AlterModelOptions(
-            name='item',
+            name="item",
             options={},
         ),
         migrations.AlterModelOptions(
-            name='leaderboardrecord',
-            options={'ordering': ['world_rank']},
+            name="leaderboardrecord",
+            options={"ordering": ["world_rank"]},
         ),
         migrations.AlterModelOptions(
-            name='resourcecount',
-            options={'ordering': ['-count']},
+            name="resourcecount",
+            options={"ordering": ["-count"]},
         ),
         migrations.AlterModelOptions(
-            name='world',
-            options={'ordering': ['id'], 'permissions': [('can_view_private', 'Can view private worlds?')]},
+            name="world",
+            options={
+                "ordering": ["id"],
+                "permissions": [("can_view_private", "Can view private worlds?")],
+            },
         ),
         migrations.RemoveField(
-            model_name='world',
-            name='description',
+            model_name="world",
+            name="description",
         ),
         migrations.AddField(
-            model_name='item',
-            name='build_xp',
+            model_name="item",
+            name="build_xp",
             field=models.PositiveSmallIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='item',
-            name='can_be_sold',
+            model_name="item",
+            name="can_be_sold",
             field=models.BooleanField(db_index=True, default=True),
         ),
         migrations.AddField(
-            model_name='item',
-            name='default_color',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='boundless.color'),
+            model_name="item",
+            name="default_color",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.color",
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='image',
-            field=models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-items'), upload_to=''),
+            model_name="item",
+            name="image",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                storage=storages.backends.azure_storage.AzureStorage(
+                    azure_container="local-items"
+                ),
+                upload_to="",
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='image_small',
-            field=models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-items'), upload_to=''),
+            model_name="item",
+            name="image_small",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                storage=storages.backends.azure_storage.AzureStorage(
+                    azure_container="local-items"
+                ),
+                upload_to="",
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='is_block',
+            model_name="item",
+            name="is_block",
             field=models.BooleanField(db_index=True, default=False),
         ),
         migrations.AddField(
-            model_name='item',
-            name='is_liquid',
+            model_name="item",
+            name="is_liquid",
             field=models.BooleanField(db_index=True, default=False),
         ),
         migrations.AddField(
-            model_name='item',
-            name='is_resource',
+            model_name="item",
+            name="is_resource",
             field=models.BooleanField(db_index=True, default=False),
         ),
         migrations.AddField(
-            model_name='item',
-            name='max_stack',
+            model_name="item",
+            name="max_stack",
             field=models.PositiveSmallIntegerField(default=100),
         ),
         migrations.AddField(
-            model_name='item',
-            name='mine_xp',
+            model_name="item",
+            name="mine_xp",
             field=models.PositiveSmallIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='item',
-            name='mint_value',
-            field=models.FloatField(blank=True, null=True, verbose_name='Chrysominter Value'),
+            model_name="item",
+            name="mint_value",
+            field=models.FloatField(
+                blank=True, null=True, verbose_name="Chrysominter Value"
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='name',
-            field=models.CharField(default=None, max_length=64, verbose_name='Name'),
+            model_name="item",
+            name="name",
+            field=models.CharField(default=None, max_length=64, verbose_name="Name"),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='item',
-            name='prestige',
+            model_name="item",
+            name="prestige",
             field=models.PositiveSmallIntegerField(default=0),
         ),
         migrations.AddField(
-            model_name='itemrequestbasketprice',
-            name='beacon_html_name',
+            model_name="itemrequestbasketprice",
+            name="beacon_html_name",
             field=models.CharField(blank=True, max_length=1024, null=True),
         ),
         migrations.AddField(
-            model_name='itemrequestbasketprice',
-            name='beacon_text_name',
+            model_name="itemrequestbasketprice",
+            name="beacon_text_name",
             field=models.CharField(blank=True, max_length=64, null=True),
         ),
         migrations.AddField(
-            model_name='itemshopstandprice',
-            name='beacon_html_name',
+            model_name="itemshopstandprice",
+            name="beacon_html_name",
             field=models.CharField(blank=True, max_length=1024, null=True),
         ),
         migrations.AddField(
-            model_name='itemshopstandprice',
-            name='beacon_text_name',
+            model_name="itemshopstandprice",
+            name="beacon_text_name",
             field=models.CharField(blank=True, max_length=64, null=True),
         ),
         migrations.AddField(
-            model_name='leaderboardrecord',
-            name='html_name',
+            model_name="leaderboardrecord",
+            name="html_name",
             field=models.CharField(blank=True, max_length=1024, null=True),
         ),
         migrations.AddField(
-            model_name='leaderboardrecord',
-            name='text_name',
+            model_name="leaderboardrecord",
+            name="text_name",
             field=models.CharField(blank=True, max_length=64, null=True),
         ),
         migrations.AddField(
-            model_name='resourcecount',
-            name='average_per_chunk',
-            field=models.DecimalField(blank=True, decimal_places=2, max_digits=10, null=True),
+            model_name="resourcecount",
+            name="average_per_chunk",
+            field=models.DecimalField(
+                blank=True, decimal_places=2, max_digits=10, null=True
+            ),
         ),
         migrations.AddField(
-            model_name='resourcecount',
-            name='percentage',
+            model_name="resourcecount",
+            name="percentage",
             field=models.DecimalField(decimal_places=2, default=None, max_digits=5),
             preserve_default=False,
         ),
         migrations.AddField(
-            model_name='world',
-            name='assignment',
-            field=models.ForeignKey(blank=True, help_text='The world this planet orbits, if any', null=True, on_delete=django.db.models.deletion.CASCADE, to='boundless.world'),
+            model_name="world",
+            name="assignment",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="The world this planet orbits, if any",
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='atlas_image',
-            field=models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-atlas'), upload_to=''),
+            model_name="world",
+            name="atlas_image",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                storage=storages.backends.azure_storage.AzureStorage(
+                    azure_container="local-atlas"
+                ),
+                upload_to="",
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='forum_id',
+            model_name="world",
+            name="forum_id",
             field=models.PositiveIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='html_name',
+            model_name="world",
+            name="html_name",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='image',
-            field=models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-worlds'), upload_to=''),
+            model_name="world",
+            name="image",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                storage=storages.backends.azure_storage.AzureStorage(
+                    azure_container="local-worlds"
+                ),
+                upload_to="",
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='image_small',
-            field=models.ImageField(blank=True, null=True, storage=storages.backends.azure_storage.AzureStorage(azure_container='local-worlds'), upload_to=''),
+            model_name="world",
+            name="image_small",
+            field=models.ImageField(
+                blank=True,
+                null=True,
+                storage=storages.backends.azure_storage.AzureStorage(
+                    azure_container="local-worlds"
+                ),
+                upload_to="",
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='is_creative',
-            field=models.BooleanField(db_index=True, default=False, help_text='If the world is a creative one', null=True),
+            model_name="world",
+            name="is_creative",
+            field=models.BooleanField(
+                db_index=True,
+                default=False,
+                help_text="If the world is a creative one",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='is_finalized',
+            model_name="world",
+            name="is_finalized",
             field=models.BooleanField(null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='is_locked',
-            field=models.BooleanField(db_index=True, default=False, help_text='If this world is locked (only `true` for Soverign worlds)', null=True),
+            model_name="world",
+            name="is_locked",
+            field=models.BooleanField(
+                db_index=True,
+                default=False,
+                help_text="If this world is locked (only `true` for Soverign worlds)",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='is_public',
-            field=models.BooleanField(db_index=True, default=True, help_text='If this world is public', null=True),
+            model_name="world",
+            name="is_public",
+            field=models.BooleanField(
+                db_index=True,
+                default=True,
+                help_text="If this world is public",
+                null=True,
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='is_public_claim',
+            model_name="world",
+            name="is_public_claim",
             field=models.BooleanField(null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='is_public_edit',
+            model_name="world",
+            name="is_public_edit",
             field=models.BooleanField(null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='last_updated',
+            model_name="world",
+            name="last_updated",
             field=models.DateTimeField(auto_now=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='notification_sent',
+            model_name="world",
+            name="notification_sent",
             field=models.BooleanField(null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='number_of_regions',
+            model_name="world",
+            name="number_of_regions",
             field=models.PositiveSmallIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='owner',
+            model_name="world",
+            name="owner",
             field=models.PositiveSmallIntegerField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='sort_name',
+            model_name="world",
+            name="sort_name",
             field=models.TextField(blank=True, db_index=True, null=True),
         ),
         migrations.AddField(
-            model_name='world',
-            name='special_type',
-            field=models.PositiveSmallIntegerField(choices=[(1, 'Color-Cycling')], db_index=True, help_text='`1` = Color-Cycling', null=True, verbose_name='Special Type'),
+            model_name="world",
+            name="special_type",
+            field=models.PositiveSmallIntegerField(
+                choices=[(1, "Color-Cycling")],
+                db_index=True,
+                help_text="`1` = Color-Cycling",
+                null=True,
+                verbose_name="Special Type",
+            ),
         ),
         migrations.AddField(
-            model_name='world',
-            name='text_name',
+            model_name="world",
+            name="text_name",
             field=models.TextField(blank=True, null=True),
         ),
         migrations.AddField(
-            model_name='worldpoll',
-            name='active',
+            model_name="worldpoll",
+            name="active",
             field=models.BooleanField(db_index=True, default=True),
         ),
         migrations.AddField(
-            model_name='worldpoll',
-            name='time',
-            field=models.DateTimeField(auto_now_add=True, default=django.utils.timezone.now),
+            model_name="worldpoll",
+            name="time",
+            field=models.DateTimeField(
+                auto_now_add=True, default=django.utils.timezone.now
+            ),
             preserve_default=False,
         ),
         migrations.AlterField(
-            model_name='item',
-            name='string_id',
-            field=models.CharField(db_index=True, max_length=64, verbose_name='String ID'),
+            model_name="item",
+            name="string_id",
+            field=models.CharField(
+                db_index=True, max_length=64, verbose_name="String ID"
+            ),
         ),
         migrations.AlterField(
-            model_name='itembuyrank',
-            name='rank',
+            model_name="itembuyrank",
+            name="rank",
             field=models.PositiveSmallIntegerField(default=20),
         ),
         migrations.AlterField(
-            model_name='itemrequestbasketprice',
-            name='guild_tag',
+            model_name="itemrequestbasketprice",
+            name="guild_tag",
             field=models.CharField(max_length=16),
         ),
         migrations.AlterField(
-            model_name='itemsellrank',
-            name='rank',
+            model_name="itemsellrank",
+            name="rank",
             field=models.PositiveSmallIntegerField(default=20),
         ),
         migrations.AlterField(
-            model_name='itemshopstandprice',
-            name='guild_tag',
+            model_name="itemshopstandprice",
+            name="guild_tag",
             field=models.CharField(max_length=16),
         ),
         migrations.AlterField(
-            model_name='leaderboardrecord',
-            name='guild_tag',
-            field=models.CharField(max_length=16, verbose_name='Guild Tag'),
+            model_name="leaderboardrecord",
+            name="guild_tag",
+            field=models.CharField(max_length=16, verbose_name="Guild Tag"),
         ),
         migrations.AlterField(
-            model_name='leaderboardrecord',
-            name='mayor_id',
+            model_name="leaderboardrecord",
+            name="mayor_id",
             field=models.PositiveIntegerField(),
         ),
         migrations.AlterField(
-            model_name='leaderboardrecord',
-            name='time',
-            field=models.DateTimeField(auto_now_add=True, primary_key=True, serialize=False),
+            model_name="leaderboardrecord",
+            name="time",
+            field=models.DateTimeField(
+                auto_now_add=True, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='localizedname',
-            name='name',
-            field=models.CharField(db_index=True, max_length=128, verbose_name='Name'),
+            model_name="localizedname",
+            name="name",
+            field=models.CharField(db_index=True, max_length=128, verbose_name="Name"),
         ),
         migrations.AlterField(
-            model_name='resourcecount',
-            name='count',
-            field=models.PositiveIntegerField(verbose_name='Count'),
+            model_name="resourcecount",
+            name="count",
+            field=models.PositiveIntegerField(verbose_name="Count"),
         ),
         migrations.AlterField(
-            model_name='resourcecount',
-            name='time',
-            field=models.DateTimeField(default=django.utils.timezone.now, primary_key=True, serialize=False),
+            model_name="resourcecount",
+            name="time",
+            field=models.DateTimeField(
+                default=django.utils.timezone.now, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='active',
-            field=models.BooleanField(db_index=True, default=True, help_text='Does this world still exist (returned by game API)?'),
+            model_name="world",
+            name="active",
+            field=models.BooleanField(
+                db_index=True,
+                default=True,
+                help_text="Does this world still exist (returned by game API)?",
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='address',
-            field=models.CharField(blank=True, max_length=128, null=True, verbose_name='Server Address'),
+            model_name="world",
+            name="address",
+            field=models.CharField(
+                blank=True, max_length=128, null=True, verbose_name="Server Address"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='api_url',
-            field=models.URLField(blank=True, null=True, verbose_name='API URL'),
+            model_name="world",
+            name="api_url",
+            field=models.URLField(blank=True, null=True, verbose_name="API URL"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='atmosphere_color_b',
-            field=models.FloatField(null=True, verbose_name='Atmosphere Linear B Color'),
+            model_name="world",
+            name="atmosphere_color_b",
+            field=models.FloatField(
+                null=True, verbose_name="Atmosphere Linear B Color"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='atmosphere_color_g',
-            field=models.FloatField(null=True, verbose_name='Atmosphere Linear G Color'),
+            model_name="world",
+            name="atmosphere_color_g",
+            field=models.FloatField(
+                null=True, verbose_name="Atmosphere Linear G Color"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='atmosphere_color_r',
-            field=models.FloatField(null=True, verbose_name='Atmosphere Linear R Color'),
+            model_name="world",
+            name="atmosphere_color_r",
+            field=models.FloatField(
+                null=True, verbose_name="Atmosphere Linear R Color"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='chunks_url',
-            field=models.URLField(blank=True, null=True, verbose_name='Chunks URL'),
+            model_name="world",
+            name="chunks_url",
+            field=models.URLField(blank=True, null=True, verbose_name="Chunks URL"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='display_name',
-            field=models.CharField(db_index=True, max_length=64, verbose_name='Display Name'),
+            model_name="world",
+            name="display_name",
+            field=models.CharField(
+                db_index=True, max_length=64, verbose_name="Display Name"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='end',
+            model_name="world",
+            name="end",
             field=models.DateTimeField(blank=True, db_index=True, null=True),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='ip_address',
-            field=models.GenericIPAddressField(blank=True, null=True, verbose_name='Server IP Address'),
+            model_name="world",
+            name="ip_address",
+            field=models.GenericIPAddressField(
+                blank=True, null=True, verbose_name="Server IP Address"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='name',
-            field=models.CharField(db_index=True, max_length=64, null=True, verbose_name='Name'),
+            model_name="world",
+            name="name",
+            field=models.CharField(
+                db_index=True, max_length=64, null=True, verbose_name="Name"
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='planets_url',
-            field=models.URLField(blank=True, null=True, verbose_name='Planets URL'),
+            model_name="world",
+            name="planets_url",
+            field=models.URLField(blank=True, null=True, verbose_name="Planets URL"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='region',
-            field=models.CharField(choices=[('use', 'US East'), ('usw', 'US West'), ('euc', 'EU Central'), ('aus', 'Australia'), ('sandbox', 'Sandbox')], db_index=True, help_text='Server Region', max_length=16, null=True, verbose_name='Server Region'),
+            model_name="world",
+            name="region",
+            field=models.CharField(
+                choices=[
+                    ("use", "US East"),
+                    ("usw", "US West"),
+                    ("euc", "EU Central"),
+                    ("aus", "Australia"),
+                    ("sandbox", "Sandbox"),
+                ],
+                db_index=True,
+                help_text="Server Region",
+                max_length=16,
+                null=True,
+                verbose_name="Server Region",
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='size',
-            field=models.IntegerField(null=True, verbose_name='World Size'),
+            model_name="world",
+            name="size",
+            field=models.IntegerField(null=True, verbose_name="World Size"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='start',
+            model_name="world",
+            name="start",
             field=models.DateTimeField(blank=True, db_index=True, null=True),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='tier',
-            field=models.PositiveSmallIntegerField(choices=[(0, 'T1 - Placid'), (1, 'T2 - Temperate'), (2, 'T3 - Rugged'), (3, 'T4 - Inhospitable'), (4, 'T5 - Turbulent'), (5, 'T6 - Fierce'), (6, 'T7 - Savage'), (7, 'T8 - Brutal')], db_index=True, help_text='Tier of the world. Starts at 0.', null=True, verbose_name='Tier'),
+            model_name="world",
+            name="tier",
+            field=models.PositiveSmallIntegerField(
+                choices=[
+                    (0, "T1 - Placid"),
+                    (1, "T2 - Temperate"),
+                    (2, "T3 - Rugged"),
+                    (3, "T4 - Inhospitable"),
+                    (4, "T5 - Turbulent"),
+                    (5, "T6 - Fierce"),
+                    (6, "T7 - Savage"),
+                    (7, "T8 - Brutal"),
+                ],
+                db_index=True,
+                help_text="Tier of the world. Starts at 0.",
+                null=True,
+                verbose_name="Tier",
+            ),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='time_offset',
-            field=models.DateTimeField(null=True, verbose_name='Time Offset'),
+            model_name="world",
+            name="time_offset",
+            field=models.DateTimeField(null=True, verbose_name="Time Offset"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='water_color_b',
-            field=models.FloatField(null=True, verbose_name='Water Linear B Color'),
+            model_name="world",
+            name="water_color_b",
+            field=models.FloatField(null=True, verbose_name="Water Linear B Color"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='water_color_g',
-            field=models.FloatField(null=True, verbose_name='Water Linear G Color'),
+            model_name="world",
+            name="water_color_g",
+            field=models.FloatField(null=True, verbose_name="Water Linear G Color"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='water_color_r',
-            field=models.FloatField(null=True, verbose_name='Water Linear R Color'),
+            model_name="world",
+            name="water_color_r",
+            field=models.FloatField(null=True, verbose_name="Water Linear R Color"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='websocket_url',
-            field=models.URLField(blank=True, null=True, verbose_name='Websocket URL'),
+            model_name="world",
+            name="websocket_url",
+            field=models.URLField(blank=True, null=True, verbose_name="Websocket URL"),
         ),
         migrations.AlterField(
-            model_name='world',
-            name='world_type',
-            field=models.CharField(choices=[('LUSH', 'Lush'), ('METAL', 'Metal'), ('COAL', 'Coal'), ('CORROSIVE', 'Corrosive'), ('SHOCK', 'Shock'), ('BLAST', 'Blast'), ('TOXIC', 'Toxic'), ('CHILL', 'Chill'), ('BURN', 'Burn'), ('DARKMATTER', 'Umbris'), ('RIFT', 'Rift'), ('BLINK', 'Blink')], db_index=True, max_length=10, null=True, verbose_name='World Type'),
+            model_name="world",
+            name="world_type",
+            field=models.CharField(
+                choices=[
+                    ("LUSH", "Lush"),
+                    ("METAL", "Metal"),
+                    ("COAL", "Coal"),
+                    ("CORROSIVE", "Corrosive"),
+                    ("SHOCK", "Shock"),
+                    ("BLAST", "Blast"),
+                    ("TOXIC", "Toxic"),
+                    ("CHILL", "Chill"),
+                    ("BURN", "Burn"),
+                    ("DARKMATTER", "Umbris"),
+                    ("RIFT", "Rift"),
+                    ("BLINK", "Blink"),
+                ],
+                db_index=True,
+                max_length=10,
+                null=True,
+                verbose_name="World Type",
+            ),
         ),
         migrations.AlterField(
-            model_name='worldpollresult',
-            name='time',
-            field=models.DateTimeField(auto_now_add=True, primary_key=True, serialize=False),
+            model_name="worldpollresult",
+            name="time",
+            field=models.DateTimeField(
+                auto_now_add=True, primary_key=True, serialize=False
+            ),
         ),
         migrations.AlterField(
-            model_name='worldpollresult',
-            name='total_prestige',
-            field=models.PositiveIntegerField(blank=True, null=True, verbose_name='Total Prestige'),
+            model_name="worldpollresult",
+            name="total_prestige",
+            field=models.PositiveIntegerField(
+                blank=True, null=True, verbose_name="Total Prestige"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='itembuyrank',
-            unique_together={('item', 'world')},
+            name="itembuyrank",
+            unique_together={("item", "world")},
         ),
         migrations.AlterUniqueTogether(
-            name='itemsellrank',
-            unique_together={('item', 'world')},
+            name="itemsellrank",
+            unique_together={("item", "world")},
         ),
         migrations.AddIndex(
-            model_name='gameobj',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['game_id'], name='boundless_g_game_id_0f0659_gin'),
+            model_name="gameobj",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["game_id"], name="boundless_g_game_id_0f0659_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='item',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['string_id'], name='boundless_i_string__186db8_gin'),
+            model_name="item",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["string_id"], name="boundless_i_string__186db8_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='localizedname',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='boundless_l_name_f8ba51_gin'),
+            model_name="localizedname",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="boundless_l_name_f8ba51_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='world',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='boundless_w_name_97f9a1_gin'),
+            model_name="world",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="boundless_w_name_97f9a1_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='world',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['text_name'], name='boundless_w_text_na_f65d9b_gin'),
+            model_name="world",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["text_name"], name="boundless_w_text_na_f65d9b_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='world',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['id'], name='boundless_w_id_58b1eb_gin'),
+            model_name="world",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["id"], name="boundless_w_id_58b1eb_gin"
+            ),
         ),
         migrations.AddField(
-            model_name='worlddistance',
-            name='world_dest',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.world'),
+            model_name="worlddistance",
+            name="world_dest",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='worlddistance',
-            name='world_source',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.world'),
+            model_name="worlddistance",
+            name="world_source",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='worldcreaturecolor',
-            name='uploader',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="worldcreaturecolor",
+            name="uploader",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='worldcreaturecolor',
-            name='world',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world'),
+            model_name="worldcreaturecolor",
+            name="world",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.world"
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='color',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.color'),
+            model_name="worldblockcolor",
+            name="color",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.color"
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='first_world',
-            field=models.ForeignKey(blank=True, help_text='First non-Exo world with this color', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='boundless.world'),
+            model_name="worldblockcolor",
+            name="first_world",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="First non-Exo world with this color",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='item',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item'),
+            model_name="worldblockcolor",
+            name="item",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='last_exo',
-            field=models.ForeignKey(blank=True, help_text='Most recent Exo with this color (only for Exo WBCs)', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='boundless.world'),
+            model_name="worldblockcolor",
+            name="last_exo",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Most recent Exo with this color (only for Exo WBCs)",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='transform_first_world',
-            field=models.ForeignKey(blank=True, help_text='First non-Exo WBC that can transform into this one', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='boundless.world'),
+            model_name="worldblockcolor",
+            name="transform_first_world",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="First non-Exo WBC that can transform into this one",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='transform_last_exo',
-            field=models.ForeignKey(blank=True, help_text='Most recent Exo WBC that can transform into this one (only for Exo WBCs)', null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to='boundless.world'),
+            model_name="worldblockcolor",
+            name="transform_last_exo",
+            field=models.ForeignKey(
+                blank=True,
+                help_text="Most recent Exo WBC that can transform into this one (only for Exo WBCs)",
+                null=True,
+                on_delete=django.db.models.deletion.SET_NULL,
+                related_name="+",
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='uploader',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to=settings.AUTH_USER_MODEL),
+            model_name="worldblockcolor",
+            name="uploader",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to=settings.AUTH_USER_MODEL,
+            ),
         ),
         migrations.AddField(
-            model_name='worldblockcolor',
-            name='world',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='boundless.world'),
+            model_name="worldblockcolor",
+            name="world",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.world",
+            ),
         ),
         migrations.AddField(
-            model_name='skillgroup',
-            name='display_name',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.localizedstring'),
+            model_name="skillgroup",
+            name="display_name",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AddField(
-            model_name='skill',
-            name='description',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.localizedstring'),
+            model_name="skill",
+            name="description",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AddField(
-            model_name='skill',
-            name='display_name',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.localizedstring'),
+            model_name="skill",
+            name="display_name",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AddField(
-            model_name='skill',
-            name='group',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.skillgroup'),
+            model_name="skill",
+            name="group",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.skillgroup"
+            ),
         ),
         migrations.AddField(
-            model_name='settlement',
-            name='world',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world'),
+            model_name="settlement",
+            name="world",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.world"
+            ),
         ),
         migrations.AddField(
-            model_name='resourcedatabestworld',
-            name='data',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='best_worlds', to='boundless.resourcedata'),
+            model_name="resourcedatabestworld",
+            name="data",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="best_worlds",
+                to="boundless.resourcedata",
+            ),
         ),
         migrations.AddField(
-            model_name='resourcedata',
-            name='item',
-            field=models.OneToOneField(on_delete=django.db.models.deletion.CASCADE, related_name='resource_data', to='boundless.item'),
+            model_name="resourcedata",
+            name="item",
+            field=models.OneToOneField(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="resource_data",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='resourcedata',
-            name='liquid_favorite',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="resourcedata",
+            name="liquid_favorite",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='resourcedata',
-            name='liquid_second_favorite',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="resourcedata",
+            name="liquid_second_favorite",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='resourcedata',
-            name='surface_favorite',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="resourcedata",
+            name="surface_favorite",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='resourcedata',
-            name='surface_second_favorite',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="resourcedata",
+            name="surface_second_favorite",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='reciperequirement',
-            name='skill',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.skill'),
+            model_name="reciperequirement",
+            name="skill",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.skill"
+            ),
         ),
         migrations.AddField(
-            model_name='recipelevel',
-            name='inputs',
-            field=models.ManyToManyField(to='boundless.RecipeInput'),
+            model_name="recipelevel",
+            name="inputs",
+            field=models.ManyToManyField(to="boundless.RecipeInput"),
         ),
         migrations.AddField(
-            model_name='recipeinput',
-            name='group',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='boundless.recipegroup'),
+            model_name="recipeinput",
+            name="group",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.recipegroup",
+            ),
         ),
         migrations.AddField(
-            model_name='recipeinput',
-            name='item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, to='boundless.item'),
+            model_name="recipeinput",
+            name="item",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='recipegroup',
-            name='display_name',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.localizedstring'),
+            model_name="recipegroup",
+            name="display_name",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AddField(
-            model_name='recipegroup',
-            name='members',
-            field=models.ManyToManyField(to='boundless.Item'),
+            model_name="recipegroup",
+            name="members",
+            field=models.ManyToManyField(to="boundless.Item"),
         ),
         migrations.AddField(
-            model_name='recipe',
-            name='levels',
-            field=models.ManyToManyField(to='boundless.RecipeLevel'),
+            model_name="recipe",
+            name="levels",
+            field=models.ManyToManyField(to="boundless.RecipeLevel"),
         ),
         migrations.AddField(
-            model_name='recipe',
-            name='output',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item'),
+            model_name="recipe",
+            name="output",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+            ),
         ),
         migrations.AddField(
-            model_name='recipe',
-            name='requirements',
-            field=models.ManyToManyField(to='boundless.RecipeRequirement'),
+            model_name="recipe",
+            name="requirements",
+            field=models.ManyToManyField(to="boundless.RecipeRequirement"),
         ),
         migrations.AddField(
-            model_name='recipe',
-            name='tints',
-            field=models.ManyToManyField(related_name='_boundless_recipe_tints_+', to='boundless.Item'),
+            model_name="recipe",
+            name="tints",
+            field=models.ManyToManyField(
+                related_name="_boundless_recipe_tints_+", to="boundless.Item"
+            ),
         ),
         migrations.AddField(
-            model_name='localizedstringtext',
-            name='string',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='strings', to='boundless.localizedstring'),
+            model_name="localizedstringtext",
+            name="string",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="strings",
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AddField(
-            model_name='liquid',
-            name='block_item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="liquid",
+            name="block_item",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='itemmetalvariant',
-            name='item',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item'),
+            model_name="itemmetalvariant",
+            name="item",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+            ),
         ),
         migrations.AddField(
-            model_name='itemmetalvariant',
-            name='metal',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.metal'),
+            model_name="itemmetalvariant",
+            name="metal",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.metal"
+            ),
         ),
         migrations.AddField(
-            model_name='itemcolorvariant',
-            name='color',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.color'),
+            model_name="itemcolorvariant",
+            name="color",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.color"
+            ),
         ),
         migrations.AddField(
-            model_name='itemcolorvariant',
-            name='item',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.item'),
+            model_name="itemcolorvariant",
+            name="item",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.item"
+            ),
         ),
         migrations.AddField(
-            model_name='emojialtname',
-            name='emoji',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.emoji'),
+            model_name="emojialtname",
+            name="emoji",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.emoji"
+            ),
         ),
         migrations.AddIndex(
-            model_name='emoji',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='boundless_e_name_753a14_gin'),
+            model_name="emoji",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="boundless_e_name_753a14_gin"
+            ),
         ),
         migrations.AddField(
-            model_name='colorvalue',
-            name='color',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.color'),
+            model_name="colorvalue",
+            name="color",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.color"
+            ),
         ),
         migrations.AddField(
-            model_name='block',
-            name='block_item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="block",
+            name="block_item",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='beaconscan',
-            name='beacon',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.beacon'),
+            model_name="beaconscan",
+            name="beacon",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.beacon"
+            ),
         ),
         migrations.AddField(
-            model_name='beaconplotcolumn',
-            name='beacon',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.beacon'),
+            model_name="beaconplotcolumn",
+            name="beacon",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.beacon"
+            ),
         ),
         migrations.AddField(
-            model_name='beacon',
-            name='world',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='boundless.world'),
+            model_name="beacon",
+            name="world",
+            field=models.ForeignKey(
+                on_delete=django.db.models.deletion.CASCADE, to="boundless.world"
+            ),
         ),
         migrations.AddField(
-            model_name='altitem',
-            name='base_item',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.item'),
+            model_name="altitem",
+            name="base_item",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.item",
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='description',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.localizedstring'),
+            model_name="item",
+            name="description",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AddField(
-            model_name='item',
-            name='list_type',
-            field=models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.CASCADE, related_name='+', to='boundless.localizedstring'),
+            model_name="item",
+            name="list_type",
+            field=models.ForeignKey(
+                blank=True,
+                null=True,
+                on_delete=django.db.models.deletion.CASCADE,
+                related_name="+",
+                to="boundless.localizedstring",
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='worldcreaturecolor',
-            unique_together={('world', 'creature_type')},
+            name="worldcreaturecolor",
+            unique_together={("world", "creature_type")},
         ),
         migrations.AddIndex(
-            model_name='skillgroup',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='boundless_s_name_7fe673_gin'),
+            model_name="skillgroup",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="boundless_s_name_7fe673_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='skill',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='boundless_s_name_a7d57d_gin'),
+            model_name="skill",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="boundless_s_name_a7d57d_gin"
+            ),
         ),
         migrations.AddIndex(
-            model_name='localizedstringtext',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['text'], name='boundless_l_text_aa0532_gin'),
+            model_name="localizedstringtext",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["text"], name="boundless_l_text_aa0532_gin"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='itemmetalvariant',
-            unique_together={('item', 'metal')},
+            name="itemmetalvariant",
+            unique_together={("item", "metal")},
         ),
         migrations.AlterUniqueTogether(
-            name='itemcolorvariant',
-            unique_together={('item', 'color')},
+            name="itemcolorvariant",
+            unique_together={("item", "color")},
         ),
         migrations.AddIndex(
-            model_name='emojialtname',
-            index=django.contrib.postgres.indexes.GinIndex(fields=['name'], name='boundless_e_name_3fa367_gin'),
+            model_name="emojialtname",
+            index=django.contrib.postgres.indexes.GinIndex(
+                fields=["name"], name="boundless_e_name_3fa367_gin"
+            ),
         ),
         migrations.AlterUniqueTogether(
-            name='colorvalue',
-            unique_together={('color', 'color_type')},
+            name="colorvalue",
+            unique_together={("color", "color_type")},
         ),
         migrations.AlterUniqueTogether(
-            name='beaconscan',
-            unique_together={('time', 'beacon')},
+            name="beaconscan",
+            unique_together={("time", "beacon")},
         ),
         migrations.AlterUniqueTogether(
-            name='beaconplotcolumn',
-            unique_together={('beacon', 'plot_x', 'plot_z')},
+            name="beaconplotcolumn",
+            unique_together={("beacon", "plot_x", "plot_z")},
         ),
         migrations.AlterUniqueTogether(
-            name='beacon',
-            unique_together={('time', 'world', 'location_x', 'location_y', 'location_z')},
+            name="beacon",
+            unique_together={
+                ("time", "world", "location_x", "location_y", "location_z")
+            },
         ),
         migrations.RunSQL(
             sql='ALTER TABLE "boundless_beaconscan" DROP CONSTRAINT "boundless_beaconscan_pkey"',
-            reverse_sql='',
+            reverse_sql="",
         ),
         migrations.RunSQL(
             sql="SELECT create_hypertable('boundless_beaconscan', 'time', chunk_time_interval => 86400000000, migrate_data => true, create_default_indexes => false)",
-            reverse_sql='',
+            reverse_sql="",
         ),
     ]
