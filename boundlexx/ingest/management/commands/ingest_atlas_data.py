@@ -11,7 +11,7 @@ from subprocess import run
 import djclick as click
 import requests
 from django.core.files.base import ContentFile
-from PIL import Image, ImageDraw, ImageFilter
+from PIL import Image, ImageDraw, ImageFilter, ImageOps
 
 from boundlexx.api.tasks import purge_static_cache
 from boundlexx.boundless.models import (
@@ -109,6 +109,11 @@ def _draw_world_image(  # pylint: disable=too-many-locals
 
 def _process_image(world, root, name):
     atlas_image_file = os.path.join(root, name)
+
+    img = Image.open(atlas_image_file)
+    ImageOps.flip(img)
+    img.save(atlas_image_file)
+
     with open(atlas_image_file, "rb") as image_file:
         atlas_image = ContentFile(image_file.read())
         atlas_image.name = f"{world.id}.png"
