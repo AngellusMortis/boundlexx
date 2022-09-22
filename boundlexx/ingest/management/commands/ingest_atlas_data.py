@@ -111,7 +111,7 @@ def _process_image(world, root, name):
     atlas_image_file = os.path.join(root, name)
 
     img = Image.open(atlas_image_file)
-    ImageOps.flip(img)
+    img = ImageOps.flip(img)
     img.save(atlas_image_file)
 
     with open(atlas_image_file, "rb") as image_file:
