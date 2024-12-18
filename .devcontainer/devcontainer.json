@@ -16,48 +16,9 @@
     // The optional 'workspaceFolder' property is the path VS Code should open by default when
     // connected. This is typically a file mount in .devcontainer/docker-compose.yml
     "workspaceFolder": "/app",
-    // Set *default* container specific settings.json values on container create.
-    "settings": {
-        "editor.formatOnSave": true,
-        "editor.formatOnSaveTimeout": 3000,
-        "editor.insertSpaces": true,
-        "files.insertFinalNewline": true,
-        "files.trimTrailingWhitespace": true,
-        "python.analysis.openFilesOnly": false,
-        "python.envFile": "${workspaceFolder}/.local.env",
-        "python.defaultInterpreterPath": "/usr/local/bin/python",
-        "python.formatting.blackArgs": [
-            "--line-length",
-            "88"
-        ],
-        "python.formatting.provider": "black",
-        "python.linting.banditEnabled": true,
-        "python.linting.enabled": true,
-        "python.linting.flake8Enabled": true,
-        "python.linting.mypyEnabled": true,
-        "python.linting.pylintEnabled": true,
-        "python.linting.pylamaEnabled": false,
-        "python.sortImports.args": [
-            "--settings-path=${workspaceFolder}/setup.cfg"
-        ],
-        "python.testing.promptToConfigure": false,
-        "python.testing.pytestEnabled": true,
-        "restructuredtext.confPath": "${workspaceFolder}/docs",
-        "vscode-coverage-highlighter.defaultState": "disable",
-        "vscode-coverage-highlighter.wholeLine": true,
-    },
-    // Add the IDs of extensions you want installed when the container is created.
-    "extensions": [
-        "ms-python.python",
-        "eamodio.gitlens",
-        "brainfit.vscode-coverage-highlighter",
-        "bungcip.better-toml",
-        "mikestead.dotenv",
-        "lextudio.restructuredtext",
-    ],
     // Uncomment the next line if you want start specific services in your Docker Compose config.
     "runServices": [
-        "django",
+        "django"
     ],
     // Uncomment the next line if you want to keep your containers running after VS Code shuts down.
     // "shutdownAction": "none",
@@ -66,6 +27,49 @@
     // Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
     "remoteUser": "django",
     "forwardPorts": [
-        28000,
+        28000
     ],
+    // IDE specific configurations
+    "customizations": {
+        "vscode": {
+            "settings": {
+                "editor.formatOnSave": true,
+                "editor.formatOnSaveTimeout": 3000,
+                "editor.insertSpaces": true,
+                "files.insertFinalNewline": true,
+                "files.trimTrailingWhitespace": true,
+                "python.analysis.openFilesOnly": false,
+                "python.envFile": "${workspaceFolder}/.local.env",
+                "python.defaultInterpreterPath": "/usr/local/bin/python",
+                "python.formatting.blackArgs": [
+                    "--line-length",
+                    "88"
+                ],
+                "python.formatting.provider": "black",
+                "python.linting.banditEnabled": true,
+                "python.linting.enabled": true,
+                "python.linting.flake8Enabled": true,
+                "python.linting.mypyEnabled": true,
+                "python.linting.pylintEnabled": true,
+                "python.linting.pylamaEnabled": false,
+                "python.sortImports.args": [
+                    "--settings-path=${workspaceFolder}/setup.cfg"
+                ],
+                "python.testing.promptToConfigure": false,
+                "python.testing.pytestEnabled": true,
+                "restructuredtext.confPath": "${workspaceFolder}/docs",
+                "vscode-coverage-highlighter.defaultState": "disable",
+                "vscode-coverage-highlighter.wholeLine": true,
+            },
+            // Add the IDs of extensions you want installed when the container is created.
+            "extensions": [
+                "ms-python.python",
+                "eamodio.gitlens",
+                "brainfit.vscode-coverage-highlighter",
+                "bungcip.better-toml",
+                "mikestead.dotenv",
+                "lextudio.restructuredtext"
+            ]
+        }
+    }
 }

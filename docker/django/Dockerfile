@@ -1,5 +1,5 @@
 # base image used by other stages
-FROM python:3.9-slim-buster as base
+FROM python:3.9-slim-buster AS base
 
 ARG DJANGO_UID=1000
 
@@ -28,7 +28,7 @@ RUN chown -R django:django /app
 
 
 # production builder
-FROM base as builder
+FROM base AS builder
 
 ENV PYTHONDONTWRITEBYTECODE 1
 RUN apt-get update \
@@ -41,7 +41,7 @@ RUN pip install --no-cache-dir -r /requirements/production.txt
 
 
 # production stage
-FROM base as production
+FROM base AS production
 ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY --from=builder /usr/local/bin/ /usr/local/bin/
@@ -61,12 +61,12 @@ WORKDIR /app
 ENTRYPOINT ["/usr/local/bin/entrypoint"]
 
 # dev builder
-FROM builder as builder-dev
+FROM builder AS builder-dev
 RUN pip install --no-cache-dir -r /requirements/dev.txt
 
 
 # dev stage
-FROM base as dev
+FROM base AS dev
 ENV PYTHONDONTWRITEBYTECODE 1
 
 COPY --from=builder-dev /usr/local/bin/ /usr/local/bin/
