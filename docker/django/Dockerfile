@@ -51,7 +51,6 @@ COPY --chown=django:django ./manage.py /app/manage.py
 COPY --chown=django:django ./locale /app/locale
 COPY --chown=django:django ./config /app/config
 COPY --chown=django:django ./boundlexx /app/boundlexx
-COPY --chown=django:django ./boundlexx_client/client.py /app/boundlexx/boundless/game/client.py
 
 RUN chmod +x /usr/local/bin/start \
   && rm /requirements -rf
