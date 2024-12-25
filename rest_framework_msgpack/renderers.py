@@ -1,9 +1,9 @@
-import msgpack
-import decimal
 import datetime
-
-from rest_framework.renderers import BaseRenderer
+import decimal
 from collections.abc import Iterable, Mapping
+
+import msgpack
+from rest_framework.renderers import BaseRenderer
 
 
 class MessagePackEncoder(object):
@@ -36,12 +36,8 @@ class MessagePackRenderer(BaseRenderer):
             data = list(data)
 
         for index, value in enumerate(data):
-            if isinstance(value, (Mapping, Iterable)) and not isinstance(
-                value, str
-            ):
-                value, data_map = self._create_mapped_data(
-                    value, data_map=data_map
-                )
+            if isinstance(value, (Mapping, Iterable)) and not isinstance(value, str):
+                value, data_map = self._create_mapped_data(value, data_map=data_map)
             data[index] = value
 
         return data, data_map
@@ -49,12 +45,8 @@ class MessagePackRenderer(BaseRenderer):
     def _iterate_dict(self, data, data_map):
         new_data = {}
         for key, value in data.items():
-            if isinstance(value, (Mapping, Iterable)) and not isinstance(
-                value, str
-            ):
-                value, data_map = self._create_mapped_data(
-                    value, data_map=data_map
-                )
+            if isinstance(value, (Mapping, Iterable)) and not isinstance(value, str):
+                value, data_map = self._create_mapped_data(value, data_map=data_map)
 
             try:
                 new_key = data_map.index(key)
@@ -84,6 +76,4 @@ class MessagePackRenderer(BaseRenderer):
             return ""
 
         root, data_map = self._create_mapped_data(data)
-        return msgpack.packb(
-            [root, data_map], default=MessagePackEncoder().encode
-        )
+        return msgpack.packb([root, data_map], default=MessagePackEncoder().encode)

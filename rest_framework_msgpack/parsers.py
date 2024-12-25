@@ -1,32 +1,30 @@
 import decimal
+
 import msgpack
 from dateutil.parser import parse
+from rest_framework.exceptions import ParseError
+from rest_framework.parsers import BaseParser
 from six import text_type
 
 
-from rest_framework.parsers import BaseParser
-from rest_framework.exceptions import ParseError
-
-
 class MessagePackDecoder(object):
-
     def decode(self, obj):
-        if '__class__' in obj:
-            decode_func = getattr(self, 'decode_%s' % obj['__class__'])
+        if "__class__" in obj:
+            decode_func = getattr(self, "decode_%s" % obj["__class__"])
             return decode_func(obj)
         return obj
 
     def decode_datetime(self, obj):
-        return parse(obj['as_str'])
+        return parse(obj["as_str"])
 
     def decode_date(self, obj):
-        return parse(obj['as_str']).date()
+        return parse(obj["as_str"]).date()
 
     def decode_time(self, obj):
-        return parse(obj['as_str']).time()
+        return parse(obj["as_str"]).time()
 
     def decode_decimal(self, obj):
-        return decimal.Decimal(obj['as_str'])
+        return decimal.Decimal(obj["as_str"])
 
 
 class MessagePackParser(BaseParser):
@@ -34,7 +32,7 @@ class MessagePackParser(BaseParser):
     Parses MessagePack-serialized data.
     """
 
-    media_type = 'application/msgpack'
+    media_type = "application/msgpack"
 
     def _clean_msgpack_value(self, value, lookup):
         if isinstance(value, (dict, list)):
@@ -43,7 +41,6 @@ class MessagePackParser(BaseParser):
             value = value.replace("\u0000", "")
 
         return value
-
 
     def _map_msgpack(self, unmapped, lookup):
         mapped: Optional[Union[list, dict]] = None
@@ -63,7 +60,6 @@ class MessagePackParser(BaseParser):
 
         return mapped
 
-
     def parse(self, stream, media_type=None, parser_context=None):
         try:
             root, lookup = msgpack.load(
@@ -71,4 +67,4 @@ class MessagePackParser(BaseParser):
             )
             return self._map_msgpack(root, lookup)
         except Exception as exc:
-            raise ParseError('MessagePack parse error - %s' % text_type(exc))
+            raise ParseError("MessagePack parse error - %s" % text_type(exc))
