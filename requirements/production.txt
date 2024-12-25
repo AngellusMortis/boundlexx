@@ -107,7 +107,6 @@ django==3.2.15
     #   django-rest-fuzzysearch
     #   django-storages
     #   djangorestframework
-    #   djangorestframework-msgpack
 django-celery-beat==2.3.0
     # via -r /app/requirements/in/base.in
 django-celery-results==2.4.0
@@ -146,10 +145,7 @@ djangorestframework==3.13.1
     # via
     #   -r /app/requirements/in/base.in
     #   django-rest-fuzzysearch
-    #   djangorestframework-msgpack
     #   drf-extensions
-djangorestframework-msgpack @ git+https://github.com/AngellusMortis/django-rest-framework-msgpack.git
-    # via -r /app/requirements/in/base.in
 drf-extensions==0.7.1
     # via -r /app/requirements/in/base.in
 et-xmlfile==1.1.0
@@ -208,7 +204,6 @@ msal-extensions==1.0.0
 msgpack==1.0.4
     # via
     #   -r /app/requirements/in/base.in
-    #   djangorestframework-msgpack
 msrest==0.7.1
     # via azure-mgmt-cdn
 numpy==1.23.3
@@ -261,7 +256,6 @@ python-dateutil==2.8.2
     # via
     #   azure-storage-common
     #   dateparser
-    #   djangorestframework-msgpack
     #   python-crontab
 python-redis-lock[django]==3.7.0
     # via -r /app/requirements/in/base.in
