@@ -48,16 +48,16 @@ jobs:
           docker pull ghcr.io/angellusmortis/boundlexx_dev_django || true
 
       - name: Build CI Images
-        run: docker-compose build postgres test lint
+        run: docker compose build postgres test lint
 
       - name: Push Django Image Cache
         run: docker tag boundlexx_dev_django ghcr.io/angellusmortis/boundlexx_dev_django && docker push ghcr.io/angellusmortis/boundlexx_dev_django || true
 
       - name: Run Linters
-        run: docker-compose run --rm lint
+        run: docker compose run --rm lint
 
       - name: Run Tests
-        run: docker-compose run --rm test
+        run: docker compose run --rm test
 
   # Push image to GitHub Packages.
   # See also https://docs.docker.com/docker-hub/builds/
