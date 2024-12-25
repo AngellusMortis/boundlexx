@@ -16,6 +16,10 @@ on:
 env:
   DOCKER_BUILDKIT: 1
 
+permissions:
+  contents: read
+  packages: write
+
 jobs:
   # Run tests.
   # See also https://docs.docker.com/docker-hub/builds/automated-testing/
@@ -25,13 +29,17 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Fix permissions
         run: sudo chown -R 1000:1000 $GITHUB_WORKSPACE
 
-      - name: Log into Registry
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u AngellusMortis --password-stdin
+      - name: 🔒 Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull Cached Images
         run: |
@@ -64,15 +72,12 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
 
-      - name: Checkout Client Repository
-        uses: actions/checkout@v2
+      - name: 🔒 Login to GitHub Container Registry
+        uses: docker/login-action@v3
         with:
-          repository: "AngellusMortis/boundlexx_client"
-          token: "${{ secrets.GHCR_PAT }}"
-          path: boundlexx_client
-
-      - name: Log into Registry
-        run: echo "${{ secrets.GHCR_PAT }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Pull Cached Images
         run: |
