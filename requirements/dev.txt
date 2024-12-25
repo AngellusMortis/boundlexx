@@ -605,7 +605,7 @@ wcwidth==0.2.5
     # via prompt-toolkit
 werkzeug==2.2.2
     # via -r /app/requirements/in/dev.in
-wheel==0.37.1
+wheel==0.38.1
     # via pip-tools
 wrapt==1.14.1
     # via
