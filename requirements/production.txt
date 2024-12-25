@@ -185,7 +185,7 @@ idna==3.4
     #   anyio
     #   requests
     #   rfc3986
-ipython==8.5.0
+ipython==8.10.0
     # via -r /app/requirements/in/base.in
 isodate==0.6.1
     # via msrest

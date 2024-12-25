@@ -270,7 +270,7 @@ iniconfig==1.1.1
     # via pytest
 ipdb==0.13.9
     # via -r /app/requirements/in/dev.in
-ipython==8.5.0
+ipython==8.10.0
     # via
     #   -r /app/requirements/in/base.in
     #   ipdb
