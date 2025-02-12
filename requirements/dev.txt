@@ -73,7 +73,7 @@ celery==5.2.7
     #   -r /app/requirements/in/base.in
     #   django-celery-beat
     #   django-celery-results
-certifi==2022.9.14
+certifi==2024.7.4
     # via
     #   httpcore
     #   httpx
