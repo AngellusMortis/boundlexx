@@ -164,7 +164,7 @@ gevent-eventemitter==2.1
     # via steam
 greenlet==1.1.3
     # via gevent
-h11==0.12.0
+h11==0.16.0
     # via httpcore
 h2==4.1.0
     # via httpx
