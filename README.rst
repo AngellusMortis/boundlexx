@@ -2,7 +2,7 @@ Boundlexx
 =========
 
 .. tip::
-> **Achieved to prevent notifications about outdated packages. Message me on Boundless forums if you want to contribute.**
+    **Achieved to prevent notifications about outdated packages. Message me on Boundless forums if you want to contribute.**
 
 .. image:: https://img.shields.io/badge/built%20with-Cookiecutter%20Django-ff69b4.svg
      :target: https://github.com/pydanny/cookiecutter-django/
